@@ -2847,14 +2847,16 @@ DM32UVCodeplug::GeneralSettingsElement::setDMRRemoteMonitorDuration(Interval dur
 }
 
 
-DM32UVCodeplug::GeneralSettingsElement::TalkerAliasFormat
-DM32UVCodeplug::GeneralSettingsElement::talkerAliasFormat() const {
-  return getBit(Offset::dmrTalkerAliasFormat()) ? TalkerAliasFormat::UnicodeU16 : TalkerAliasFormat::ISO8;
+DMRSettings::TalkerAliasEncoding
+DM32UVCodeplug::GeneralSettingsElement::talkerAliasEncoding() const {
+  return getBit(Offset::dmrTalkerAliasFormat())
+           ? DMRSettings::TalkerAliasEncoding::Unicode
+           : DMRSettings::TalkerAliasEncoding::Iso8;
 }
 
 void
-DM32UVCodeplug::GeneralSettingsElement::setTalkerAliasFormat(TalkerAliasFormat format) {
-  setBit(Offset::dmrTalkerAliasFormat(), TalkerAliasFormat::UnicodeU16 == format);
+DM32UVCodeplug::GeneralSettingsElement::setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding format) {
+  setBit(Offset::dmrTalkerAliasFormat(), DMRSettings::TalkerAliasEncoding::Unicode == format);
 }
 
 
@@ -3264,6 +3266,13 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
 
   ctx.config()->settings()->gnss()->setSystems(gnss());
 
+  ctx.config()->settings()->dmr()->enablePrivateCallMatch(privateCallMatchEnabled());
+  ctx.config()->settings()->dmr()->enableGroupCallMatch(groupCallMatchEnabled());
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(dmrCallHangTime());
+  ctx.config()->settings()->dmr()->enableSendTalkerAlias(txTalkerAliasEnabled());
+  ctx.config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
+  ctx.config()->settings()->dmr()->setPreamble(dmrPreambleDuration());
+
   return true;
 }
 
@@ -3288,6 +3297,13 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
     setSMSFormat(ctx.config()->smsExtension()->format());
 
   setGNSS(ctx.config()->settings()->gnss()->systems());
+
+  enablePrivateCallMatch(ctx.config()->settings()->dmr()->privateCallMatchEnabled());
+  enableGroupCallMatch(ctx.config()->settings()->dmr()->groupCallMatchEnabled());
+  setDMRCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
+  enableTXTalkerAlias(ctx.config()->settings()->dmr()->sendTalkerAliasEnabled());
+  setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
+  setDmrPreambleDuration(ctx.config()->settings()->dmr()->preamble());
 
   return true;
 }

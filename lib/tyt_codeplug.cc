@@ -15,7 +15,6 @@
 #include <QChar>
 
 #define SETTINGS_SIZE     0x000090
-#define CONTACT_SIZE      0x000024
 #define MENUSETTINGS_SIZE 0x000010
 
 
@@ -679,7 +678,7 @@ TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr, size_t size)
 }
 
 TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, CONTACT_SIZE)
+  : Codeplug::Element(ptr, size())
 {
   // pass...
 }
@@ -690,44 +689,44 @@ TyTCodeplug::ContactElement::~ContactElement() {
 
 bool
 TyTCodeplug::ContactElement::isValid() const {
-  return Element::isValid() && (0 != getUInt2(3, 0))
-      && (0x0000 != getUInt16_be(4)) && (0xffff != getUInt16_be(4));
+  return Element::isValid() && (0 != getUInt2(Offset::callType()))
+      && (0x0000 != getUInt16_be(Offset::name())) && (0xffff != getUInt16_be(Offset::name()));
 }
 
 void
 TyTCodeplug::ContactElement::clear() {
   memset(_data, 0xff, 3); // clear DMR ID
-  setUInt2(3, 0, 0);      // type=0
-  setBit(3,2, 0); setBit(3,3, 0); setBit(3,4, 0); // unused = 0
+  setUInt2(Offset::callType(), 0);      // type=0
+  setBit({3,2}, 0); setBit({3,3}, 0); setBit({3,4}, 0); // unused = 0
   enableRingTone(false);
-  setBit(3,6, 1); setBit(3,7, 1); // unknown = 1
-  memset(_data+0x04, 0x00, 2*16);
+  setBit({3,6}, 1); setBit({3,7}, 1); // unknown = 1
+  memset(_data+Offset::name(), 0x00, 2*Limit::nameLength());
 }
 
 uint32_t
 TyTCodeplug::ContactElement::dmrId() const {
-  return getUInt24_le(0);
+  return getUInt24_le(Offset::dmrId());
 }
 
 void
 TyTCodeplug::ContactElement::setDMRId(uint32_t id) {
-  setUInt24_le(0, id);
+  setUInt24_le(Offset::dmrId(), id);
 }
 
 bool
 TyTCodeplug::ContactElement::ringTone() const {
-  return getBit(3, 5);
+  return getBit(Offset::ringTone());
 }
 void
 TyTCodeplug::ContactElement::enableRingTone(bool enable) {
-  setBit(3, 5, enable);
+  setBit(Offset::ringTone(), enable);
 }
 
 DMRContact::Type TyTCodeplug::ContactElement::callType() const {
-  switch(getUInt2(3,0)) {
-  case 1: return DMRContact::GroupCall;
-  case 2: return DMRContact::PrivateCall;
-  case 3: return DMRContact::AllCall;
+  switch((CallType)getUInt2(Offset::callType())) {
+  case CallType::GroupCall: return DMRContact::GroupCall;
+  case CallType::PrivateCall: return DMRContact::PrivateCall;
+  case CallType::AllCall: return DMRContact::AllCall;
   default:
     break;
   }
@@ -736,19 +735,25 @@ DMRContact::Type TyTCodeplug::ContactElement::callType() const {
 void
 TyTCodeplug::ContactElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DMRContact::GroupCall:   setUInt2(3,0, 1); break;
-  case DMRContact::PrivateCall: setUInt2(3,0, 2); break;
-  case DMRContact::AllCall:     setUInt2(3,0, 3); break;
+  case DMRContact::GroupCall:
+    setUInt2(Offset::callType(), (unsigned int)CallType::GroupCall);
+    break;
+  case DMRContact::PrivateCall:
+    setUInt2(Offset::callType(), (unsigned int)CallType::PrivateCall);
+    break;
+  case DMRContact::AllCall:
+    setUInt2(Offset::callType(), (unsigned int)CallType::AllCall);
+    break;
   }
 }
 
 QString
 TyTCodeplug::ContactElement::name() const {
-  return readUnicode(4, 16, 0x0000);
+  return readUnicode(Offset::name(), Limit::nameLength(), 0x0000);
 }
 void
 TyTCodeplug::ContactElement::setName(const QString &nm) {
-  writeUnicode(4, nm, 16, 0x0000);
+  writeUnicode(Offset::name(), nm, Limit::nameLength(), 0x0000);
 }
 
 DMRContact *
@@ -1228,9 +1233,9 @@ TyTCodeplug::GeneralSettingsElement::clear() {
 
   setDMRId(0); setUInt8(0x47,0);
 
-  setTXPreambleDuration(600);
-  setGroupCallHangTime(3000);
-  setPrivateCallHangTime(4000);
+  setTXPreambleDuration(Interval::fromMilliseconds(600));
+  setGroupCallHangTime(Interval::fromMilliseconds(3000));
+  setPrivateCallHangTime(Interval::fromMilliseconds(4000));
   setVOXSesitivity(Level::fromValue(3));
   setUInt8(0x4c, 0x00); setUInt8(0x4d, 0x00);
   setLowBatteryInterval(120);
@@ -1372,34 +1377,34 @@ TyTCodeplug::GeneralSettingsElement::setDMRId(uint32_t id) {
   setUInt24_le(0x44, id);
 }
 
-unsigned
+Interval
 TyTCodeplug::GeneralSettingsElement::txPreambleDuration() const {
-  return unsigned(getUInt8(0x48))*60;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x48))*60);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setTXPreambleDuration(unsigned dur) {
-  dur = std::min(8640U, dur);
-  setUInt8(0x48, dur/60);
+TyTCodeplug::GeneralSettingsElement::setTXPreambleDuration(const Interval &dur) {
+  auto ms = std::min(8640ULL, dur.milliseconds());
+  setUInt8(0x48, ms/60);
 }
 
-unsigned
+Interval
 TyTCodeplug::GeneralSettingsElement::groupCallHangTime() const {
-  return unsigned(getUInt8(0x49))*100;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x49))*100);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setGroupCallHangTime(unsigned dur) {
-  dur = std::min(7000U, dur);
-  setUInt8(0x49, dur/100);
+TyTCodeplug::GeneralSettingsElement::setGroupCallHangTime(const Interval &dur) {
+  auto ms = std::min(7000ULL, dur.milliseconds());
+  setUInt8(0x49, ms/100);
 }
 
-unsigned
+Interval
 TyTCodeplug::GeneralSettingsElement::privateCallHangTime() const {
-  return unsigned(getUInt8(0x4a))*100;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x4a))*100);
 }
 void
-TyTCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned dur) {
-  dur = std::min(7000U, dur);
-  setUInt8(0x4a, dur/100);
+TyTCodeplug::GeneralSettingsElement::setPrivateCallHangTime(const Interval &dur) {
+  auto ms = std::min(7000ULL, dur.milliseconds());
+  setUInt8(0x4a, ms/100);
 }
 
 Level
@@ -1576,6 +1581,10 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   setIntroLine2(config->settings()->introLine2());
   setVOXSesitivity(config->settings()->vox());
 
+  setPrivateCallHangTime(config->settings()->dmr()->privateCallHangTime());
+  setGroupCallHangTime(config->settings()->dmr()->groupCallHangTime());
+  setTXPreambleDuration(config->settings()->dmr()->preamble());
+
   if (TyTSettingsExtension *ex = config->settings()->tytExtension()) {
     setMonitorType(ex->monitorType());
     disableAllLEDs(ex->allLEDsDisabled());
@@ -1587,9 +1596,6 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
     setSaveModeRX(ex->powerSaveMode());
     setSavePreamble(ex->wakeupPreamble());
     enableIntroPicture(ex->bootPicture());
-    setTXPreambleDuration(ex->txPreambleDuration());
-    setGroupCallHangTime(ex->groupCallHangTime());
-    setPrivateCallHangTime(ex->privateCallHangTime());
     setLowBatteryInterval(ex->lowBatteryWarnInterval());
     if (ex->callAlertToneContinuous())
       setCallAlertToneContinuous();
@@ -1635,6 +1641,10 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   config->settings()->setIntroLine2(introLine2());
   config->settings()->setVOX(voxSesitivity());
 
+  config->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
+  config->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
+  config->settings()->dmr()->setPreamble(txPreambleDuration());
+
   // apply extension
   TyTSettingsExtension *ex = new TyTSettingsExtension();
   config->settings()->setTyTExtension(ex);
@@ -1649,9 +1659,6 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   ex->enablePowerSaveMode(saveModeRX());
   ex->enableWakeupPreamble(savePreamble());
   ex->enableBootPicture(introPicture());
-  ex->setTXPreambleDuration(txPreambleDuration());
-  ex->setGroupCallHangTime(groupCallHangTime());
-  ex->setPrivateCallHangTime(privateCallHangTime());
   ex->setLowBatteryWarnInterval(lowBatteryInterval());
   ex->enableCallAlertToneContinuous(callAlertToneIsContinuous());
   if (! callAlertToneIsContinuous())

@@ -315,6 +315,12 @@ public:
   class ContactElement: public Codeplug::Element
   {
   protected:
+    /** Encoded call types. */
+    enum class CallType {
+      GroupCall=1, PrivateCall=2, AllCall=3
+    };
+
+  protected:
     /** Constructor. */
     ContactElement(uint8_t *ptr, size_t size);
 
@@ -324,6 +330,8 @@ public:
     /** Destructor. */
     virtual ~ContactElement();
 
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x000024; }
     void clear();
     bool isValid() const;
 
@@ -351,6 +359,24 @@ public:
     virtual bool fromContactObj(const DMRContact *contact);
     /** Creates a contact. */
     virtual DMRContact *toContactObj() const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /** Maximum name length. */
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int dmrId() { return 0x0000; }
+      static constexpr Bit callType()       { return {0x0003, 0}; }
+      static constexpr Bit ringTone()       { return {0x0003, 5}; }
+      static constexpr unsigned int name()  { return 0x0004; }
+      /// @endcond DO_NOT_DOCUMENT
+    };
   };
 
   /** Represents a zone within the codeplug.
@@ -568,17 +594,17 @@ public:
     virtual void setDMRId(uint32_t id);
 
     /** Returns the TX preamble duration. */
-    virtual unsigned txPreambleDuration() const;
+    virtual Interval txPreambleDuration () const;
     /** Sets the TX preamble duration. */
-    virtual void setTXPreambleDuration(unsigned ms);
+    virtual void setTXPreambleDuration(const Interval &ms);
     /** Returns the group call hang time. */
-    virtual unsigned groupCallHangTime() const;
+    virtual Interval groupCallHangTime() const;
     /** Sets the group call hang time. */
-    virtual void setGroupCallHangTime(unsigned ms);
+    virtual void setGroupCallHangTime(const Interval &ms);
     /** Returns the private call hang time. */
-    virtual unsigned privateCallHangTime() const;
+    virtual Interval privateCallHangTime() const;
     /** Sets the private call hang time. */
-    virtual void setPrivateCallHangTime(unsigned ms);
+    virtual void setPrivateCallHangTime(const Interval &ms);
     /** Returns the VOX sensitivity. */
     virtual Level voxSesitivity() const;
     /** Sets the group call hang time. */

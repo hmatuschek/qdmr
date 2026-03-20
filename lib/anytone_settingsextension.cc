@@ -7,15 +7,11 @@
  * Implementation of AnytoneDMRSettingsExtension
  * ********************************************************************************************* */
 AnytoneDMRSettingsExtension::AnytoneDMRSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _groupCallHangTime(Interval::fromSeconds(3)),
-    _manualGroupCallHangTime(Interval::fromSeconds(5)),
-    _privateCallHangTime(Interval::fromSeconds(5)),
+  : ConfigItem(parent), _manualGroupCallHangTime(Interval::fromSeconds(5)),
     _manualPrivateCallHangTime(Interval::fromSeconds(7)),
-    _preWaveDelay(Interval::fromMilliseconds(100)),
     _wakeHeadPeriod(Interval::fromMilliseconds(100)), _filterOwnID(true),
     _monitorSlotMatch(SlotMatch::Off), _monitorColorCodeMatch(false), _monitorIDMatch(false),
-    _monitorTimeSlotHold(true), _smsFormat(SMSFormat::Motorola), _sendTalkerAlias(false),
-    _talkerAliasSource(TalkerAliasSource::UserDB), _talkerAliasEncoding(TalkerAliasEncoding::ISO7),
+    _monitorTimeSlotHold(true), _talkerAliasSource(TalkerAliasSource::UserDB),
     _encryption(EncryptionType::DMR)
 {
   // pass...
@@ -31,17 +27,6 @@ AnytoneDMRSettingsExtension::clone() const {
   return ext;
 }
 
-Interval
-AnytoneDMRSettingsExtension::groupCallHangTime() const {
-  return _groupCallHangTime;
-}
-void
-AnytoneDMRSettingsExtension::setGroupCallHangTime(Interval sec) {
-  if (_groupCallHangTime == sec)
-    return;
-  _groupCallHangTime = sec;
-  emit modified(this);
-}
 
 Interval
 AnytoneDMRSettingsExtension::manualGroupCallHangTime() const {
@@ -55,17 +40,6 @@ AnytoneDMRSettingsExtension::setManualGroupCallHangTime(Interval sec) {
   emit modified(this);
 }
 
-Interval
-AnytoneDMRSettingsExtension::privateCallHangTime() const {
-  return _privateCallHangTime;
-}
-void
-AnytoneDMRSettingsExtension::setPrivateCallHangTime(Interval sec) {
-  if (_privateCallHangTime == sec)
-    return;
-  _privateCallHangTime = sec;
-  emit modified(this);
-}
 
 Interval
 AnytoneDMRSettingsExtension::manualPrivateCallHangTime() const {
@@ -79,17 +53,6 @@ AnytoneDMRSettingsExtension::setManualPrivateCallHangTime(Interval sec) {
   emit modified(this);
 }
 
-Interval
-AnytoneDMRSettingsExtension::preWaveDelay() const {
-  return _preWaveDelay;
-}
-void
-AnytoneDMRSettingsExtension::setPreWaveDelay(Interval ms) {
-  if (_preWaveDelay == ms)
-    return;
-  _preWaveDelay = ms;
-  emit modified(this);
-}
 
 Interval
 AnytoneDMRSettingsExtension::wakeHeadPeriod() const {
@@ -163,29 +126,6 @@ AnytoneDMRSettingsExtension::enableMonitorTimeSlotHold(bool enable) {
   emit modified(this);
 }
 
-AnytoneDMRSettingsExtension::SMSFormat
-AnytoneDMRSettingsExtension::smsFormat() const {
-  return _smsFormat;
-}
-void
-AnytoneDMRSettingsExtension::setSMSFormat(SMSFormat format) {
-  if (_smsFormat == format)
-    return;
-  _smsFormat = format;
-  emit modified(this);
-}
-
-bool
-AnytoneDMRSettingsExtension::sendTalkerAlias() const {
-  return _sendTalkerAlias;
-}
-void
-AnytoneDMRSettingsExtension::enableSendTalkerAlias(bool enable) {
-  if (_sendTalkerAlias == enable)
-    return;
-  _sendTalkerAlias = enable;
-  emit modified(this);
-}
 
 AnytoneDMRSettingsExtension::TalkerAliasSource
 AnytoneDMRSettingsExtension::talkerAliasSource() const {
@@ -199,17 +139,6 @@ AnytoneDMRSettingsExtension::setTalkerAliasSource(TalkerAliasSource mode) {
   emit modified(this);
 }
 
-AnytoneDMRSettingsExtension::TalkerAliasEncoding
-AnytoneDMRSettingsExtension::talkerAliasEncoding() const {
-  return _talkerAliasEncoding;
-}
-void
-AnytoneDMRSettingsExtension::setTalkerAliasEncoding(TalkerAliasEncoding encoding) {
-  if (_talkerAliasEncoding == encoding)
-    return;
-  _talkerAliasEncoding = encoding;
-  emit modified(this);
-}
 
 AnytoneDMRSettingsExtension::EncryptionType
 AnytoneDMRSettingsExtension::encryption() const {

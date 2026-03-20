@@ -245,6 +245,12 @@ public:
       kHz25 = 7, kHz30 = 8, kHz50=9
     };
 
+    /** Possible SMS formats. */
+    enum class SMSFormat {
+      Motorola = 0, Hytera = 1, DMR = 2
+    };
+
+
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
@@ -572,9 +578,9 @@ public:
     void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
-    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    virtual SMSExtension::Format smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+    virtual void setSMSFormat(SMSExtension::Format fmt);
 
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const override;
     void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) override;
@@ -936,6 +942,11 @@ public:
       Any = 0, RX1_TX2 = 1, RX2_TX1 = 2
     };
 
+    /** Talker alias encoding. */
+    enum class TalkerAliasEncoding {
+      ISO8 = 0, ISO7 = 1, Unicode = 2,
+    };
+
   protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
@@ -956,9 +967,9 @@ public:
     virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
     /** Returns the talker alias encoding. */
-    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    virtual DMRSettings::TalkerAliasEncoding talkerAliasEncoding() const;
     /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    virtual void setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding encoding);
 
     /** Returns @c true if the weather alarm is enabled. */
     virtual bool weatherAlarmEnabled() const;
