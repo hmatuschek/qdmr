@@ -156,9 +156,9 @@ public:
       static constexpr Bit roaming()                       { return {0x0034, 6}; }
       static constexpr unsigned int fmScrambler()          { return 0x003a; }
       static constexpr unsigned int customScrambler()      { return 0x003b; }
-      static constexpr Bit multipleKeyEncryption()         { return {0x003b, 0}; }
-      static constexpr Bit randomKey()                     { return {0x003b, 1}; }
-      static constexpr Bit sms()                           { return {0x003b, 2}; }
+      static constexpr Bit multipleKeyEncryption()         { return {0x003d, 0}; }
+      static constexpr Bit randomKey()                     { return {0x003d, 1}; }
+      static constexpr Bit sms()                           { return {0x003d, 2}; }
       static constexpr Bit dataACK()                       { return {0x003d, 3}; }
       static constexpr Bit autoScan()                      { return {0x003d, 4}; }
       static constexpr Bit talkerAlias()                   { return {0x003d, 5}; }
@@ -743,6 +743,12 @@ public:
     bool fromConfig(const Flags &flags, Context &ctx) override;
     bool updateConfig(Context &ctx) override;
     bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) override;
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: D878UVCodeplug::GeneralSettingsElement::Limit {
+      // pass...
+    };
 
   protected:
     /** Some internal offsets. */

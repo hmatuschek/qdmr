@@ -23,7 +23,7 @@ private slots:
   void testRegressionSMSTemplateOffset();
   void testRegressionSMSCount();
   void testRegressionDefaultChannel();
-
+  void testChannelDataACK(); ///< Regression test for #813
 };
 
 #endif // D878UV2TEST_HH

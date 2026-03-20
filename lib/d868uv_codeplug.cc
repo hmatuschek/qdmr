@@ -782,7 +782,7 @@ D868UVCodeplug::GeneralSettingsElement::enableGetGPSPosition(bool enable) {
 
 bool
 D868UVCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
-  return getUInt8(Offset::volumeChangePrompt());
+  return 0x01 == getUInt8(Offset::volumeChangePrompt());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {

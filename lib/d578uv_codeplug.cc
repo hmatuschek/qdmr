@@ -117,13 +117,13 @@ D578UVCodeplug::ChannelElement::enableSMS(bool enable) {
 bool
 D578UVCodeplug::ChannelElement::dataACK() const {
   // inverted!
-  return !getBit(0x003d,3);
+  return !getBit(Offset::dataACK());
 }
 
 void
 D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted!
-  setBit(0x003d, 3, !enable);
+  setBit(Offset::dataACK(), !enable);
 }
 
 
@@ -967,7 +967,7 @@ D578UVCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
 }
 void
 D578UVCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
-  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x01));
+  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x00));
 }
 
 AnytoneAutoRepeaterSettingsExtension::Direction
@@ -1812,8 +1812,8 @@ D578UVCodeplug::GeneralSettingsElement::repeaterCheckNumNotifications() const {
 }
 void
 D578UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigned int n) {
-  n = std::max(1U, std::min(10U, n));
-  setUInt8(Offset::repCheckNumNotify(), n);
+  n = Limit::repeaterOORNotificationCount().limit(n);
+  setUInt8(Offset::repCheckNumNotify(), n-1);
 }
 
 

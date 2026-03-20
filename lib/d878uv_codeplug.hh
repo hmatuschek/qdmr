@@ -232,7 +232,7 @@ public:
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int pttIDSetting()         { return 0x0019; }
       static constexpr unsigned int aesKeyIndex()          { return 0x0022; }
-      static constexpr Bit roaming()                       { return {0x034,  2}; }
+      static constexpr Bit roaming()                       { return {0x0034, 2}; }
       static constexpr Bit dataACK()                       { return {0x0034, 3}; }
       static constexpr Bit autoScan()                      { return {0x0034, 4}; }
       static constexpr unsigned int fmAPRSPTTSetting()     { return 0x0036; }
@@ -804,6 +804,13 @@ public:
     bool fromConfig(const Flags &flags, Context &ctx) override;
     bool updateConfig(Context &ctx) override;
     bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) override;
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: D868UVCodeplug::GeneralSettingsElement::Limit {
+      // Valid repeater-out-of-range notification counts.
+      static constexpr Range<unsigned int> repeaterOORNotificationCount() { return {1, 10}; }
+    };
 
   protected:
     /** Some internal used offsets within the element. */
