@@ -990,9 +990,9 @@ public:
     virtual void setRadioID(unsigned id);
 
     /** Returns the preamble duration in ms. */
-    virtual unsigned preambleDuration() const;
+    virtual Interval preambleDuration() const;
     /** Sets the preamble duration in ms. */
-    virtual void setPreambleDuration(unsigned ms);
+    virtual void setPreambleDuration(const Interval &dur);
 
     /** Returns the monitor type. */
     virtual MonitorType monitorType() const;
@@ -1024,13 +1024,13 @@ public:
     virtual void setLoneWorkerReminderPeriod(unsigned sec);
 
     /** Returns the group call hang time in ms. */
-    virtual unsigned groupCallHangTime() const;
+    virtual Interval groupCallHangTime() const;
     /** Sets the group call hang time in ms. */
-    virtual void setGroupCallHangTime(unsigned ms);
+    virtual void setGroupCallHangTime(const Interval &dur);
     /** Returns the private call hang time in ms. */
-    virtual unsigned privateCallHangTime() const;
+    virtual Interval privateCallHangTime() const;
     /** Sets the private call hang time in ms. */
-    virtual void setPrivateCallHangTime(unsigned ms);
+    virtual void setPrivateCallHangTime(const Interval &dur);
 
     /** Returns @c true if the down-channel mode is VFO. */
     virtual bool downChannelModeVFO() const;

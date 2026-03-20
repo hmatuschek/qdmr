@@ -722,13 +722,8 @@ bool
 GD73Codeplug::DMRSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  if (nullptr == ctx.config()->settings()->radioddityExtension()) {
-    ctx.config()->settings()->setRadioddityExtension(new RadiodditySettingsExtension());
-  }
-  auto ext = ctx.config()->settings()->radioddityExtension();
-
-  ext->setPrivateCallHangTime(callHangTime());
-  ext->setGroupCallHangTime(callHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(callHangTime());
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(callHangTime());
 
   return true;
 }
@@ -737,11 +732,8 @@ bool
 GD73Codeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  if (nullptr == ctx.config()->settings()->radioddityExtension())
-    return true;
-  auto ext = ctx.config()->settings()->radioddityExtension();
-
-  setCallHangTime(std::max(ext->privateCallHangTime(), ext->groupCallHangTime()));
+  setCallHangTime(std::max(ctx.config()->settings()->dmr()->privateCallHangTime(),
+                           ctx.config()->settings()->dmr()->groupCallHangTime()));
 
   return true;
 }

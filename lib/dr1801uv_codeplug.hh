@@ -2129,9 +2129,9 @@ public:
     static constexpr unsigned int size() { return 0x0010; }
 
     /** Returns the hold-time in seconds. */
-    virtual unsigned int holdTime() const;
+    virtual Interval callHangTime() const;
     /** Sets the hold-time in seconds. */
-    virtual void setHoldTime(unsigned int sec);
+    virtual void setCallHangTime(const Interval &dur);
 
     /** Returns the remote-listen duration in seconds. */
     virtual unsigned int remoteListen() const;
@@ -2218,7 +2218,8 @@ public:
     /** Some limits. */
     struct Limit: public Element::Limit {
       /** The range of hold time. */
-      static constexpr Range<unsigned int> holdTime() { return {1, 90}; }
+      static constexpr Range<Interval> holdTime() {
+        return {Interval::fromSeconds(1), Interval::fromSeconds(90)}; }
       /** The range of remote listen duration. */
       static constexpr Range<unsigned int> remoteListen() { return {10, 120}; }
       /** The range of active wait period. */
