@@ -15,7 +15,6 @@
 #include <QChar>
 
 #define SETTINGS_SIZE     0x000090
-#define CONTACT_SIZE      0x000024
 #define MENUSETTINGS_SIZE 0x000010
 
 
@@ -679,7 +678,7 @@ TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr, size_t size)
 }
 
 TyTCodeplug::ContactElement::ContactElement(uint8_t *ptr)
-  : Codeplug::Element(ptr, CONTACT_SIZE)
+  : Codeplug::Element(ptr, size())
 {
   // pass...
 }
@@ -690,44 +689,44 @@ TyTCodeplug::ContactElement::~ContactElement() {
 
 bool
 TyTCodeplug::ContactElement::isValid() const {
-  return Element::isValid() && (0 != getUInt2(3, 0))
-      && (0x0000 != getUInt16_be(4)) && (0xffff != getUInt16_be(4));
+  return Element::isValid() && (0 != getUInt2(Offset::callType()))
+      && (0x0000 != getUInt16_be(Offset::name())) && (0xffff != getUInt16_be(Offset::name()));
 }
 
 void
 TyTCodeplug::ContactElement::clear() {
   memset(_data, 0xff, 3); // clear DMR ID
-  setUInt2(3, 0, 0);      // type=0
-  setBit(3,2, 0); setBit(3,3, 0); setBit(3,4, 0); // unused = 0
+  setUInt2(Offset::callType(), 0);      // type=0
+  setBit({3,2}, 0); setBit({3,3}, 0); setBit({3,4}, 0); // unused = 0
   enableRingTone(false);
-  setBit(3,6, 1); setBit(3,7, 1); // unknown = 1
-  memset(_data+0x04, 0x00, 2*16);
+  setBit({3,6}, 1); setBit({3,7}, 1); // unknown = 1
+  memset(_data+Offset::name(), 0x00, 2*Limit::nameLength());
 }
 
 uint32_t
 TyTCodeplug::ContactElement::dmrId() const {
-  return getUInt24_le(0);
+  return getUInt24_le(Offset::dmrId());
 }
 
 void
 TyTCodeplug::ContactElement::setDMRId(uint32_t id) {
-  setUInt24_le(0, id);
+  setUInt24_le(Offset::dmrId(), id);
 }
 
 bool
 TyTCodeplug::ContactElement::ringTone() const {
-  return getBit(3, 5);
+  return getBit(Offset::ringTone());
 }
 void
 TyTCodeplug::ContactElement::enableRingTone(bool enable) {
-  setBit(3, 5, enable);
+  setBit(Offset::ringTone(), enable);
 }
 
 DMRContact::Type TyTCodeplug::ContactElement::callType() const {
-  switch(getUInt2(3,0)) {
-  case 1: return DMRContact::GroupCall;
-  case 2: return DMRContact::PrivateCall;
-  case 3: return DMRContact::AllCall;
+  switch((CallType)getUInt2(Offset::callType())) {
+  case CallType::GroupCall: return DMRContact::GroupCall;
+  case CallType::PrivateCall: return DMRContact::PrivateCall;
+  case CallType::AllCall: return DMRContact::AllCall;
   default:
     break;
   }
@@ -736,19 +735,25 @@ DMRContact::Type TyTCodeplug::ContactElement::callType() const {
 void
 TyTCodeplug::ContactElement::setCallType(DMRContact::Type type) {
   switch (type) {
-  case DMRContact::GroupCall:   setUInt2(3,0, 1); break;
-  case DMRContact::PrivateCall: setUInt2(3,0, 2); break;
-  case DMRContact::AllCall:     setUInt2(3,0, 3); break;
+  case DMRContact::GroupCall:
+    setUInt2(Offset::callType(), (unsigned int)CallType::GroupCall);
+    break;
+  case DMRContact::PrivateCall:
+    setUInt2(Offset::callType(), (unsigned int)CallType::PrivateCall);
+    break;
+  case DMRContact::AllCall:
+    setUInt2(Offset::callType(), (unsigned int)CallType::AllCall);
+    break;
   }
 }
 
 QString
 TyTCodeplug::ContactElement::name() const {
-  return readUnicode(4, 16, 0x0000);
+  return readUnicode(Offset::name(), Limit::nameLength(), 0x0000);
 }
 void
 TyTCodeplug::ContactElement::setName(const QString &nm) {
-  writeUnicode(4, nm, 16, 0x0000);
+  writeUnicode(Offset::name(), nm, Limit::nameLength(), 0x0000);
 }
 
 DMRContact *
