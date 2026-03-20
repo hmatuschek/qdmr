@@ -1,11 +1,9 @@
 #include "d578uv_test.hh"
 #include "config.hh"
-#include "d578uv.hh"
 #include "d578uv_codeplug.hh"
 #include "errorstack.hh"
-#include <iostream>
 #include <QTest>
-#include "commercial_extension.hh"
+
 
 D578UVTest::D578UVTest(QObject *parent)
   : UnitTestBase(parent)
@@ -105,6 +103,35 @@ D578UVTest::testChannelDataACK() {
 
 
 void
+D578UVTest::testSettingsDisplayVolumeChangePrompt() {
+  ErrorStack err;
+  Config config;
+
+  if (! config.readYAML(":/data/anytone_settings_display.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.settings()->anytoneExtension()->displaySettings()->volumeChangePromptEnabled(), false);
+
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  D578UVCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  Config testConfig;
+  if (! codeplug.decode(&testConfig, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(testConfig.settings()->anytoneExtension()->displaySettings()->volumeChangePromptEnabled(), true);
+}
+
+void
 D578UVTest::testMicGain() {
   ErrorStack err;
 
@@ -131,6 +158,37 @@ D578UVTest::testMicGain() {
   QVERIFY(! copy.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
   QCOMPARE(copy.settings()->anytoneExtension()->audioSettings()->fmMicGain(), 10);
 }
+
+
+void
+D578UVTest::testSettingsRoamingNotificationCount() {
+  ErrorStack err;
+  Config config;
+
+  if (! config.readYAML(":/data/anytone_settings_roaming.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.settings()->anytoneExtension()->roamingSettings()->notificationCount(), 1);
+
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  D578UVCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  Config testConfig;
+  if (! codeplug.decode(&testConfig, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(testConfig.settings()->anytoneExtension()->roamingSettings()->notificationCount(), 1);
+}
+
 
 QTEST_GUILESS_MAIN(D578UVTest)
 
