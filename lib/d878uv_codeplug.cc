@@ -122,16 +122,20 @@ D878UVCodeplug::ChannelElement::enableRoaming(bool enable) {
   // inverted
   setBit(Offset::roaming(), !enable);
 }
+
+
 bool
 D878UVCodeplug::ChannelElement::dataACK() const {
   // inverted
   return !getBit(Offset::dataACK());
 }
+
 void
 D878UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted
-  setBit(Offset::dataACK(),!enable);
+  setBit(Offset::dataACK(), !enable);
 }
+
 
 bool
 D878UVCodeplug::ChannelElement::autoScan() const {

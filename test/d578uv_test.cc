@@ -66,6 +66,45 @@ D578UVTest::testChannelFrequency() {
 
 
 void
+D578UVTest::testChannelDataACK() {
+  ErrorStack err;
+  Config config;
+
+  if (! config.readYAML(":/data/anytone_channel_data_ack.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->count(), 2);
+  QVERIFY(config.channelList()->channel(0)->is<DMRChannel>());
+  QCOMPARE(config.channelList()->channel(0)->as<DMRChannel>()
+             ->anytoneChannelExtension()->dataACK(), false);
+  QVERIFY(config.channelList()->channel(1)->is<DMRChannel>());
+  QCOMPARE(config.channelList()->channel(1)->as<DMRChannel>()
+             ->anytoneChannelExtension()->dataACK(), true);
+
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  D578UVCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  Config testConfig;
+  if (! codeplug.decode(&testConfig, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(testConfig.channelList()->channel(0)->as<DMRChannel>()
+             ->anytoneChannelExtension()->dataACK(), false);
+  QCOMPARE(testConfig.channelList()->channel(1)->as<DMRChannel>()
+             ->anytoneChannelExtension()->dataACK(), true);
+}
+
+
+void
 D578UVTest::testMicGain() {
   ErrorStack err;
 

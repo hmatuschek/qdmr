@@ -117,13 +117,13 @@ D578UVCodeplug::ChannelElement::enableSMS(bool enable) {
 bool
 D578UVCodeplug::ChannelElement::dataACK() const {
   // inverted!
-  return !getBit(0x003d,3);
+  return !getBit(Offset::dataACK());
 }
 
 void
 D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted!
-  setBit(0x003d, 3, !enable);
+  setBit(Offset::dataACK(), !enable);
 }
 
 

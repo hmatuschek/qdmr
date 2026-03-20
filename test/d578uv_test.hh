@@ -15,6 +15,7 @@ private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
   void testChannelFrequency();
+  void testChannelDataACK(); // Regression test for #813
   void testMicGain(); // Retression test for #773
 };
 

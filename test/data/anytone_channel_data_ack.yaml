@@ -1,0 +1,18 @@
+radioIDs:
+  - dmr: {id: id1, name: DM3MAT, number: 2621370}
+
+channels:
+  - dmr:
+      id: ch1
+      name: "Test Channel"
+      rxFrequency: 123.456 Mhz
+      txFrequency: 123.456 Mhz
+      anytone:
+        dataACK: false
+  - dmr:
+      id: ch2
+      name: "Test Channel 2"
+      rxFrequency: 123.456 Mhz
+      txFrequency: 123.456 Mhz
+      anytone:
+        dataACK: true

@@ -21,5 +21,6 @@
         <file>data/arc4_encryption.yaml</file>
         <file>data/dtmf_contact.yaml</file>
         <file>data/am_channel_test.yaml</file>
+        <file>data/anytone_channel_data_ack.yaml</file>
     </qresource>
 </RCC>
