@@ -1,6 +1,7 @@
 #include "d878uv_test.hh"
 #include "config.hh"
 #include "d878uv_codeplug.hh"
+#include "d878uv_limits.hh"
 #include "errorstack.hh"
 #include <QTest>
 #include "logger.hh"
@@ -565,6 +566,26 @@ D878UVTest::testSettingsDisplayVolumeChangePrompt() {
 
   QCOMPARE(testConfig.settings()->anytoneExtension()->displaySettings()->volumeChangePromptEnabled(), false);
 }
+
+
+void
+D878UVTest::testRadioLimits() {
+  D878UVLimits limits({{Frequency::fromMHz(137),Frequency::fromMHz(150)},
+                       {Frequency::fromMHz(400),Frequency::fromMHz(450)}},
+                      {{Frequency::fromMHz(137),Frequency::fromMHz(150)},
+                       {Frequency::fromMHz(400),Frequency::fromMHz(450)}}, "V100");
+  RadioLimitContext ctx;
+  if (! limits.verifyConfig(&_basicConfig, ctx)) {
+    QString issues;
+    for (int i=0; i<ctx.count(); i++) {
+      if (! issues.isEmpty())
+        issues.append(", ");
+      issues.append(ctx.message(i).format());
+    }
+    QFAIL(issues.toLatin1().constData());
+  }
+}
+
 
 
 QTEST_GUILESS_MAIN(D878UVTest)

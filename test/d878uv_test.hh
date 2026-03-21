@@ -35,6 +35,7 @@ private slots:
   void testEmptyAESKey();  ///< Regression test for #711
   void testChannelDataACK(); ///< Regression test for #813
   void testSettingsDisplayVolumeChangePrompt(); ///< Regression test for #813
+  void testRadioLimits(); ///< Regression test for #816
 
 protected:
   Config _micGainConfig;
