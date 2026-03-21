@@ -1457,15 +1457,15 @@ RadioddityCodeplug::GeneralSettingsElement::clear() {
   setUInt32_be(0x000c, 0);
   setUInt8(0x0010, 0);
 
-  setPreambleDuration(360);
+  setPreambleDuration(Interval::fromMilliseconds(360));
   setMonitorType(MonitorType::Silent);
   setVOXSensitivity(Level::fromValue(3));
   setLowBatteryWarnInterval(30);
   setCallAlertDuration(120);
   setLoneWorkerResponsePeriod(1);
   setLoneWorkerReminderPeriod(10);
-  setGroupCallHangTime(3000);
-  setPrivateCallHangTime(3000);
+  setGroupCallHangTime(Interval::fromMilliseconds(3000));
+  setPrivateCallHangTime(Interval::fromMilliseconds(3000));
 
   enableDownChannelModeVFO(false);
   enableUpChannelModeVFO(false);
@@ -1518,13 +1518,13 @@ RadioddityCodeplug::GeneralSettingsElement::setRadioID(unsigned id) {
   setBCD8_be(0x0008, id);
 }
 
-unsigned
+Interval
 RadioddityCodeplug::GeneralSettingsElement::preambleDuration() const {
-  return unsigned(getUInt8(0x0011)*60);
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x0011)*60));
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setPreambleDuration(unsigned ms) {
-  setUInt8(0x0011, ms/60);
+RadioddityCodeplug::GeneralSettingsElement::setPreambleDuration(const Interval &dur) {
+  setUInt8(0x0011, dur.milliseconds()/60);
 }
 
 RadioddityCodeplug::GeneralSettingsElement::MonitorType
@@ -1580,21 +1580,21 @@ RadioddityCodeplug::GeneralSettingsElement::setLoneWorkerReminderPeriod(unsigned
   setUInt8(0x0017, sec);
 }
 
-unsigned
+Interval
 RadioddityCodeplug::GeneralSettingsElement::groupCallHangTime() const {
-  return unsigned(getUInt8(0x0018))*500;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x0018))*500);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setGroupCallHangTime(unsigned ms) {
-  setUInt8(0x0018, ms/500);
+RadioddityCodeplug::GeneralSettingsElement::setGroupCallHangTime(const Interval &dur) {
+  setUInt8(0x0018, dur.milliseconds()/500);
 }
-unsigned
+Interval
 RadioddityCodeplug::GeneralSettingsElement::privateCallHangTime() const {
-  return unsigned(getUInt8(0x0019))*500;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x0019))*500);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned ms) {
-  setUInt8(0x0019, ms/500);
+RadioddityCodeplug::GeneralSettingsElement::setPrivateCallHangTime(const Interval &dur) {
+  setUInt8(0x0019, dur.milliseconds()/500);
 }
 
 bool
@@ -1795,18 +1795,18 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const Error
   }
 
   setVOXSensitivity(ctx.config()->settings()->vox());
+  setPreambleDuration(ctx.config()->settings()->dmr()->preamble());
+  setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
+  setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
   // There is no global squelch settings either
 
   // Handle Radioddity extension
   if (RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension()) {
-    setPreambleDuration(ext->preambleDuration().milliseconds());
     setMonitorType(ext->monitorType());
     setLowBatteryWarnInterval(ext->tone()->lowBatteryWarnInterval().seconds());
     setCallAlertDuration(ext->tone()->callAlertDuration().seconds());
     setLoneWorkerResponsePeriod(ext->loneWorkerResponseTime().minutes());
     setLoneWorkerReminderPeriod(ext->loneWorkerReminderPeriod().seconds());
-    setGroupCallHangTime(ext->groupCallHangTime().milliseconds());
-    setPrivateCallHangTime(ext->privateCallHangTime().milliseconds());
     enableDownChannelModeVFO(ext->downChannelModeVFO());
     enableUpChannelModeVFO(ext->upChannelModeVFO());
     enableResetTone(ext->tone()->resetTone());
@@ -1849,6 +1849,10 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
     ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()->setNumber(radioID());
   }
   ctx.config()->settings()->setVOX(voxSensitivity());
+  ctx.config()->settings()->dmr()->setPreamble(preambleDuration());
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
+
   // There is no global squelch settings either, so set it to 1
   ctx.config()->settings()->setSquelch(1);
 
@@ -1859,14 +1863,11 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
     ctx.config()->settings()->setRadioddityExtension(ext);
   }
   // Update settings extension
-  ext->setPreambleDuration(Interval::fromMilliseconds(preambleDuration()));
   ext->setMonitorType(monitorType());
   ext->tone()->setLowBatteryWarnInterval(Interval::fromSeconds(lowBatteryWarnInterval()));
   ext->tone()->setCallAlertDuration(Interval::fromSeconds(callAlertDuration()));
   ext->setLoneWorkerResponseTime(Interval::fromMinutes(loneWorkerResponsePeriod()));
   ext->setLoneWorkerReminderPeriod(Interval::fromSeconds(loneWorkerReminderPeriod()));
-  ext->setGroupCallHangTime(Interval::fromMilliseconds(groupCallHangTime()));
-  ext->setPrivateCallHangTime(Interval::fromMilliseconds(privateCallHangTime()));
   ext->enableDownChannelModeVFO(downChannelModeVFO());
   ext->enableUpChannelModeVFO(upChannelModeVFO());
   ext->tone()->enableResetTone(resetTone());

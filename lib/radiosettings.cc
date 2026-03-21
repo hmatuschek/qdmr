@@ -1,13 +1,16 @@
 #include "radiosettings.hh"
 #include "radioid.hh"
+#include "gnsssettings.hh"
+
 
 RadioSettings::RadioSettings(QObject *parent)
   : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
   _squelch(1), _power(Channel::Power::High), _vox(Level::null()), _transmitTimeOut(Interval::infinity()),
-  _defaultId(new DMRRadioIDReference(this)), _tytExtension(nullptr),
-  _radioddityExtension(nullptr), _anytoneExtension(nullptr)
+  _defaultId(new DMRRadioIDReference(this)), _gnss(new GNSSSettings(this)), _dmr(new DMRSettings(this)),
+  _tytExtension(nullptr), _radioddityExtension(nullptr), _anytoneExtension(nullptr)
 {
-  // pass
+  connect(_gnss, &GNSSSettings::modified, this, &RadioSettings::modified);
+  connect(_dmr, &DMRSettings::modified, this, &RadioSettings::modified);
 }
 
 bool
@@ -173,6 +176,16 @@ RadioSettings::setDefaultId(DMRRadioID *id) {
   _defaultId->set(id);
 }
 
+
+GNSSSettings *
+RadioSettings::gnss() const {
+  return _gnss;
+}
+
+DMRSettings *
+RadioSettings::dmr() const {
+  return _dmr;
+}
 
 TyTSettingsExtension *
 RadioSettings::tytExtension() const {

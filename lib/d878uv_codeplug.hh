@@ -6,6 +6,9 @@
 #include "d868uv_codeplug.hh"
 #include "signaling.hh"
 #include "gpssystem.hh"
+#include "gnsssettings.hh"
+#include "dmrsettings.hh"
+#include "smsextension.hh"
 
 class Channel;
 class DMRContact;
@@ -229,7 +232,7 @@ public:
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int pttIDSetting()         { return 0x0019; }
       static constexpr unsigned int aesKeyIndex()          { return 0x0022; }
-      static constexpr Bit roaming()                       { return {0x034,  2}; }
+      static constexpr Bit roaming()                       { return {0x0034, 2}; }
       static constexpr Bit dataACK()                       { return {0x0034, 3}; }
       static constexpr Bit autoScan()                      { return {0x0034, 4}; }
       static constexpr unsigned int fmAPRSPTTSetting()     { return 0x0036; }
@@ -389,6 +392,11 @@ public:
     enum class BacklightDuration {
       Infinite = 0, _5s = 1, _10s = 2, _15s = 3, _20s = 4, _25s = 5, _30s = 6, _1min=7, _2min=8,
       _3min = 9, _4min = 10, _5min = 11, _15min = 12, _30min = 13, _45min = 14, _1h = 15
+    };
+
+    /** Possible SMS formats. */
+    enum class SMSFormat {
+      Motorola = 0, Hytera = 1, DMR = 2
     };
 
   protected:
@@ -653,9 +661,9 @@ public:
     void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
-    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    virtual SMSExtension::Format smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+    virtual void setSMSFormat(SMSExtension::Format fmt);
 
     /** Returns the minimum frequency in Hz for the auto-repeater range in VHF band. */
     virtual Frequency autoRepeaterMinFrequencyVHF() const override;
@@ -797,6 +805,13 @@ public:
     bool updateConfig(Context &ctx) override;
     bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) override;
 
+  public:
+    /** Some limits for the settings. */
+    struct Limit: D868UVCodeplug::GeneralSettingsElement::Limit {
+      // Valid repeater-out-of-range notification counts.
+      static constexpr Range<unsigned int> repeaterOORNotificationCount() { return {1, 10}; }
+    };
+
   protected:
     /** Some internal used offsets within the element. */
     struct Offset: public D868UVCodeplug::GeneralSettingsElement::Offset {
@@ -892,6 +907,17 @@ public:
   class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
   protected:
+    /** Encoding of possible GNSSs. */
+    enum class GNSS {
+      GPS=0, Beidou=1, Both = 2
+    };
+
+    /** Talker alias encoding. */
+    enum class TalkerAliasEncoding {
+      ISO8 = 0, ISO7 = 1, Unicode = 2,
+    };
+
+  protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
 
@@ -916,9 +942,9 @@ public:
     virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
     /** Returns the talker alias encoding. */
-    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    virtual DMRSettings::TalkerAliasEncoding talkerAliasEncoding() const;
     /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    virtual void setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding encoding);
 
     /** Returns @c true if the BT PTT latch is enabled. */
     virtual bool bluetoothPTTLatch() const;
@@ -970,9 +996,9 @@ public:
     virtual void setAutoRepeaterUHF2MaxFrequency(Frequency hz);
 
     /** Returns the GPS mode. */
-    virtual AnytoneGPSSettingsExtension::GPSMode gpsMode() const;
+    virtual GNSSSettings::Systems gnss() const;
     /** Sets the GPS mode. */
-    virtual void setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode);
+    virtual void setGNSS(GNSSSettings::Systems mode);
 
     /** Returns the STE (squelch tail elimination) duration. */
     virtual Interval steDuration() const;
@@ -1215,9 +1241,9 @@ public:
     /** Returns the fixed location send. */
     virtual QGeoCoordinate fixedLocation() const;
     /** Sets the fixed location to send. */
-    virtual void setFixedLocation(QGeoCoordinate &loc);
+    virtual void setFixedLocation(const QGeoCoordinate& loc);
     /** Disables sending a fixed location. */
-    virtual void disableFixedLocation();
+    virtual void enableFixedLocation(bool enable);
 
     /** Returns the destination call. */
     virtual QString destination() const;
@@ -1354,6 +1380,11 @@ public:
     virtual bool reportOther() const;
     /** Enables/disables report other flag. */
     virtual void enableReportOther(bool enable);
+
+    /** Encodes global APRS settings. */
+    virtual bool fromConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Updates global APRS settings. */
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
 
     /** Configures this APRS system from the given generic config. */
     virtual bool fromFMAPRSSystem(const FMAPRSSystem *sys, Context &ctx,

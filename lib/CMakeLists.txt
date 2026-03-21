@@ -13,12 +13,12 @@ qt_add_library(libdmrconf SHARED
   ${CMAKE_CURRENT_BINARY_DIR}/config.h
   utils.cc crc32.cc addressmap.cc radiointerface.cc errorstack.cc frequency.cc interval.cc
   ranges.cc dummyfilereader.cc chirpformat.cc signaling.cc radio.cc dfu_libusb.cc usbserial.cc
-  radioinfo.cc usbdevice.cc radiolimits.cc csvreader.cc dfufile.cc userdatabase.cc logger.cc
+  radioinfo.cc usbdevice.cc radiolimits.cc csvreader.cc dfufile.cc userdatabase.cc logger.cc level.cc
   melody.cc visitor.cc configlabelingvisitor.cc configcopyvisitor.cc
   intermediaterepresentation.cc configmergevisitor.cc configobject.cc configreference.cc config.cc
   radiosettings.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
   roamingzone.cc roamingchannel.cc callsigndb.cc talkgroupdatabase.cc radioid.cc transferflags.cc
-  encryptionextension.cc commercial_extension.cc smsextension.cc
+  encryptionextension.cc commercial_extension.cc smsextension.cc gnsssettings.cc dmrsettings.cc
   satellitedatabase.cc orbitalelementsdatabase.cc transponderdatabase.cc satelliteconfig.cc
   tyt_radio.cc tyt_interface.cc tyt_codeplug.cc tyt_callsigndb.cc tyt_extensions.cc
   md2017.cc md2017_codeplug.cc md2017_callsigndb.cc md2017_filereader.cc md2017_limits.cc
@@ -47,21 +47,20 @@ qt_add_library(libdmrconf SHARED
   dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc
   dm32uv.hh dm32uv.cc dm32uv_interface.hh dm32uv_interface.cc dm32uv_limits.hh dm32uv_limits.cc
   dm32uv_codeplug.hh dm32uv_codeplug.cc
-  dm32uv_callsigndb.hh dm32uv_callsigndb.cc
-  level.hh level.cc)
+  dm32uv_callsigndb.hh dm32uv_callsigndb.cc)
 
 target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
   FILES
   ${CMAKE_CURRENT_BINARY_DIR}/config.h
   libdmrconf.hh utils.hh ${hid_HEADERS} crc32.hh addressmap.hh radiointerface.hh errorstack.hh
-  frequency.hh interval.hh ranges.hh dummyfilereader.hh chirpformat.hh signaling.hh radio.hh
+  frequency.hh interval.hh ranges.hh dummyfilereader.hh chirpformat.hh signaling.hh radio.hh level.hh
   dfu_libusb.hh usbserial.hh radioinfo.hh usbdevice.hh radiolimits.hh csvreader.hh dfufile.hh
   userdatabase.hh logger.hh melody.hh visitor.hh configlabelingvisitor.hh configcopyvisitor.hh
   intermediaterepresentation.hh configmergevisitor.hh configobject.hh configreference.hh config.hh
   radiosettings.hh contact.hh rxgrouplist.hh channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh
   roamingzone.hh roamingchannel.hh callsigndb.hh talkgroupdatabase.hh radioid.hh transferflags.hh
-  encryptionextension.hh commercial_extension.hh smsextension.hh
+  encryptionextension.hh commercial_extension.hh smsextension.hh gnsssettings.hh dmrsettings.hh
   satellitedatabase.hh orbitalelementsdatabase.hh transponderdatabase.hh satelliteconfig.hh
   tyt_radio.hh tyt_interface.hh tyt_codeplug.hh tyt_callsigndb.hh tyt_extensions.hh
   md2017.hh md2017_codeplug.hh md2017_callsigndb.hh md2017_filereader.hh md2017_limits.hh

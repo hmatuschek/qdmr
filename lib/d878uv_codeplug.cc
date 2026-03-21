@@ -122,16 +122,20 @@ D878UVCodeplug::ChannelElement::enableRoaming(bool enable) {
   // inverted
   setBit(Offset::roaming(), !enable);
 }
+
+
 bool
 D878UVCodeplug::ChannelElement::dataACK() const {
   // inverted
   return !getBit(Offset::dataACK());
 }
+
 void
 D878UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted
-  setBit(Offset::dataACK(),!enable);
+  setBit(Offset::dataACK(), !enable);
 }
+
 
 bool
 D878UVCodeplug::ChannelElement::autoScan() const {
@@ -444,6 +448,7 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     // Apply extension settings, if present
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
       ch_ext = ext;
+      enableDataACK(dc->anytoneChannelExtension()->dataACK());
       /// Handles bug in AnyTone firmware.
       /// @todo Remove once fixed by AnyTone.
       enableRXAPRS(! ext->sms());
@@ -1708,14 +1713,32 @@ D878UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
   setUInt8(Offset::showLastHeard(), (enable ? 0x01 : 0x00));
 }
 
-AnytoneDMRSettingsExtension::SMSFormat
+
+SMSExtension::Format
 D878UVCodeplug::GeneralSettingsElement::smsFormat() const {
-  return (AnytoneDMRSettingsExtension::SMSFormat) getUInt8(Offset::smsFormat());
+  switch((SMSFormat) getUInt8(Offset::smsFormat())) {
+  case SMSFormat::Motorola: return SMSExtension::Format::Motorola;
+  case SMSFormat::Hytera: return SMSExtension::Format::Hytera;
+  case SMSFormat::DMR: return SMSExtension::Format::DMR;
+  }
+  return SMSExtension::Format::Motorola;
 }
+
 void
-D878UVCodeplug::GeneralSettingsElement::setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt) {
-  setUInt8(Offset::smsFormat(), (unsigned)fmt);
+D878UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSExtension::Format fmt) {
+  switch (fmt) {
+    case SMSExtension::Format::Motorola:
+      setUInt8(Offset::smsFormat(), (unsigned)SMSFormat::Motorola);
+      break;
+    case SMSExtension::Format::Hytera:
+      setUInt8(Offset::smsFormat(), (unsigned)SMSFormat::Hytera);
+      break;
+    case SMSExtension::Format::DMR:
+      setUInt8(Offset::smsFormat(), (unsigned)SMSFormat::DMR);
+      break;
+  }
 }
+
 
 Frequency
 D878UVCodeplug::GeneralSettingsElement::autoRepeaterMinFrequencyVHF() const {
@@ -1961,11 +1984,12 @@ D878UVCodeplug::GeneralSettingsElement::setMuteDelay(Interval min) {
 
 unsigned
 D878UVCodeplug::GeneralSettingsElement::repeaterCheckNumNotifications() const {
-  return getUInt8(Offset::repCheckNumNotify());
+  return getUInt8(Offset::repCheckNumNotify())+1;
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigned num) {
-  setUInt8(Offset::repCheckNumNotify(), num);
+  num = Limit::repeaterOORNotificationCount().limit(num);
+  setUInt8(Offset::repCheckNumNotify(), num-1);
 }
 
 bool
@@ -2033,10 +2057,15 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
 
-  // Set measurement system based on system locale (0x00==Metric)
-  enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
+
+  enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
+
+  setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
+  setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
+  setPreWaveDelay(ctx.config()->settings()->dmr()->preamble());
+  setSMSFormat(ctx.config()->smsExtension()->format());
 
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -2092,19 +2121,14 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
 
   // Encode DMR settings
-  setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
-  setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
-  setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
   setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
   enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
   setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
   enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
   enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
   enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
-  setSMSFormat(ext->dmrSettings()->smsFormat());
 
   // Encode GPS settings
-  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
   setGPSTimeZone(ext->gpsSettings()->timeZone());
   enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
   setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
@@ -2137,6 +2161,16 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
+
+  ctx.config()->settings()->gnss()->setUnits(
+        this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
+                                   GNSSSettings::Units::Metric);
+
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(this->groupCallHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(this->privateCallHangTime());
+  ctx.config()->settings()->dmr()->setPreamble(this->preWaveDelay());
+  ctx.config()->smsExtension()->setFormat(this->smsFormat());
+
 
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
@@ -2188,21 +2222,14 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
   // Decode dmr settings
-  ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
-  ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
-  ext->dmrSettings()->setPreWaveDelay(this->preWaveDelay());
   ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
   ext->dmrSettings()->enableFilterOwnID(this->filterOwnID());
   ext->dmrSettings()->setMonitorSlotMatch(this->monitorSlotMatch());
   ext->dmrSettings()->enableMonitorColorCodeMatch(this->monitorColorCodeMatch());
   ext->dmrSettings()->enableMonitorIDMatch(this->monitorIDMatch());
   ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
-  ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
   // Encode GPS settings
-  ext->gpsSettings()->setUnits(
-        this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
-                                   AnytoneGPSSettingsExtension::Units::Metric);
   ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
   ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
 
@@ -2301,14 +2328,32 @@ D878UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(AnytoneDMRSettings
   setUInt8(Offset::talkerAliasDisplay(), (unsigned)mode);
 }
 
-AnytoneDMRSettingsExtension::TalkerAliasEncoding
+
+DMRSettings::TalkerAliasEncoding
 D878UVCodeplug::ExtendedSettingsElement::talkerAliasEncoding() const {
-  return (AnytoneDMRSettingsExtension::TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding());
+  switch ((TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding())) {
+  case TalkerAliasEncoding::ISO7: return DMRSettings::TalkerAliasEncoding::Iso7;
+  case TalkerAliasEncoding::ISO8: return DMRSettings::TalkerAliasEncoding::Iso8;
+  case TalkerAliasEncoding::Unicode: return DMRSettings::TalkerAliasEncoding::Unicode;
+  }
+  return DMRSettings::TalkerAliasEncoding::Iso8;
 }
+
 void
-D878UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding enc) {
-  setUInt8(Offset::talkerAliasEncoding(), (unsigned)enc);
+D878UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding enc) {
+  switch (enc) {
+  case DMRSettings::TalkerAliasEncoding::Iso7:
+    setUInt8(Offset::talkerAliasEncoding(), (unsigned)TalkerAliasEncoding::ISO7);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Iso8:
+    setUInt8(Offset::talkerAliasEncoding(), (unsigned)TalkerAliasEncoding::ISO8);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Unicode:
+    setUInt8(Offset::talkerAliasEncoding(), (unsigned)TalkerAliasEncoding::Unicode);
+    break;
+  }
 }
+
 
 bool
 D878UVCodeplug::ExtendedSettingsElement::bluetoothPTTLatch() const {
@@ -2404,13 +2449,25 @@ D878UVCodeplug::ExtendedSettingsElement::setAutoRepeaterUHF2MaxFrequency(Frequen
   setUInt32_le(Offset::autoRepeaterUHF2MaxFrequency(), hz.inHz()/10);
 }
 
-AnytoneGPSSettingsExtension::GPSMode
-D878UVCodeplug::ExtendedSettingsElement::gpsMode() const {
-  return (AnytoneGPSSettingsExtension::GPSMode)getUInt8(Offset::gpsMode());
+GNSSSettings::Systems
+D878UVCodeplug::ExtendedSettingsElement::gnss() const {
+  switch ((GNSS)getUInt8(Offset::gpsMode())) {
+  case GNSS::GPS: return GNSSSettings::System::GPS;
+  case GNSS::Beidou: return GNSSSettings::System::Beidou;
+  case GNSS::Both: return GNSSSettings::System::GPS|GNSSSettings::System::Beidou;
+  }
+  return GNSSSettings::System::GPS;
 }
 void
-D878UVCodeplug::ExtendedSettingsElement::setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode) {
-  setUInt8(Offset::gpsMode(), (unsigned)mode);
+D878UVCodeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems mode) {
+  int value = 0;
+  if (mode.testFlag(GNSSSettings::System::GPS))
+    value = (int)GNSS::GPS;
+  if (mode.testFlag(GNSSSettings::System::Beidou))
+    value = (int)GNSS::Beidou;
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
+    value = (int)GNSS::Both;
+  setUInt8(Offset::gpsMode(), value);
 }
 
 Interval
@@ -2651,6 +2708,12 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
+  // Encode GPS settings
+  setGNSS(ctx.config()->settings()->gnss()->systems());
+
+  enableSendTalkerAlias(ctx.config()->settings()->dmr()->sendTalkerAliasEnabled());
+  setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
+
   if (nullptr == ctx.config()->settings()->anytoneExtension()) {
     // If there is no extension, reuse DMR mic gain setting
     setFMMicGain(ctx.config()->settings()->micLevel());
@@ -2661,9 +2724,7 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
 
   // Encode DMR settings
-  enableSendTalkerAlias(ext->dmrSettings()->sendTalkerAlias());
   setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
-  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
 
   // Some general settings
   setSTEDuration(ext->steDuration());
@@ -2714,9 +2775,6 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
             ext->autoRepeaterSettings()->uhf2Ref()->as<AnytoneAutoRepeaterOffset>()));
   }
 
-  // Encode GPS settings
-  setGPSMode(ext->gpsSettings()->mode());
-
   // Encode roaming settings
   enableGPSRoaming(ext->roamingSettings()->gpsRoaming());
 
@@ -2734,6 +2792,12 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err))
     return false;
 
+  // Store GPS settings
+  ctx.config()->settings()->gnss()->setSystems(this->gnss());
+
+  ctx.config()->settings()->dmr()->enableSendTalkerAlias(sendTalkerAlias());
+  ctx.config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
+
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
@@ -2742,9 +2806,7 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   }
 
   // Store DMR settings
-  ext->dmrSettings()->enableSendTalkerAlias(sendTalkerAlias());
   ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
-  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Some general settings
   ext->setSTEDuration(this->steDuration());
@@ -2780,9 +2842,6 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->autoRepeaterSettings()->setVHF2Max(this->autoRepeaterVHF2MaxFrequency());
   ext->autoRepeaterSettings()->setUHF2Min(this->autoRepeaterUHF2MinFrequency());
   ext->autoRepeaterSettings()->setUHF2Max(this->autoRepeaterUHF2MaxFrequency());
-
-  // Store GPS settings
-  ext->gpsSettings()->setMode(this->gpsMode());
 
   // Store roaming settings
   ext->roamingSettings()->enableGPSRoaming(this->gpsRoaming());
@@ -2947,7 +3006,7 @@ D878UVCodeplug::APRSSettingsElement::fixedLocation() const {
   return QGeoCoordinate(latitude, longitude, height_ft/3.281);
 }
 void
-D878UVCodeplug::APRSSettingsElement::setFixedLocation(QGeoCoordinate &loc) {
+D878UVCodeplug::APRSSettingsElement::setFixedLocation(const QGeoCoordinate &loc) {
   double latitude = loc.latitude();
   bool south = (0 > latitude); latitude = std::abs(latitude);
   unsigned lat_deg = int(latitude); latitude -= lat_deg; latitude *= 60;
@@ -2968,12 +3027,10 @@ D878UVCodeplug::APRSSettingsElement::setFixedLocation(QGeoCoordinate &loc) {
   setUInt8(Offset::fixedLonSec(), lon_sec);
   setUInt8(Offset::fixedLonWest(), (west ? 0x01 : 0x00));
   setUInt16_le(Offset::fixedHeight(), height_ft);
-  // enable fixed location.
-  setUInt8(Offset::fixedLocation(), 0x01);
 }
 void
-D878UVCodeplug::APRSSettingsElement::disableFixedLocation() {
-  setUInt8(Offset::fixedLocation(), 0x00);
+D878UVCodeplug::APRSSettingsElement::enableFixedLocation(bool enable) {
+  setUInt8(Offset::fixedLocation(), enable ? 0x01 : 0x00);
 }
 
 QString
@@ -3280,6 +3337,34 @@ D878UVCodeplug::APRSSettingsElement::clearFMFrequency(unsigned int n) {
   n = std::min(Limit::fmFrequencies()-1, n);
   setBCD8_be(Offset::fmFrequencies() + n*Offset::betweenFMFrequencies(), 0);
 }
+
+
+bool
+D878UVCodeplug::APRSSettingsElement::fromConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  // Encode fixed location if valid
+  if (ctx.config()->settings()->gnss()->fixedPosition().isValid()) {
+    setFixedLocation(ctx.config()->settings()->gnss()->fixedPosition());
+    // Enable if there are no GNSS enabled
+    enableFixedLocation(ctx.config()->settings()->gnss()->fixedPositionEnabled());
+  }
+
+  return true;
+}
+
+bool
+D878UVCodeplug::APRSSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (fixedLocation().isValid()) {
+    ctx.config()->settings()->gnss()->setFixedPosition(fixedLocation());
+    ctx.config()->settings()->gnss()->enableFixedPosition(fixedLocationEnabled());
+  }
+
+  return true;
+}
+
 
 bool
 D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
@@ -4171,6 +4256,11 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
   FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
 
+  if (! aprs.fromConfig(ctx, err)) {
+    errMsg(err) << "Cannot encode global APRS settings.";
+    return false;
+  }
+
   // Encode APRS system (there can only be one)
   if (0 < ctx.count<FMAPRSSystem>()) {
     aprs.fromFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx, aprsNames, err);
@@ -4203,6 +4293,11 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
                                           data(Offset::fmAPRSFrequencyNames()):
                                           nullptr);
   AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
+
+  if (! aprs.updateConfig(ctx, err)) {
+    errMsg(err) << "Cannot update global APRS settings.";
+    return false;
+  }
 
   // Create APRS system (if enabled)
   if (aprs.isValid()) {

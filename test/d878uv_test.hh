@@ -32,7 +32,9 @@ private slots:
   void testRegressionAutoRepeater();
   void testRegressionVFOStep();
 
-  void testEmptyAESKey();  /// < Regression test for #711
+  void testEmptyAESKey();  ///< Regression test for #711
+  void testChannelDataACK(); ///< Regression test for #813
+  void testSettingsDisplayVolumeChangePrompt(); ///< Regression test for #813
 
 protected:
   Config _micGainConfig;

@@ -156,9 +156,9 @@ public:
       static constexpr Bit roaming()                       { return {0x0034, 6}; }
       static constexpr unsigned int fmScrambler()          { return 0x003a; }
       static constexpr unsigned int customScrambler()      { return 0x003b; }
-      static constexpr Bit multipleKeyEncryption()         { return {0x003b, 0}; }
-      static constexpr Bit randomKey()                     { return {0x003b, 1}; }
-      static constexpr Bit sms()                           { return {0x003b, 2}; }
+      static constexpr Bit multipleKeyEncryption()         { return {0x003d, 0}; }
+      static constexpr Bit randomKey()                     { return {0x003d, 1}; }
+      static constexpr Bit sms()                           { return {0x003d, 2}; }
       static constexpr Bit dataACK()                       { return {0x003d, 3}; }
       static constexpr Bit autoScan()                      { return {0x003d, 4}; }
       static constexpr Bit talkerAlias()                   { return {0x003d, 5}; }
@@ -244,6 +244,12 @@ public:
       Hz2500 = 0, Hz5000 = 1, Hz6250 = 2, Hz8330 = 3, kHz10 = 4, Hz12500 = 5, kHz20 = 6,
       kHz25 = 7, kHz30 = 8, kHz50=9
     };
+
+    /** Possible SMS formats. */
+    enum class SMSFormat {
+      Motorola = 0, Hytera = 1, DMR = 2
+    };
+
 
   protected:
     /** Hidden constructor. */
@@ -572,9 +578,9 @@ public:
     void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
-    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    virtual SMSExtension::Format smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+    virtual void setSMSFormat(SMSExtension::Format fmt);
 
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const override;
     void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) override;
@@ -737,6 +743,12 @@ public:
     bool fromConfig(const Flags &flags, Context &ctx) override;
     bool updateConfig(Context &ctx) override;
     bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) override;
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: D878UVCodeplug::GeneralSettingsElement::Limit {
+      // pass...
+    };
 
   protected:
     /** Some internal offsets. */
@@ -936,6 +948,11 @@ public:
       Any = 0, RX1_TX2 = 1, RX2_TX1 = 2
     };
 
+    /** Talker alias encoding. */
+    enum class TalkerAliasEncoding {
+      ISO8 = 0, ISO7 = 1, Unicode = 2,
+    };
+
   protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
@@ -956,9 +973,9 @@ public:
     virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
     /** Returns the talker alias encoding. */
-    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    virtual DMRSettings::TalkerAliasEncoding talkerAliasEncoding() const;
     /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    virtual void setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding encoding);
 
     /** Returns @c true if the weather alarm is enabled. */
     virtual bool weatherAlarmEnabled() const;
@@ -981,9 +998,9 @@ public:
     virtual void setMicSpeakerSource(AnytoneAudioSettingsExtension::HandsetSpeakerSource source);
 
     /** Returns the GPS mode. */
-    virtual AnytoneGPSSettingsExtension::GPSMode gpsMode() const;
+    virtual GNSSSettings::Systems gnss() const;
     /** Sets the GPS mode. */
-    virtual void setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode);
+    virtual void setGNSS(GNSSSettings::Systems mode);
 
     /** Returns @c true if the BT PTT latch is enabled. */
     virtual bool bluetoothPTTLatch() const;

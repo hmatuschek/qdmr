@@ -1024,42 +1024,6 @@ TyTSettingsExtension::enableChannelModeB(bool enable) {
 }
 
 unsigned
-TyTSettingsExtension::txPreambleDuration() const {
-  return _txPreambleDuration;
-}
-void
-TyTSettingsExtension::setTXPreambleDuration(unsigned ms) {
-  if (_txPreambleDuration == ms)
-    return;
-  _txPreambleDuration = ms;
-  emit modified(this);
-}
-
-unsigned
-TyTSettingsExtension::groupCallHangTime() const {
-  return _groupCallHangTime;
-}
-void
-TyTSettingsExtension::setGroupCallHangTime(unsigned ms) {
-  if (_groupCallHangTime == ms)
-    return;
-  _groupCallHangTime = ms;
-  emit modified(this);
-}
-
-unsigned
-TyTSettingsExtension::privateCallHangTime() const {
-  return _privateCallHangTime;
-}
-void
-TyTSettingsExtension::setPrivateCallHangTime(unsigned ms) {
-  if (_privateCallHangTime == ms)
-    return;
-  _privateCallHangTime = ms;
-  emit modified(this);
-}
-
-unsigned
 TyTSettingsExtension::lowBatteryWarnInterval() const {
   return _lowBatteryWarnInterval;
 }
@@ -1243,30 +1207,6 @@ TyTSettingsExtension::setPCProgPassword(const QString &passwd) {
   if (_pcProgPassword == passwd)
     return;
   _pcProgPassword = passwd;
-  emit modified(this);
-}
-
-bool
-TyTSettingsExtension::privateCallMatch() const {
-  return _privateCallMatch;
-}
-void
-TyTSettingsExtension::enablePrivateCallMatch(bool enable) {
-  if (_privateCallMatch == enable)
-    return;
-  _privateCallMatch = enable;
-  emit modified(this);
-}
-
-bool
-TyTSettingsExtension::groupCallMatch() const {
-  return _groupCallMatch;
-}
-void
-TyTSettingsExtension::enableGroupCallMatch(bool enable) {
-  if (_groupCallMatch == enable)
-    return;
-  _groupCallMatch = enable;
   emit modified(this);
 }
 

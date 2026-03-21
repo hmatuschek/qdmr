@@ -1,12 +1,8 @@
 #include "gpssystem.hh"
-#include "userdatabase.hh"
-#include "roamingchannel.hh"
 #include "d878uv2_codeplug.hh"
-#include "config.hh"
 #include "utils.hh"
 #include "channel.hh"
 #include "config.h"
-#include "logger.hh"
 
 #include <QTimeZone>
 #include <QtEndian>

@@ -547,6 +547,9 @@ loc2deg(const QString &loc) {
 
 QString
 deg2loc(const QGeoCoordinate &coor, unsigned int size) {
+  if (!coor.isValid())
+    return QString();
+
   QString loc;
   double lon = (coor.longitude()+180)/360;
   double lat = (coor.latitude()+90)/180;

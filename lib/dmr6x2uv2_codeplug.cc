@@ -464,34 +464,23 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::enableATPC(bool enable) {
 }
 
 
-AnytoneGPSSettingsExtension::GPSMode
-DMR6X2UV2Codeplug::ExtendedSettingsElement::gnss() const {
+GNSSSettings::Systems DMR6X2UV2Codeplug::ExtendedSettingsElement::gnss() const {
   switch ((GNSS) getUInt8(Offset::gnss())) {
-  case GNSS::GPS: return AnytoneGPSSettingsExtension::GPSMode::GPS;
-  case GNSS::BeiDou: return AnytoneGPSSettingsExtension::GPSMode::Beidou;
-  case GNSS::Both: return AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou;
+  case GNSS::GPS: return GNSSSettings::System::GPS;
+  case GNSS::BeiDou: return GNSSSettings::System::Beidou;
+  case GNSS::Both: return GNSSSettings::System::GPS|GNSSSettings::System::Beidou;
   }
-
-  return AnytoneGPSSettingsExtension::GPSMode::GPS;
+  return GNSSSettings::System::GPS;
 }
 
 void
-DMR6X2UV2Codeplug::ExtendedSettingsElement::setGNSS(AnytoneGPSSettingsExtension::GPSMode gnss) {
-  switch (gnss) {
-  case AnytoneGPSSettingsExtension::GPSMode::GPS:
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems gnss) {
+  if (gnss.testFlag(GNSSSettings::System::GPS))
     setUInt8(Offset::gnss(), (unsigned int)GNSS::GPS);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::Glonass:
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou_Glonass:
+  if (gnss.testFlag(GNSSSettings::System::Beidou))
     setUInt8(Offset::gnss(), (unsigned int)GNSS::BeiDou);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Glonas:
-  case AnytoneGPSSettingsExtension::GPSMode::All:
+  if (gnss.testAnyFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
     setUInt8(Offset::gnss(), (unsigned int)GNSS::Both);
-    break;
-  }
 }
 
 
@@ -590,6 +579,10 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
     return false;
   }
 
+  // GPS settings
+  setGNSS(ctx.config()->settings()->gnss()->systems());
+
+
   // Encode device specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -618,9 +611,6 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   // Power settings
   enableATPC(ext->powerSaveSettings()->atpc());
 
-  // GPS settings
-  setGNSS(ext->gpsSettings()->mode());
-
   // Display settings
   setChannelIndexDisplay(ext->displaySettings()->showGlobalChannelNumber() ?
                            ChannelIndexDisplay::GlobalIndex :
@@ -640,6 +630,9 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
     errMsg(err) << "Cannot decode extended settings for DMR-6X2UV codeplug";
     return false;
   }
+
+  // Store GPS settings
+  ctx.config()->settings()->gnss()->setSystems(gnss());
 
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
@@ -669,9 +662,6 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
 
   // Power settings
   ext->powerSaveSettings()->enableATPC(atpcEnabled());
-
-  // Store GPS settings
-  ext->gpsSettings()->setMode(gnss());
 
   // Display settings
   ext->displaySettings()->enableShowGlobalChannelNumber(

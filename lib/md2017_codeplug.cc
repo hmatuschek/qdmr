@@ -97,15 +97,15 @@ MD2017Codeplug::clearGeneralSettings() {
 }
 
 bool
-MD2017Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
-  return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
+  return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(ctx.config());
 }
 
 bool
-MD2017Codeplug::decodeGeneralSettings(Config *config, const ErrorStack &err) {
+MD2017Codeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config);
+  return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(ctx.config());
 }
 
 void
@@ -116,13 +116,13 @@ MD2017Codeplug::clearChannels() {
 }
 
 bool
-MD2017Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
-    if (i < config->channelList()->count()) {
-      chan.fromChannelObj(config->channelList()->channel(i), ctx);
+    if (i < ctx.config()->channelList()->count()) {
+      chan.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
     } else {
       chan.clear();
     }
@@ -131,7 +131,7 @@ MD2017Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx,
 }
 
 bool
-MD2017Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::createChannels(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
   for (int i=0; i<NUM_CHANNELS; i++) {
@@ -140,7 +140,7 @@ MD2017Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &e
       continue;
     ErrorStack err;
     if (Channel *obj = chan.toChannelObj(err)) {
-      config->channelList()->add(obj);
+      ctx.config()->channelList()->add(obj);
       ctx.add(obj, i+1);
     } else {
       logWarn() << "Cannot decode channel at index " << i << ":\n"
@@ -179,8 +179,8 @@ MD2017Codeplug::clearContacts() {
 }
 
 bool
-MD2017Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(config); Q_UNUSED(err)
+MD2017Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
   // Encode contacts
   for (unsigned int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
@@ -193,13 +193,13 @@ MD2017Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx,
 }
 
 bool
-MD2017Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::createContacts(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
       continue;
     if (DMRContact *obj = cont.toContactObj()) {
-      config->contacts()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid contact at index " << i << ".";
       return false;
@@ -218,30 +218,30 @@ MD2017Codeplug::clearZones() {
 }
 
 bool
-MD2017Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
     zone.clear();
     ext.clear();
-    if (i < config->zones()->count()) {
-      zone.fromZoneObj(config->zones()->zone(i), ctx);
-      if (config->zones()->zone(i)->B()->count() || (16 < config->zones()->zone(i)->A()->count()))
-        ext.fromZoneObj(config->zones()->zone(i), ctx);
+    if (i < ctx.config()->zones()->count()) {
+      zone.fromZoneObj(ctx.config()->zones()->zone(i), ctx);
+      if (ctx.config()->zones()->zone(i)->B()->count() || (16 < ctx.config()->zones()->zone(i)->A()->count()))
+        ext.fromZoneObj(ctx.config()->zones()->zone(i), ctx);
     }
   }
   return true;
 }
 
 bool
-MD2017Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::createZones(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       continue;
     if (Zone *obj = zone.toZoneObj()) {
-      config->zones()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->zones()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid zone at index " << i << ".";
       return false;
@@ -278,12 +278,12 @@ MD2017Codeplug::clearGroupLists() {
 }
 
 bool
-MD2017Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
-    if (i < config->rxGroupLists()->count())
-      glist.fromGroupListObj(config->rxGroupLists()->list(i), ctx);
+    if (i < ctx.config()->rxGroupLists()->count())
+      glist.fromGroupListObj(ctx.config()->rxGroupLists()->list(i), ctx);
     else
       glist.clear();
   }
@@ -291,13 +291,13 @@ MD2017Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ct
 }
 
 bool
-MD2017Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::createGroupLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
       continue;
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
-      config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid group list at index " << i << ".";
       return false;
@@ -328,13 +328,13 @@ MD2017Codeplug::clearScanLists() {
 }
 
 bool
-MD2017Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
-    if (i < config->scanlists()->count())
-      scan.fromScanListObj(config->scanlists()->scanlist(i), ctx);
+    if (i < ctx.config()->scanlists()->count())
+      scan.fromScanListObj(ctx.config()->scanlists()->scanlist(i), ctx);
     else
       scan.clear();
   }
@@ -342,14 +342,14 @@ MD2017Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx
 }
 
 bool
-MD2017Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::createScanLists(Context &ctx, const ErrorStack &err) {
 
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
       continue;
     if (ScanList *obj = scan.toScanListObj(ctx)) {
-      config->scanlists()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid scanlist at index " << i << ".";
       return false;
@@ -381,7 +381,7 @@ MD2017Codeplug::clearPositioningSystems() {
 }
 
 bool
-MD2017Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::encodePositioningSystems(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (unsigned int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
@@ -394,13 +394,13 @@ MD2017Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Con
 }
 
 bool
-MD2017Codeplug::createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::createPositioningSystems(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GPSSYSTEMS; i++) {
     GPSSystemElement gps(data(ADDR_GPSSYSTEMS+i*GPSSYSTEM_SIZE));
     if (! gps.isValid())
       continue;
     if (DMRAPRSSystem *obj = gps.toGPSSystemObj()) {
-      config->posSystems()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->posSystems()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid GPS system at index " << i << ".";
       return false;
@@ -441,16 +441,16 @@ MD2017Codeplug::clearButtonSettings() {
 }
 
 bool
-MD2017Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::encodeButtonSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode settings
-  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(ctx.config());
 }
 
 bool
-MD2017Codeplug::decodeButtonSetttings(Config *config, const ErrorStack &err) {
+MD2017Codeplug::decodeButtonSetttings( Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(ctx.config());
 }
 
 
@@ -460,22 +460,21 @@ MD2017Codeplug::clearPrivacyKeys() {
 }
 
 bool
-MD2017Codeplug::encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+MD2017Codeplug::encodePrivacyKeys(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err);
   // First, reset keys
   clearPrivacyKeys();
   // Get keys
   EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
   // If there is no encryption extension -> done.
-  if (! config->commercialExtension())
+  if (! ctx.config()->commercialExtension())
     return true;
   // Otherwise encode
-  return keys.fromCommercialExt(config->commercialExtension(), ctx);
+  return keys.fromCommercialExt(ctx.config()->commercialExtension(), ctx);
 }
 
 bool
-MD2017Codeplug::decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config)
+MD2017Codeplug::decodePrivacyKeys(Context &ctx, const ErrorStack &err) {
   // Get keys
   EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
   // Decode element

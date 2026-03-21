@@ -117,13 +117,13 @@ D578UVCodeplug::ChannelElement::enableSMS(bool enable) {
 bool
 D578UVCodeplug::ChannelElement::dataACK() const {
   // inverted!
-  return !getBit(0x003d,3);
+  return !getBit(Offset::dataACK());
 }
 
 void
 D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted!
-  setBit(0x003d, 3, !enable);
+  setBit(Offset::dataACK(), !enable);
 }
 
 
@@ -967,7 +967,7 @@ D578UVCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
 }
 void
 D578UVCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
-  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x01));
+  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x00));
 }
 
 AnytoneAutoRepeaterSettingsExtension::Direction
@@ -1429,14 +1429,32 @@ D578UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
   setUInt8(Offset::showLastHeard(), (enable ? 0x01 : 0x00));
 }
 
-AnytoneDMRSettingsExtension::SMSFormat
+
+SMSExtension::Format
 D578UVCodeplug::GeneralSettingsElement::smsFormat() const {
-  return (AnytoneDMRSettingsExtension::SMSFormat) getUInt8(Offset::smsFormat());
+  switch ((SMSFormat) getUInt8(Offset::smsFormat())) {
+  case SMSFormat::Motorola: return SMSExtension::Format::Motorola;
+  case SMSFormat::Hytera: return SMSExtension::Format::Hytera;
+  case SMSFormat::DMR: return SMSExtension::Format::DMR;
+  }
+  return SMSExtension::Format::Motorola;
 }
+
 void
-D578UVCodeplug::GeneralSettingsElement::setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt) {
-  setUInt8(Offset::smsFormat(), (unsigned)fmt);
+D578UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSExtension::Format fmt) {
+  switch (fmt) {
+  case SMSExtension::Format::Motorola:
+    setUInt8(Offset::smsFormat(), (unsigned)SMSFormat::Motorola);
+    break;
+  case SMSExtension::Format::Hytera:
+    setUInt8(Offset::smsFormat(), (unsigned)SMSFormat::Hytera);
+    break;
+  case SMSExtension::Format::DMR:
+    setUInt8(Offset::smsFormat(), (unsigned)SMSFormat::DMR);
+    break;
+  }
 }
+
 
 AnytoneAutoRepeaterSettingsExtension::Direction
 D578UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
@@ -1794,8 +1812,8 @@ D578UVCodeplug::GeneralSettingsElement::repeaterCheckNumNotifications() const {
 }
 void
 D578UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigned int n) {
-  n = std::max(1U, std::min(10U, n));
-  setUInt8(Offset::repCheckNumNotify(), n);
+  n = Limit::repeaterOORNotificationCount().limit(n);
+  setUInt8(Offset::repCheckNumNotify(), n-1);
 }
 
 
@@ -1866,10 +1884,16 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
 
-  // Set measurement system based on system locale (0x00==Metric)
-  enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
+
+  // Set measurement system based on system locale (0x00==Metric)
+  enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
+
+  setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
+  setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
+  setSMSFormat(ctx.config()->smsExtension()->format());
+
 
   // Handle D578UV specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -1929,18 +1953,14 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
 
   // Encode DMR settings
-  setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
-  setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
   setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
   enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
   setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
   enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
   enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
   enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
-  setSMSFormat(ext->dmrSettings()->smsFormat());
 
   // Encode GPS settings
-  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
   setGPSTimeZone(ext->gpsSettings()->timeZone());
   enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
   setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
@@ -1970,6 +1990,14 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
+
+  ctx.config()->settings()->gnss()->setUnits(
+        this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
+                                   GNSSSettings::Units::Metric);
+
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(this->groupCallHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(this->privateCallHangTime());
+  ctx.config()->smsExtension()->setFormat(this->smsFormat());
 
   // Handle D578UV specific extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -2016,19 +2044,14 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
   // Encode dmr settings
-  ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
-  ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
   ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
   ext->dmrSettings()->enableFilterOwnID(this->filterOwnID());
   ext->dmrSettings()->setMonitorSlotMatch(this->monitorSlotMatch());
   ext->dmrSettings()->enableMonitorColorCodeMatch(this->monitorColorCodeMatch());
   ext->dmrSettings()->enableMonitorIDMatch(this->monitorIDMatch());
   ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
-  ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
   // Encode GPS settings
-  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
-                                                          AnytoneGPSSettingsExtension::Units::Metric);
   ext->gpsSettings()->setTimeZone(this->gpsTimeZone());
   ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
   ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
@@ -2115,13 +2138,28 @@ D578UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(AnytoneDMRSettings
 }
 
 
-AnytoneDMRSettingsExtension::TalkerAliasEncoding
+DMRSettings::TalkerAliasEncoding
 D578UVCodeplug::ExtendedSettingsElement::talkerAliasEncoding() const {
-  return (AnytoneDMRSettingsExtension::TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding());
+  switch ((TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding())) {
+  case TalkerAliasEncoding::ISO7: return DMRSettings::TalkerAliasEncoding::Iso7;
+  case TalkerAliasEncoding::ISO8: return DMRSettings::TalkerAliasEncoding::Iso8;
+  case TalkerAliasEncoding::Unicode: return DMRSettings::TalkerAliasEncoding::Unicode;
+  }
+  return DMRSettings::TalkerAliasEncoding::Iso8;
 }
 void
-D578UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding enc) {
-  setUInt8(Offset::talkerAliasEncoding(), (unsigned)enc);
+D578UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding enc) {
+  switch (enc) {
+  case DMRSettings::TalkerAliasEncoding::Iso7:
+    setUInt8(Offset::talkerAliasEncoding(), (unsigned)TalkerAliasEncoding::ISO7);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Iso8:
+    setUInt8(Offset::talkerAliasEncoding(), (unsigned)TalkerAliasEncoding::ISO8);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Unicode:
+    setUInt8(Offset::talkerAliasEncoding(), (unsigned)TalkerAliasEncoding::Unicode);
+    break;
+  }
 }
 
 
@@ -2197,33 +2235,24 @@ D578UVCodeplug::ExtendedSettingsElement::setMicSpeakerSource(AnytoneAudioSetting
 }
 
 
-AnytoneGPSSettingsExtension::GPSMode
-D578UVCodeplug::ExtendedSettingsElement::gpsMode() const {
+GNSSSettings::Systems
+D578UVCodeplug::ExtendedSettingsElement::gnss() const {
   switch ((GPSMode)getUInt8(Offset::gpsMode())) {
-  case GPSMode::GPS: return AnytoneGPSSettingsExtension::GPSMode::GPS;
-  case GPSMode::Beidou: return AnytoneGPSSettingsExtension::GPSMode::Beidou;
-  case GPSMode::GPS_Beidou: return AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou;
+  case GPSMode::GPS: return GNSSSettings::System::GPS;
+  case GPSMode::Beidou: return GNSSSettings::System::Beidou;
+  case GPSMode::GPS_Beidou: return GNSSSettings::System::GPS | GNSSSettings::System::Beidou;
   }
-  return AnytoneGPSSettingsExtension::GPSMode::GPS;
+  return GNSSSettings::System::GPS;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode) {
-  switch (mode) {
-  case AnytoneGPSSettingsExtension::GPSMode::GPS:
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Glonas:
-  case AnytoneGPSSettingsExtension::GPSMode::Glonass:
+D578UVCodeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems mode) {
+  if (mode.testFlag(GNSSSettings::System::GPS))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::GPS);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou_Glonass:
+  if (mode.testFlag(GNSSSettings::System::Beidou))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::Beidou);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::All:
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::GPS_Beidou);
-    break;
-  }
 }
 
 
@@ -2946,6 +2975,11 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
+  // Encode GPS settings
+  setGNSS(ctx.config()->settings()->gnss()->systems());
+
+  setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
+
   if (nullptr == ctx.config()->settings()->anytoneExtension()) {
     // If there is no extension, reuse DMR mic gain setting
     setFMMicGain(ctx.config()->settings()->micLevel());
@@ -2957,7 +2991,6 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Encode DMR settings
   setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
-  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
 
   // Some general settings
   setSTEDuration(ext->steDuration());
@@ -2996,9 +3029,6 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   enableShowTimeSlot(ext->displaySettings()->showTimeSlot());
   enableShowChannelType(ext->displaySettings()->showChannelType());
   setDateFormat(ext->displaySettings()->dateFormat());
-
-  // Encode GPS settings
-  setGPSMode(ext->gpsSettings()->mode());
 
   // Encode roaming settings
   enableGPSRoaming(ext->roamingSettings()->gpsRoaming());
@@ -3044,6 +3074,11 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err))
     return false;
 
+  // Store GPS settings
+  ctx.config()->settings()->gnss()->setSystems(this->gnss());
+
+  ctx.config()->config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
+
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
@@ -3053,7 +3088,6 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store DMR settings
   ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
-  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Some general settings
   ext->setSTEDuration(this->steDuration());
@@ -3092,9 +3126,6 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->dmrSettings()->setManualGroupCallHangTime(this->manDialGroupCallHangTime());
   ext->dmrSettings()->setManualPrivateCallHangTime(this->manDialPrivateCallHangTime());
   ext->dmrSettings()->setEncryption(this->encryption());
-
-  // Store GPS settings
-  ext->gpsSettings()->setMode(this->gpsMode());
 
   // Store roaming settings
   ext->roamingSettings()->enableGPSRoaming(this->gpsRoaming());

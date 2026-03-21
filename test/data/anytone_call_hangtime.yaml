@@ -10,10 +10,13 @@ settings:
   vox: 0
   tot: 0
   defaultID: id1
+  dmr:
+    privateCallHangTime: 4s
+    groupCallHangTime: 5s
   anytone:
     dmrSettings:
-      privateCallHangTime: 4s
-      groupCallHangTime: 5s
+      manualPrivateCallHangTime: 4s
+      manualGroupCallHangTime: 5s
 
 radioIDs:
   - dmr: {id: id1, name: DM3MAT, number: 2621370}

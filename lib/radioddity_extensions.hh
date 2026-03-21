@@ -320,10 +320,6 @@ class RadiodditySettingsExtension: public ConfigExtension
   Q_PROPERTY(Interval loneWorkerResponseTime READ loneWorkerResponseTime WRITE setLoneWorkerResponseTime)
   /** The lonw-worker reminder period in seconds. */
   Q_PROPERTY(Interval loneWorkerReminderPeriod READ loneWorkerReminderPeriod WRITE setLoneWorkerReminderPeriod)
-  /** The group-call hang-time in ms. */
-  Q_PROPERTY(Interval groupCallHangTime READ groupCallHangTime WRITE setGroupCallHangTime)
-  /** The private-call hang-time in ms. */
-  Q_PROPERTY(Interval privateCallHangTime READ privateCallHangTime WRITE setPrivateCallHangTime)
   /** If @c true the down-channel mode is VFO. */
   Q_PROPERTY(bool downChannelModeVFO READ downChannelModeVFO WRITE enableDownChannelModeVFO)
   /** If @c true the up-channel mode is VFO. */
@@ -338,10 +334,6 @@ class RadiodditySettingsExtension: public ConfigExtension
               "radios in the network to provide this wake-up delay.")
   /** If @c true, a wakeup preamble is sent. */
   Q_PROPERTY(bool wakeupPreamble READ wakeupPreamble WRITE enableWakeupPreamble)
-  /** The preamble duration in ms. */
-  Q_PROPERTY(Interval preambleDuration READ preambleDuration WRITE setPreambleDuration)
-  Q_CLASSINFO("wakeupPreambleDescription", "If enabled, the radio will transmit a short wake-up "
-              "preamble before each call.")
   /** The delay, before the idle radio enters power save mode (if enabled). */
   Q_PROPERTY(Interval powerSaveDelay READ powerSaveDelay WRITE setPowerSaveDelay)
   /** If @c true, all LEDs are disabled. */
@@ -410,15 +402,6 @@ public:
   /** Sets the lone-worker reminder period in seconds. */
   void setLoneWorkerReminderPeriod(Interval sec);
 
-  /** Returns the group call hang time in ms. */
-  Interval groupCallHangTime() const;
-  /** Sets the group call hang time in ms. */
-  void setGroupCallHangTime(Interval ms);
-  /** Returns the private call hang time in ms. */
-  Interval privateCallHangTime() const;
-  /** Sets the private call hang time in ms. */
-  void setPrivateCallHangTime(Interval ms);
-
   /** Returns @c true if the down-channel mode is VFO. */
   bool downChannelModeVFO() const;
   /** Enables/disables down-channel mode is VFO. */
@@ -436,10 +419,6 @@ public:
   bool wakeupPreamble() const;
   /** Enables transmission of wakeup preamble. */
   void enableWakeupPreamble(bool enable);
-  /** Returns the preamble duration in ms. */
-  Interval preambleDuration() const;
-  /** Sets the preamble duration in ms. */
-  void setPreambleDuration(Interval ms);
   /** Returns the delay, before an idle radio enters power save mode. */
   Interval powerSaveDelay() const;
   /** Sets the delay before an idle radio enters power save mode. */
@@ -498,10 +477,6 @@ protected:
   Interval _loneWorkerResponseTime;
   /** Holds the lone-worker reminder period in seconds. */
   Interval _loneWorkerReminderPeriod;
-  /** The group-call hang-time in ms. */
-  Interval _groupCallHangTime;
-  /** The private-call hang-time in ms. */
-  Interval _privateCallHangTime;
   /** If @c true down-channel mode is VFO. */
   bool _downChannelModeVFO;
   /** If @c true the up-channel mode is VFO. */
@@ -510,8 +485,6 @@ protected:
   bool _powerSaveMode;
   /** If @c true, the wake-up preamble is sent. */
   bool _wakeupPreamble;
-  /** Holds the preamble duration in ms. */
-  Interval _preambleDuration;
   /** Delay before an idle radio enters the power save mode. */
   Interval _powerSaveDelay;
   /** If @c true, all LEDs are disabled. */

@@ -97,7 +97,7 @@ OpenGD77BaseCodeplug::ChannelElement::clear() {
   setTXFrequency(Frequency());
   setMode(MODE_ANALOG);
   setPower(Channel::Power::High);
-  clearFixedPosition();
+  enableFixedPosition(false);
   setRXTone(SelectiveCall());
   setTXTone(SelectiveCall());
   enableSimplex(false);
@@ -226,7 +226,7 @@ OpenGD77BaseCodeplug::ChannelElement::setTransmitTimeout(const Interval &interva
 
 
 bool
-OpenGD77BaseCodeplug::ChannelElement::hasFixedPosition() const {
+OpenGD77BaseCodeplug::ChannelElement::fixedPositionEnabled() const {
   return getBit(Offset::useFixedLocation());
 }
 
@@ -245,14 +245,13 @@ OpenGD77BaseCodeplug::ChannelElement::fixedPosition() const {
 void
 OpenGD77BaseCodeplug::ChannelElement::setFixedPosition(const QGeoCoordinate &coordinate) {
   if (! coordinate.isValid()) {
-    clearFixedPosition();
+    enableFixedPosition(false);
     return;
   }
 
   uint32_t latCode = encodeAngle(coordinate.latitude());
   uint32_t lonCode = encodeAngle(coordinate.longitude());
 
-  setBit(Offset::useFixedLocation(), true);
   setUInt8(Offset::latitude0(), ((latCode >>  0) & 0xff));
   setUInt8(Offset::latitude1(), ((latCode >>  8) & 0xff));
   setUInt8(Offset::latitude2(), ((latCode >> 16) & 0xff));
@@ -262,8 +261,8 @@ OpenGD77BaseCodeplug::ChannelElement::setFixedPosition(const QGeoCoordinate &coo
 }
 
 void
-OpenGD77BaseCodeplug::ChannelElement::clearFixedPosition() {
-  setBit(Offset::useFixedLocation(), false);
+OpenGD77BaseCodeplug::ChannelElement::enableFixedPosition(bool enable) {
+  setBit(Offset::useFixedLocation(), enable);
 }
 
 
@@ -595,10 +594,8 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
   ch->openGD77ChannelExtension()->enableScanAllSkip(skipScan());
   ch->openGD77ChannelExtension()->enableBeep(beep());
   ch->openGD77ChannelExtension()->enablePowerSave(powerSave());
-  if (hasFixedPosition())
-    ch->openGD77ChannelExtension()->setLocation(fixedPosition());
-  else
-    ch->openGD77ChannelExtension()->setLocation(QGeoCoordinate());
+  ch->openGD77ChannelExtension()->enableLocation(fixedPositionEnabled());
+  ch->openGD77ChannelExtension()->setLocation(fixedPosition());
   ch->openGD77ChannelExtension()->setTalkerAliasTS1(aliasTimeSlot1());
   ch->openGD77ChannelExtension()->setTalkerAliasTS2(aliasTimeSlot2());
 
@@ -705,10 +702,8 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
   enableSkipScan(c->openGD77ChannelExtension()->scanAllSkip());
   enableBeep(c->openGD77ChannelExtension()->beep());
   enablePowerSave(c->openGD77ChannelExtension()->powerSave());
-  if (c->openGD77ChannelExtension()->location().isValid())
-    setFixedPosition(c->openGD77ChannelExtension()->location());
-  else
-    clearFixedPosition();
+  setFixedPosition(c->openGD77ChannelExtension()->location());
+  enableFixedPosition(c->openGD77ChannelExtension()->locationEnabled());
 
   setAliasTimeSlot1(c->openGD77ChannelExtension()->talkerAliasTS1());
   setAliasTimeSlot2(c->openGD77ChannelExtension()->talkerAliasTS2());
@@ -988,7 +983,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::clear() {
   Element::clear();
 
   setName("");
-  clearFixedPosition();
+  enableFixedPosition(false);
   setUInt32_le(Offset::fmFrequency(), 0);
 
   // Some random data, appears to be important
@@ -1025,7 +1020,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::setSourceSSID(unsigned int ssid) {
 
 
 bool
-OpenGD77BaseCodeplug::APRSSettingsElement::hasFixedPosition() const {
+OpenGD77BaseCodeplug::APRSSettingsElement::fixedPositionEnabled() const {
   return getBit(Offset::useFixedPosition());
 }
 
@@ -1044,8 +1039,8 @@ OpenGD77BaseCodeplug::APRSSettingsElement::setFixedPosition(const QGeoCoordinate
 }
 
 void
-OpenGD77BaseCodeplug::APRSSettingsElement::clearFixedPosition() {
-  clearBit(Offset::useFixedPosition());
+OpenGD77BaseCodeplug::APRSSettingsElement::enableFixedPosition(bool enable) {
+  setBit(Offset::useFixedPosition(), enable);
 }
 
 OpenGD77BaseCodeplug::APRSSettingsElement::PositionPrecision
@@ -1179,19 +1174,13 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const FMAPRSSystem *sys, const
   setIcon(sys->icon());
   setComment(sys->message());
 
-  clearFixedPosition();
+  enableFixedPosition(false);
   setBaudRate(BaudRate::Baud1200);
   setPositionPrecision(PositionPrecision::Max);
 
   if(sys->hasRevertChannel()) {
     setFMFrequency(sys->revertChannel()->txFrequency());
   }
-
-  if (nullptr == sys->openGD77Extension())
-    return true;
-
-  if (sys->openGD77Extension()->location().isValid())
-    setFixedPosition(sys->openGD77Extension()->location());
 
   return true;
 }
@@ -1217,12 +1206,6 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
 
   sys->setIcon(icon());
   sys->setMessage(comment());
-
-  auto ext = new OpenGD77APRSSystemExtension();
-  sys->setOpenGD77Extension(ext);
-
-  if (hasFixedPosition())
-    ext->setLocation(fixedPosition());
 
   return sys;
 }

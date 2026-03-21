@@ -1,6 +1,5 @@
 #include "dr1801uv_codeplug.hh"
 #include "logger.hh"
-#include "utils.hh"
 #include "zone.hh"
 #include "config.hh"
 #include "intermediaterepresentation.hh"
@@ -2908,15 +2907,18 @@ DR1801UVCodeplug::DMRSettingsElement::clear() {
   memset(_data, 0, _size);
 }
 
-unsigned int
-DR1801UVCodeplug::DMRSettingsElement::holdTime() const {
-  return getUInt8(Offset::holdTime());
+
+Interval
+DR1801UVCodeplug::DMRSettingsElement::callHangTime() const {
+  return Interval::fromSeconds(getUInt8(Offset::holdTime()));
 }
+
 void
-DR1801UVCodeplug::DMRSettingsElement::setHoldTime(unsigned int sec) {
-  sec = Limit::holdTime().limit(sec);
-  setUInt8(Offset::holdTime(), sec);
+DR1801UVCodeplug::DMRSettingsElement::setCallHangTime(const Interval &dur) {
+  auto t = Limit::holdTime().limit(dur);
+  setUInt8(Offset::holdTime(), t.seconds());
 }
+
 
 unsigned int
 DR1801UVCodeplug::DMRSettingsElement::remoteListen() const {
@@ -3066,6 +3068,9 @@ bool
 DR1801UVCodeplug::DMRSettingsElement::decode(Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(err);
 
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(callHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(callHangTime());
+
   switch(smsFormat()) {
   case SMSFormat::IPData: ctx.config()->smsExtension()->setFormat(SMSExtension::Format::Motorola); break;
   case SMSFormat::CompressedIP: ctx.config()->smsExtension()->setFormat(SMSExtension::Format::Hytera); break;
@@ -3078,6 +3083,8 @@ DR1801UVCodeplug::DMRSettingsElement::decode(Context &ctx, const ErrorStack &err
 bool
 DR1801UVCodeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+
+  setCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
 
   switch(ctx.config()->smsExtension()->format()) {
   case SMSExtension::Format::Motorola: setSMSFormat(SMSFormat::IPData); break;

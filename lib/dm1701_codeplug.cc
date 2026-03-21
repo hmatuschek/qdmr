@@ -286,13 +286,14 @@ DM1701Codeplug::GeneralSettingsElement::fromConfig(const Config *config) {
 
   setTimeZone(QTimeZone::systemTimeZone());
 
+  enablePrivateCallMatch(config->settings()->dmr()->privateCallMatchEnabled());
+  enableGroupCallMatch(config->settings()->dmr()->groupCallMatchEnabled());
+
   // apply extension
   if (TyTSettingsExtension *ex  = config->settings()->tytExtension()) {
     enableChannelMode(ex->channelMode());
     enableChannelModeA(ex->channelModeA());
     enableChannelModeB(ex->channelModeB());
-    enableGroupCallMatch(ex->groupCallMatch());
-    enablePrivateCallMatch(ex->privateCallMatch());
     setChannelHangTime(ex->channelHangTime());
   }
 
@@ -304,13 +305,14 @@ DM1701Codeplug::GeneralSettingsElement::updateConfig(Config *config) {
   if (! TyTCodeplug::GeneralSettingsElement::updateConfig(config))
     return false;
 
+  config->settings()->dmr()->enablePrivateCallMatch(privateCallMatch());
+  config->settings()->dmr()->enableGroupCallMatch(groupCallMatch());
+
   // Update extension if set.
   if (TyTSettingsExtension *ex = config->settings()->tytExtension()) {
     ex->enableChannelMode(channelMode());
     ex->enableChannelModeA(channelModeA());
     ex->enableChannelModeB(channelModeB());
-    ex->enableGroupCallMatch(groupCallMatch());
-    ex->enablePrivateCallMatch(privateCallMatch());
     ex->setChannelHangTime(channelHangTime());
   }
 
@@ -555,15 +557,15 @@ DM1701Codeplug::clearGeneralSettings() {
 }
 
 bool
-DM1701Codeplug::encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
-  return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(config);
+  return GeneralSettingsElement(data(ADDR_SETTINGS)).fromConfig(ctx.config());
 }
 
 bool
-DM1701Codeplug::decodeGeneralSettings(Config *config, const ErrorStack &err) {
+DM1701Codeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(config);
+  return GeneralSettingsElement(data(ADDR_SETTINGS)).updateConfig(ctx.config());
 }
 
 void
@@ -574,13 +576,13 @@ DM1701Codeplug::clearChannels() {
 }
 
 bool
-DM1701Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
-    if (i < config->channelList()->count()) {
-      chan.fromChannelObj(config->channelList()->channel(i), ctx);
+    if (i < ctx.config()->channelList()->count()) {
+      chan.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
     } else {
       chan.clear();
     }
@@ -589,13 +591,13 @@ DM1701Codeplug::encodeChannels(Config *config, const Flags &flags, Context &ctx,
 }
 
 bool
-DM1701Codeplug::createChannels(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createChannels(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
     if (! chan.isValid())
       continue;
     if (Channel *obj = chan.toChannelObj()) {
-      config->channelList()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->channelList()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid channel at index %" << i << ".";
       return false;
@@ -626,7 +628,7 @@ DM1701Codeplug::clearContacts() {
 }
 
 bool
-DM1701Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode contacts
   for (unsigned int i=0; i<NUM_CONTACTS; i++) {
@@ -640,13 +642,13 @@ DM1701Codeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx,
 }
 
 bool
-DM1701Codeplug::createContacts(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createContacts(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
     if (! cont.isValid())
       continue;
     if (DMRContact *obj = cont.toContactObj()) {
-      config->contacts()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->contacts()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid contact at index " << i << ".";
       return false;
@@ -665,30 +667,30 @@ DM1701Codeplug::clearZones() {
 }
 
 bool
-DM1701Codeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
     ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
     zone.clear();
     ext.clear();
-    if (i < config->zones()->count()) {
-      zone.fromZoneObj(config->zones()->zone(i), ctx);
-      if (config->zones()->zone(i)->B()->count() || (16 < config->zones()->zone(i)->A()->count()))
-        ext.fromZoneObj(config->zones()->zone(i), ctx);
+    if (i < ctx.config()->zones()->count()) {
+      zone.fromZoneObj(ctx.config()->zones()->zone(i), ctx);
+      if (ctx.config()->zones()->zone(i)->B()->count() || (16 < ctx.config()->zones()->zone(i)->A()->count()))
+        ext.fromZoneObj(ctx.config()->zones()->zone(i), ctx);
     }
   }
   return true;
 }
 
 bool
-DM1701Codeplug::createZones(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createZones(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_ZONES; i++) {
     ZoneElement zone(data(ADDR_ZONES+i*ZONE_SIZE));
     if (! zone.isValid())
       continue;
     if (Zone *obj = zone.toZoneObj()) {
-      config->zones()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->zones()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid zone at index " << i << ".";
       return false;
@@ -725,12 +727,12 @@ DM1701Codeplug::clearGroupLists() {
 }
 
 bool
-DM1701Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
-    if (i < config->rxGroupLists()->count())
-      glist.fromGroupListObj(config->rxGroupLists()->list(i), ctx);
+    if (i < ctx.config()->rxGroupLists()->count())
+      glist.fromGroupListObj(ctx.config()->rxGroupLists()->list(i), ctx);
     else
       glist.clear();
   }
@@ -738,13 +740,13 @@ DM1701Codeplug::encodeGroupLists(Config *config, const Flags &flags, Context &ct
 }
 
 bool
-DM1701Codeplug::createGroupLists(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createGroupLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_GROUPLISTS; i++) {
     GroupListElement glist(data(ADDR_GROUPLISTS+i*GROUPLIST_SIZE));
     if (! glist.isValid())
       continue;
     if (RXGroupList *obj = glist.toGroupListObj(ctx)) {
-      config->rxGroupLists()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->rxGroupLists()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid group list at index " << i << ".";
       return false;
@@ -775,13 +777,13 @@ DM1701Codeplug::clearScanLists() {
 }
 
 bool
-DM1701Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Define Scanlists
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
-    if (i < config->scanlists()->count())
-      scan.fromScanListObj(config->scanlists()->scanlist(i), ctx);
+    if (i < ctx.config()->scanlists()->count())
+      scan.fromScanListObj(ctx.config()->scanlists()->scanlist(i), ctx);
     else
       scan.clear();
   }
@@ -789,13 +791,13 @@ DM1701Codeplug::encodeScanLists(Config *config, const Flags &flags, Context &ctx
 }
 
 bool
-DM1701Codeplug::createScanLists(Config *config, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::createScanLists(Context &ctx, const ErrorStack &err) {
   for (int i=0; i<NUM_SCANLISTS; i++) {
     ScanListElement scan(data(ADDR_SCANLISTS + i*SCANLIST_SIZE));
     if (! scan.isValid())
       continue;
     if (ScanList *obj = scan.toScanListObj(ctx)) {
-      config->scanlists()->add(obj); ctx.add(obj, i+1);
+      ctx.config()->scanlists()->add(obj); ctx.add(obj, i+1);
     } else {
       errMsg(err) << "Invalid scanlist at index " << i << ".";
       return false;
@@ -830,16 +832,16 @@ DM1701Codeplug::clearButtonSettings() {
 }
 
 bool
-DM1701Codeplug::encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodeButtonSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Encode settings
-  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(config);
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).fromConfig(ctx.config());
 }
 
 bool
-DM1701Codeplug::decodeButtonSetttings(Config *config, const ErrorStack &err) {
+DM1701Codeplug::decodeButtonSetttings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(config);
+  return ButtonSettingsElement(data(ADDR_BUTTONSETTINGS)).updateConfig(ctx.config());
 }
 
 
@@ -849,18 +851,17 @@ DM1701Codeplug::clearPrivacyKeys() {
 }
 
 bool
-DM1701Codeplug::encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
+DM1701Codeplug::encodePrivacyKeys(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err);
   // First, reset keys
   clearPrivacyKeys();
   // Get keys
   EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
-  return keys.fromCommercialExt(config->commercialExtension(), ctx);
+  return keys.fromCommercialExt(ctx.config()->commercialExtension(), ctx);
 }
 
 bool
-DM1701Codeplug::decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config)
+DM1701Codeplug::decodePrivacyKeys(Context &ctx, const ErrorStack &err) {
   // Get keys
   EncryptionElement keys(data(ADDR_PRIVACY_KEYS));
   // Decode element
@@ -908,15 +909,15 @@ DM1701Codeplug::clearPositioningSystems() {
 }
 
 bool
-DM1701Codeplug::encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
+DM1701Codeplug::encodePositioningSystems(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(ctx); Q_UNUSED(err)
   // Pass, nothing to do
   return true;
 }
 
 bool
-DM1701Codeplug::createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(config); Q_UNUSED(ctx); Q_UNUSED(err)
+DM1701Codeplug::createPositioningSystems(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err)
   // Pass, nothing to do
   return true;
 }
