@@ -155,12 +155,12 @@ D578UVLimits::D578UVLimits(const std::initializer_list<std::pair<Frequency, Freq
   add("positioning", new RadioLimitList{
         { DMRAPRSSystem::staticMetaObject, 0, 8, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
-            { "period", new RadioLimitUInt(0, 7650) },
+            { "period", new RadioLimitInterval({Interval::null(), Interval::fromMinutes(127)}) },
             { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
             { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) } } },
         { FMAPRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
-            { "period", new RadioLimitUInt(0, 7650) },
+            { "period", new RadioLimitInterval({Interval::null(), Interval::fromMinutes(127)}) },
             { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, FMChannel::staticMetaObject}, false) },
             { "icon", new RadioLimitEnum{} },
             { "message", new RadioLimitString(0, 60, RadioLimitString::ASCII) }

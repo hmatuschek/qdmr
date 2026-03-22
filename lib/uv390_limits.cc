@@ -157,7 +157,7 @@ UV390Limits::UV390Limits(QObject *parent)
   add("positioning", new RadioLimitList({
         { DMRAPRSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
           { "name", new RadioLimitStringIgnored() },
-          { "period", new RadioLimitUInt(0, 7650) },
+          { "period", new RadioLimitInterval({Interval::null(), Interval::fromMinutes(127)}) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
           { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) }
           } },
