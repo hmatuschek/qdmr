@@ -22,6 +22,11 @@ Channel::Channel(QObject *parent)
     _openGD77ChannelExtension(nullptr),
     _tytChannelExtension(nullptr)
 {
+  Context::setTag(staticMetaObject.className(), "timeout",
+                  "!default", QVariant::fromValue(Interval::null()));
+  Context::setTag(staticMetaObject.className(), "vox",
+                  "!default", QVariant::fromValue(Level::invalid()));
+
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -298,13 +303,6 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
     node["power"] = metaEnum.valueToKey((unsigned)power());
   }
 
-  if (defaultTimeout()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["timeout"] = def;
-  } else {
-    node["timeout"] = timeout();
-  }
-
   return true;
 }
 
@@ -327,18 +325,6 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   } else if (ch["power"] && ch["power"].IsScalar()) {
     QMetaEnum meta = QMetaEnum::fromType<Channel::Power>();
     setPower((Channel::Power)meta.keyToValue(ch["power"].as<std::string>().c_str()));
-  }
-
-  if ((! ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
-    setDefaultTimeout();
-  } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
-    setTimeout(ch["timeout"].as<Interval>());
-  }
-
-  if ((! ch["vox"]) || ("!default" == ch["vox"].Tag())) {
-    setVOXDefault();
-  } else if (ch["vox"] && ch["vox"].IsScalar()) {
-    setVOX(ch["vox"].as<Level>());
   }
 
   return ConfigObject::parse(ch, ctx, err);
@@ -722,10 +708,10 @@ DMRChannel::DMRChannel(QObject *parent)
     _commercialExtension(nullptr), _anytoneExtension(nullptr)
 {
   // Register default tags
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "roaming", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "radioId", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::tagIsSet(staticMetaObject.className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", QVariant::fromValue(DefaultRoamingZone::get()));
+  if (! ConfigItem::Context::tagIsSet(staticMetaObject.className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", QVariant::fromValue(DefaultRadioID::get()));
 
   // Set default DMR Id
   _radioId.set(DefaultRadioID::get());

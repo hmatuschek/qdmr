@@ -43,7 +43,7 @@ class Channel: public ConfigObject
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */
-  Q_PROPERTY(Interval timeout READ timeout WRITE setTimeout SCRIPTABLE false)
+  Q_PROPERTY(Interval timeout READ timeout WRITE setTimeout)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */

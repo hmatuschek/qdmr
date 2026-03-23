@@ -105,7 +105,8 @@ DMRAPRSSystem::DMRAPRSSystem(QObject *parent)
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _revertChannel.allow(SelectedChannel::get()->metaObject());
   // Register '!selected' tag for revert channel
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "revert",
+                  "!selected", QVariant::fromValue(SelectedChannel::get()));
   // By default, selected channel is revert channel
   resetRevertChannel();
 
@@ -122,7 +123,8 @@ DMRAPRSSystem::DMRAPRSSystem(const QString &name, DMRContact *contact,
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _revertChannel.allow(SelectedChannel::get()->metaObject());
   // Register '!selected' tag for revert channel
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "revert",
+                  "!selected", QVariant::fromValue(SelectedChannel::get()));
 
   // Set references.
   _contact.set(contact);
@@ -226,7 +228,8 @@ FMAPRSSystem::FMAPRSSystem(QObject *parent)
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _channel.allow(SelectedChannel::get()->metaObject());
   // Register '!selected' tag for revert channel
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "revert",
+                  "!selected", QVariant::fromValue(SelectedChannel::get()));
   // By default, selected channel is revert channel
   resetRevertChannel();
 
@@ -244,7 +247,8 @@ FMAPRSSystem::FMAPRSSystem(const QString &name, FMChannel *channel, const QStrin
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _channel.allow(SelectedChannel::get()->metaObject());
   // Register '!selected' tag for revert channel
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "revert",
+                  "!selected", QVariant::fromValue(SelectedChannel::get()));
 
   // Set revert channel
   setRevertChannel(channel);

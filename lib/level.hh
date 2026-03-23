@@ -95,18 +95,13 @@ struct convert<Level>
 {
   /** Serializes the interval. */
   static Node encode(const Level& rhs) {
-    if (rhs.isInvalid()) {
-      YAML::Node def = YAML::Node(YAML::NodeType::Scalar);
-      def.SetTag("!default");
-      return def;
-    }
     return Node(rhs.format().toStdString());
   }
 
   /** Parses the interval. */
   static bool decode(const Node& node, Level& rhs) {
     // Usually means default level
-    if (node.IsNull() || ("!default" == node.Tag())) {
+    if (node.IsNull()) {
       rhs = Level::invalid();
       return true;
     }
