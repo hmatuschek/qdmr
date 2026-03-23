@@ -2046,7 +2046,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
   chan->setTimeout(Interval::fromSeconds(tot));
   chan->setRXOnly(ro);
   chan->setAdmit(admit);
-  chan->setSquelch(squelch);
+  chan->setSquelch(Level::fromValue(squelch));
   chan->setRXTone(rxTone);
   chan->setTXTone(txTone);
   chan->setBandwidth(bw);

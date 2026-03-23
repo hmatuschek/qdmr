@@ -924,13 +924,13 @@ public:
     /** Enables/disables boot password. */
     virtual void enableBootPassword(bool enable);
     /** Squelch level of VFO A, (0=off). */
-    virtual unsigned squelchLevelA() const;
+    virtual Level squelchLevelA() const;
     /** Returns the squelch level for VFO A, (0=off). */
-    virtual void setSquelchLevelA(unsigned level);
+    virtual void setSquelchLevelA(Level level);
     /** Squelch level of VFO B, (0=off). */
-    virtual unsigned squelchLevelB() const;
+    virtual Level squelchLevelB() const;
     /** Returns the squelch level for VFO B, (0=off). */
-    virtual void setSquelchLevelB(unsigned level);
+    virtual void setSquelchLevelB(Level level);
 
     /** Returns the VFO scan type. */
     virtual AnytoneSettingsExtension::VFOScanType vfoScanType() const = 0;

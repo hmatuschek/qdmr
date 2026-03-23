@@ -31,7 +31,7 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
   }
 
-  ui->squelchValue->setValue(_config->settings()->squelch());
+  ui->squelchValue->setValue(_config->settings()->squelch().value());
   if (_config->settings()->totDisabled())
     ui->totValue->setValue(0);
   else
@@ -88,7 +88,7 @@ GeneralSettingsView::onConfigModified() {
   case Channel::Power::Low: ui->powerValue->setCurrentIndex(3); break;
   case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
   }
-  ui->squelchValue->setValue(_config->settings()->squelch());
+  ui->squelchValue->setValue(_config->settings()->squelch().value());
   if (_config->settings()->totDisabled())
     ui->totValue->setValue(0);
   else
@@ -148,7 +148,7 @@ GeneralSettingsView::onPowerChanged() {
 }
 void
 GeneralSettingsView::onSquelchChanged() {
-  _config->settings()->setSquelch(ui->squelchValue->value());
+  _config->settings()->setSquelch(Level::fromValue(ui->squelchValue->value()));
 }
 void
 GeneralSettingsView::onTOTChanged() {

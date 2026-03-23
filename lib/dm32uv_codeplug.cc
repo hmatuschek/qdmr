@@ -229,14 +229,14 @@ DM32UVCodeplug::ChannelElement::clearEmergencySystemIndex() {
 }
 
 
-unsigned
+Level
 DM32UVCodeplug::ChannelElement::squelchLevel() const {
-  return (10*getUInt4(Offset::squelchLevel()))/Limit::squelchLevel();
+  return Level::fromValue(getUInt4(Offset::squelchLevel()), Limit::squelchLevel());
 }
 
 void
-DM32UVCodeplug::ChannelElement::setSquelchLevel(unsigned int level) {
-  setUInt4(Offset::squelchLevel(), (level*Limit::squelchLevel())/10);
+DM32UVCodeplug::ChannelElement::setSquelchLevel(Level level) {
+  setUInt4(Offset::squelchLevel(), level.mapTo(Limit::squelchLevel()));
 }
 
 

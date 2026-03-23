@@ -33,8 +33,8 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
             unsigned(Channel::Power::Low),
             unsigned(Channel::Power::Mid),
             unsigned(Channel::Power::High) } },
-        { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitLevel() },
+        { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );
@@ -81,7 +81,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -90,7 +90,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
                  (unsigned)FMChannel::Admit::Free,
                  (unsigned)FMChannel::Admit::Tone
                } },
-              {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"squelch", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"bandwidth", new RadioLimitEnum{
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
@@ -109,7 +109,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
                }},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),

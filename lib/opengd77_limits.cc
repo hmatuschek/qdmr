@@ -31,8 +31,8 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
         { "micLevel", new RadioLimitUInt(1, 10) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
-        { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitLevel() },
+        { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "tot", new RadioLimitInterval() }
       });
 
@@ -90,14 +90,14 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum{
                  (unsigned)FMChannel::Admit::Always,
                  (unsigned)FMChannel::Admit::Free,
                  (unsigned)FMChannel::Admit::Tone
                } },
-              {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"squelch", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"bandwidth", new RadioLimitEnum{
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
@@ -117,7 +117,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),

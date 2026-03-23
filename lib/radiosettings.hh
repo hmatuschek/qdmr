@@ -27,7 +27,7 @@ class RadioSettings : public ConfigItem
   /** The default channel power */
   Q_PROPERTY(Channel::Power power READ power WRITE setPower)
   /** The squelch level. */
-  Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch)
+  Q_PROPERTY(Level squelch READ squelch WRITE setSquelch)
   /** The default vox sensitivity */
   Q_PROPERTY(Level vox READ vox WRITE setVOX)
   /** The default transmit timeout */
@@ -76,9 +76,9 @@ public:
   void enableSpeech(bool enabled);
 
   /** Returns the default squelch level [0-10]. */
-  unsigned squelch() const;
+  Level squelch() const;
   /** Sets the default squelch level. */
-  void setSquelch(unsigned squelch);
+  void setSquelch(Level squelch);
 
   /** Returns the default channel power. */
   Channel::Power power() const;
@@ -149,7 +149,7 @@ protected:
   /** Holds the speech synthesis flag. */
   bool _speech;
   /** Holds the global squelch setting. */
-  unsigned _squelch;
+  Level _squelch;
   /** Holds the global power setting. */
   Channel::Power _power;
   /** Holds the global VOX level. */

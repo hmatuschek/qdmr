@@ -92,9 +92,9 @@ public:
     virtual void setTurnOffFreq(TyTChannelExtension::KillTone freq);
 
     /** Returns the squelch level [0-10]. */
-    virtual unsigned squelch() const;
+    virtual Level squelch() const;
     /** Sets the squelch level [0-10]. */
-    virtual void setSquelch(unsigned value);
+    virtual void setSquelch(Level value);
 
     /** Returns the power of this channel. */
     virtual Channel::Power power() const;

@@ -138,9 +138,9 @@ public:
     virtual void clearEmergencySystemIndex();
 
     /** Returns FM and DMR squelch level. */
-    virtual unsigned int squelchLevel() const;
+    virtual Level squelchLevel() const;
     /** Sets the FM and DMR squelch level. */
-    virtual void setSquelchLevel(unsigned int level);
+    virtual void setSquelchLevel(Level level);
 
     /** Returns @c true if the channel is RX only. */
     virtual bool rxOnlyEnabled() const;
@@ -225,7 +225,7 @@ public:
       /** Maximum name length. */
       static constexpr unsigned int nameLength() { return 16; }
       /** Maximum squelch level. */
-      static constexpr unsigned int squelchLevel() { return 15; }
+      static constexpr Range<unsigned int> squelchLevel() { return {0, 15}; }
     };
 
   protected:

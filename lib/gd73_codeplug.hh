@@ -233,9 +233,9 @@ public:
     void setVOX(Level level);
 
     /** Returns the squelch level [0,10]. */
-    unsigned int squelch() const;
+    Level squelch() const;
     /** Sets the squelch level [0,10]. */
-    void setSquelch(unsigned int level);
+    void setSquelch(Level level);
 
     /** Returns @c true, if a transmit time-out is set. */
     bool totIsSet() const;
@@ -366,6 +366,9 @@ public:
       static constexpr unsigned int name() { return 16; }
       /** Valid VOX sensitivity levels. */
       static constexpr Range<unsigned int> vox() { return {1, 4}; }
+      /** Valid squelch sensitivity levels. */
+      static constexpr Range<unsigned int> squelch() { return {1, 9}; }
+
       /** Transmit time-out range. */
       static constexpr TimeRange tot() {
         return TimeRange{Interval::fromSeconds(20), Interval::fromSeconds(500)};

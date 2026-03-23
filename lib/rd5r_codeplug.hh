@@ -96,9 +96,9 @@ public:
     void clear();
 
     /** Returns the squelch level. */
-    virtual unsigned squelch() const;
+    virtual Level squelch() const;
     /** Sets the squelch level. */
-    virtual void setSquelch(unsigned level);
+    virtual void setSquelch(Level level);
 
     bool fromChannelObj(const Channel *c, Context &ctx, const ErrorStack &err=ErrorStack());
     Channel *toChannelObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;

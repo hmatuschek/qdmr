@@ -32,8 +32,8 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
         { "power", new RadioLimitEnum {
             unsigned(Channel::Power::Low),
             unsigned(Channel::Power::High) } },
-        { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitLevel() },
+        { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );
@@ -88,7 +88,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -97,7 +97,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
                  (unsigned)FMChannel::Admit::Free,
                  (unsigned)FMChannel::Admit::Tone
                } },
-              {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"squelch", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"bandwidth", new RadioLimitEnum{
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
@@ -119,7 +119,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
                }},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),
@@ -144,6 +144,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(118.), Frequency::fromMHz(137.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(118.), Frequency::fromMHz(137.)}})},
               {"power", new RadioLimitEnum {unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
+              {"squelch", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()}
             } }
         } ) );

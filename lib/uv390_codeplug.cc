@@ -68,7 +68,7 @@ UV390Codeplug::ChannelElement::clear() {
   clearBit(5,0);
   setInCallCriteria(TyTChannelExtension::InCallCriterion::Always);
   setTurnOffFreq(TyTChannelExtension::KillTone::Off);
-  setSquelch(1);
+  setSquelch(Level::fromValue(1));
   setPower(Channel::Power::High);
   enableAllowInterrupt(true);
   enableDualCapacityDirectMode(false);
@@ -117,14 +117,14 @@ UV390Codeplug::ChannelElement::setTurnOffFreq(TyTChannelExtension::KillTone freq
   setUInt2(Offset::turnOffFreq(), uint8_t(freq));
 }
 
-unsigned
+Level
 UV390Codeplug::ChannelElement::squelch() const {
-  return getUInt8(Offset::squelch());
+  return Level::fromValue(getUInt8(Offset::squelch()));
 }
 void
-UV390Codeplug::ChannelElement::setSquelch(unsigned value) {
-  value = std::min(unsigned(10), value);
-  return setUInt8(Offset::squelch(), value);
+UV390Codeplug::ChannelElement::setSquelch(Level value) {
+  if (value.isInvalid())
+    setUInt8(Offset::squelch(), value.value());
 }
 
 Channel::Power

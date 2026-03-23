@@ -1567,20 +1567,21 @@ AnytoneCodeplug::GeneralSettingsElement::enableBootPassword(bool enable) {
   setUInt8(Offset::bootPassword(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Level
 AnytoneCodeplug::GeneralSettingsElement::squelchLevelA() const {
-  return getUInt8(Offset::squelchLevelA());
+  return Level::fromValue(getUInt8(Offset::squelchLevelA()), {1,5});
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelA(unsigned level) {
-  setUInt8(Offset::squelchLevelA(), level);
+AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelA(Level level) {
+  setUInt8(Offset::squelchLevelA(), level.mapTo({1,5}));
 }
-unsigned AnytoneCodeplug::GeneralSettingsElement::squelchLevelB() const {
-  return getUInt8(Offset::squelchLevelB());
+Level
+AnytoneCodeplug::GeneralSettingsElement::squelchLevelB() const {
+  return Level::fromValue(getUInt8(Offset::squelchLevelB()), {1,5});
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(unsigned level) {
-  setUInt8(Offset::squelchLevelB(), level);
+AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(Level level) {
+  setUInt8(Offset::squelchLevelB(), level.mapTo({1, 5}));
 }
 
 bool
@@ -1603,16 +1604,8 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     }
   }
   // Set default squelch level
-  if (0 == ctx.config()->settings()->squelch()) {
-    setSquelchLevelA(0);
-    setSquelchLevelB(0);
-  } else if (1 == ctx.config()->settings()->squelch()) {
-    setSquelchLevelA(1);
-    setSquelchLevelB(1);
-  } else {
-    setSquelchLevelA(ctx.config()->settings()->squelch()/2);
-    setSquelchLevelB(ctx.config()->settings()->squelch()/2);
-  }
+  setSquelchLevelA(ctx.config()->settings()->squelch());
+  setSquelchLevelB(ctx.config()->settings()->squelch());
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
@@ -1747,7 +1740,7 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->setMicLevel(dmrMicGain());
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
-  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
+  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB()));
 
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :

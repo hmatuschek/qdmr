@@ -2,6 +2,8 @@
 #define TYTEXTENSION_HH
 
 #include "configobject.hh"
+#include "level.hh"
+
 
 /** Represents the TyT channel extension.
  *
@@ -55,7 +57,7 @@ class TyTChannelExtension: public ConfigExtension
   /** If @c true, and dcdm is enabled, this radio is the leader, specifying the clock. */
   Q_PROPERTY(bool dcdmLeader READ dcdmLeader WRITE enableDCDMLeader)
   /** The squelch level for DMR channels. */
-  Q_PROPERTY(unsigned int dmrSquelch READ dmrSquelch WRITE setDMRSquelch)
+  Q_PROPERTY(Level dmrSquelch READ dmrSquelch WRITE setDMRSquelch)
   Q_CLASSINFO("dmrSquelchDescription", "Sets the squelch level for DMR channels. "
               "Only applicable for MD-UV390 and MD-2017")
 
@@ -155,9 +157,9 @@ public:
   /** Enables/disables this radio to be the leader on a DCDM simplex channel. */
   void enableDCDMLeader(bool enable);
   /** Squelch level for DMR channels. */
-  unsigned int dmrSquelch() const;
+  Level dmrSquelch() const;
   /** Sets the squelch-level for DMR channels. */
-  void setDMRSquelch(unsigned int sq);
+  void setDMRSquelch(Level sq);
 
 public:
   /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
@@ -204,7 +206,7 @@ protected:
   /** Holds the DCDM-leader flag. */
   bool _dcdmLeader;
   /** The squelch level [0-10] for DMR channels. */
-  unsigned int _dmrSquelch;
+  Level _dmrSquelch;
 };
 
 
