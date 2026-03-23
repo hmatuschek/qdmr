@@ -607,12 +607,12 @@ D578UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension:
 
 Level
 D578UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
-  return Level::fromValue(getUInt8(Offset::dmrMicGain())+1, Limit::micGain());
+  return Level::fromValue(getUInt8(Offset::dmrMicGain()), Limit::micGain());
 }
 
 void
 D578UVCodeplug::GeneralSettingsElement::setDMRMicGain(Level gain) {
-  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain())-1);
+  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain()));
 }
 
 

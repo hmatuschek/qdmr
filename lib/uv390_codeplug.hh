@@ -234,7 +234,7 @@ public:
     /** Some limits. */
     struct Limit: DM1701Codeplug::GeneralSettingsElement::Limit {
       /** Specifies the valid range for mic gain. */
-      static constexpr Range<unsigned int> micGain() { return {1,7}; }
+      static constexpr Range<unsigned int> micGain() { return {0,6}; }
     };
 
   protected:

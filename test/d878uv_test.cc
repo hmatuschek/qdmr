@@ -13,6 +13,21 @@ D878UVTest::D878UVTest(QObject *parent)
 }
 
 void
+D878UVTest::encodeDecode(Config &input, Config &output) {
+  ErrorStack err;
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&input, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  if (! codeplug.decode(&output, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+}
+
+void
 D878UVTest::initTestCase() {
   UnitTestBase::initTestCase();
 
@@ -583,6 +598,19 @@ D878UVTest::testRadioLimits() {
       issues.append(ctx.message(i).format());
     }
     QFAIL(issues.toLatin1().constData());
+  }
+}
+
+
+void
+D878UVTest::testMicGain() {
+  ErrorStack err;
+  Config copy, config; config.copy(_basicConfig);
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  for (auto pair: pairs) {
+    config.settings()->setMicLevel(Level::fromValue(pair.first));
+    encodeDecode(config, copy);
+    QCOMPARE(copy.settings()->micLevel(), Level::fromValue(pair.second));
   }
 }
 

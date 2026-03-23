@@ -1104,7 +1104,7 @@ public:
     /** Some limits for the settings. */
     struct Limit: AnytoneCodeplug::ExtendedSettingsElement::Limit {
       static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }    ///< Maximum delay in minutes.
-      static constexpr Range<unsigned int> micGain() { return {1,5}; }
+      static constexpr Range<unsigned int> micGain() { return {0,4}; }
     };
 
   protected:

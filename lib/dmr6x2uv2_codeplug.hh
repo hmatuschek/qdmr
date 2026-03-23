@@ -229,7 +229,7 @@ public:
   public:
     /** Some limits. */
     struct Limit: DMR6X2UVCodeplug::ExtendedSettingsElement::Limit {
-      static constexpr Range<unsigned int> micGain() { return {1,5}; }    ///< Valid mic gain settings.
+      static constexpr Range<unsigned int> micGain() { return {0,4}; }    ///< Valid mic gain settings.
     };
 
   protected:

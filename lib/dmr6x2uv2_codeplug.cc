@@ -432,12 +432,12 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::enableFMIdleTone(bool enable) {
 
 Level
 DMR6X2UV2Codeplug::ExtendedSettingsElement::fmMicGain() const {
-  return Level::fromValue(getUInt8(Offset::fmMicGain())+1, Limit::micGain());
+  return Level::fromValue(getUInt8(Offset::fmMicGain()), Limit::micGain());
 }
 
 void
 DMR6X2UV2Codeplug::ExtendedSettingsElement::setFMMicGain(Level gain) {
-  setUInt8(Offset::fmMicGain(), gain.mapTo(Limit::micGain())-1);
+  setUInt8(Offset::fmMicGain(), gain.mapTo(Limit::micGain()));
 }
 
 

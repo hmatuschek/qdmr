@@ -10,6 +10,21 @@ DMR6X2UVTest::DMR6X2UVTest(QObject *parent)
   // pass...
 }
 
+void
+DMR6X2UVTest::encodeDecode(Config &input, Config &output) {
+  ErrorStack err;
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&input, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  if (! codeplug.decode(&output, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DMR-6X2UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+}
+
 
 void
 DMR6X2UVTest::testBasicConfigEncoding() {
@@ -231,6 +246,19 @@ DMR6X2UVTest::testARC4Encryption() {
   QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
   QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
            decoded.commercialExtension()->encryptionKeys()->key(0));
+}
+
+
+void
+DMR6X2UVTest::testMicGain() {
+  ErrorStack err;
+  Config copy, config; config.copy(_basicConfig);
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  for (auto pair: pairs) {
+    config.settings()->setMicLevel(Level::fromValue(pair.first));
+    encodeDecode(config, copy);
+    QCOMPARE(copy.settings()->micLevel(), Level::fromValue(pair.second));
+  }
 }
 
 

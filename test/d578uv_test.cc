@@ -12,6 +12,22 @@ D578UVTest::D578UVTest(QObject *parent)
 }
 
 void
+D578UVTest::encodeDecode(Config &input, Config &output) {
+  ErrorStack err;
+  D578UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&input, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  if (! codeplug.decode(&output, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+}
+
+
+void
 D578UVTest::testBasicConfigEncoding() {
   ErrorStack err;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
@@ -133,29 +149,20 @@ D578UVTest::testSettingsDisplayVolumeChangePrompt() {
 
 void
 D578UVTest::testMicGain() {
-  ErrorStack err;
-
-  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
-  D578UVCodeplug codeplug;
-  codeplug.clear();
-
-  Config config; config.copy(_basicConfig);
+  Config copy, config; config.copy(_basicConfig);
   config.settings()->setMicLevel(Level::fromValue(10));
-  if (! codeplug.encode(&config, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone D578UV: {}")
-            .arg(err.format()).toStdString().c_str());
-  }
-
-  Config copy;
-  if (! codeplug.decode(&copy, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone D578UV: %1")
-            .arg(err.format()).toStdString().c_str());
-  }
-
+  encodeDecode(config, copy);
   QCOMPARE(copy.settings()->micLevel(), Level::fromValue(10));
   QVERIFY(copy.settings()->anytoneExtension());
   // FM mic gain enabled only if it differs from DMR gain
   QVERIFY(! copy.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
+
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  for (auto pair: pairs) {
+    config.settings()->setMicLevel(Level::fromValue(pair.first));
+    encodeDecode(config, copy);
+    QCOMPARE(copy.settings()->micLevel(), Level::fromValue(pair.second));
+  }
 }
 
 

@@ -1934,7 +1934,7 @@ public:
       /** Valid VOX sensitivity levels. */
       static constexpr Range<unsigned int> vox() { return {1,5}; }
       /** Valid mic gain settings. */
-      static constexpr Range<unsigned int> micGain() { return {1,5}; }
+      static constexpr Range<unsigned int> micGain() { return {0,4}; }
     };
 
   protected:

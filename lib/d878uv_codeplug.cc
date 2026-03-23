@@ -2641,11 +2641,11 @@ D878UVCodeplug::ExtendedSettingsElement::setDateFormat(AnytoneDisplaySettingsExt
 
 Level
 D878UVCodeplug::ExtendedSettingsElement::fmMicGain() const {
-  return Level::fromValue(getUInt8(Offset::analogMicGain())+1, Limit::micGain());
+  return Level::fromValue(getUInt8(Offset::analogMicGain()), Limit::micGain());
 }
 void
 D878UVCodeplug::ExtendedSettingsElement::setFMMicGain(Level gain) {
-  setUInt8(Offset::analogMicGain(), gain.mapTo(Limit::micGain())-1);
+  setUInt8(Offset::analogMicGain(), gain.mapTo(Limit::micGain()));
 }
 
 bool

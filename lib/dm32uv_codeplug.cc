@@ -3240,7 +3240,7 @@ DM32UVCodeplug::GeneralSettingsElement::setFMMicLevel(Level level) {
 
 Level
 DM32UVCodeplug::GeneralSettingsElement::dmrMicLevel() const {
-  return Level::fromValue(getUInt8(Offset::dmrMicLevel())+ 1, Limit::micGain());
+  return Level::fromValue(getUInt8(Offset::dmrMicLevel()), Limit::micGain());
 }
 
 void

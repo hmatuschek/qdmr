@@ -11,6 +11,9 @@ class D868UVETest : public UnitTestBase
 public:
   explicit D868UVETest(QObject *parent = nullptr);
 
+protected:
+  void encodeDecode(Config &input, Config &output);
+
 private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
@@ -24,6 +27,7 @@ private slots:
   void testRegressionSMSCount();
   void testRegressionDefaultChannel();
   void testChannelDataACK(); ///< Regression test for #813
+  void testMicGain();
 };
 
 #endif // D878UV2TEST_HH

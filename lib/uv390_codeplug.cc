@@ -374,11 +374,11 @@ UV390Codeplug::GeneralSettingsElement::setAdditionalDMRId(unsigned n, uint32_t i
 
 Level
 UV390Codeplug::GeneralSettingsElement::micLevel() const {
-  return Level::fromValue(getUInt3(Offset::micGain())+1, Limit::micGain());
+  return Level::fromValue(getUInt3(Offset::micGain()), Limit::micGain());
 }
 void
 UV390Codeplug::GeneralSettingsElement::setMICLevel(Level level) {
-  setUInt3(Offset::micGain(), level.mapTo(Limit::micGain())-1);
+  setUInt3(Offset::micGain(), level.mapTo(Limit::micGain()));
 }
 
 bool
