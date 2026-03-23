@@ -605,17 +605,14 @@ D578UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension:
 }
 
 
-unsigned
+Level
 D578UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
-  return Limit::Range<unsigned int>{0,4}
-    .mapTo({1,10},
-           getUInt8(Offset::dmrMicGain()));
+  return Level::fromValue(getUInt8(Offset::dmrMicGain())+1, Limit::micGain());
 }
 
 void
-D578UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
-  gain = Limit::Range<unsigned int>{1,10}.mapTo({0,4}, gain);
-  setUInt8(Offset::dmrMicGain(), gain);
+D578UVCodeplug::GeneralSettingsElement::setDMRMicGain(Level gain) {
+  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain())-1);
 }
 
 
@@ -2553,15 +2550,14 @@ D578UVCodeplug::ExtendedSettingsElement::setDateFormat(AnytoneDisplaySettingsExt
 }
 
 
-unsigned int
+Level
 D578UVCodeplug::ExtendedSettingsElement::fmMicGain() const {
-  return (getUInt8(Offset::analogMicGain())+1)*10/5;
+  return Level::fromValue(getUInt8(Offset::analogMicGain())+1, Limit::micGain());
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
-  gain = std::min(10U, std::max(1U, gain));
-  setUInt8(Offset::analogMicGain(), gain*4/10);
+D578UVCodeplug::ExtendedSettingsElement::setFMMicGain(Level gain) {
+  setUInt8(Offset::analogMicGain(), gain.mapTo(Limit::micGain())-1);
 }
 
 
@@ -3107,11 +3103,11 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
   this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
 
-  // Store FM mic gain separately
-  ext->audioSettings()->setFMMicGain(fmMicGain());
-  // Enable separate mic gain, if it differs from the DMR mic gain:
-  ext->audioSettings()->enableFMMicGain(
-      ctx.config()->settings()->micLevel() != fmMicGain());
+  // Store FM mic gain separately, if different
+  if (ctx.config()->settings()->micLevel() == fmMicGain())
+    ext->audioSettings()->disableFMMicGain();
+  else
+    ext->audioSettings()->setFMMicGain(fmMicGain());
   ext->audioSettings()->setSpeaker(speaker());
   ext->audioSettings()->setHandsetSpeaker(micSpeakerSource());
   ext->audioSettings()->setHandsetType(micType());

@@ -21,7 +21,7 @@ class RadioSettings : public ConfigItem
   /** The second intro line. */
   Q_PROPERTY(QString introLine2 READ introLine2 WRITE setIntroLine2)
   /** The mic amplification level. */
-  Q_PROPERTY(unsigned micLevel READ micLevel WRITE setMicLevel)
+  Q_PROPERTY(Level micLevel READ micLevel WRITE setMicLevel)
   /** Speech synthesis flag. */
   Q_PROPERTY(bool speech READ speech WRITE enableSpeech)
   /** The default channel power */
@@ -66,9 +66,9 @@ public:
   void setIntroLine2(const QString &line);
 
   /** Returns the MIC amplification level [1,10]. */
-  unsigned micLevel() const;
+  Level micLevel() const;
   /** (Re-)Sets the MIC amplification level [1,10]. */
-  void setMicLevel(unsigned value);
+  void setMicLevel(Level value);
 
   /** Returns @c true if the speech synthesis is enabled. */
   bool speech() const;
@@ -145,7 +145,7 @@ protected:
   /** Holds the second intro line. */
   QString _introLine2;
   /** Holds the mic amplification level. */
-  unsigned _micLevel;
+  Level _micLevel;
   /** Holds the speech synthesis flag. */
   bool _speech;
   /** Holds the global squelch setting. */

@@ -1896,14 +1896,14 @@ public:
     virtual void setSTEMode(STEMode mode);
 
     /** Returns the FM mic level. */
-    virtual unsigned int fmMicLevel() const;
+    virtual Level fmMicLevel() const;
     /** Sets the FM mic level.*/
-    virtual void setFMMicLevel(unsigned int level);
+    virtual void setFMMicLevel(Level level);
 
     /** Returns the DMR mic level. */
-    virtual unsigned int dmrMicLevel() const;
+    virtual Level dmrMicLevel() const;
     /** Sets the DMR mic level.*/
-    virtual void setDMRMicLevel(unsigned int level);
+    virtual void setDMRMicLevel(Level level);
 
     /** Decodes the general settings. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1933,6 +1933,8 @@ public:
       }
       /** Valid VOX sensitivity levels. */
       static constexpr Range<unsigned int> vox() { return {1,5}; }
+      /** Valid mic gain settings. */
+      static constexpr Range<unsigned int> micGain() { return {1,5}; }
     };
 
   protected:

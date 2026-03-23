@@ -430,15 +430,14 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::enableFMIdleTone(bool enable) {
 }
 
 
-unsigned int
+Level
 DMR6X2UV2Codeplug::ExtendedSettingsElement::fmMicGain() const {
-  return 2*(1 + getUInt8(Offset::fmMicGain()));
+  return Level::fromValue(getUInt8(Offset::fmMicGain())+1, Limit::micGain());
 }
 
 void
-DMR6X2UV2Codeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
-  gain = std::max(1U, std::min(10U, gain));
-  setUInt8(Offset::fmMicGain(), (gain-1)/2);
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setFMMicGain(Level gain) {
+  setUInt8(Offset::fmMicGain(), gain.mapTo(Limit::micGain())-1);
 }
 
 
@@ -651,12 +650,12 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   ext->bluetoothSettings()->enablePTTLatch(bluetoothPTTLatchEnabled());
   ext->bluetoothSettings()->setPTTSleepTimer(bluetoothPTTSleepTimeout());
 
-  // Store FM mic gain separately
+  // Store FM mic gain separately, if different
   ext->toneSettings()->enableFMIdleChannelTone(fmIdleToneEnabled());
-  ext->audioSettings()->setFMMicGain(fmMicGain());
-  // Enable separate mic gain, if it differs from the DMR mic gain:
-  ext->audioSettings()->enableFMMicGain(
-        ctx.config()->settings()->micLevel() != fmMicGain());
+  if (ctx.config()->settings()->micLevel() == fmMicGain())
+    ext->audioSettings()->disableFMMicGain();
+  else
+    ext->audioSettings()->setFMMicGain(fmMicGain());
   ext->toneSettings()->enableTOTNotification(totWarningToneEnabled());
   ext->toneSettings()->enableWXAlarm(wxAlarmEnabled());
 

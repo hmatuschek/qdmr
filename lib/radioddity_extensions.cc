@@ -109,10 +109,10 @@ RadioddityButtonSettingsExtension::setFuncKey3Long(Function func) {
  * ********************************************************************************************* */
 RadioddityToneSettingsExtension::RadioddityToneSettingsExtension(QObject *parent)
   : ConfigItem(parent), _lowBatteryWarn(true), _lowBatteryWarnInterval(Interval::fromSeconds(30)),
-    _lowBatteryWarnVolume(5), _callAlertDuration(Interval::fromSeconds(120)), _resetTone(false),
-    _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _digitalTalkPermitTone(false),
-    _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
-    _disableAllTones(false), _txExitTone(false), _keyTone(false), _keyToneVolume(5), _fmMicGain(5)
+  _lowBatteryWarnVolume(5), _callAlertDuration(Interval::fromSeconds(120)), _resetTone(false),
+  _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _digitalTalkPermitTone(false),
+  _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
+  _disableAllTones(false), _txExitTone(false), _keyTone(false), _keyToneVolume(5), _fmMicGain(Level::fromValue(5))
 {
   // pass...
 }
@@ -309,13 +309,12 @@ RadioddityToneSettingsExtension::setKeyToneVolume(unsigned int volume) {
   emit modified(this);
 }
 
-unsigned int
+Level
 RadioddityToneSettingsExtension::fmMicGain() const {
   return _fmMicGain;
 }
 void
-RadioddityToneSettingsExtension::setFMMicGain(unsigned int gain) {
-  gain = std::min(10U, std::max(1U, gain));
+RadioddityToneSettingsExtension::setFMMicGain(Level gain) {
   if (gain == _fmMicGain)
     return;
   _fmMicGain = gain;

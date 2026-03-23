@@ -937,9 +937,9 @@ public:
     /** Sets the VFO scan type. */
     virtual void setVFOScanType(AnytoneSettingsExtension::VFOScanType type) = 0;
     /** Returns the mirophone gain. */
-    virtual unsigned dmrMicGain() const = 0;
+    virtual Level dmrMicGain() const = 0;
     /** Sets the microphone gain. */
-    virtual void setDMRMicGain(unsigned int gain) = 0;
+    virtual void setDMRMicGain(Level gain) = 0;
 
     /** Returns the key function for a short press on the function key 1/A. */
     virtual AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const = 0;

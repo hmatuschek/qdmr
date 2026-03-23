@@ -27,7 +27,7 @@ DR1801UVLimits::DR1801UVLimits(QObject *parent)
           -1, DR1801UVCodeplug::SettingsElement::Limit::bootLineLength(), RadioLimitString::ASCII) },
         { "introLine2", new RadioLimitString(
           -1, DR1801UVCodeplug::SettingsElement::Limit::bootLineLength(), RadioLimitString::ASCII) },
-        { "micLevel", new RadioLimitUInt(1, 10) },
+        { "micLevel", new RadioLimitLevel({1, 10}, false) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum {
             unsigned(Channel::Power::Low),

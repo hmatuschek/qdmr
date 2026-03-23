@@ -27,7 +27,7 @@ GD73Limits::GD73Limits(QObject *parent)
       new RadioLimitItem{
         { "introLine1", new RadioLimitString(-1, GD73Codeplug::SettingsElement::Limit::bootTextLine(), RadioLimitString::Unicode) },
         { "introLine2", new RadioLimitString(-1, GD73Codeplug::SettingsElement::Limit::bootTextLine(), RadioLimitString::Unicode) },
-        { "micLevel", new RadioLimitUInt(1, 10) },
+        { "micLevel", new RadioLimitLevel({1, 10}, false) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
         { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },

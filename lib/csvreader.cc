@@ -1804,7 +1804,7 @@ CSVReader::handleMicLevel(unsigned level, qint64 line, qint64 column, QString &e
   Q_UNUSED(errorMessage);
 
   if (_link) {
-    _config->settings()->setMicLevel(level);
+    _config->settings()->setMicLevel(Level::fromValue(level));
   }
   return true;
 }

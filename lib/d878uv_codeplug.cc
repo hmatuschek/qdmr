@@ -2639,14 +2639,13 @@ D878UVCodeplug::ExtendedSettingsElement::setDateFormat(AnytoneDisplaySettingsExt
   setUInt8(Offset::dateFormat(), (unsigned int)format);
 }
 
-unsigned int
+Level
 D878UVCodeplug::ExtendedSettingsElement::fmMicGain() const {
-  return (getUInt8(Offset::analogMicGain())+1)*10/5;
+  return Level::fromValue(getUInt8(Offset::analogMicGain())+1, Limit::micGain());
 }
 void
-D878UVCodeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
-  gain = std::min(10U, std::max(1U, gain));
-  setUInt8(Offset::analogMicGain(), gain*4/10);
+D878UVCodeplug::ExtendedSettingsElement::setFMMicGain(Level gain) {
+  setUInt8(Offset::analogMicGain(), gain.mapTo(Limit::micGain())-1);
 }
 
 bool
@@ -2820,11 +2819,11 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
   this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
 
-  // Store FM mic gain separately
-  ext->audioSettings()->setFMMicGain(fmMicGain());
-  // Enable separate mic gain, if it differs from the DMR mic gain:
-  ext->audioSettings()->enableFMMicGain(
-        ctx.config()->settings()->micLevel() != fmMicGain());
+  // Store FM mic gain separately, if different
+  if (ctx.config()->settings()->micLevel() == fmMicGain())
+    ext->audioSettings()->disableFMMicGain();
+  else
+    ext->audioSettings()->setFMMicGain(fmMicGain());
 
   // Store display settings
   ext->displaySettings()->enableShowColorCode(this->showColorCode());

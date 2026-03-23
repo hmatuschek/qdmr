@@ -432,10 +432,15 @@ class RadioLimitLevel: public RadioLimitValue
 
 public:
   /** Empty constructor. */
-  explicit RadioLimitLevel(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+  explicit RadioLimitLevel(const Range<unsigned int> &range = {0, 10}, bool allowInvalid=true,
+                           RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
                            QObject *parent=nullptr);
 
   bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const;
+
+protected:
+  Range<unsigned int> _range;
+  bool _allowInvalid;
 };
 
 

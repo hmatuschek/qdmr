@@ -4,7 +4,7 @@
 
 
 RadioSettings::RadioSettings(QObject *parent)
-  : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
+  : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(Level::fromValue(3)), _speech(false),
     _squelch(Level::fromValue(1)), _power(Channel::Power::High), _vox(Level::null()),
     _transmitTimeOut(Interval::infinity()), _defaultId(new DMRRadioIDReference(this)),
     _gnss(new GNSSSettings(this)), _dmr(new DMRSettings(this)),
@@ -42,7 +42,7 @@ RadioSettings::clear() {
 
   _introLine1.clear();
   _introLine2.clear();
-  _micLevel = 3;
+  _micLevel = Level::fromValue(3);
   _speech = false;
   _squelch = Level::fromValue(1);
   _power = Channel::Power::High;
@@ -76,12 +76,16 @@ RadioSettings::setIntroLine2(const QString &line) {
   emit modified(this);
 }
 
-unsigned
+Level
 RadioSettings::micLevel() const {
   return _micLevel;
 }
 void
-RadioSettings::setMicLevel(unsigned value) {
+RadioSettings::setMicLevel(Level value) {
+  if (value.isInvalid() || value.isNull())
+    value = Level::fromValue(1);
+  if (_micLevel == value)
+    return;
   _micLevel = value;
   emit modified(this);
 }

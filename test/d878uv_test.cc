@@ -68,7 +68,7 @@ D878UVTest::testAnalogMicGain() {
   }
 
   QVERIFY(config.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
-  QCOMPARE(config.settings()->anytoneExtension()->audioSettings()->fmMicGain(), 6);
+  QCOMPARE(config.settings()->anytoneExtension()->audioSettings()->fmMicGain(), Level::fromValue(5));
 }
 
 void
@@ -573,7 +573,7 @@ D878UVTest::testRadioLimits() {
   D878UVLimits limits({{Frequency::fromMHz(137),Frequency::fromMHz(150)},
                        {Frequency::fromMHz(400),Frequency::fromMHz(450)}},
                       {{Frequency::fromMHz(137),Frequency::fromMHz(150)},
-                       {Frequency::fromMHz(400),Frequency::fromMHz(450)}}, "V100");
+                       {Frequency::fromMHz(400),Frequency::fromMHz(450)}}, "V101");
   RadioLimitContext ctx;
   if (! limits.verifyConfig(&_basicConfig, ctx)) {
     QString issues;

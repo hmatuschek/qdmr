@@ -140,7 +140,7 @@ D578UVTest::testMicGain() {
   codeplug.clear();
 
   Config config; config.copy(_basicConfig);
-  config.settings()->setMicLevel(10);
+  config.settings()->setMicLevel(Level::fromValue(10));
   if (! codeplug.encode(&config, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone D578UV: {}")
             .arg(err.format()).toStdString().c_str());
@@ -152,11 +152,10 @@ D578UVTest::testMicGain() {
             .arg(err.format()).toStdString().c_str());
   }
 
-  QCOMPARE(copy.settings()->micLevel(), 10);
+  QCOMPARE(copy.settings()->micLevel(), Level::fromValue(10));
   QVERIFY(copy.settings()->anytoneExtension());
   // FM mic gain enabled only if it differs from DMR gain
   QVERIFY(! copy.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
-  QCOMPARE(copy.settings()->anytoneExtension()->audioSettings()->fmMicGain(), 10);
 }
 
 

@@ -14,7 +14,7 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   }
   ui->introLine1->setText(_config->settings()->introLine1());
   ui->introLine2->setText(_config->settings()->introLine2());
-  ui->mic->setValue(_config->settings()->micLevel());
+  ui->mic->setValue(_config->settings()->micLevel().value());
   ui->speech->setChecked(_config->settings()->speech());
 
   ui->powerValue->setItemData(0, (unsigned)Channel::Power::Max);
@@ -79,7 +79,7 @@ GeneralSettingsView::onConfigModified() {
   }
   ui->introLine1->setText(_config->settings()->introLine1());
   ui->introLine2->setText(_config->settings()->introLine2());
-  ui->mic->setValue(_config->settings()->micLevel());
+  ui->mic->setValue(_config->settings()->micLevel().value());
   ui->speech->setChecked(_config->settings()->speech());
   switch(_config->settings()->power()) {
   case Channel::Power::Max: ui->powerValue->setCurrentIndex(0); break;
@@ -134,7 +134,7 @@ GeneralSettingsView::onIntroLine2Edited() {
 
 void
 GeneralSettingsView::onMicLevelChanged() {
-  _config->settings()->setMicLevel(ui->mic->value());
+  _config->settings()->setMicLevel(Level::fromValue(ui->mic->value()));
 }
 
 void

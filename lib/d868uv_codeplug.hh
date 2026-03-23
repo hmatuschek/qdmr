@@ -226,8 +226,8 @@ public:
     virtual AnytoneAudioSettingsExtension::VoxSource voxSource() const;
     /** Sets the VOX source. */
     virtual void setVOXSource(AnytoneAudioSettingsExtension::VoxSource source);
-    unsigned int dmrMicGain() const;
-    void setDMRMicGain(unsigned int gain);
+    Level dmrMicGain() const;
+    void setDMRMicGain(Level gain);
     unsigned maxSpeakerVolume() const;
     void setMaxSpeakerVolume(unsigned level);
     /** Returns the maximum headphone volume. */
@@ -427,6 +427,8 @@ public:
     struct Limit: Element::Limit {
       /** Valid VOX sensitivity levels. */
       static constexpr Range<unsigned int> vox() { return {1,3}; }
+      /** Valid mic gain settings. */
+      static constexpr Range<unsigned int> micGain() { return {1,5}; }
     };
 
   protected:

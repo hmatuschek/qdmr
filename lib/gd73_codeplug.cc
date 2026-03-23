@@ -325,21 +325,22 @@ GD73Codeplug::SettingsElement::setChannelDisplayMode(ChannelDisplayMode mode) {
   setUInt8(Offset::channelDisplayMode(), (unsigned int)mode);
 }
 
-unsigned int
+Level
 GD73Codeplug::SettingsElement::dmrMicGain() const {
-  return getUInt8(Offset::dmrMicGain())*9/5+1;
+  return Level::fromValue(getUInt8(Offset::dmrMicGain())+1, Limit::micGain());
 }
 void
-GD73Codeplug::SettingsElement::setDMRMicGain(unsigned int gain) {
-  setUInt8(Offset::dmrMicGain(), (gain-1)*5/9);
+GD73Codeplug::SettingsElement::setDMRMicGain(Level gain) {
+  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain())-1);
 }
-unsigned int
+
+Level
 GD73Codeplug::SettingsElement::fmMicGain() const {
-  return getUInt8(Offset::fmMicGain())*9/5+1;
+  return Level::fromValue(getUInt8(Offset::fmMicGain())+1, Limit::micGain());
 }
 void
-GD73Codeplug::SettingsElement::setFMMicGain(unsigned int gain) {
-  setUInt8(Offset::fmMicGain(), (gain-1)*5/9);
+GD73Codeplug::SettingsElement::setFMMicGain(Level gain) {
+  setUInt8(Offset::fmMicGain(), gain.mapTo(Limit::micGain())-1);
 }
 
 Interval

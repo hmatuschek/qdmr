@@ -27,7 +27,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
   add("settings", new RadioLimitItem {
         { "introLine1", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
         { "introLine2", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
-        { "micLevel", new RadioLimitUInt(1, 10) },
+        { "micLevel", new RadioLimitLevel({1, 10}, false) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum {
             unsigned(Channel::Power::Low),
