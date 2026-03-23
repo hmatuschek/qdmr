@@ -102,7 +102,7 @@ ConfigItem::Context::hasTag(const QString &className, const QString &property, Q
   if (! _tags.contains(qname))
     return false;
   for(auto pair: _tags[qname]) {
-    if (Qt::partial_ordering::equivalent == QVariant::compare(pair.second, value))
+    if (QPartialOrdering::equivalent == QVariant::compare(pair.second, value))
       return true;
   }
   return false;
@@ -126,7 +126,7 @@ ConfigItem::Context::getTag(const QString &className, const QString &property, Q
   if (! _tags.contains(qname))
     return QString();
   for(auto pair: _tags[qname]) {
-    if (Qt::partial_ordering::equivalent == QVariant::compare(pair.second, value))
+    if (QPartialOrdering::equivalent == QVariant::compare(pair.second, value))
       return pair.first;
   }
   return QString();
