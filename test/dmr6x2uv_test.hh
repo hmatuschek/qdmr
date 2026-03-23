@@ -11,6 +11,9 @@ class DMR6X2UVTest : public UnitTestBase
 public:
   explicit DMR6X2UVTest(QObject *parent = nullptr);
 
+protected:
+  void encodeDecode(Config &input, Config &output);
+
 private slots:
   void testBasicConfigEncoding();
   void testBasicConfigDecoding();
@@ -20,7 +23,7 @@ private slots:
 
   void testAESEncryption();
   void testARC4Encryption();
-
+  void testMicGain();
 };
 
 #endif // DMR6X2UVTEST_HH

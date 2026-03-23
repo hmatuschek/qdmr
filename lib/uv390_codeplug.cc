@@ -68,7 +68,7 @@ UV390Codeplug::ChannelElement::clear() {
   clearBit(5,0);
   setInCallCriteria(TyTChannelExtension::InCallCriterion::Always);
   setTurnOffFreq(TyTChannelExtension::KillTone::Off);
-  setSquelch(1);
+  setSquelch(Level::fromValue(1));
   setPower(Channel::Power::High);
   enableAllowInterrupt(true);
   enableDualCapacityDirectMode(false);
@@ -117,14 +117,14 @@ UV390Codeplug::ChannelElement::setTurnOffFreq(TyTChannelExtension::KillTone freq
   setUInt2(Offset::turnOffFreq(), uint8_t(freq));
 }
 
-unsigned
+Level
 UV390Codeplug::ChannelElement::squelch() const {
-  return getUInt8(Offset::squelch());
+  return Level::fromValue(getUInt8(Offset::squelch()));
 }
 void
-UV390Codeplug::ChannelElement::setSquelch(unsigned value) {
-  value = std::min(unsigned(10), value);
-  return setUInt8(Offset::squelch(), value);
+UV390Codeplug::ChannelElement::setSquelch(Level value) {
+  if (value.isInvalid())
+    setUInt8(Offset::squelch(), value.value());
 }
 
 Channel::Power
@@ -321,7 +321,7 @@ UV390Codeplug::GeneralSettingsElement::clear() {
   setAdditionalDMRId(1, 2); setUInt8(0x9b, 0);
   setAdditionalDMRId(2, 3); setUInt8(0x9f, 0);
   setUInt3(0xa0, 0, 0b111);
-  setMICLevel(2);
+  setMICLevel(Level::fromValue(2));
   enableEditRadioID(true);
   setBit(0xa0, 7, true);
   memset(_data+0xa1, 0xff, 15);
@@ -372,13 +372,13 @@ UV390Codeplug::GeneralSettingsElement::setAdditionalDMRId(unsigned n, uint32_t i
   setUInt24_le(0x94+4*n, id);
 }
 
-unsigned
+Level
 UV390Codeplug::GeneralSettingsElement::micLevel() const {
-  return (unsigned(getUInt3(0xa0,3)+1)*100)/60;
+  return Level::fromValue(getUInt3(Offset::micGain()), Limit::micGain());
 }
 void
-UV390Codeplug::GeneralSettingsElement::setMICLevel(unsigned level) {
-  setUInt3(0xa0,3, ((level-1)*60)/100);
+UV390Codeplug::GeneralSettingsElement::setMICLevel(Level level) {
+  setUInt3(Offset::micGain(), level.mapTo(Limit::micGain()));
 }
 
 bool

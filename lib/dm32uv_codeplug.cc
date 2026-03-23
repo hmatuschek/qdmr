@@ -229,14 +229,14 @@ DM32UVCodeplug::ChannelElement::clearEmergencySystemIndex() {
 }
 
 
-unsigned
+Level
 DM32UVCodeplug::ChannelElement::squelchLevel() const {
-  return (10*getUInt4(Offset::squelchLevel()))/Limit::squelchLevel();
+  return Level::fromValue(getUInt4(Offset::squelchLevel()), Limit::squelchLevel());
 }
 
 void
-DM32UVCodeplug::ChannelElement::setSquelchLevel(unsigned int level) {
-  setUInt4(Offset::squelchLevel(), (level*Limit::squelchLevel())/10);
+DM32UVCodeplug::ChannelElement::setSquelchLevel(Level level) {
+  setUInt4(Offset::squelchLevel(), level.mapTo(Limit::squelchLevel()));
 }
 
 
@@ -3228,24 +3228,24 @@ DM32UVCodeplug::GeneralSettingsElement::setSTEMode(STEMode mode) {
 }
 
 
-unsigned int
+Level
 DM32UVCodeplug::GeneralSettingsElement::fmMicLevel() const {
-  return getUInt8(Offset::fmMicLevel())*10/5 + 1;
+  return Level::fromValue(getUInt8(Offset::fmMicLevel())+ 1, Limit::micGain());
 }
 
 void
-DM32UVCodeplug::GeneralSettingsElement::setFMMicLevel(unsigned int level) {
-  return setUInt8(Offset::fmMicLevel(), (level*4)/10);
+DM32UVCodeplug::GeneralSettingsElement::setFMMicLevel(Level level) {
+  return setUInt8(Offset::fmMicLevel(), level.mapTo(Limit::micGain()));
 }
 
-unsigned int
+Level
 DM32UVCodeplug::GeneralSettingsElement::dmrMicLevel() const {
-  return getUInt8(Offset::dmrMicLevel())*10/5 + 1;
+  return Level::fromValue(getUInt8(Offset::dmrMicLevel()), Limit::micGain());
 }
 
 void
-DM32UVCodeplug::GeneralSettingsElement::setDMRMicLevel(unsigned int level) {
-  return setUInt8(Offset::dmrMicLevel(), (level*4)/10);
+DM32UVCodeplug::GeneralSettingsElement::setDMRMicLevel(Level level) {
+  return setUInt8(Offset::dmrMicLevel(), level.mapTo(Limit::micGain()));
 }
 
 

@@ -85,7 +85,7 @@ AMChannelDialog::construct() {
   ui->rxOnly->setChecked(_myChannel->rxOnly());
   if (! _myChannel->defaultSquelch()) {
     ui->squelchDefault->setChecked(false); ui->squelchValue->setEnabled(true);
-    ui->squelchValue->setValue(_myChannel->squelch());
+    ui->squelchValue->setValue(_myChannel->squelch().mapTo({0,10}));
   }
   if (! _myChannel->defaultVOX()) {
     ui->voxDefault->setChecked(false); ui->voxValue->setEnabled(true);
@@ -131,7 +131,7 @@ AMChannelDialog::channel()
   if (ui->squelchDefault->isChecked())
     _myChannel->setSquelchDefault();
   else
-    _myChannel->setSquelch(ui->squelchValue->value());
+    _myChannel->setSquelch(Level::fromValue(ui->squelchValue->value()));
   _myChannel->setScanList(ui->scanList->currentData().value<ScanList *>());
   if (ui->voxDefault->isChecked())
     _myChannel->setVOXDefault();

@@ -413,14 +413,13 @@ D868UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension:
   setUInt8(Offset::vfoScanType(), (unsigned)type);
 }
 
-unsigned
+Level
 D868UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
-  return (((unsigned)getUInt8(Offset::dmrMicGain())+1)*10)/4;
+  return Level::fromValue(getUInt8(Offset::dmrMicGain()), Limit::micGain());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
-  gain = std::max(1U, std::min(10U, gain));
-  setUInt8(Offset::dmrMicGain(), (gain*4)/10);
+D868UVCodeplug::GeneralSettingsElement::setDMRMicGain(Level gain) {
+  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain()));
 }
 
 AnytoneKeySettingsExtension::KeyFunction

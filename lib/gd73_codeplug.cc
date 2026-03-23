@@ -223,14 +223,13 @@ GD73Codeplug::SettingsElement::setVOX(Level level) {
   setUInt8(Offset::voxLevel(), level.mapTo(Limit::vox()));
 }
 
-unsigned int
+Level
 GD73Codeplug::SettingsElement::squelch() const {
-  return getUInt8(Offset::squelchLevel())*10/9;
+  return Level::fromValue(getUInt8(Offset::squelchLevel()), Limit::squelch());
 }
 void
-GD73Codeplug::SettingsElement::setSquelch(unsigned int level) {
-  level = std::min(9U, level);
-  setUInt8(Offset::squelchLevel(), level);
+GD73Codeplug::SettingsElement::setSquelch(Level level) {
+  setUInt8(Offset::squelchLevel(), level.mapTo(Limit::squelch()));
 }
 
 bool
@@ -326,21 +325,22 @@ GD73Codeplug::SettingsElement::setChannelDisplayMode(ChannelDisplayMode mode) {
   setUInt8(Offset::channelDisplayMode(), (unsigned int)mode);
 }
 
-unsigned int
+Level
 GD73Codeplug::SettingsElement::dmrMicGain() const {
-  return getUInt8(Offset::dmrMicGain())*9/5+1;
+  return Level::fromValue(getUInt8(Offset::dmrMicGain())+1, Limit::micGain());
 }
 void
-GD73Codeplug::SettingsElement::setDMRMicGain(unsigned int gain) {
-  setUInt8(Offset::dmrMicGain(), (gain-1)*5/9);
+GD73Codeplug::SettingsElement::setDMRMicGain(Level gain) {
+  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain())-1);
 }
-unsigned int
+
+Level
 GD73Codeplug::SettingsElement::fmMicGain() const {
-  return getUInt8(Offset::fmMicGain())*9/5+1;
+  return Level::fromValue(getUInt8(Offset::fmMicGain())+1, Limit::micGain());
 }
 void
-GD73Codeplug::SettingsElement::setFMMicGain(unsigned int gain) {
-  setUInt8(Offset::fmMicGain(), (gain-1)*5/9);
+GD73Codeplug::SettingsElement::setFMMicGain(Level gain) {
+  setUInt8(Offset::fmMicGain(), gain.mapTo(Limit::micGain())-1);
 }
 
 Interval

@@ -1854,7 +1854,7 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
   ctx.config()->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
 
   // There is no global squelch settings either, so set it to 1
-  ctx.config()->settings()->setSquelch(1);
+  ctx.config()->settings()->setSquelch(Level::fromValue(1));
 
   // Allocate Radioddity extension if needed
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();

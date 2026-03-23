@@ -73,7 +73,8 @@ public:
   inline static constexpr Level invalid() { return Level(std::numeric_limits<unsigned int>::max()); }
   /** Constructs a proper level. */
   inline static constexpr Level fromValue(unsigned int value, const Codeplug::Element::Limit::Range<unsigned int> range={1,10}) {
-    if (0 == value)
+    // If 0 is not in normal range -> always may 0 -> 0 (e.g. means off).
+    if ((0 == value) && (0 != range.min))
       return Level::null();
     return Level(range.mapTo({1,10},value));
   }
@@ -95,18 +96,13 @@ struct convert<Level>
 {
   /** Serializes the interval. */
   static Node encode(const Level& rhs) {
-    if (rhs.isInvalid()) {
-      YAML::Node def = YAML::Node(YAML::NodeType::Scalar);
-      def.SetTag("!default");
-      return def;
-    }
     return Node(rhs.format().toStdString());
   }
 
   /** Parses the interval. */
   static bool decode(const Node& node, Level& rhs) {
     // Usually means default level
-    if (node.IsNull() || ("!default" == node.Tag())) {
+    if (node.IsNull()) {
       rhs = Level::invalid();
       return true;
     }

@@ -11,6 +11,21 @@ D868UVETest::D868UVETest(QObject *parent)
 }
 
 void
+D868UVETest::encodeDecode(Config &input, Config &output) {
+  ErrorStack err;
+  D868UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&input, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  if (! codeplug.decode(&output, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D868UVE: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+}
+
+void
 D868UVETest::testBasicConfigEncoding() {
   ErrorStack err;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
@@ -347,6 +362,19 @@ D868UVETest::testChannelDataACK() {
   QCOMPARE(testConfig.channelList()->channel(1)->as<DMRChannel>()
              ->anytoneChannelExtension()->dataACK(), true);
 }
+
+void
+D868UVETest::testMicGain() {
+  ErrorStack err;
+  Config copy, config; config.copy(_basicConfig);
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  for (auto pair: pairs) {
+    config.settings()->setMicLevel(Level::fromValue(pair.first));
+    encodeDecode(config, copy);
+    QCOMPARE(copy.settings()->micLevel().value(), Level::fromValue(pair.second).value());
+  }
+}
+
 
 
 QTEST_GUILESS_MAIN(D868UVETest)

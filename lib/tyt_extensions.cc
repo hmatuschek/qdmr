@@ -1,5 +1,5 @@
 #include "tyt_extensions.hh"
-#include "logger.hh"
+#include "level.hh"
 
 /* ******************************************************************************************** *
  * Implementation of TyTChannelExtension
@@ -10,7 +10,7 @@ TyTChannelExtension::TyTChannelExtension(QObject *parent)
     _displayPTTId(true), _rxRefFrequency(RefFrequency::Low), _txRefFrequency(RefFrequency::Low),
     _tightSquelch(false), _compressedUDPHeader(false), _reverseBurst(true),
     _killTone(KillTone::Off), _inCallCriterion(InCallCriterion::Always), _allowInterrupt(false),
-    _dcdm(false), _dcdmLeader(false), _dmrSquelch(1)
+    _dcdm(false), _dcdmLeader(false), _dmrSquelch(Level::fromValue(1))
 {
   // pass...
 }
@@ -134,12 +134,12 @@ TyTChannelExtension::setTXRefFrequency(RefFrequency ref) {
   emit modified(this);
 }
 
-unsigned int
+Level
 TyTChannelExtension::dmrSquelch() const {
   return _dmrSquelch;
 }
 void
-TyTChannelExtension::setDMRSquelch(unsigned int sq) {
+TyTChannelExtension::setDMRSquelch(Level sq) {
   if (_dmrSquelch == sq)
     return;
   _dmrSquelch = sq;

@@ -25,6 +25,11 @@ Level::parse(const QString &value) {
     return true;
   }
 
+  if ("none" == value.toLower().simplified()) {
+    _level = std::numeric_limits<unsigned int>::max();
+    return true;
+  }
+
   bool ok;
   _level = std::min(10U, value.toUInt(&ok));
   return ok;

@@ -30,11 +30,11 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
       new RadioLimitItem{
         { "introLine1", new RadioLimitString(-1, 14, RadioLimitString::ASCII) },
         { "introLine2", new RadioLimitString(-1, 14, RadioLimitString::ASCII) },
-        { "micLevel", new RadioLimitUInt(1, 10) },
+        { "micLevel", new RadioLimitLevel({1, 10}, false) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
-        { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitLevel() },
+        { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "tot", new RadioLimitInterval() }
       });
 
@@ -84,14 +84,14 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum{
                  (unsigned)FMChannel::Admit::Always,
                  (unsigned)FMChannel::Admit::Free,
                  (unsigned)FMChannel::Admit::Tone
                } },
-              {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"squelch", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"bandwidth", new RadioLimitEnum{
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
@@ -108,7 +108,7 @@ DMR6X2UVLimits::DMR6X2UVLimits(const std::initializer_list<std::pair<Frequency, 
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),
