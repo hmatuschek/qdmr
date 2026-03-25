@@ -1804,7 +1804,7 @@ CSVReader::handleMicLevel(unsigned level, qint64 line, qint64 column, QString &e
   Q_UNUSED(errorMessage);
 
   if (_link) {
-    _config->settings()->setMicLevel(level);
+    _config->settings()->setMicLevel(Level::fromValue(level));
   }
   return true;
 }
@@ -2046,7 +2046,7 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
   chan->setTimeout(Interval::fromSeconds(tot));
   chan->setRXOnly(ro);
   chan->setAdmit(admit);
-  chan->setSquelch(squelch);
+  chan->setSquelch(Level::fromValue(squelch));
   chan->setRXTone(rxTone);
   chan->setTXTone(txTone);
   chan->setBandwidth(bw);

@@ -66,15 +66,15 @@ public:
     virtual bool add(const QString &id, ConfigObject *);
 
     /** Returns @c true if the property of the class has the specified tag associated. */
-    static bool hasTag(const QString &className, const QString &property, const QString &tag);
+    static bool tagIsSet(const QString &className, const QString &property, const QString &tag);
     /** Returns @c true if the property of the class has the specified object as a tag associated. */
-    static bool hasTag(const QString &className, const QString &property, ConfigObject *obj);
+    static bool hasTag(const QString &className, const QString &property, QVariant value);
     /** Returns the object associated with the tag for the property of the class. */
-    static ConfigObject *getTag(const QString &className, const QString &property, const QString &tag);
+    static QVariant tagGetValue(const QString &className, const QString &property, const QString &tag);
     /** Returns the tag associated with the object for the property of the class. */
-    static QString getTag(const QString &className, const QString &property, ConfigObject *obj);
+    static QString getTag(const QString &className, const QString &property, QVariant value);
     /** Associates the given object with the tag for the property of the given class. */
-    static void setTag(const QString &className, const QString &property, const QString &tag, ConfigObject *obj);
+    static void setTag(const QString &className, const QString &property, const QString &tag, QVariant value);
 
   protected:
     /** The version string. */
@@ -83,10 +83,8 @@ public:
     QHash<QString, ConfigObject *> _objects;
     /** OBJ->ID look-up table. */
     QHash<ConfigObject*, QString> _ids;
-    /** Maps tags to singleton objects. */
-    static QHash<QString, QHash<QString, ConfigObject *>> _tagObjects;
-    /** Maps singleton objects to tags. */
-    static QHash<QString, QHash<ConfigObject *, QString>> _tagNames;
+    /** Set of tag-value pairs for all properties. */
+    static QHash<QString, QList<QPair<QString, QVariant>>> _tags;
   };
 
 protected:

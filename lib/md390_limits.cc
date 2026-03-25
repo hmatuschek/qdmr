@@ -27,14 +27,14 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
   add("settings", new RadioLimitItem {
         { "introLine1", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
         { "introLine2", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
-        { "micLevel", new RadioLimitUInt(1, 10) },
+        { "micLevel", new RadioLimitLevel({1, 10}, false) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum {
             unsigned(Channel::Power::Low),
             unsigned(Channel::Power::Mid),
             unsigned(Channel::Power::High) } },
-        { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitLevel() },
+        { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );
@@ -81,7 +81,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -90,7 +90,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
                  (unsigned)FMChannel::Admit::Free,
                  (unsigned)FMChannel::Admit::Tone
                } },
-              {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"squelch", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"bandwidth", new RadioLimitEnum{
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
@@ -109,7 +109,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
                }},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),
@@ -152,7 +152,7 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
   add("positioning", new RadioLimitList({
         { DMRAPRSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
           { "name", new RadioLimitStringIgnored() },
-          { "period", new RadioLimitUInt(0, 7650) },
+          { "period", new RadioLimitInterval({Interval::null(), Interval::fromMinutes(127)}) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
           { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) } } },
         { FMAPRSSystem::staticMetaObject, 0, -1, new RadioLimitIgnored() } } ) );

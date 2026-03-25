@@ -29,11 +29,11 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
       new RadioLimitItem{
         { "introLine1", new RadioLimitString(-1, 14, RadioLimitString::ASCII) },
         { "introLine2", new RadioLimitString(-1, 14, RadioLimitString::ASCII) },
-        { "micLevel", new RadioLimitUInt(1, 10) },
+        { "micLevel", new RadioLimitLevel({1, 10}, false) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
-        { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitLevel() },
+        { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "tot", new RadioLimitInterval() }
       });
 
@@ -86,14 +86,14 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum{
                  (unsigned)FMChannel::Admit::Always,
                  (unsigned)FMChannel::Admit::Free,
                  (unsigned)FMChannel::Admit::Tone
                } },
-              {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"squelch", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"bandwidth", new RadioLimitEnum{
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
@@ -110,7 +110,7 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitLevel()},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),
@@ -155,12 +155,12 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
   add("positioning", new RadioLimitList{
         { DMRAPRSSystem::staticMetaObject, 0, 8, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
-            { "period", new RadioLimitUInt(0, 7650) },
+            { "period", new RadioLimitInterval({Interval::null(), Interval::fromMinutes(127)}) },
             { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
             { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) } } },
         { FMAPRSSystem::staticMetaObject, 0, 1, new RadioLimitObject {
             { "name", new RadioLimitStringIgnored() },
-            { "period", new RadioLimitUInt(0, 7650) },
+            { "period", new RadioLimitInterval({Interval::null(), Interval::fromMinutes(127)}) },
             { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, FMChannel::staticMetaObject}, false) },
             { "icon", new RadioLimitEnum{} },
             { "message", new RadioLimitString(0, 60, RadioLimitString::ASCII) }

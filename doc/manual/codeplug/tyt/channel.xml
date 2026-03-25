@@ -21,22 +21,16 @@
   <title>Example channel settings specifying the default values for <trademark>TyT</trademark> 
     <trademark>Retevis</trademark> devices.</title>
   <programlisting><![CDATA[tyt:
-  loneWorker: false
   autoScan: false
-  talkaround: true
-  dataCallConfirmed: false
-  privateCallConfirmed: false
   emergencyAlarmConfirmed: false
   displayPTTId: true
   rxRefFrequency: Low
   txRefFrequency: Low
   tightSquelch: false
   compressedUDPHeader: false
-  reverseBurst: true
   killTone: Off
   inCallCriterion: Always
   allowInterrupt: false
-  dcdm: false
   dcdmLeader: false
 ]]></programlisting>
 </example>
@@ -44,35 +38,16 @@
 <variablelist>
   <title>Common channel setting fields</title>
   <varlistentry>
-    <term><token>loneWorker</token></term>
-    <listitem>
-      <para>If <token>true</token>, the lone worker feature is enabled. See also 
-        <xref linkend="glLoneWorker">Lone Worker</xref></para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
     <term><token>autoScan</token></term>
     <listitem>
       <para>If <token>true</token>, the auto-scan feature is enabled.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>talkaround</token></term>
-    <listitem>
-      <para>
-        If <token>true</token>, talk around is enabled. That is, the radio will receive on the 
-        input and transmit on the output frequency of the repeater effectively bypassing the 
-        repeater. See also <xref linkend="glTalkaround">Talkaround</xref>.
-      </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>dataCallConfirmed</token></term> 
-    <term><token>privateCallConfirmed</token></term>
     <term><token>emergencyAlarmConfirmed</token></term>
     <listitem>
       <para>
-        Enables the confirmation of data, private and emergency calls. These fields are usually
+        Enables the confirmation of emergency calls. These fields are usually
         disabled as the radio will first establish the connection before the actual call can be 
         started.
       </para>
@@ -111,13 +86,6 @@
       <para>Some unknown flag. Usually disabled.</para>
     </listitem>
   </varlistentry>
-  <varlistentry>
-    <term><token>reverseBurst</token></term>
-    <listitem>
-      <para>If enabled (default), avoids a noise burst at the end of a transmission, when the 
-        squelch is controlled by a sub tone.</para>
-    </listitem>
-  </varlistentry>
 </variablelist>
 
 <variablelist>
@@ -147,13 +115,6 @@
         Enables/disables interrupts if <token>inCallCriterion</token> is set to 
         <token>TXInterrupt</token>.
       </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>dcdm</token></term>
-    <listitem>
-      <para>If enabled, the dual-capacity direct mode is used for simplex operation. 
-        See also <xref linkend="glDCDM">DCDM</xref>.</para>
     </listitem>
   </varlistentry>
   <varlistentry>

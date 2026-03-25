@@ -156,13 +156,13 @@ DM32UVCodeplug::ChannelElement::clearScanListIndex() {
 
 
 bool
-DM32UVCodeplug::ChannelElement::preventTalkaroundEnabled() const {
-  return getBit(Offset::preventTalkaround());
+DM32UVCodeplug::ChannelElement::talkaroundEnabled() const {
+  return !getBit(Offset::preventTalkaround());
 }
 
 void
-DM32UVCodeplug::ChannelElement::enablePreventTalkaround(bool enabled) {
-  setBit(Offset::preventTalkaround(), enabled);
+DM32UVCodeplug::ChannelElement::enableTalkaround(bool enabled) {
+  setBit(Offset::preventTalkaround(), !enabled);
 }
 
 
@@ -229,14 +229,14 @@ DM32UVCodeplug::ChannelElement::clearEmergencySystemIndex() {
 }
 
 
-unsigned
+Level
 DM32UVCodeplug::ChannelElement::squelchLevel() const {
-  return (10*getUInt4(Offset::squelchLevel()))/Limit::squelchLevel();
+  return Level::fromValue(getUInt4(Offset::squelchLevel()), Limit::squelchLevel());
 }
 
 void
-DM32UVCodeplug::ChannelElement::setSquelchLevel(unsigned int level) {
-  setUInt4(Offset::squelchLevel(), (level*Limit::squelchLevel())/10);
+DM32UVCodeplug::ChannelElement::setSquelchLevel(Level level) {
+  setUInt4(Offset::squelchLevel(), level.mapTo(Limit::squelchLevel()));
 }
 
 
@@ -422,6 +422,7 @@ DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) cons
       fm->setSquelch(squelchLevel());
       fm->setRXTone(rxTone());
       fm->setTXTone(txTone());
+      fm->extended()->enableTalkaround(talkaroundEnabled());
     }
   } else if ((ChannelType::DMR == channelType()) || (ChannelType::DMRFixed == channelType())) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
@@ -433,6 +434,11 @@ DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) cons
     }
     dmr->setTimeSlot(timeslot());
     dmr->setColorCode(colorCode());
+    dmr->extended()->enableTalkaround(talkaroundEnabled());
+    dmr->extended()->enableDCDM(dcdmEnabled());
+    dmr->extended()->enableLoneWorker(loneWorkerEnabled());
+    dmr->extended()->enablePrivateCallConfirm(privateCallACKEnabled());
+    dmr->extended()->enableDataConfirm(dataACKEnabled());
   } else {
     errMsg(err) << "Unknown channel type " << (unsigned int)channelType() << ".";
     return nullptr;
@@ -547,6 +553,11 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     } else {
       setDMRIdIndex(ctx.index(dmr->radioId()));
     }
+    enableTalkaround(dmr->extended()->talkaround());
+    enableDCDM(dmr->extended()->dcdm());
+    enableLoneWorker(dmr->extended()->loneWorker());
+    enablePrivateCallACK(dmr->extended()->privateCallConfirm());
+    enableDataACK(dmr->extended()->dataConfirm());
   } else if (channel->is<FMChannel>()) {
     auto fm = channel->as<FMChannel>();
     setBandwidth(fm->bandwidth());
@@ -558,6 +569,7 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     setSquelchLevel(fm->defaultSquelch() ? ctx.config()->settings()->squelch() : fm->squelch());
     setRXTone(fm->rxTone());
     setTXTone(fm->txTone());
+    enableTalkaround(fm->extended()->talkaround());
   } else if (channel->is<AMChannel>()) {
     auto am = channel->as<AMChannel>();
     clearTXFrequency();
@@ -3228,24 +3240,24 @@ DM32UVCodeplug::GeneralSettingsElement::setSTEMode(STEMode mode) {
 }
 
 
-unsigned int
+Level
 DM32UVCodeplug::GeneralSettingsElement::fmMicLevel() const {
-  return getUInt8(Offset::fmMicLevel())*10/5 + 1;
+  return Level::fromValue(getUInt8(Offset::fmMicLevel())+ 1, Limit::micGain());
 }
 
 void
-DM32UVCodeplug::GeneralSettingsElement::setFMMicLevel(unsigned int level) {
-  return setUInt8(Offset::fmMicLevel(), (level*4)/10);
+DM32UVCodeplug::GeneralSettingsElement::setFMMicLevel(Level level) {
+  return setUInt8(Offset::fmMicLevel(), level.mapTo(Limit::micGain()));
 }
 
-unsigned int
+Level
 DM32UVCodeplug::GeneralSettingsElement::dmrMicLevel() const {
-  return getUInt8(Offset::dmrMicLevel())*10/5 + 1;
+  return Level::fromValue(getUInt8(Offset::dmrMicLevel()), Limit::micGain());
 }
 
 void
-DM32UVCodeplug::GeneralSettingsElement::setDMRMicLevel(unsigned int level) {
-  return setUInt8(Offset::dmrMicLevel(), (level*4)/10);
+DM32UVCodeplug::GeneralSettingsElement::setDMRMicLevel(Level level) {
+  return setUInt8(Offset::dmrMicLevel(), level.mapTo(Limit::micGain()));
 }
 
 
@@ -3923,9 +3935,9 @@ DM32UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err
   Q_UNUSED(flags);
 
   Context ctx(config);
-  ctx.remTable(&BasicEncryptionKey::staticMetaObject);
-  ctx.remTable(&ARC4EncryptionKey::staticMetaObject);
-  ctx.remTable(&AESEncryptionKey::staticMetaObject);
+  ctx.remTable(&BasicEncryptionKey::staticMetaObject, true);
+  ctx.remTable(&ARC4EncryptionKey::staticMetaObject, true);
+  ctx.remTable(&AESEncryptionKey::staticMetaObject, true);
   ctx.addTable(&EncryptionKey::staticMetaObject);
   if (! index(config, ctx, err)) {
     errMsg(err) << "Index elements.";

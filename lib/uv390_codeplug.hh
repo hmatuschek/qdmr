@@ -67,10 +67,10 @@ public:
     explicit ChannelElement(uint8_t *ptr);
 
     /** Clears/resets the channel and therefore disables it. */
-    void clear();
+    void clear() override;
 
-    bool talkaround() const;
-    void enableTalkaround(bool enable);
+    bool talkaround() const override;
+    void enableTalkaround(bool enable) override;
 
     /** Returns @c true, if the privacy switch is enabled. */
     virtual bool privacySwitch() const;
@@ -92,9 +92,9 @@ public:
     virtual void setTurnOffFreq(TyTChannelExtension::KillTone freq);
 
     /** Returns the squelch level [0-10]. */
-    virtual unsigned squelch() const;
+    virtual Level squelch() const;
     /** Sets the squelch level [0-10]. */
-    virtual void setSquelch(unsigned value);
+    virtual void setSquelch(Level value);
 
     /** Returns the power of this channel. */
     virtual Channel::Power power() const;
@@ -117,9 +117,9 @@ public:
     virtual void enableDCDMLeader(bool enable);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj(const ErrorStack &err=ErrorStack()) const;
+    virtual Channel *toChannelObj(const ErrorStack &err=ErrorStack()) const override;
     /** Initializes this codeplug channel from the given generic configuration. */
-    virtual void fromChannelObj(const Channel *c, Context &ctx);
+    virtual void fromChannelObj(const Channel *c, Context &ctx) override;
 
   protected:
     /** Some internal offsets. */
@@ -216,9 +216,9 @@ public:
     virtual void setAdditionalDMRId(unsigned n, uint32_t id);
 
     /** Returns the microphone gain. */
-    virtual unsigned micLevel() const;
+    virtual Level micLevel() const;
     /** Sets the microphone gain. */
-    virtual void setMICLevel(unsigned val);
+    virtual void setMICLevel(Level val);
 
     /** If @c true, radio ID editing is enabled. */
     virtual bool editRadioID() const;
@@ -229,6 +229,21 @@ public:
     virtual bool fromConfig(const Config *config);
     /** Updates config from general settings. */
     virtual bool updateConfig(Config *config);
+
+  public:
+    /** Some limits. */
+    struct Limit: DM1701Codeplug::GeneralSettingsElement::Limit {
+      /** Specifies the valid range for mic gain. */
+      static constexpr Range<unsigned int> micGain() { return {0,6}; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: DM1701Codeplug::GeneralSettingsElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Bit micGain() { return {0x00a0, 3}; }
+      /// @endcond
+    };
   };
 
   /** Represents the boot-time settings (selected zone and channels) within the UV390 code-plug.

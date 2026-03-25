@@ -123,7 +123,7 @@ FMChannelDialog::construct() {
   }
   if (! _myChannel->defaultSquelch()) {
     squelchDefault->setChecked(false); squelchValue->setEnabled(true);
-    squelchValue->setValue(_myChannel->squelch());
+    squelchValue->setValue(_myChannel->squelch().value());
   }
   if (FMChannel::Bandwidth::Narrow == _myChannel->bandwidth())
     bandwidth->setCurrentIndex(0);
@@ -176,7 +176,7 @@ FMChannelDialog::channel()
   if (squelchDefault->isChecked())
     _myChannel->setSquelchDefault();
   else
-    _myChannel->setSquelch(squelchValue->value());
+    _myChannel->setSquelch(Level::fromValue(squelchValue->value()));
   _myChannel->setRXTone(rxTone->selectiveCall());
   _myChannel->setTXTone(txTone->selectiveCall());
   _myChannel->setBandwidth(FMChannel::Bandwidth(bandwidth->currentData().toUInt()));

@@ -445,14 +445,10 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     if (dc->roamingRef())
       enableRoaming(true);
 
-    // Apply extension settings, if present
-    if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      ch_ext = ext;
-      enableDataACK(dc->anytoneChannelExtension()->dataACK());
-      /// Handles bug in AnyTone firmware.
-      /// @todo Remove once fixed by AnyTone.
-      enableRXAPRS(! ext->sms());
-    }
+    enableDataACK(dc->extended()->dataConfirm());
+    /// Handles bug in AnyTone firmware.
+    /// @todo Remove once fixed by AnyTone.
+    enableRXAPRS(! dc->extended()->sms());
 
     clearDMREncryptionKeyIndex();
     clearAESEncryptionKeyIndex();
@@ -2639,14 +2635,13 @@ D878UVCodeplug::ExtendedSettingsElement::setDateFormat(AnytoneDisplaySettingsExt
   setUInt8(Offset::dateFormat(), (unsigned int)format);
 }
 
-unsigned int
+Level
 D878UVCodeplug::ExtendedSettingsElement::fmMicGain() const {
-  return (getUInt8(Offset::analogMicGain())+1)*10/5;
+  return Level::fromValue(getUInt8(Offset::analogMicGain()), Limit::micGain());
 }
 void
-D878UVCodeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
-  gain = std::min(10U, std::max(1U, gain));
-  setUInt8(Offset::analogMicGain(), gain*4/10);
+D878UVCodeplug::ExtendedSettingsElement::setFMMicGain(Level gain) {
+  setUInt8(Offset::analogMicGain(), gain.mapTo(Limit::micGain()));
 }
 
 bool
@@ -2820,11 +2815,11 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
   this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
 
-  // Store FM mic gain separately
-  ext->audioSettings()->setFMMicGain(fmMicGain());
-  // Enable separate mic gain, if it differs from the DMR mic gain:
-  ext->audioSettings()->enableFMMicGain(
-        ctx.config()->settings()->micLevel() != fmMicGain());
+  // Store FM mic gain separately, if different
+  if (ctx.config()->settings()->micLevel() == fmMicGain())
+    ext->audioSettings()->disableFMMicGain();
+  else
+    ext->audioSettings()->setFMMicGain(fmMicGain());
 
   // Store display settings
   ext->displaySettings()->enableShowColorCode(this->showColorCode());
@@ -4095,16 +4090,16 @@ bool
 D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
         + idx*ChannelElement::size();
 
     ChannelElement ch(data(addr));
-    ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    ch.fromChannelObj(ctx.get<Channel>(i), ctx);
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
-    ext.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    ext.fromChannelObj(ctx.get<Channel>(i), ctx);
   }
   return true;
 }

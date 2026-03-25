@@ -1,6 +1,7 @@
 #include "d878uv_test.hh"
 #include "config.hh"
 #include "d878uv_codeplug.hh"
+#include "d878uv_limits.hh"
 #include "errorstack.hh"
 #include <QTest>
 #include "logger.hh"
@@ -9,6 +10,21 @@ D878UVTest::D878UVTest(QObject *parent)
   : UnitTestBase(parent), _stderr(stderr)
 {
   Logger::get().addHandler(new StreamLogHandler(_stderr, LogMessage::DEBUG));
+}
+
+void
+D878UVTest::encodeDecode(Config &input, Config &output) {
+  ErrorStack err;
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&input, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  if (! codeplug.decode(&output, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
 }
 
 void
@@ -67,7 +83,7 @@ D878UVTest::testAnalogMicGain() {
   }
 
   QVERIFY(config.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
-  QCOMPARE(config.settings()->anytoneExtension()->audioSettings()->fmMicGain(), 6);
+  QCOMPARE(config.settings()->anytoneExtension()->audioSettings()->fmMicGain(), Level::fromValue(5));
 }
 
 void
@@ -511,10 +527,10 @@ D878UVTest::testChannelDataACK() {
   QCOMPARE(config.channelList()->count(), 2);
   QVERIFY(config.channelList()->channel(0)->is<DMRChannel>());
   QCOMPARE(config.channelList()->channel(0)->as<DMRChannel>()
-             ->anytoneChannelExtension()->dataACK(), false);
+             ->extended()->dataConfirm(), false);
   QVERIFY(config.channelList()->channel(1)->is<DMRChannel>());
   QCOMPARE(config.channelList()->channel(1)->as<DMRChannel>()
-             ->anytoneChannelExtension()->dataACK(), true);
+             ->extended()->dataConfirm(), true);
 
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D878UVCodeplug codeplug;
@@ -531,9 +547,9 @@ D878UVTest::testChannelDataACK() {
   }
 
   QCOMPARE(testConfig.channelList()->channel(0)->as<DMRChannel>()
-             ->anytoneChannelExtension()->dataACK(), false);
+             ->extended()->dataConfirm(), false);
   QCOMPARE(testConfig.channelList()->channel(1)->as<DMRChannel>()
-             ->anytoneChannelExtension()->dataACK(), true);
+             ->extended()->dataConfirm(), true);
 }
 
 
@@ -565,6 +581,39 @@ D878UVTest::testSettingsDisplayVolumeChangePrompt() {
 
   QCOMPARE(testConfig.settings()->anytoneExtension()->displaySettings()->volumeChangePromptEnabled(), false);
 }
+
+
+void
+D878UVTest::testRadioLimits() {
+  D878UVLimits limits({{Frequency::fromMHz(137),Frequency::fromMHz(150)},
+                       {Frequency::fromMHz(400),Frequency::fromMHz(450)}},
+                      {{Frequency::fromMHz(137),Frequency::fromMHz(150)},
+                       {Frequency::fromMHz(400),Frequency::fromMHz(450)}}, "V101");
+  RadioLimitContext ctx;
+  if (! limits.verifyConfig(&_basicConfig, ctx)) {
+    QString issues;
+    for (int i=0; i<ctx.count(); i++) {
+      if (! issues.isEmpty())
+        issues.append(", ");
+      issues.append(ctx.message(i).format());
+    }
+    QFAIL(issues.toLatin1().constData());
+  }
+}
+
+
+void
+D878UVTest::testMicGain() {
+  ErrorStack err;
+  Config copy, config; config.copy(_basicConfig);
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  for (auto pair: pairs) {
+    config.settings()->setMicLevel(Level::fromValue(pair.first));
+    encodeDecode(config, copy);
+    QCOMPARE(copy.settings()->micLevel(), Level::fromValue(pair.second));
+  }
+}
+
 
 
 QTEST_GUILESS_MAIN(D878UVTest)

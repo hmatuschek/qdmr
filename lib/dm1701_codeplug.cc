@@ -121,11 +121,12 @@ DM1701Codeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
     return ch;
 
   ch->setPower(power());
+  if (auto fmc = ch->as<FMChannel>())
+    fmc->extended()->enableReverseBurst(reverseBurst());
 
   // Apply extension
   if (ch->tytChannelExtension()) {
     ch->tytChannelExtension()->enableTightSquelch(tightSquelchEnabled());
-    ch->tytChannelExtension()->enableReverseBurst(reverseBurst());
   }
 
   return ch;
@@ -136,11 +137,12 @@ DM1701Codeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   TyTCodeplug::ChannelElement::fromChannelObj(c, ctx);
 
   setPower(c->power());
+  if (auto fmc = c->as<FMChannel>())
+    enableReverseBurst(fmc->extended()->reverseBurst());
 
   // apply extensions (extension will be created in TyTCodeplug::ChannelElement::fromChannelObj)
   if (TyTChannelExtension *ex = c->tytChannelExtension()) {
     enableTightSquelch(ex->tightSquelch());
-    enableReverseBurst(ex->reverseBurst());
   }
 }
 

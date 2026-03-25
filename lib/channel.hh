@@ -10,6 +10,7 @@
 #include "interval.hh"
 #include "level.hh"
 
+#include "channel_extension.hh"
 #include "opengd77_extension.hh"
 #include "tyt_extensions.hh"
 #include "opengd77_extension.hh"
@@ -43,7 +44,7 @@ class Channel: public ConfigObject
   /** The transmit power. */
   Q_PROPERTY(Power power READ power WRITE setPower SCRIPTABLE false)
   /** The transmit timeout in seconds. */
-  Q_PROPERTY(Interval timeout READ timeout WRITE setTimeout SCRIPTABLE false)
+  Q_PROPERTY(Interval timeout READ timeout WRITE setTimeout)
   /** If true, the channel is receive only. */
   Q_PROPERTY(bool rxOnly READ rxOnly WRITE setRXOnly)
   /** The scan list. */
@@ -205,6 +206,9 @@ class AnalogChannel: public Channel
 {
   Q_OBJECT
 
+  /** Specifies the squelch level for the channel. */
+  Q_PROPERTY(Level squelch READ squelch WRITE setSquelch FINAL)
+
 protected:
   /** Hidden constructor. */
   explicit AnalogChannel(QObject *parent=nullptr);
@@ -212,6 +216,25 @@ protected:
 public:
   /** Copy constructor. */
   AnalogChannel(const AnalogChannel &other, QObject *parent=nullptr);
+
+
+  /** Returns @c true if the global default squelch level is used. */
+  bool defaultSquelch() const;
+  /** Returns @c true if the squelch is disabled. */
+  bool squelchDisabled() const;
+  /** Returns the squelch level [1,10]. */
+  Level squelch() const;
+  /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
+    bool setSquelch(Level squelch);
+  /** Disables the quelch. */
+  void disableSquelch();
+  /** Sets the squelch to the global default value. */
+  void setSquelchDefault();
+
+
+protected:
+  /** Squelch. If set to 0 -> disabled. If invalid -> default squelch. */
+  Level _squelch;
 };
 
 
@@ -228,8 +251,6 @@ class FMChannel: public AnalogChannel
 
   /** The admit criterion of the channel. */
   Q_PROPERTY(Admit admit READ admit WRITE setAdmit)
-  /** The squelch level of the channel [1-10]. */
-  Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch SCRIPTABLE false)
   /** The RX tone (CTCSS/DSC). */
   Q_PROPERTY(SelectiveCall rxTone READ rxTone WRITE setRXTone)
   /** The TX tone (CTCSS/DSC). */
@@ -239,6 +260,8 @@ class FMChannel: public AnalogChannel
   /** The APRS system. */
   Q_PROPERTY(FMAPRSSystemReference* aprs READ aprsRef)
 
+  /** Common extended channel settings. */
+  Q_PROPERTY(FMChannelExtension *extended READ extended);
   /** The AnyTone FM channel extension. */
   Q_PROPERTY(AnytoneFMChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
 
@@ -272,19 +295,6 @@ public:
   /** (Re-)Sets the admit criterion for the analog channel. */
   void setAdmit(Admit admit);
 
-  /** Returns @c true if the global default squelch level is used. */
-  bool defaultSquelch() const;
-  /** Returns @c true if the squelch is disabled. */
-  bool squelchDisabled() const;
-  /** Returns the squelch level [0,10]. */
-	unsigned squelch() const;
-  /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
-	bool setSquelch(unsigned squelch);
-  /** Disables the quelch. */
-  void disableSquelch();
-  /** Sets the squelch to the global default value. */
-  void setSquelchDefault();
-
   /** Returns the CTCSS/DCS RX tone, @c SIGNALING_NONE means disabled. */
   SelectiveCall rxTone() const;
   /** (Re-)Sets the CTCSS/DCS RX tone, @c SIGNALING_NONE disables the RX tone. */
@@ -308,6 +318,9 @@ public:
   /** Sets the APRS system. */
   void setAPRS(FMAPRSSystem *sys);
 
+  /** Returns the extended settings. */
+  FMChannelExtension *extended() const;
+
   /** Returns the FM channel extension for AnyTone devices.
    * If this extension is not set, returns @c nullptr. */
   AnytoneFMChannelExtension *anytoneChannelExtension() const;
@@ -319,22 +332,18 @@ public:
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
-  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
-
-protected:
   /** Holds the admit criterion. */
 	Admit _admit;
-  /** Holds the squelch level [0,10]. */
-  unsigned _squelch;
   /** The RX CTCSS/DCS setting. */
   SelectiveCall _rxTone;
   /** The TX CTCSS/DCS setting. */
   SelectiveCall _txTone;
   /** The channel bandwidth. */
-	Bandwidth _bw;
+  Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
   FMAPRSSystemReference _aprsSystem;
-
+  /** Owns the extended settings. */
+  FMChannelExtension *_extended;
   /** Owns the AnyTone FM channel extension. */
   AnytoneFMChannelExtension *_anytoneExtension;
 };
@@ -351,9 +360,6 @@ class AMChannel: public AnalogChannel
 {
   Q_OBJECT
 
-  /** The squelch level of the channel [1-10]. */
-  Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch SCRIPTABLE false)
-
 public:
   /** Constructs a new empty AM channel. */
   Q_INVOKABLE explicit AMChannel(QObject *parent=nullptr);
@@ -362,29 +368,9 @@ public:
   ConfigItem *clone() const override;
   void clear() override;
 
-  /** Returns @c true if the global default squelch level is used. */
-  bool defaultSquelch() const;
-  /** Returns @c true if the squelch is disabled. */
-  bool squelchDisabled() const;
-  /** Returns the squelch level [0,10]. */
-  unsigned squelch() const;
-  /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
-  bool setSquelch(unsigned squelch);
-  /** Disables the quelch. */
-  void disableSquelch();
-  /** Sets the squelch to the global default value. */
-  void setSquelchDefault();
-
 public:
   YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack()) override;
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack()) override;
-
-protected:
-  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack()) override;
-
-protected:
-  /** Holds the squelch level [0,10]. */
-  unsigned _squelch;
 };
 
 
@@ -433,6 +419,8 @@ class DMRChannel: public DigitalChannel
   /** The roaming zone. */
   Q_PROPERTY(RoamingZoneReference* roaming READ roamingRef)
 
+  /** The extended dmr channel settings. */
+  Q_PROPERTY(DMRChannelExtension* extended READ extended)
   /** The commercial channel extension. */
   Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
   /** The AnyTone DMR channel extension. */
@@ -521,6 +509,9 @@ public:
   /** Associates the given radio ID with this channel. */
   bool setRadioId(DMRRadioID *id);
 
+  /** Returns the extended channel settings. */
+  DMRChannelExtension *extended() const;
+
   /** Returns the extension for commercial features. */
   CommercialChannelExtension *commercialExtension() const;
   /** Sets the commercial channel extension. */
@@ -553,6 +544,8 @@ protected:
   /** Radio ID to use on this channel. */
   DMRRadioIDReference _radioId;
 
+  /** Owns the extended channel extension. */
+  DMRChannelExtension *_extended;
   /** Owns the commercial channel extension. */
   CommercialChannelExtension *_commercialExtension;
   /** Owns the AnyTone DMR channel extension. */

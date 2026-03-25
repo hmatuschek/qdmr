@@ -157,12 +157,13 @@ ConfigTest::testGNSSSettings() {
   config.settings()->gnss()->setFixedPositionLocator("JO62jl45");
   config.settings()->gnss()->setSystems(GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
 
+  qDebug() << "Before" << config.settings()->gnss()->fixedPositionLocator();
+
   QString buffer;
   QTextStream stream(&buffer);
   ErrorStack err;
   if (! config.toYAML(stream, err))
     QFAIL(err.format().toLocal8Bit().constData());
-  qDebug() << buffer;
 
   Config testConfig;
   Config::Context ctx;
@@ -172,6 +173,9 @@ ConfigTest::testGNSSSettings() {
   if (! testConfig.link(doc, ctx, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
+  qDebug() << "After" << testConfig.settings()->gnss()->fixedPositionLocator();
+
+  QCOMPARE(testConfig.settings()->gnss()->fixedPositionEnabled(), true);
   QCOMPARE(testConfig.settings()->gnss()->fixedPositionLocator(), "JO62jl45");
   QCOMPARE(testConfig.settings()->gnss()->systems(), GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
 }

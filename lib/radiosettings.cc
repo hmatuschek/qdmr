@@ -4,10 +4,11 @@
 
 
 RadioSettings::RadioSettings(QObject *parent)
-  : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(3), _speech(false),
-  _squelch(1), _power(Channel::Power::High), _vox(Level::null()), _transmitTimeOut(Interval::infinity()),
-  _defaultId(new DMRRadioIDReference(this)), _gnss(new GNSSSettings(this)), _dmr(new DMRSettings(this)),
-  _tytExtension(nullptr), _radioddityExtension(nullptr), _anytoneExtension(nullptr)
+  : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(Level::fromValue(3)), _speech(false),
+    _squelch(Level::fromValue(1)), _power(Channel::Power::High), _vox(Level::null()),
+    _transmitTimeOut(Interval::infinity()), _defaultId(new DMRRadioIDReference(this)),
+    _gnss(new GNSSSettings(this)), _dmr(new DMRSettings(this)),
+    _tytExtension(nullptr), _radioddityExtension(nullptr), _anytoneExtension(nullptr)
 {
   connect(_gnss, &GNSSSettings::modified, this, &RadioSettings::modified);
   connect(_dmr, &DMRSettings::modified, this, &RadioSettings::modified);
@@ -41,9 +42,9 @@ RadioSettings::clear() {
 
   _introLine1.clear();
   _introLine2.clear();
-  _micLevel = 3;
+  _micLevel = Level::fromValue(3);
   _speech = false;
-  _squelch = 1;
+  _squelch = Level::fromValue(1);
   _power = Channel::Power::High;
   disableVOX();
   disableTOT();
@@ -75,12 +76,16 @@ RadioSettings::setIntroLine2(const QString &line) {
   emit modified(this);
 }
 
-unsigned
+Level
 RadioSettings::micLevel() const {
   return _micLevel;
 }
 void
-RadioSettings::setMicLevel(unsigned value) {
+RadioSettings::setMicLevel(Level value) {
+  if (value.isInvalid() || value.isNull())
+    value = Level::fromValue(1);
+  if (_micLevel == value)
+    return;
   _micLevel = value;
   emit modified(this);
 }
@@ -95,13 +100,12 @@ RadioSettings::enableSpeech(bool enabled) {
   emit modified(this);
 }
 
-unsigned
+Level
 RadioSettings::squelch() const {
   return _squelch;
 }
 void
-RadioSettings::setSquelch(unsigned squelch) {
-  squelch = std::min(10u, squelch);
+RadioSettings::setSquelch(Level squelch) {
   _squelch = squelch;
   emit modified(this);
 }

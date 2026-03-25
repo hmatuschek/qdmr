@@ -582,7 +582,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Q_UNUSED(ctx)
 
   Channel *ch;
-  AnytoneChannelExtension *ch_ext = nullptr;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
     if (Mode::MixedAnalog == mode())
@@ -600,11 +599,12 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     ach->setBandwidth(bandwidth());
     // no per channel squelch settings
     ach->setSquelchDefault();
+    ach->extended()->enableTalkaround(talkaround());
+    ach->extended()->enableReverseBurst(ctcssPhaseReversal());
 
     // Create extension
-    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension(); ch_ext = ext;
+    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension();
     ach->setAnytoneChannelExtension(ext);
-    ext->enableReverseBurst(ctcssPhaseReversal());
     ext->enableRXCustomCTCSS(rxCTCSSIsCustom());
     ext->enableTXCustomCTCSS(txCTCSSIsCustom());
     ext->setCustomCTCSS(customCTCSSFrequency());
@@ -628,15 +628,16 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     }
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
+    dch->extended()->enableTalkaround(talkaround());
+    dch->extended()->enablePrivateCallConfirm(callConfirm());
+    dch->extended()->enableSMSConfirm(smsConfirm());
+    dch->extended()->enableDCDM(simplexTDMA());
+    dch->extended()->enableLoneWorker(loneWorker());
 
     // Create extension
-    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension(); ch_ext = ext;
+    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension();
     dch->setAnytoneChannelExtension(ext);
-    ext->enableCallConfirm(callConfirm());
-    ext->enableSMSConfirm(smsConfirm());
-    ext->enableSimplexTDMA(simplexTDMA());
     ext->enableAdaptiveTDMA(adaptiveTDMA());
-    ext->enableLoneWorker(loneWorker());
     // Done
     ch = dch;
   } else {
@@ -654,11 +655,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   // No per channel vox & tot setting
   ch->setVOXDefault();
   ch->setDefaultTimeout();
-
-  // Apply common channel extension settings
-  if (nullptr != ch_ext) {
-    ch_ext->enableTalkaround(talkaround());
-  }
 
   return ch;
 }
@@ -746,12 +742,12 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       setSquelchMode(AnytoneFMChannelExtension::SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
+    // Apply common settings
+    enableTalkaround(ac->extended()->talkaround());
+    // Apply FM settings
+    enableCTCSSPhaseReversal(ac->extended()->reverseBurst());
     // Handle extension
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
-      // Apply common settings
-      enableTalkaround(ext->talkaround());
-      // Apply FM settings
-      enableCTCSSPhaseReversal(ext->reverseBurst());
       setCustomCTCSSFrequency(ext->customCTCSS());
       if (ext->rxCustomCTCSS())
         enableRXCustomCTCSS();
@@ -794,16 +790,16 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     } else {
       setRadioIDIndex(ctx.index(dc->radioId()));
     }
+    // Apply common settings
+    enableTalkaround(dc->extended()->talkaround());
+    // Apply DMR settings
+    enableCallConfirm(dc->extended()->privateCallConfirm());
+    enableSMSConfirm(dc->extended()->smsConfirm());
+    enableSimplexTDMA(dc->extended()->dcdm());
+    enableLoneWorker(dc->extended()->loneWorker());
     // Handle extension
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      // Apply common settings
-      enableTalkaround(ext->talkaround());
-      // Apply DMR settings
-      enableCallConfirm(ext->callConfirm());
-      enableSMSConfirm(ext->smsConfirm());
-      enableSimplexTDMA(ext->simplexTDMA());
       enableAdaptiveTDMA(ext->adaptiveTDMA());
-      enableLoneWorker(ext->loneWorker());
     }
   }
 
@@ -1567,20 +1563,21 @@ AnytoneCodeplug::GeneralSettingsElement::enableBootPassword(bool enable) {
   setUInt8(Offset::bootPassword(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Level
 AnytoneCodeplug::GeneralSettingsElement::squelchLevelA() const {
-  return getUInt8(Offset::squelchLevelA());
+  return Level::fromValue(getUInt8(Offset::squelchLevelA()), {1,5});
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelA(unsigned level) {
-  setUInt8(Offset::squelchLevelA(), level);
+AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelA(Level level) {
+  setUInt8(Offset::squelchLevelA(), level.mapTo({1,5}));
 }
-unsigned AnytoneCodeplug::GeneralSettingsElement::squelchLevelB() const {
-  return getUInt8(Offset::squelchLevelB());
+Level
+AnytoneCodeplug::GeneralSettingsElement::squelchLevelB() const {
+  return Level::fromValue(getUInt8(Offset::squelchLevelB()), {1,5});
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(unsigned level) {
-  setUInt8(Offset::squelchLevelB(), level);
+AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(Level level) {
+  setUInt8(Offset::squelchLevelB(), level.mapTo({1, 5}));
 }
 
 bool
@@ -1603,16 +1600,8 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     }
   }
   // Set default squelch level
-  if (0 == ctx.config()->settings()->squelch()) {
-    setSquelchLevelA(0);
-    setSquelchLevelB(0);
-  } else if (1 == ctx.config()->settings()->squelch()) {
-    setSquelchLevelA(1);
-    setSquelchLevelB(1);
-  } else {
-    setSquelchLevelA(ctx.config()->settings()->squelch()/2);
-    setSquelchLevelB(ctx.config()->settings()->squelch()/2);
-  }
+  setSquelchLevelA(ctx.config()->settings()->squelch());
+  setSquelchLevelB(ctx.config()->settings()->squelch());
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
@@ -1747,7 +1736,7 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->setMicLevel(dmrMicGain());
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
-  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
+  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB()));
 
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
@@ -4439,7 +4428,8 @@ bool
 AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(err)
 
-  // All indices as 0-based. That is, the first channel gets index 0 etc.
+  // AM channels are indexed separately.
+  ctx.addTable(&AMChannel::staticMetaObject);
 
   // Map radio IDs
   for (int i=0; i<config->radioIDs()->count(); i++) {
@@ -4461,8 +4451,14 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
     ctx.add(config->rxGroupLists()->list(i), i);
 
   // Map channels
-  for (int i=0; i<config->channelList()->count(); i++)
-    ctx.add(config->channelList()->channel(i), i);
+  for (int i=0, common=0, am=0; i<config->channelList()->count(); i++) {
+    if (config->channelList()->channel(i)->is<DMRChannel>() ||
+        config->channelList()->channel(i)->is<FMChannel>()) {
+      ctx.add(config->channelList()->channel(i), common++);
+    } else if (config->channelList()->channel(i)->is<AMChannel>()) {
+      ctx.add(config->channelList()->channel(i), am++);
+    }
+  }
 
   // Map zones
   for (int i=0; i<config->zones()->count(); i++)

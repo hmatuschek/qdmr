@@ -16,10 +16,14 @@ private slots:
   void testBasicConfigDecoding();
   void testChannelFrequency();
   void testARC4Encryption();
+  void testAMChannel();
   void testMicGain(); // Retression test for #773
   void testChannelDataACK(); // Regression test for #813
   void testSettingsDisplayVolumeChangePrompt(); // Regression test for #813
   void testSettingsRoamingNotificationCount(); // Regression test for #813
+
+protected:
+  void encodeDecode(Config &input, Config &ouput);
 };
 
 #endif // D578UVTEST_HH
