@@ -6,62 +6,62 @@
     <message>
         <location filename="../src/amchanneldialog.ui" line="14"/>
         <source>Edit AM Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifica canale AM</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Base</translation>
+        <translation>Base</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="32"/>
         <source>Name</source>
-        <translation type="unfinished">Nome</translation>
+        <translation>Nome</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="49"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished">Frequenza RX</translation>
+        <translation>Frequenza RX</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="59"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished">Frequenza TX</translation>
+        <translation>Frequenza TX</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="69"/>
         <source>Tx Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Offset TX</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="121"/>
         <source>Power</source>
-        <translation type="unfinished">Potenza</translation>
+        <translation>Potenza</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="137"/>
         <source>Max</source>
-        <translation type="unfinished">Massima</translation>
+        <translation>Massima</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="142"/>
         <source>High</source>
-        <translation type="unfinished">Alta</translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="147"/>
         <source>Mid</source>
-        <translation type="unfinished">Media</translation>
+        <translation>Media</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="152"/>
         <source>Low</source>
-        <translation type="unfinished">Bassa</translation>
+        <translation>Bassa</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="157"/>
         <source>Min</source>
-        <translation type="unfinished">Minima</translation>
+        <translation>Minima</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="165"/>
@@ -69,68 +69,68 @@
         <location filename="../src/amchanneldialog.ui" line="236"/>
         <location filename="../src/amchanneldialog.ui" line="307"/>
         <source>Default</source>
-        <translation type="unfinished">Predefinito/a</translation>
+        <translation>Predefinito/a</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="174"/>
         <source>Tx Timeout</source>
-        <translation type="unfinished">Timeout TX</translation>
+        <translation>Timeout TX</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="189"/>
         <location filename="../src/amchanneldialog.ui" line="226"/>
         <source>Off</source>
-        <translation type="unfinished">Disattivato</translation>
+        <translation>Disattivato</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="211"/>
         <source>VOX Level</source>
-        <translation type="unfinished">Livello VOX</translation>
+        <translation>Livello VOX</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="245"/>
         <source>Rx Only</source>
-        <translation type="unfinished">Solo RX</translation>
+        <translation>Solo RX</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="255"/>
         <source>Scan List</source>
-        <translation type="unfinished">Lista di scansione</translation>
+        <translation>Lista di scansione</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="282"/>
         <source>Squelch</source>
-        <translation type="unfinished">Squelch</translation>
+        <translation>Squelch</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="297"/>
         <source>Open</source>
-        <translation type="unfinished">Aperto</translation>
+        <translation>Aperto</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.ui" line="319"/>
         <source>Extensions</source>
-        <translation type="unfinished">Estensioni</translation>
+        <translation>Estensioni</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.cc" line="47"/>
         <source>[None]</source>
-        <translation type="unfinished">[Nessuno/a]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.cc" line="63"/>
         <source>No offset</source>
-        <translation type="unfinished">Nessun offset</translation>
+        <translation>Nessun offset</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.cc" line="65"/>
         <source>Positive offset</source>
-        <translation type="unfinished">Offset positivo</translation>
+        <translation>Offset positivo</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.cc" line="67"/>
         <source>Negative offset</source>
-        <translation type="unfinished">Offset negativo</translation>
+        <translation>Offset negativo</translation>
     </message>
 </context>
 <context>
@@ -202,7 +202,7 @@
     <message>
         <location filename="../src/fmchanneldialog.ui" line="91"/>
         <source>Tx Offset</source>
-        <translation>Offset TX</translation>
+        <translation>Offset Tx</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.ui" line="143"/>
@@ -653,7 +653,7 @@
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Channel ...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi canale...</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
@@ -678,32 +678,32 @@
     <message>
         <location filename="../src/channellistview.ui" line="64"/>
         <source>Add FM Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi canale FM</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="67"/>
         <source>Adds a new FM channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiunge un nuovo canale FM</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="75"/>
         <source>Add DMR Channel</source>
-        <translation type="unfinished">Aggiungi canale DMR</translation>
+        <translation>Aggiungi canale DMR</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="78"/>
         <source>Adds a new DMR channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiunge un nuovo canale DMR.</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="86"/>
         <source>Add AM Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiungi canale AM</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="89"/>
         <source>Adds a new AM channel.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggiunge un nuovo canale AM.</translation>
     </message>
 </context>
 <context>
@@ -721,7 +721,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="282"/>
         <source>AM</source>
-        <translation type="unfinished"></translation>
+        <translation>AM</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="293"/>
@@ -1317,28 +1317,28 @@
         <location filename="../src/dmrchanneldialog.cc" line="84"/>
         <location filename="../src/dmrchanneldialog.cc" line="91"/>
         <source>[None]</source>
-        <translation type="unfinished">[Nessuno/a]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="92"/>
         <location filename="../src/dmrchanneldialog.cc" line="101"/>
         <source>[Default]</source>
-        <translation type="unfinished">[Predefinito/a]</translation>
+        <translation>[Predefinito/a]</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="119"/>
         <source>No offset</source>
-        <translation type="unfinished">Nessun offset</translation>
+        <translation>Nessun offset</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="121"/>
         <source>Positive offset</source>
-        <translation type="unfinished">Offset positivo</translation>
+        <translation>Offset positivo</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="123"/>
         <source>Negative offset</source>
-        <translation type="unfinished">Offset negativo</translation>
+        <translation>Offset negativo</translation>
     </message>
 </context>
 <context>
@@ -1706,442 +1706,442 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="7"/>
         <source>[None]</source>
-        <translation type="unfinished">[Nessuno/a]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
         <source>Police station</source>
-        <translation type="unfinished">Stazione di polizia</translation>
+        <translation>Stazione di polizia</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="9"/>
         <source>Digipeater</source>
-        <translation type="unfinished">Digipeater</translation>
+        <translation>Digipeater</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="10"/>
         <source>Phone</source>
-        <translation type="unfinished">Telefono</translation>
+        <translation>Telefono</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="11"/>
         <source>DX cluster</source>
-        <translation type="unfinished">Cluster DX</translation>
+        <translation>Cluster DX</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="12"/>
         <source>HF gateway</source>
-        <translation type="unfinished">Gateway HF</translation>
+        <translation>Gateway HF</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="13"/>
         <source>Plane small</source>
-        <translation type="unfinished">Aereo piccolo</translation>
+        <translation>Aereo piccolo</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="14"/>
         <source>Mobile Satellite station</source>
-        <translation type="unfinished">Stazione satellitare mobile</translation>
+        <translation>Stazione satellitare mobile</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="15"/>
         <source>Wheel Chair</source>
-        <translation type="unfinished">Sedia a rotelle</translation>
+        <translation>Sedia a rotelle</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="16"/>
         <source>Snowmobile</source>
-        <translation type="unfinished">Motoslitta</translation>
+        <translation>Motoslitta</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="17"/>
         <source>Red cross</source>
-        <translation type="unfinished">Croce rossa</translation>
+        <translation>Croce rossa</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="18"/>
         <source>Boy scout</source>
-        <translation type="unfinished">Boy scout</translation>
+        <translation>Boy scout</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="19"/>
         <source>Home</source>
-        <translation type="unfinished">Casa</translation>
+        <translation>Casa</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="20"/>
         <source>X</source>
-        <translation type="unfinished">X</translation>
+        <translation>X</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="21"/>
         <source>Red dot</source>
-        <translation type="unfinished">Punto rosso</translation>
+        <translation>Punto rosso</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="22"/>
         <source>Circle 0</source>
-        <translation type="unfinished">Cerchio 0</translation>
+        <translation>Cerchio 0</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="23"/>
         <source>Circle 1</source>
-        <translation type="unfinished">Cerchio 1</translation>
+        <translation>Cerchio 1</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="24"/>
         <source>Circle 2</source>
-        <translation type="unfinished">Cerchio 2</translation>
+        <translation>Cerchio 2</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="25"/>
         <source>Circle 3</source>
-        <translation type="unfinished">Cerchio 3</translation>
+        <translation>Cerchio 3</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="26"/>
         <source>Circle 4</source>
-        <translation type="unfinished">Cerchio 4</translation>
+        <translation>Cerchio 4</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="27"/>
         <source>Circle 5</source>
-        <translation type="unfinished">Cerchio 5</translation>
+        <translation>Cerchio 5</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="28"/>
         <source>Circle 6</source>
-        <translation type="unfinished">Cerchio 6</translation>
+        <translation>Cerchio 6</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="29"/>
         <source>Circle 7</source>
-        <translation type="unfinished">Cerchio 7</translation>
+        <translation>Cerchio 7</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="30"/>
         <source>Circle 8</source>
-        <translation type="unfinished">Cerchio 8</translation>
+        <translation>Cerchio 8</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="31"/>
         <source>Circle 9</source>
-        <translation type="unfinished">Cerchio 9</translation>
+        <translation>Cerchio 9</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="32"/>
         <source>Fire</source>
-        <translation type="unfinished">Fuoco</translation>
+        <translation>Fuoco</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="33"/>
         <source>Campground</source>
-        <translation type="unfinished">Campeggio</translation>
+        <translation>Campeggio</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="34"/>
         <source>Motorcycle</source>
-        <translation type="unfinished">Motocicletta</translation>
+        <translation>Motocicletta</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="35"/>
         <source>Rail engine</source>
-        <translation type="unfinished">Locomotiva</translation>
+        <translation>Locomotiva</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="36"/>
         <source>Car</source>
-        <translation type="unfinished">Automobile</translation>
+        <translation>Automobile</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="37"/>
         <source>File server</source>
-        <translation type="unfinished">File server</translation>
+        <translation>File server</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="38"/>
         <source>HC Future</source>
-        <translation type="unfinished">Futuro HC</translation>
+        <translation>Futuro HC</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="39"/>
         <source>Aid station</source>
-        <translation type="unfinished">Pronto soccorso</translation>
+        <translation>Pronto soccorso</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="40"/>
         <source>BBS</source>
-        <translation type="unfinished">BBS</translation>
+        <translation>BBS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="41"/>
         <source>Canoe</source>
-        <translation type="unfinished">Canoa</translation>
+        <translation>Canoa</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="42"/>
         <source>Eyeball</source>
-        <translation type="unfinished">Occhio</translation>
+        <translation>Occhio</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="43"/>
         <source>Tractor</source>
-        <translation type="unfinished">Trattore</translation>
+        <translation>Trattore</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="44"/>
         <source>Grid Square</source>
-        <translation type="unfinished">Grid square</translation>
+        <translation>Grid square</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="45"/>
         <source>Hotel</source>
-        <translation type="unfinished">Hotel</translation>
+        <translation>Hotel</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="46"/>
         <source>TCP/IP</source>
-        <translation type="unfinished">TCP/IP</translation>
+        <translation>TCP/IP</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="47"/>
         <source>School</source>
-        <translation type="unfinished">Scuola</translation>
+        <translation>Scuola</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="48"/>
         <source>Logon</source>
-        <translation type="unfinished">Accesso</translation>
+        <translation>Accesso</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="49"/>
         <source>MacOS</source>
-        <translation type="unfinished">MacOS</translation>
+        <translation>MacOS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="50"/>
         <source>NTS station</source>
-        <translation type="unfinished">Stazione NTS</translation>
+        <translation>Stazione NTS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="51"/>
         <source>Balloon</source>
-        <translation type="unfinished">Mongolfiera</translation>
+        <translation>Mongolfiera</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="52"/>
         <source>Police car</source>
-        <translation type="unfinished">Auto della polizia</translation>
+        <translation>Auto della polizia</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="53"/>
         <source>TBD</source>
-        <translation type="unfinished">TBD</translation>
+        <translation>TBD</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="54"/>
         <source>RV</source>
-        <translation type="unfinished">RV</translation>
+        <translation>RV</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="55"/>
         <source>Shuttle</source>
-        <translation type="unfinished">Navetta</translation>
+        <translation>Navetta</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="56"/>
         <source>SSTV</source>
-        <translation type="unfinished">SSTV</translation>
+        <translation>SSTV</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="57"/>
         <source>Bus</source>
-        <translation type="unfinished">Autobus</translation>
+        <translation>Autobus</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="58"/>
         <source>ATV</source>
-        <translation type="unfinished">ATV</translation>
+        <translation>ATV</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="59"/>
         <source>Weather service</source>
-        <translation type="unfinished">Servizio meteo</translation>
+        <translation>Servizio meteo</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="60"/>
         <source>Helo</source>
-        <translation type="unfinished">Elicottero</translation>
+        <translation>Elicottero</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="61"/>
         <source>Yacht</source>
-        <translation type="unfinished">Yacht</translation>
+        <translation>Yacht</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="62"/>
         <source>MS Windows</source>
-        <translation type="unfinished">MS Windows</translation>
+        <translation>MS Windows</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="63"/>
         <source>Jogger</source>
-        <translation type="unfinished">Corridore</translation>
+        <translation>Corridore</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="64"/>
         <source>Triangle</source>
-        <translation type="unfinished">Triangolo</translation>
+        <translation>Triangolo</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="65"/>
         <source>PBBS</source>
-        <translation type="unfinished">PBBS</translation>
+        <translation>PBBS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="66"/>
         <source>Plane large</source>
-        <translation type="unfinished">Aereo grande</translation>
+        <translation>Aereo grande</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="67"/>
         <source>Weather station</source>
-        <translation type="unfinished">Stazione meteo</translation>
+        <translation>Stazione meteo</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="68"/>
         <source>Dish antenna</source>
-        <translation type="unfinished">Antenna parabolica</translation>
+        <translation>Antenna parabolica</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="69"/>
         <source>Ambulance</source>
-        <translation type="unfinished">Ambulanza</translation>
+        <translation>Ambulanza</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="70"/>
         <source>Bike</source>
-        <translation type="unfinished">Bicicletta</translation>
+        <translation>Bicicletta</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="71"/>
         <source>ICP</source>
-        <translation type="unfinished">ICP</translation>
+        <translation>ICP</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="72"/>
         <source>Fire station</source>
-        <translation type="unfinished">Caserma dei vigili del fuoco</translation>
+        <translation>Caserma dei vigili del fuoco</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="73"/>
         <source>Horse</source>
-        <translation type="unfinished">Cavallo</translation>
+        <translation>Cavallo</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="74"/>
         <source>Fire truck</source>
-        <translation type="unfinished">Automezzo dei vigili del fuoco</translation>
+        <translation>Automezzo dei vigili del fuoco</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="75"/>
         <source>Glider</source>
-        <translation type="unfinished">Aliante</translation>
+        <translation>Aliante</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="76"/>
         <source>Hospital</source>
-        <translation type="unfinished">Ospedale</translation>
+        <translation>Ospedale</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="77"/>
         <source>IOTA</source>
-        <translation type="unfinished">IOTA</translation>
+        <translation>IOTA</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="78"/>
         <source>Jeep</source>
-        <translation type="unfinished">Jeep</translation>
+        <translation>Jeep</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="79"/>
         <source>Truck small</source>
-        <translation type="unfinished">Camion piccolo</translation>
+        <translation>Camion piccolo</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="80"/>
         <source>Laptop</source>
-        <translation type="unfinished">Computer portatile</translation>
+        <translation>Computer portatile</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="81"/>
         <source>Mic-E</source>
-        <translation type="unfinished">Mic-E</translation>
+        <translation>Mic-E</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="82"/>
         <source>Node</source>
-        <translation type="unfinished">Nodo</translation>
+        <translation>Nodo</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="83"/>
         <source>EOC</source>
-        <translation type="unfinished">EOC</translation>
+        <translation>EOC</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="84"/>
         <source>Rover</source>
-        <translation type="unfinished">Rover</translation>
+        <translation>Rover</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="85"/>
         <source>Grid</source>
-        <translation type="unfinished">Griglia</translation>
+        <translation>Griglia</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="86"/>
         <source>Antenna</source>
-        <translation type="unfinished">Antenna</translation>
+        <translation>Antenna</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="87"/>
         <source>Power boat</source>
-        <translation type="unfinished">Motoscafo</translation>
+        <translation>Motoscafo</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="88"/>
         <source>Truck stop</source>
-        <translation type="unfinished">Area di sosta per camion</translation>
+        <translation>Area di sosta per camion</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="89"/>
         <source>Truck large</source>
-        <translation type="unfinished">Camion grande</translation>
+        <translation>Camion grande</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="90"/>
         <source>Van</source>
-        <translation type="unfinished">Furgone</translation>
+        <translation>Furgone</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="91"/>
         <source>Water</source>
-        <translation type="unfinished">Acqua</translation>
+        <translation>Acqua</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="92"/>
         <source>XAPRS</source>
-        <translation type="unfinished">XAPRS</translation>
+        <translation>XAPRS</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="93"/>
         <source>Yagi</source>
-        <translation type="unfinished">Yagi</translation>
+        <translation>Yagi</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="94"/>
         <source>Shelter</source>
-        <translation type="unfinished">Rifugio</translation>
+        <translation>Rifugio</translation>
     </message>
 </context>
 <context>
@@ -2150,22 +2150,22 @@
         <location filename="../src/fmchanneldialog.cc" line="57"/>
         <location filename="../src/fmchanneldialog.cc" line="75"/>
         <source>[None]</source>
-        <translation type="unfinished">[Nessuno/a]</translation>
+        <translation>[Nessuno/a]</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="92"/>
         <source>No offset</source>
-        <translation type="unfinished">Nessun offset</translation>
+        <translation>Nessun offset</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="94"/>
         <source>Positive offset</source>
-        <translation type="unfinished">Offset positivo</translation>
+        <translation>Offset positivo</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="96"/>
         <source>Negative offset</source>
-        <translation type="unfinished">Offset negativo</translation>
+        <translation>Offset negativo</translation>
     </message>
 </context>
 <context>
@@ -2903,7 +2903,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="838"/>
         <source>Period</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervallo</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="839"/>
@@ -4089,12 +4089,12 @@
     <message>
         <location filename="../src/main.cc" line="25"/>
         <source>Codeplug file to load.</source>
-        <translation type="unfinished"></translation>
+        <translation>File codeplug da caricare.</translation>
     </message>
     <message>
         <location filename="../src/main.cc" line="26"/>
         <source>Specifies applications log-level to stdout. Must be one of `debug`, `info`, `warning`, `error` or `fatal`.</source>
-        <translation type="unfinished"></translation>
+        <translation>Specifica il livello di log dell&apos;applicazione da inviare a stdout. Deve essere uno tra `debug`, `info`, `warning`, `error` o `fatal`.</translation>
     </message>
 </context>
 </TS>
