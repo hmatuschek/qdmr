@@ -527,10 +527,10 @@ D878UVTest::testChannelDataACK() {
   QCOMPARE(config.channelList()->count(), 2);
   QVERIFY(config.channelList()->channel(0)->is<DMRChannel>());
   QCOMPARE(config.channelList()->channel(0)->as<DMRChannel>()
-             ->anytoneChannelExtension()->dataACK(), false);
+             ->extended()->dataConfirm(), false);
   QVERIFY(config.channelList()->channel(1)->is<DMRChannel>());
   QCOMPARE(config.channelList()->channel(1)->as<DMRChannel>()
-             ->anytoneChannelExtension()->dataACK(), true);
+             ->extended()->dataConfirm(), true);
 
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   D878UVCodeplug codeplug;
@@ -547,9 +547,9 @@ D878UVTest::testChannelDataACK() {
   }
 
   QCOMPARE(testConfig.channelList()->channel(0)->as<DMRChannel>()
-             ->anytoneChannelExtension()->dataACK(), false);
+             ->extended()->dataConfirm(), false);
   QCOMPARE(testConfig.channelList()->channel(1)->as<DMRChannel>()
-             ->anytoneChannelExtension()->dataACK(), true);
+             ->extended()->dataConfirm(), true);
 }
 
 

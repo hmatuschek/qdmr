@@ -445,14 +445,10 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
     if (dc->roamingRef())
       enableRoaming(true);
 
-    // Apply extension settings, if present
-    if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      ch_ext = ext;
-      enableDataACK(dc->anytoneChannelExtension()->dataACK());
-      /// Handles bug in AnyTone firmware.
-      /// @todo Remove once fixed by AnyTone.
-      enableRXAPRS(! ext->sms());
-    }
+    enableDataACK(dc->extended()->dataConfirm());
+    /// Handles bug in AnyTone firmware.
+    /// @todo Remove once fixed by AnyTone.
+    enableRXAPRS(! dc->extended()->sms());
 
     clearDMREncryptionKeyIndex();
     clearAESEncryptionKeyIndex();

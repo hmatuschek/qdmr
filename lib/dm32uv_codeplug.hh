@@ -105,10 +105,10 @@ public:
     /** Invalidates the scan list index. */
     virtual void clearScanListIndex();
 
-    /** Returns @c true if talkaround cannot be enabled on this channel. */
-    virtual bool preventTalkaroundEnabled() const;
-    /** Enables/disables prevention of talkaround feature on this channel. */
-    virtual void enablePreventTalkaround(bool enable);
+    /** Returns @c true if talkaround is enabled on this channel. */
+    virtual bool talkaroundEnabled() const;
+    /** Enables/disables talkaround feature on this channel. */
+    virtual void enableTalkaround(bool enable);
 
     /** Returns the admit criterion. */
     virtual Admit admitCriterion() const;

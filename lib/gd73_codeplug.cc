@@ -1639,6 +1639,7 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
     fm->setSquelchDefault();
     fm->setRXTone(rxTone());
     fm->setTXTone(txTone());
+    fm->extended()->enableTalkaround(talkaroundEnabled());
   } else if (Type::DMR == type()) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
     switch (admit()) {
@@ -1649,6 +1650,7 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
     dmr->setColorCode(colorCode());
     dmr->setTimeSlot(timeSlot());
     dmr->setRadioId(DefaultRadioID::get());
+    dmr->extended()->enableTalkaround(talkaroundEnabled());
   }
 
   ch->setName(name());
@@ -1741,6 +1743,7 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     if (CommercialChannelExtension *ext = dmr->commercialExtension())
       if ((! ext->encryptionKeyRef()->isNull()) && (0 <= ctx.index(ext->encryptionKey())) )
         setEncryptionKeyIndex(ctx.index(ext->encryptionKey()));
+    enableTalkaround(dmr->extended()->talkaround());
   } else if (ch->is<FMChannel>()) {
     FMChannel *fm = ch->as<FMChannel>();
     setType(ChannelElement::Type::FM);
@@ -1752,6 +1755,7 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     setBandwidth(fm->bandwidth());
     setRXTone(fm->rxTone());
     setTXTone(fm->txTone());
+    enableTalkaround(fm->extended()->talkaround());
   }
 
   return true;

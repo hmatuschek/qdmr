@@ -364,6 +364,7 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const E
     ach->setRXTone(rxTone());
     ach->setTXTone(txTone());
     ach->setSquelchDefault(); // There is no per-channel squelch setting
+    ach->extended()->enableTalkaround(talkaround());
   } else {
     DMRChannel *dch = new DMRChannel(); ch = dch;
     switch (admitCriterion()) {
@@ -374,6 +375,10 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const E
     }
     dch->setTimeSlot(timeSlot());
     dch->setColorCode(txColorCode());
+    dch->extended()->enableDataConfirm(dataCallConfirm());
+    dch->extended()->enableCallConfirm(privateCallConfirm());
+    dch->extended()->enableDCDM(dualCapacityDirectMode());
+    dch->extended()->enableTalkaround(talkaround());
   }
 
   // Apply common settings
@@ -448,6 +453,7 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // no per channel squelch setting
+    enableTalkaround(ac->extended()->talkaround());
   } else if (c->is<DMRChannel>()) {
     const DMRChannel *dc = c->as<const DMRChannel>();
     setMode(MODE_DIGITAL);
@@ -463,6 +469,10 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
       setGroupListIndex(ctx.index(dc->groupList()));
     if (dc->contact())
       setContactIndex(ctx.index(dc->contact()));
+    enableTalkaround(dc->extended()->talkaround());
+    enableDataCallConfirm(dc->extended()->dataConfirm());
+    enablePrivateCallConfirm(dc->extended()->callConfirm());
+    enableDualCapacityDirectMode(dc->extended()->dcdm());
   } else {
     errMsg(err) << "Cannot encode channel of type '" << c->metaObject()->className()
                 << "': Not supported by the radio.";

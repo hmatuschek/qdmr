@@ -582,7 +582,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Q_UNUSED(ctx)
 
   Channel *ch;
-  AnytoneChannelExtension *ch_ext = nullptr;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
     if (Mode::MixedAnalog == mode())
@@ -600,11 +599,12 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     ach->setBandwidth(bandwidth());
     // no per channel squelch settings
     ach->setSquelchDefault();
+    ach->extended()->enableTalkaround(talkaround());
+    ach->extended()->enableReverseBurst(ctcssPhaseReversal());
 
     // Create extension
-    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension(); ch_ext = ext;
+    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension();
     ach->setAnytoneChannelExtension(ext);
-    ext->enableReverseBurst(ctcssPhaseReversal());
     ext->enableRXCustomCTCSS(rxCTCSSIsCustom());
     ext->enableTXCustomCTCSS(txCTCSSIsCustom());
     ext->setCustomCTCSS(customCTCSSFrequency());
@@ -628,15 +628,16 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     }
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
+    dch->extended()->enableTalkaround(talkaround());
+    dch->extended()->enableCallConfirm(callConfirm());
+    dch->extended()->enableSMSConfirm(smsConfirm());
+    dch->extended()->enableDCDM(simplexTDMA());
+    dch->extended()->enableLoneWorker(loneWorker());
 
     // Create extension
-    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension(); ch_ext = ext;
+    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension();
     dch->setAnytoneChannelExtension(ext);
-    ext->enableCallConfirm(callConfirm());
-    ext->enableSMSConfirm(smsConfirm());
-    ext->enableSimplexTDMA(simplexTDMA());
     ext->enableAdaptiveTDMA(adaptiveTDMA());
-    ext->enableLoneWorker(loneWorker());
     // Done
     ch = dch;
   } else {
@@ -654,11 +655,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   // No per channel vox & tot setting
   ch->setVOXDefault();
   ch->setDefaultTimeout();
-
-  // Apply common channel extension settings
-  if (nullptr != ch_ext) {
-    ch_ext->enableTalkaround(talkaround());
-  }
 
   return ch;
 }
@@ -746,12 +742,12 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       setSquelchMode(AnytoneFMChannelExtension::SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
+    // Apply common settings
+    enableTalkaround(ac->extended()->talkaround());
+    // Apply FM settings
+    enableCTCSSPhaseReversal(ac->extended()->reverseBurst());
     // Handle extension
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
-      // Apply common settings
-      enableTalkaround(ext->talkaround());
-      // Apply FM settings
-      enableCTCSSPhaseReversal(ext->reverseBurst());
       setCustomCTCSSFrequency(ext->customCTCSS());
       if (ext->rxCustomCTCSS())
         enableRXCustomCTCSS();
@@ -794,16 +790,16 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     } else {
       setRadioIDIndex(ctx.index(dc->radioId()));
     }
+    // Apply common settings
+    enableTalkaround(dc->extended()->talkaround());
+    // Apply DMR settings
+    enableCallConfirm(dc->extended()->callConfirm());
+    enableSMSConfirm(dc->extended()->smsConfirm());
+    enableSimplexTDMA(dc->extended()->dcdm());
+    enableLoneWorker(dc->extended()->loneWorker());
     // Handle extension
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      // Apply common settings
-      enableTalkaround(ext->talkaround());
-      // Apply DMR settings
-      enableCallConfirm(ext->callConfirm());
-      enableSMSConfirm(ext->smsConfirm());
-      enableSimplexTDMA(ext->simplexTDMA());
       enableAdaptiveTDMA(ext->adaptiveTDMA());
-      enableLoneWorker(ext->loneWorker());
     }
   }
 

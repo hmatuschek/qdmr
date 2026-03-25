@@ -10,6 +10,7 @@
 #include "interval.hh"
 #include "level.hh"
 
+#include "channel_extension.hh"
 #include "opengd77_extension.hh"
 #include "tyt_extensions.hh"
 #include "opengd77_extension.hh"
@@ -259,6 +260,8 @@ class FMChannel: public AnalogChannel
   /** The APRS system. */
   Q_PROPERTY(FMAPRSSystemReference* aprs READ aprsRef)
 
+  /** Common extended channel settings. */
+  Q_PROPERTY(FMChannelExtension *extended READ extended);
   /** The AnyTone FM channel extension. */
   Q_PROPERTY(AnytoneFMChannelExtension* anytone READ anytoneChannelExtension WRITE setAnytoneChannelExtension)
 
@@ -315,6 +318,9 @@ public:
   /** Sets the APRS system. */
   void setAPRS(FMAPRSSystem *sys);
 
+  /** Returns the extended settings. */
+  FMChannelExtension *extended() const;
+
   /** Returns the FM channel extension for AnyTone devices.
    * If this extension is not set, returns @c nullptr. */
   AnytoneFMChannelExtension *anytoneChannelExtension() const;
@@ -336,7 +342,8 @@ protected:
   Bandwidth _bw;
   /** A reference to the APRS system used on the channel or @c nullptr if disabled. */
   FMAPRSSystemReference _aprsSystem;
-
+  /** Owns the extended settings. */
+  FMChannelExtension *_extended;
   /** Owns the AnyTone FM channel extension. */
   AnytoneFMChannelExtension *_anytoneExtension;
 };
@@ -412,6 +419,8 @@ class DMRChannel: public DigitalChannel
   /** The roaming zone. */
   Q_PROPERTY(RoamingZoneReference* roaming READ roamingRef)
 
+  /** The extended dmr channel settings. */
+  Q_PROPERTY(DMRChannelExtension* extended READ extended)
   /** The commercial channel extension. */
   Q_PROPERTY(CommercialChannelExtension* commercial READ commercialExtension WRITE setCommercialExtension)
   /** The AnyTone DMR channel extension. */
@@ -500,6 +509,9 @@ public:
   /** Associates the given radio ID with this channel. */
   bool setRadioId(DMRRadioID *id);
 
+  /** Returns the extended channel settings. */
+  DMRChannelExtension *extended() const;
+
   /** Returns the extension for commercial features. */
   CommercialChannelExtension *commercialExtension() const;
   /** Sets the commercial channel extension. */
@@ -532,6 +544,8 @@ protected:
   /** Radio ID to use on this channel. */
   DMRRadioIDReference _radioId;
 
+  /** Owns the extended channel extension. */
+  DMRChannelExtension *_extended;
   /** Owns the commercial channel extension. */
   CommercialChannelExtension *_commercialExtension;
   /** Owns the AnyTone DMR channel extension. */
