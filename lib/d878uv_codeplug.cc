@@ -4094,16 +4094,16 @@ bool
 D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
         + idx*ChannelElement::size();
 
     ChannelElement ch(data(addr));
-    ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    ch.fromChannelObj(ctx.get<Channel>(i), ctx);
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
-    ext.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    ext.fromChannelObj(ctx.get<Channel>(i), ctx);
   }
   return true;
 }

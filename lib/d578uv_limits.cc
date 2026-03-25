@@ -127,6 +127,15 @@ D578UVLimits::D578UVLimits(const std::initializer_list<std::pair<Frequency, Freq
               {"roaming", new RadioLimitObjRef(RoamingZone::staticMetaObject, true) },
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)}
+            } },
+          { AMChannel::staticMetaObject,
+            new RadioLimitObject {
+              {"name", new RadioLimitString(1,16, RadioLimitString::ASCII)},
+              {"rxFrequency", new RadioLimitFrequencies(
+                {{Frequency::fromMHz(108), Frequency::fromMHz(136)}},
+                RadioLimitIssue::Severity::Critical)},
+              {"txFrequency", new RadioLimitTransmitFrequencies(txFreqRanges)},
+              {"rxOnly", new RadioLimitBool()},
             } }
         } ));
 

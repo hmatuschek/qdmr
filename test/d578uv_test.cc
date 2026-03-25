@@ -62,7 +62,7 @@ D578UVTest::testChannelFrequency() {
   D578UVCodeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone D578UV: {}")
+    QFAIL(QString("Cannot encode codeplug for AnyTone D578UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
@@ -229,6 +229,28 @@ D578UVTest::testARC4Encryption() {
   QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
   QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
            decoded.commercialExtension()->encryptionKeys()->key(0));
+}
+
+
+void
+D578UVTest::testAMChannel() {
+  // Load config from file
+  ErrorStack err;
+  Config config, testConfig;
+  if (! config.readYAML(":/data/am_channel_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file:\n%1")
+            .arg(err.format(" ")).toStdString().c_str());
+  }
+
+  encodeDecode(config, testConfig);
+
+  // There must be an AM and a FM channel. The order is not defined.
+  QCOMPARE(testConfig.channelList()->count(), 2);
+  auto am = testConfig.channelList()->channel(0)->is<AMChannel>() ?
+              testConfig.channelList()->channel(0)->as<AMChannel>() :
+              testConfig.channelList()->channel(1)->as<AMChannel>();
+  QCOMPARE(am->name(), config.channelList()->channel(0)->as<AMChannel>()->name());
+  QCOMPARE(am->rxFrequency(), config.channelList()->channel(0)->as<AMChannel>()->rxFrequency());
 }
 
 

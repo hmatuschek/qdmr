@@ -2570,15 +2570,15 @@ DMR6X2UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorSt
   Q_UNUSED(flags);
 
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()+ idx*ChannelElement::size();
     ChannelElement ch(data(addr));
-    if (! ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx))
+    if (! ch.fromChannelObj(ctx.get<Channel>(i), ctx))
       return false;
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
-    if (! ext.fromChannelObj(ctx.config()->channelList()->channel(i), ctx, err))
+    if (! ext.fromChannelObj(ctx.get<Channel>(i), ctx, err))
       return false;
   }
   return true;
@@ -2597,7 +2597,8 @@ DMR6X2UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
     if (Channel *obj = ch.toChannelObj(ctx)) {
-      ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+      ctx.config()->channelList()->add(obj);
+      ctx.add(obj, i);
     }
   }
   return true;

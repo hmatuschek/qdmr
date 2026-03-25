@@ -1622,12 +1622,12 @@ D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     ChannelElement ch(data(Offset::channelBanks() + bank * Offset::betweenChannelBanks()
                            + idx * ChannelElement::size()));
-    if (! ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx))
+    if (! ch.fromChannelObj(ctx.get<Channel>(i), ctx))
       return false;
   }
   return true;

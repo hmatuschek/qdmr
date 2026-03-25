@@ -4432,7 +4432,8 @@ bool
 AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(err)
 
-  // All indices as 0-based. That is, the first channel gets index 0 etc.
+  // AM channels are indexed separately.
+  ctx.addTable(&AMChannel::staticMetaObject);
 
   // Map radio IDs
   for (int i=0; i<config->radioIDs()->count(); i++) {
@@ -4454,8 +4455,14 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
     ctx.add(config->rxGroupLists()->list(i), i);
 
   // Map channels
-  for (int i=0; i<config->channelList()->count(); i++)
-    ctx.add(config->channelList()->channel(i), i);
+  for (int i=0, common=0, am=0; i<config->channelList()->count(); i++) {
+    if (config->channelList()->channel(i)->is<DMRChannel>() ||
+        config->channelList()->channel(i)->is<FMChannel>()) {
+      ctx.add(config->channelList()->channel(i), common++);
+    } else if (config->channelList()->channel(i)->is<AMChannel>()) {
+      ctx.add(config->channelList()->channel(i), am++);
+    }
+  }
 
   // Map zones
   for (int i=0; i<config->zones()->count(); i++)

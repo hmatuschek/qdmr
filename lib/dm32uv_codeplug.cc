@@ -3923,9 +3923,9 @@ DM32UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err
   Q_UNUSED(flags);
 
   Context ctx(config);
-  ctx.remTable(&BasicEncryptionKey::staticMetaObject);
-  ctx.remTable(&ARC4EncryptionKey::staticMetaObject);
-  ctx.remTable(&AESEncryptionKey::staticMetaObject);
+  ctx.remTable(&BasicEncryptionKey::staticMetaObject, true);
+  ctx.remTable(&ARC4EncryptionKey::staticMetaObject, true);
+  ctx.remTable(&AESEncryptionKey::staticMetaObject, true);
   ctx.addTable(&EncryptionKey::staticMetaObject);
   if (! index(config, ctx, err)) {
     errMsg(err) << "Index elements.";

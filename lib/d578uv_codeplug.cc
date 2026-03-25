@@ -4,6 +4,7 @@
 #include "utils.hh"
 #include "channel.hh"
 #include "config.h"
+#include "intermediaterepresentation.hh"
 
 #include <QTimeZone>
 #include <QtEndian>
@@ -3187,34 +3188,66 @@ D578UVCodeplug::AirBandChannelElement::AirBandChannelElement(uint8_t *ptr, size_
   // pass...
 }
 
+
 D578UVCodeplug::AirBandChannelElement::AirBandChannelElement(uint8_t *ptr)
   : Element(ptr, AirBandChannelElement::size())
 {
   // pass...
 }
 
+
 void
 D578UVCodeplug::AirBandChannelElement::clear() {
   memset(_data, 0, _size);
 }
 
+
 Frequency
 D578UVCodeplug::AirBandChannelElement::frequency() const {
   return Frequency::fromHz(((unsigned long long)getBCD8_be(Offset::frequency()))*10);
 }
+
 void
 D578UVCodeplug::AirBandChannelElement::setFrequency(Frequency freq) {
   setBCD8_be(Offset::frequency(), freq.inHz()/10);
 }
 
+
 QString
 D578UVCodeplug::AirBandChannelElement::name() const {
   return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
+
 void
 D578UVCodeplug::AirBandChannelElement::setName(const QString &name) {
   writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
+
+
+bool
+D578UVCodeplug::AirBandChannelElement::encode(AMChannel *am, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  if (nullptr == am)
+    return false;
+
+  setName(am->name());
+  setFrequency(am->rxFrequency());
+
+  return true;
+}
+
+
+AMChannel *
+D578UVCodeplug::AirBandChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
+  auto am = new AMChannel();
+  am->setName(name());
+  am->setRXFrequency(frequency());
+
+  return am;
+}
+
 
 
 /* ******************************************************************************************** *
@@ -3248,7 +3281,8 @@ D578UVCodeplug::D578UVCodeplug(QObject *parent)
   // pass...
 }
 
-bool D578UVCodeplug::allocateBitmaps() {
+bool
+D578UVCodeplug::allocateBitmaps() {
   if (! D878UVCodeplug::allocateBitmaps())
     return false;
 
@@ -3258,30 +3292,115 @@ bool D578UVCodeplug::allocateBitmaps() {
   return true;
 }
 
-void
-D578UVCodeplug::allocateUpdated() {
-  D878UVCodeplug::allocateUpdated();
 
-  this->allocateAirBand();
+void
+D578UVCodeplug::setBitmaps(Context &ctx) {
+  D878UVCodeplug::setBitmaps(ctx);
+
+  AirBandBitmapElement air_band_bitmap(data(Offset::airBandChannelBitmap())),
+    air_scan_bitmap(data(Offset::airBandScanBitmap()));
+  unsigned int num_am_channels = std::min(Limit::airBandChannels(), ctx.count<AMChannel>());
+  air_band_bitmap.clear(); air_band_bitmap.enableFirst(num_am_channels);
+  air_scan_bitmap.clear(); air_scan_bitmap.enableFirst(num_am_channels);
 }
+
+
+void
+D578UVCodeplug::allocateForEncoding() {
+  // First allocate everything common
+  D878UVCodeplug::allocateForEncoding();
+  this->allocateAirBandChannels();
+}
+
+void
+D578UVCodeplug::allocateForDecoding() {
+  // First allocate everything common
+  D878UVCodeplug::allocateForDecoding();
+  this->allocateAirBandChannels();
+}
+
 
 void
 D578UVCodeplug::allocateHotKeySettings() {
   image(0).addElement(Offset::hotKeySettings(), HotKeySettingsElement::size());
 }
 
+
+Config *
+D578UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  // Apply base preprocessing
+  auto intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot apply preprocessing for D578UV.";
+    return nullptr;
+  }
+
+  // Split A/B zones into two.
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Split multi-VFO zones.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  // Keep 16bit DMR, 128 bit AES and 256 bit AES keys.
+  EncryptionKeyFilterVisitor filter(
+    { EncryptionKeyFilterVisitor::Filter(BasicEncryptionKey::staticMetaObject, 16, 16),
+      EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 128, 128),
+      EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 256, 256),});
+  if (! filter.process(intermediate, err)) {
+    errMsg(err) << "Cannot remove unsupported exncryption.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
+bool
+D578UVCodeplug:: encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! D878UVCodeplug::encodeElements(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode elements for D578UV.";
+    return false;
+  }
+
+  if (! encodeAirBandChannels(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode AM channels.";
+    return false;
+  }
+
+  return true;
+}
+
+bool
+D578UVCodeplug::createElements(Context &ctx, const ErrorStack &err) {
+  if (! D878UVCodeplug::createElements(ctx, err)) {
+    errMsg(err) << "Cannot create elements for D578UV.";
+    return false;
+  }
+
+  if (! createAirBandChannels(ctx, err)) {
+    errMsg(err) << "Cannot create AM channels.";
+    return false;
+  }
+
+  return true;
+}
+
+
 bool
 D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                     + idx*ChannelElement::size();
     ChannelElement ch(data(addr));
-    ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    ch.fromChannelObj(ctx.get<Channel>(i), ctx);
 
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
     ext.clear();
@@ -3330,6 +3449,7 @@ D578UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 
   return true;
 }
+
 
 void
 D578UVCodeplug::allocateContacts() {
@@ -3384,6 +3504,7 @@ D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
   return true;
 }
 
+
 void
 D578UVCodeplug::allocateGeneralSettings() {
   // override allocation of general settings for D878UV code-plug. General settings are larger!
@@ -3392,6 +3513,7 @@ D578UVCodeplug::allocateGeneralSettings() {
   image(0).addElement(Offset::settingsExtension(), ExtendedSettingsElement::size());
 
 }
+
 bool
 D578UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
@@ -3401,6 +3523,7 @@ D578UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const Er
   ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx);
   return true;
 }
+
 bool
 D578UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
@@ -3410,6 +3533,7 @@ D578UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx);
   return true;
 }
+
 bool
 D578UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
   if (! GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err)) {
@@ -3425,18 +3549,61 @@ D578UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
-void
-D578UVCodeplug::allocateAirBand() {
+
+bool
+D578UVCodeplug::allocateAirBandChannels() {
   // Allocate valid air-band channels
   AirBandBitmapElement bitmap(data(Offset::airBandChannelBitmap()));
   for (unsigned int i=0; i<Limit::airBandChannels(); i++)  {
     if (! bitmap.isEncoded(i))
-      return;
+      continue;
     image(0).addElement(Offset::airBandChannels() + i*AirBandChannelElement::size(),
                         AirBandChannelElement::size());
   }
   // allocate air-band VFO channel
   image(0).addElement(Offset::airBandVFO(), AirBandChannelElement::size());
+  return true;
 }
 
 
+bool
+D578UVCodeplug::encodeAirBandChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags);
+
+  AirBandBitmapElement air_band_bitmap(data(Offset::airBandChannelBitmap()));
+  for (unsigned int i=0; i<Limit::airBandChannels(); i++) {
+    if (! air_band_bitmap.isEncoded(i))
+      continue;
+    if (! ctx.has<AMChannel>(i)) {
+      errMsg(err) << "Cannot resolve AM channel at index " << i << ". Not defined!";
+      return false;
+    }
+    AirBandChannelElement ch(data(Offset::airBandChannels() + i*AirBandChannelElement::size()));
+    if (! ch.encode(ctx.get<AMChannel>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode AM channel at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool
+D578UVCodeplug::createAirBandChannels(Context &ctx, const ErrorStack &err) {
+  AirBandBitmapElement air_band_bitmap(data(Offset::airBandChannelBitmap()));
+  for (unsigned int i=0; i<Limit::airBandChannels(); i++) {
+    if (! air_band_bitmap.isEncoded(i))
+      continue;
+    AirBandChannelElement ch(data(Offset::airBandChannels() + i*AirBandChannelElement::size()));
+    auto am = ch.decode(ctx, err);
+    if (nullptr == am) {
+      errMsg(err) << "Cannot decode AM channel at index " << i << ".";
+      return false;
+    }
+    ctx.config()->channelList()->add(am);
+    ctx.add(am, i);
+  }
+
+  return true;
+}
