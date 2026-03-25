@@ -400,10 +400,12 @@ AnalogChannel::setSquelchDefault() {
 FMChannel::FMChannel(QObject *parent)
   : AnalogChannel(parent),
     _admit(Admit::Always), _rxTone(), _txTone(), _bw(Bandwidth::Narrow),
-    _aprsSystem(), _anytoneExtension(nullptr)
+    _aprsSystem(), _extended(new FMChannelExtension(this)), _anytoneExtension(nullptr)
 {
   // Link APRS system reference
-  connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_aprsSystem, &FMAPRSSystemReference::modified, this, &FMChannel::onReferenceModified);
+  // Link extended settings
+  connect(_extended, &FMChannelExtension::modified, this, &FMChannel::modified);
 }
 
 bool
@@ -501,6 +503,13 @@ void
 FMChannel::setAPRS(FMAPRSSystem *sys) {
   _aprsSystem.set(sys);
 }
+
+
+FMChannelExtension *
+FMChannel::extended() const {
+  return _extended;
+}
+
 
 AnytoneFMChannelExtension *
 FMChannel::anytoneChannelExtension() const {
@@ -634,6 +643,7 @@ DMRChannel::DMRChannel(QObject *parent)
   : DigitalChannel(parent), _admit(Admit::Always),
     _colorCode(1), _timeSlot(TimeSlot::TS1),
     _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
+    _extended(new DMRChannelExtension(this)),
     _commercialExtension(nullptr), _anytoneExtension(nullptr)
 {
   // Register default tags
@@ -651,6 +661,7 @@ DMRChannel::DMRChannel(QObject *parent)
   connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(_extended, &DMRChannelExtension::modified, this, &DMRChannel::modified);
 }
 
 void
@@ -826,6 +837,13 @@ DMRChannel::setRadioId(DMRRadioID *id) {
   emit modified(this);
   return true;
 }
+
+
+DMRChannelExtension *
+DMRChannel::extended() const {
+  return _extended;
+}
+
 
 CommercialChannelExtension *
 DMRChannel::commercialExtension() const {

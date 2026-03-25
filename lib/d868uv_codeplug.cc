@@ -170,9 +170,10 @@ D868UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
   if (ch->is<DMRChannel>()) {
     DMRChannel *dch = ch->as<DMRChannel>();
+    dch->extended()->enableSMS(sms());
+    dch->extended()->enableDataConfirm(dataACK());
+
     if (AnytoneDMRChannelExtension *ext = dch->anytoneChannelExtension()) {
-      ext->enableSMS(sms());
-      ext->enableDataACK(dataACK());
       ext->enableThroughMode(throughMode());
     }
   }
@@ -226,6 +227,9 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       enableRXAPRS(false);
     }
 
+    enableSMS(dc->extended()->sms());
+    enableDataACK(dc->extended()->dataConfirm());
+
     clearDMREncryptionKeyIndex();
     bool hasStrongEncryption = ctx.config()->settings()->anytoneExtension() &&
         (AnytoneDMRSettingsExtension::EncryptionType::AES ==
@@ -242,8 +246,6 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 
     // Handle extension
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      enableSMS(ext->sms());
-      enableDataACK(ext->dataACK());
       enableThroughMode(ext->throughMode());
     }
   }

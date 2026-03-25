@@ -156,13 +156,13 @@ DM32UVCodeplug::ChannelElement::clearScanListIndex() {
 
 
 bool
-DM32UVCodeplug::ChannelElement::preventTalkaroundEnabled() const {
-  return getBit(Offset::preventTalkaround());
+DM32UVCodeplug::ChannelElement::talkaroundEnabled() const {
+  return !getBit(Offset::preventTalkaround());
 }
 
 void
-DM32UVCodeplug::ChannelElement::enablePreventTalkaround(bool enabled) {
-  setBit(Offset::preventTalkaround(), enabled);
+DM32UVCodeplug::ChannelElement::enableTalkaround(bool enabled) {
+  setBit(Offset::preventTalkaround(), !enabled);
 }
 
 
@@ -422,6 +422,7 @@ DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) cons
       fm->setSquelch(squelchLevel());
       fm->setRXTone(rxTone());
       fm->setTXTone(txTone());
+      fm->extended()->enableTalkaround(talkaroundEnabled());
     }
   } else if ((ChannelType::DMR == channelType()) || (ChannelType::DMRFixed == channelType())) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
@@ -433,6 +434,11 @@ DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) cons
     }
     dmr->setTimeSlot(timeslot());
     dmr->setColorCode(colorCode());
+    dmr->extended()->enableTalkaround(talkaroundEnabled());
+    dmr->extended()->enableDCDM(dcdmEnabled());
+    dmr->extended()->enableLoneWorker(loneWorkerEnabled());
+    dmr->extended()->enablePrivateCallConfirm(privateCallACKEnabled());
+    dmr->extended()->enableDataConfirm(dataACKEnabled());
   } else {
     errMsg(err) << "Unknown channel type " << (unsigned int)channelType() << ".";
     return nullptr;
@@ -547,6 +553,11 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     } else {
       setDMRIdIndex(ctx.index(dmr->radioId()));
     }
+    enableTalkaround(dmr->extended()->talkaround());
+    enableDCDM(dmr->extended()->dcdm());
+    enableLoneWorker(dmr->extended()->loneWorker());
+    enablePrivateCallACK(dmr->extended()->privateCallConfirm());
+    enableDataACK(dmr->extended()->dataConfirm());
   } else if (channel->is<FMChannel>()) {
     auto fm = channel->as<FMChannel>();
     setBandwidth(fm->bandwidth());
@@ -558,6 +569,7 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     setSquelchLevel(fm->defaultSquelch() ? ctx.config()->settings()->squelch() : fm->squelch());
     setRXTone(fm->rxTone());
     setTXTone(fm->txTone());
+    enableTalkaround(fm->extended()->talkaround());
   } else if (channel->is<AMChannel>()) {
     auto am = channel->as<AMChannel>();
     clearTXFrequency();

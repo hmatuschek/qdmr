@@ -195,10 +195,12 @@ UV390Codeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
   }
 
   // decode squelch setting
-  if (ch->is<FMChannel>()) {
-    FMChannel *ach = ch->as<FMChannel>();
+  if (auto ach = ch->as<FMChannel>()) {
     ach->setSquelch(squelch());
+  } else if (auto dch = ch->as<DMRChannel>()) {
+    dch->extended()->enableDCDM(dualCapacityDirectMode());
   }
+
   // Common settings
   ch->setPower(power());
 
@@ -207,7 +209,6 @@ UV390Codeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
     ex->setKillTone(turnOffFreq());
     ex->setInCallCriterion(inCallCriteria());
     ex->enableAllowInterrupt(allowInterrupt());
-    ex->enableDCDM(dualCapacityDirectMode());
     ex->enableDCDMLeader(dcdmLeader());
     if (ch->is<DMRChannel>())
       ex->setDMRSquelch(squelch());
@@ -227,10 +228,11 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
   // By default, set to global default value.
   setSquelch(ctx.config()->settings()->squelch());
 
-  if (chan->is<FMChannel>()) {
-    const FMChannel *achan = chan->as<const FMChannel>();
+  if (auto achan = chan->as<const FMChannel>()) {
     if (! achan->defaultSquelch())
       setSquelch(achan->squelch());
+  } else if (auto dch = chan->as<const DMRChannel>()) {
+    enableDualCapacityDirectMode(dch->extended()->dcdm());
   }
 
   // apply extensions
@@ -238,7 +240,6 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
     setTurnOffFreq(ex->killTone());
     setInCallCriteria(ex->inCallCriterion());
     enableAllowInterrupt(ex->allowInterrupt());
-    enableDualCapacityDirectMode(ex->dcdm());
     enableDCDMLeader(ex->dcdmLeader());
     if (chan->is<DMRChannel>())
       setSquelch(ex->dmrSquelch());

@@ -480,6 +480,7 @@ DR1801UVCodeplug::ChannelElement::toChannelObj(Context &ctx, const ErrorStack &e
     fm->setBandwidth(bandwidth());
     fm->setRXTone(rxTone());
     fm->setTXTone(txTone());
+    fm->extended()->enableTalkaround(talkaround());
   } else if (Type::DMR == channelType()) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
     switch (admitCriterion()) {
@@ -489,6 +490,10 @@ DR1801UVCodeplug::ChannelElement::toChannelObj(Context &ctx, const ErrorStack &e
     }
     dmr->setColorCode(colorCode());
     dmr->setTimeSlot(timeSlot());
+    dmr->extended()->enableTalkaround(talkaround());
+    dmr->extended()->enableDCDM(dcdm());
+    dmr->extended()->enablePrivateCallConfirm(confirmPrivateCall());
+    dmr->extended()->enableLoneWorker(loneWorker());
   } else {
     errMsg(err) <<  "Unknown channel type " << (uint8_t)channelType() << ".";
     return nullptr;
@@ -559,6 +564,7 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
     case FMChannel::Admit::Free:   setAdmitCriterion(Admit::ChannelFree); break;
     case FMChannel::Admit::Tone:   setAdmitCriterion(Admit::ColorCode_or_Tone); break;
     }
+    enableTalkaround(fm->extended()->talkaround());
   } else if (channel->is<DMRChannel>()) {
     DMRChannel *dmr = channel->as<DMRChannel>();
     setChannelType(Type::DMR);
@@ -582,6 +588,10 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
       setGroupListIndex(ctx.index(dmr->groupList()));
     else
       clearGroupListIndex();
+    enableTalkaround(dmr->extended()->talkaround());
+    enableDCDM(dmr->extended()->dcdm());
+    enablePrivateCallConfirmation(dmr->extended()->privateCallConfirm());
+    enableLoneWorker(dmr->extended()->loneWorker());
   }
 
   return true;

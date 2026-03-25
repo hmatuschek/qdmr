@@ -453,6 +453,7 @@ TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
     ach->setRXTone(rxSignaling());
     ach->setTXTone(txSignaling());
     ach->setBandwidth(bandwidth());
+    ach->extended()->enableTalkaround(talkaround());
     // Apply analog channel extension settings
     ex->enableDisplayPTTId(displayPTTId());
     ch = ach;
@@ -468,9 +469,12 @@ TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
     dch->setAdmit(admit_crit);
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
+    dch->extended()->enablePrivateCallConfirm(privateCallConfirm());
+    dch->extended()->enableDataConfirm(dataCallConfirm());
+    dch->extended()->enableLoneWorker(loneWorker());
+    dch->extended()->enableTalkaround(talkaround());
+
     // Apply digital channel extension settings
-    ex->enablePrivateCallConfirmed(privateCallConfirm());
-    ex->enableDataCallConfirmed(dataCallConfirm());
     ex->enableEmergencyAlarmConfirmed(emergencyAlarmACK());
     // If encryption is enabled, Add commercial extension to channel if needed
     // the key will be linked later
@@ -499,9 +503,7 @@ TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
     ch->disableVOX();
 
   // Apply common channel settings
-  ex->enableLoneWorker(loneWorker());
   ex->enableAutoScan(autoScan());
-  ex->enableTalkaround(talkaround());
   ex->setRXRefFrequency(rxRefFrequency());
   ex->setTXRefFrequency(txRefFrequency());
   ch->setTyTChannelExtension(ex);
@@ -610,13 +612,16 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     setBandwidth(FMChannel::Bandwidth::Narrow);
     setRXSignaling(SelectiveCall());
     setTXSignaling(SelectiveCall());
+    enablePrivateCallConfirm(dchan->extended()->privateCallConfirm());
+    enableDataCallConfirm(dchan->extended()->dataConfirm());
+    enableLoneWorker(dchan->extended()->loneWorker());
+    enableTalkaround(dchan->extended()->talkaround());
+
     if (dchan->aprs() && dchan->aprs()->is<DMRAPRSSystem>()) {
       setPositioningSystemIndex(ctx.index(dchan->aprs()->as<DMRAPRSSystem>()));
       enableTXGPSInfo(true); enableRXGPSInfo(false);
     }
     if (chan->tytChannelExtension()) {
-      enablePrivateCallConfirm(chan->tytChannelExtension()->privateCallConfirmed());
-      enableDataCallConfirm(chan->tytChannelExtension()->dataCallConfirmed());
       enableEmergencyAlarmACK(chan->tytChannelExtension()->emergencyAlarmConfirmed());
     }
     // Link encryption key if set
@@ -652,6 +657,8 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     setTXSignaling(achan->txTone());
     setGroupListIndex(0);
     setContactIndex(0);
+    enableTalkaround(achan->extended()->talkaround());
+
     if (chan->tytChannelExtension()) {
       enableDisplayPTTId(chan->tytChannelExtension()->displayPTTId());
     }
@@ -659,9 +666,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
 
   // Apply channel extension (if set)
   if (chan->tytChannelExtension()) {
-    enableLoneWorker(chan->tytChannelExtension()->loneWorker());
     enableAutoScan(chan->tytChannelExtension()->autoScan());
-    enableTalkaround(chan->tytChannelExtension()->talkaround());
     setRXRefFrequency(chan->tytChannelExtension()->rxRefFrequency());
     setTXRefFrequency(chan->tytChannelExtension()->txRefFrequency());
   }

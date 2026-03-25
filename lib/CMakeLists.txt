@@ -19,6 +19,7 @@ qt_add_library(libdmrconf SHARED
   radiosettings.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
   roamingzone.cc roamingchannel.cc callsigndb.cc talkgroupdatabase.cc radioid.cc transferflags.cc
   encryptionextension.cc commercial_extension.cc smsextension.cc gnsssettings.cc dmrsettings.cc
+  channel_extension.cc
   satellitedatabase.cc orbitalelementsdatabase.cc transponderdatabase.cc satelliteconfig.cc
   tyt_radio.cc tyt_interface.cc tyt_codeplug.cc tyt_callsigndb.cc tyt_extensions.cc
   md2017.cc md2017_codeplug.cc md2017_callsigndb.cc md2017_filereader.cc md2017_limits.cc
@@ -45,9 +46,7 @@ qt_add_library(libdmrconf SHARED
   dmr6x2uv2.cc dmr6x2uv2_codeplug.cc dmr6x2uv2_limits.cc
   auctus_a6_interface.cc
   dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc
-  dm32uv.hh dm32uv.cc dm32uv_interface.hh dm32uv_interface.cc dm32uv_limits.hh dm32uv_limits.cc
-  dm32uv_codeplug.hh dm32uv_codeplug.cc
-  dm32uv_callsigndb.hh dm32uv_callsigndb.cc)
+  dm32uv.cc dm32uv_interface.cc dm32uv_limits.cc dm32uv_codeplug.cc dm32uv_callsigndb.cc)
 
 target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
@@ -61,6 +60,7 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   radiosettings.hh contact.hh rxgrouplist.hh channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh
   roamingzone.hh roamingchannel.hh callsigndb.hh talkgroupdatabase.hh radioid.hh transferflags.hh
   encryptionextension.hh commercial_extension.hh smsextension.hh gnsssettings.hh dmrsettings.hh
+  channel_extension.hh
   satellitedatabase.hh orbitalelementsdatabase.hh transponderdatabase.hh satelliteconfig.hh
   tyt_radio.hh tyt_interface.hh tyt_codeplug.hh tyt_callsigndb.hh tyt_extensions.hh
   md2017.hh md2017_codeplug.hh md2017_callsigndb.hh md2017_filereader.hh md2017_limits.hh
@@ -86,7 +86,8 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   dmr6x2uv.hh dmr6x2uv_codeplug.hh dmr6x2uv_limits.hh
   dmr6x2uv2.hh dmr6x2uv2_codeplug.hh dmr6x2uv2_limits.hh
   auctus_a6_interface.hh
-  dr1801uv.hh dr1801uv_interface.hh dr1801uv_codeplug.hh dr1801uv_filereader.hh dr1801uv_limits.hh)
+  dr1801uv.hh dr1801uv_interface.hh dr1801uv_codeplug.hh dr1801uv_filereader.hh dr1801uv_limits.hh
+  dm32uv.hh dm32uv_interface.hh dm32uv_limits.hh dm32uv_codeplug.hh dm32uv_callsigndb.hh)
 
 
 set_target_properties(libdmrconf PROPERTIES
