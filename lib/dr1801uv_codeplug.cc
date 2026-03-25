@@ -492,7 +492,7 @@ DR1801UVCodeplug::ChannelElement::toChannelObj(Context &ctx, const ErrorStack &e
     dmr->setTimeSlot(timeSlot());
     dmr->extended()->enableTalkaround(talkaround());
     dmr->extended()->enableDCDM(dcdm());
-    dmr->extended()->enableCallConfirm(confirmPrivateCall());
+    dmr->extended()->enablePrivateCallConfirm(confirmPrivateCall());
     dmr->extended()->enableLoneWorker(loneWorker());
   } else {
     errMsg(err) <<  "Unknown channel type " << (uint8_t)channelType() << ".";
@@ -590,7 +590,7 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
       clearGroupListIndex();
     enableTalkaround(dmr->extended()->talkaround());
     enableDCDM(dmr->extended()->dcdm());
-    enablePrivateCallConfirmation(dmr->extended()->callConfirm());
+    enablePrivateCallConfirmation(dmr->extended()->privateCallConfirm());
     enableLoneWorker(dmr->extended()->loneWorker());
   }
 

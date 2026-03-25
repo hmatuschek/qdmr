@@ -376,7 +376,7 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const E
     dch->setTimeSlot(timeSlot());
     dch->setColorCode(txColorCode());
     dch->extended()->enableDataConfirm(dataCallConfirm());
-    dch->extended()->enableCallConfirm(privateCallConfirm());
+    dch->extended()->enablePrivateCallConfirm(privateCallConfirm());
     dch->extended()->enableDCDM(dualCapacityDirectMode());
     dch->extended()->enableTalkaround(talkaround());
   }
@@ -471,7 +471,7 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
       setContactIndex(ctx.index(dc->contact()));
     enableTalkaround(dc->extended()->talkaround());
     enableDataCallConfirm(dc->extended()->dataConfirm());
-    enablePrivateCallConfirm(dc->extended()->callConfirm());
+    enablePrivateCallConfirm(dc->extended()->privateCallConfirm());
     enableDualCapacityDirectMode(dc->extended()->dcdm());
   } else {
     errMsg(err) << "Cannot encode channel of type '" << c->metaObject()->className()

@@ -85,12 +85,12 @@ DMRChannelExtension::clone() const {
 
 
 bool
-DMRChannelExtension::callConfirm() const {
+DMRChannelExtension::privateCallConfirm() const {
   return _callConfirm;
 }
 
 void
-DMRChannelExtension::enableCallConfirm(bool enabled) {
+DMRChannelExtension::enablePrivateCallConfirm(bool enabled) {
   if (enabled == _callConfirm)
     return;
   _callConfirm = enabled;

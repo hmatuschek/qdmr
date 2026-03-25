@@ -437,7 +437,7 @@ DM32UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) cons
     dmr->extended()->enableTalkaround(talkaroundEnabled());
     dmr->extended()->enableDCDM(dcdmEnabled());
     dmr->extended()->enableLoneWorker(loneWorkerEnabled());
-    dmr->extended()->enableCallConfirm(privateCallACKEnabled());
+    dmr->extended()->enablePrivateCallConfirm(privateCallACKEnabled());
     dmr->extended()->enableDataConfirm(dataACKEnabled());
   } else {
     errMsg(err) << "Unknown channel type " << (unsigned int)channelType() << ".";
@@ -556,7 +556,7 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     enableTalkaround(dmr->extended()->talkaround());
     enableDCDM(dmr->extended()->dcdm());
     enableLoneWorker(dmr->extended()->loneWorker());
-    enablePrivateCallACK(dmr->extended()->callConfirm());
+    enablePrivateCallACK(dmr->extended()->privateCallConfirm());
     enableDataACK(dmr->extended()->dataConfirm());
   } else if (channel->is<FMChannel>()) {
     auto fm = channel->as<FMChannel>();

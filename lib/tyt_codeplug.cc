@@ -469,7 +469,7 @@ TyTCodeplug::ChannelElement::toChannelObj(const ErrorStack &err) const {
     dch->setAdmit(admit_crit);
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
-    dch->extended()->enableCallConfirm(privateCallConfirm());
+    dch->extended()->enablePrivateCallConfirm(privateCallConfirm());
     dch->extended()->enableDataConfirm(dataCallConfirm());
     dch->extended()->enableLoneWorker(loneWorker());
     dch->extended()->enableTalkaround(talkaround());
@@ -612,7 +612,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
     setBandwidth(FMChannel::Bandwidth::Narrow);
     setRXSignaling(SelectiveCall());
     setTXSignaling(SelectiveCall());
-    enablePrivateCallConfirm(dchan->extended()->callConfirm());
+    enablePrivateCallConfirm(dchan->extended()->privateCallConfirm());
     enableDataCallConfirm(dchan->extended()->dataConfirm());
     enableLoneWorker(dchan->extended()->loneWorker());
     enableTalkaround(dchan->extended()->talkaround());

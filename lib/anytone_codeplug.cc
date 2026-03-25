@@ -629,7 +629,7 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
     dch->extended()->enableTalkaround(talkaround());
-    dch->extended()->enableCallConfirm(callConfirm());
+    dch->extended()->enablePrivateCallConfirm(callConfirm());
     dch->extended()->enableSMSConfirm(smsConfirm());
     dch->extended()->enableDCDM(simplexTDMA());
     dch->extended()->enableLoneWorker(loneWorker());
@@ -793,7 +793,7 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     // Apply common settings
     enableTalkaround(dc->extended()->talkaround());
     // Apply DMR settings
-    enableCallConfirm(dc->extended()->callConfirm());
+    enableCallConfirm(dc->extended()->privateCallConfirm());
     enableSMSConfirm(dc->extended()->smsConfirm());
     enableSimplexTDMA(dc->extended()->dcdm());
     enableLoneWorker(dc->extended()->loneWorker());

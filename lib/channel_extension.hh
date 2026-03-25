@@ -65,7 +65,7 @@ class DMRChannelExtension: public ChannelExtension
   Q_OBJECT
 
   /** If @c true, the call confirmation is enabled. */
-  Q_PROPERTY(bool callConfirm READ callConfirm WRITE enableCallConfirm)
+  Q_PROPERTY(bool privateCallConfirm READ privateCallConfirm WRITE enablePrivateCallConfirm)
   /** If @c true, SMS reception is enabled. */
   Q_PROPERTY(bool sms READ sms WRITE enableSMS)
   /** If @c true, the SMS confirmation is enabled. */
@@ -83,10 +83,10 @@ public:
 
   ConfigItem *clone() const override;
 
-  /** Returns @c true if the call confirmation is enabled. */
-  bool callConfirm() const;
-  /** Enables/disables the call confirmation. */
-  void enableCallConfirm(bool enabled);
+  /** Returns @c true if the private-call confirmation is enabled. */
+  bool privateCallConfirm() const;
+  /** Enables/disables the private-call confirmation. */
+  void enablePrivateCallConfirm(bool enabled);
 
   /** Returns @c true if SMS reception is enabled. */
   bool sms() const;

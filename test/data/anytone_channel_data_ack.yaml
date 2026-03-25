@@ -8,14 +8,14 @@ channels:
       rxFrequency: 123.456 Mhz
       txFrequency: 123.456 Mhz
       extended:
-        dataACK: false
+        dataConfirm: false
   - dmr:
       id: ch2
       name: "Test Channel 2"
       rxFrequency: 123.456 Mhz
       txFrequency: 123.456 Mhz
       extended:
-        dataACK: true
+        dataConfirm: true
 
 zones:
   - id: zone1
