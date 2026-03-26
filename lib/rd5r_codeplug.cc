@@ -274,7 +274,7 @@ RD5RCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack 
   for (unsigned int i=0; i<Limit::contactCount(); i++) {
     ContactElement el(data(Offset::contacts() + i*ContactElement::size()));
     el.clear();
-    if (i >= (unsigned int) ctx.count<DMRContact>())
+    if (i >= (unsigned int) ctx.count<DigitalContact>())
       continue;
     if (! el.fromContactObj(ctx.get<DMRContact>(i+1), ctx, err)) {
       errMsg(err) << "Cannot encode contact '" << ctx.get<DMRContact>(i+1)->name()
@@ -364,8 +364,8 @@ RD5RCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack 
     for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++) {
       ChannelElement el(bank.get(i));
       if (c < ctx.count<Channel>()) {
-        if (! el.fromChannelObj(ctx.get<Channel>(c+1), ctx, err)) {
-          errMsg(err) << "Cannot encode channel " << c+1 << " (" << i << " of bank " << b <<").";
+        if (! el.fromChannelObj(ctx.get<Channel>(c+1), ctx)) {
+          errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
           return false;
         }
         bank.enable(i,true);

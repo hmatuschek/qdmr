@@ -10,7 +10,7 @@
 #include <QMenu>
 #include <QHeaderView>
 #include <QMessageBox>
-
+#include <QMenu>
 
 ChannelListView::ChannelListView(Config *config, QWidget *parent)
   : QWidget(parent), ui(new Ui::ChannelListView), _config(config)

@@ -691,7 +691,7 @@ DR1801UVCodeplug::ContactBankElement::link(Context &ctx, const ErrorStack &err) 
 
 bool
 DR1801UVCodeplug::ContactBankElement::encode(Context &ctx, const ErrorStack &err) {
-  unsigned int n = std::min(Limit::contactCount(), ctx.count<DMRContact>());
+  unsigned int n = std::min(Limit::contactCount(), ctx.count<DigitalContact>());
   setContactCount(n); setFirstIndex(0);
   for (unsigned int i=0; i<n; i++) {
     ContactElement contact = this->contact(i);
@@ -3249,10 +3249,10 @@ DR1801UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
-  // Remove all AM channels
-  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  // Remove all AM & M17 channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject, M17Channel::staticMetaObject};
   if (! amFilter.process(copy, err)) {
-    errMsg(err) << "Remove AM channels.";
+    errMsg(err) << "Remove AM & M17 channels.";
     delete copy;
     return nullptr;
   }

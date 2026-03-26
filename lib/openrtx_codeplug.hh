@@ -357,9 +357,9 @@ public:
     virtual bool setM17Call(const QString &call, const ErrorStack &err=ErrorStack());
 
     /** Constructs a @c DigitalContact instance from this codeplug contact. */
-    virtual DMRContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    virtual DigitalContact *toContactObj(Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Resets this codeplug contact from the given @c DigitalContact. */
-    virtual void fromContactObj(const DMRContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool fromContactObj(const DigitalContact *obj, Context &ctx, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Just holds the offsets within the codeplug. */
@@ -436,9 +436,11 @@ public:
 
   bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
-  /** Decodes the binary codeplug and stores its content in the given generic configuration. */
+
   bool decode(Config *config, const ErrorStack &err=ErrorStack());
-  /** Encodes the given generic configuration as a binary codeplug. */
+  bool postprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
+
+  Config *preprocess(Config *config, const ErrorStack &err=ErrorStack()) const;
   bool encode(Config *config, const Flags &flags = Flags(), const ErrorStack &err=ErrorStack());
 
 public:

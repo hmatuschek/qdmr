@@ -6,6 +6,7 @@
 #include "dr1801uv_interface.hh"
 #include "gd73_interface.hh"
 #include "dm32uv_interface.hh"
+#include "openrtx_interface.hh"
 
 #include "rd5r.hh"
 #include "gd73.hh"
@@ -18,6 +19,7 @@
 #include "dr1801uv.hh"
 #include "opengd77.hh"
 #include "openuv380.hh"
+#include "openrtx.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
 #include "d878uv2.hh"
@@ -124,6 +126,22 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     ogd77->deleteLater();
+  } else if (OpenRTXInterface::interfaceInfo() == descr) {
+    auto rtxIf = new OpenRTXInterface(descr, err);
+    if (rtxIf->isOpen()) {
+      RadioInfo id = rtxIf->identifier();
+      if ((id.isValid() && (RadioInfo::OpenRTX == id.id())) || (force.isValid() && (RadioInfo::OpenRTX == force.id()))) {
+        logInfo() << "Yah!";
+        return nullptr; //new OpenRTX(rtxIf);
+      } else {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+        << ". Device known but not implemented yet.";
+      }
+      rtxIf->close();
+      rtxIf->deleteLater();
+      return nullptr;
+    }
+    rtxIf->deleteLater();
   } else if (TyTInterface::interfaceInfo() == descr) {
     TyTInterface *dfu = new TyTInterface(descr, err);
     if (dfu->isOpen()) {

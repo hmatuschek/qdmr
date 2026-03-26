@@ -2407,7 +2407,13 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) {
   DMRContact *cont = nullptr;
   // Find matching contact, if not found -> create one.
-  if (nullptr == (cont = ctx.config()->contacts()->findDigitalContact(destination()))) {
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
+    if (ctx.get<DMRContact>(i)->number() == destination()) {
+      cont = ctx.get<DMRContact>(i);
+      break;
+    }
+  }
+  if (nullptr == cont) {
     cont = new DMRContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }
@@ -4443,6 +4449,10 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
       ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d); d++;
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a); a++;
+    } else {
+      logInfo() << "Cannot index contact '" << config->contacts()->contact(i)->name()
+                << "'. Contact type '" << config->contacts()->contact(i)->metaObject()->className()
+                << "' not supported by or implemented for AnyTone devices.";
     }
   }
 
@@ -4543,10 +4553,10 @@ AnytoneCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
-  // Remove all AM channels
-  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  // Remove all AM & M17 channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject, M17Channel::staticMetaObject};
   if (! amFilter.process(intermediate, err)) {
-    errMsg(err) << "Remove AM channels.";
+    errMsg(err) << "Remove AM & M17 channels.";
     delete intermediate;
     return nullptr;
   }

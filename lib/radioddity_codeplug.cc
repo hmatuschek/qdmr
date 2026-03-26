@@ -2858,10 +2858,15 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DMRContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d+1); d++;
-    } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a+1); a++;
+    Contact *contact = config->contacts()->contact(i);
+    if (contact->is<DMRContact>()) {
+      ctx.add(contact->as<DMRContact>(), d+1); d++;
+    } else if (contact->is<DTMFContact>()) {
+      ctx.add(contact->as<DTMFContact>(), a+1); a++;
+    } else {
+      logInfo() << "Cannot index contact '" << contact->name()
+                << "'. Contact type '" << contact->metaObject()->className()
+                << "' not supported by or implemented for Radioddity devices.";
     }
   }
 
@@ -2870,8 +2875,16 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
     ctx.add(config->rxGroupLists()->list(i), i+1);
 
   // Map channels
-  for (int i=0; i<config->channelList()->count(); i++)
-    ctx.add(config->channelList()->channel(i), i+1);
+  for (int i=0, c=1; i<config->channelList()->count(); i++) {
+    Channel *channel = config->channelList()->channel(i);
+    if (channel->is<FMChannel>() || channel->is<DMRChannel>()) {
+      ctx.add(channel, c); c++;
+    } else {
+      logInfo() << "Cannot index channel '" << channel->name()
+                << "'. Channel type '" << channel->metaObject()->className()
+                << "' not supported by or implemented for Radioddity devices.";
+    }
+  }
 
   // Map zones
   for (int i=0; i<config->zones()->count(); i++)
@@ -2905,10 +2918,10 @@ RadioddityCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
-  // Remove all AM channels
-  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  // Remove all AM & M17 channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject, M17Channel::staticMetaObject};
   if (! amFilter.process(intermediate, err)) {
-    errMsg(err) << "Remove AM channels.";
+    errMsg(err) << "Remove AM & M17 channels.";
     delete intermediate;
     return nullptr;
   }

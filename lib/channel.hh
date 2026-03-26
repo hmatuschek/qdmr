@@ -20,6 +20,7 @@
 class Config;
 class RXGroupList;
 class DMRContact;
+class M17Contact;
 class ScanList;
 class FMAPRSSystem;
 class PositionReportingSystem;
@@ -552,6 +553,92 @@ protected:
   AnytoneDMRChannelExtension *_anytoneExtension;
 };
 
+
+/** Implements an M17 channel.
+ * @ingroup conf */
+class M17Channel: public DigitalChannel
+{
+  Q_OBJECT
+
+  /** The channel access number. */
+  Q_PROPERTY(unsigned accessNumber READ accessNumber WRITE setAccessNumber)
+  /** The transmit contact. */
+  Q_PROPERTY(M17ContactReference* contact READ contactRef WRITE setContactRef)
+  /** The channel mode. */
+  Q_PROPERTY(Mode mode READ mode WRITE setMode)
+  /** The encryption mode. */
+  Q_PROPERTY(EncryptionMode encryptionMode READ encryptionMode WRITE setEncryptionMode)
+  /** If enabled, positioning data is send along with voice and data. */
+  Q_PROPERTY(bool gpsEnabled READ gpsEnabled WRITE enableGPS)
+
+public:
+  /** Possible channel modes. */
+  enum class Mode {
+    Voice, Data, VoiceAndData
+  };
+  Q_ENUM(Mode)
+
+  /** Possible encryption modes. */
+  enum class EncryptionMode {
+    None, AES256, Scrambled
+  };
+  Q_ENUM(EncryptionMode)
+
+public:
+  /** Constructs a new empty M17 channel. */
+  M17Channel(QObject *parent=nullptr);
+  /** Copy constructor. */
+  M17Channel(const M17Channel &other, QObject *parent=nullptr);
+
+  ConfigItem *clone() const;
+  void clear();
+
+  /** Returns the channel mode. */
+  Mode mode() const;
+  /** Sets the channel mode. */
+  void setMode(Mode mode);
+
+  /** Returns the channel access number. */
+  unsigned int accessNumber() const;
+  /** Sets the channel access number (0-15). */
+  void setAccessNumber(unsigned int can);
+
+  /** Returns a reference to the transmit contact. */
+  const M17ContactReference *contactRef() const;
+  /** Returns a reference to the transmit contact. */
+  M17ContactReference *contactRef();
+  /** Sets the reference to the transmit contact. */
+  void setContactRef(M17ContactReference *ref);
+  /** Returns the default TX contact to call on this channel. */
+  M17Contact *contact() const;
+  /** (Re-) Sets the default TX contact for this channel. */
+  bool setContact(M17Contact *c);
+
+  /** Returns @c true if GPS is enabled. */
+  bool gpsEnabled() const;
+  /** Enables/disables GPS. */
+  void enableGPS(bool enabled);
+
+  /** Returns the encryption mode of the channel. */
+  EncryptionMode encryptionMode() const;
+  /** Sets the encryption mode of the channel. */
+  void setEncryptionMode(EncryptionMode mode);
+
+public:
+  YAML::Node serialize(const Context &context, const ErrorStack &err=ErrorStack());
+
+protected:
+  /** Holds the channel mode. */
+  Mode _mode;
+  /** Holds the channel access number. */
+  unsigned int _accessNumber;
+  /** The default TX contact. */
+  M17ContactReference _txContact;
+  /** If @c true, positioning information is send alonside voice and data. */
+  bool _gpsEnabled;
+  /** Holds the encryption mode for the channel. */
+  EncryptionMode _encryptionMode;
+};
 
 
 /** Internal singleton class representing the "currently selected" channel.

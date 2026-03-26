@@ -2300,7 +2300,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(FMAPRSSystem *sys, Conte
     ch->setPower(power());
     ch->setTXTone(txTone());
     logInfo() << "No matching APRS channel found for TX frequency " << fmFrequency().format()
-              << "MHz, create one as 'APRS Channel'";
+              << ", create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }
   sys->setRevertChannel(ch);
@@ -2347,7 +2347,13 @@ DMR6X2UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, DMRAPRSSystem 
     sys->setRevertChannel(ctx.get<Channel>(dmrChannelIndex(idx))->as<DMRChannel>());
 
   // Search for a matching contact in contacts
-  DMRContact *cont = ctx.config()->contacts()->findDigitalContact(dmrDestination(idx));
+  DMRContact *cont = nullptr;
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
+    if (ctx.get<DMRContact>(i)->number() == dmrDestination(idx)) {
+      cont = ctx.get<DMRContact>(i);
+      break;
+    }
+  }
   // If no matching contact is found, create one
   if (nullptr == cont) {
     cont = new DMRContact(dmrCallType(idx), tr("GPS #%1 Contact").arg(idx+1),

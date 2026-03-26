@@ -2627,6 +2627,7 @@ OpenGD77BaseCodeplug::index(Config *config, Context &ctx, const ErrorStack &err)
   return true;
 }
 
+
 Config *
 OpenGD77BaseCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   Config *intermediate = Codeplug::preprocess(config, err);
@@ -2635,10 +2636,10 @@ OpenGD77BaseCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
-  // Remove all AM channels
-  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  // Remove all AM & M17 channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject, M17Channel::staticMetaObject};
   if (! amFilter.process(intermediate, err)) {
-    errMsg(err) << "Remove AM channels.";
+    errMsg(err) << "Remove AM & M17 channels.";
     delete intermediate;
     return nullptr;
   }
