@@ -3528,7 +3528,7 @@ D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, DMRAPRSSystem *s
 
   // Search for a matching contact in contacts
   DMRContact *cont = nullptr;
-  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
     if (ctx.get<DMRContact>(i)->number() == dmrDestination(idx)) {
       cont = ctx.get<DMRContact>(i);
       break;

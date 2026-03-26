@@ -644,7 +644,7 @@ DM1701Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
   // Encode contacts
   for (unsigned int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
-    if (i < ctx.count<DMRContact>())
+    if (i < ctx.count<DigitalContact>())
       cont.fromContactObj(ctx.get<DMRContact>(i+1));
     else
       cont.clear();

@@ -555,7 +555,7 @@ GD77Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack 
   for (unsigned int i=0; i<Limit::contactCount(); i++) {
     ContactElement el(data(Offset::contacts() + i*ContactElement::size()));
     el.clear();
-    if (i >= ctx.count<DMRContact>())
+    if (i >= ctx.count<DigitalContact>())
       continue;
     if (! el.fromContactObj(ctx.get<DMRContact>(i+1), ctx, err)) {
       errMsg(err) << "Cannot encode contact at index " << i << ".";

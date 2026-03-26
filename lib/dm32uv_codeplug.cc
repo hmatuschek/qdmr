@@ -634,8 +634,6 @@ DM32UVCodeplug::ChannelBankElement::setChannelCount(unsigned int n) {
 
 
 /* ******************************************************************************************** *
-<<<<<<< HEAD
-=======
  * Implementation of DM32UVCodeplug::ChannelExtensionElement
  * ******************************************************************************************** */
 DM32UVCodeplug::ChannelExtensionElement::ChannelExtensionElement(uint8_t *ptr)
@@ -722,7 +720,6 @@ DM32UVCodeplug::ChannelExtensionElement::encode(const Channel *ch, Context &ctx,
 
 
 /* ******************************************************************************************** *
->>>>>>> devel
  * Implementation of DM32UVCodeplug::ContactElement
  * ******************************************************************************************** */
 DM32UVCodeplug::ContactElement::ContactElement(uint8_t *data, size_t size)
@@ -942,10 +939,11 @@ bool
 DM32UVCodeplug::ContactIndexElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  setContactCount(ctx.count<DMRContact>());
+  setContactCount(ctx.count<DigitalContact>());
   unsigned int privatCallCount = 0, groupCallCount = 0;
 
-  QVector<unsigned int> indices; indices.reserve(contactCount());
+  unsigned int cc = contactCount();
+  QVector<unsigned int> indices; indices.reserve(cc);
   for (unsigned int idx=0; idx<contactCount(); idx++) {
     if (DMRContact::Type::PrivateCall == ctx.get<DMRContact>(idx)->type())
       privatCallCount++;
@@ -958,7 +956,7 @@ DM32UVCodeplug::ContactIndexElement::encode(Context &ctx, const ErrorStack &err)
 
   setPrivateCallCount(privatCallCount);
   setGroupCallCount(groupCallCount);
-  bitmap().enableFirst(ctx.count<DMRContact>());
+  bitmap().enableFirst(ctx.count<DigitalContact>());
 
   // Sort indices w.r.t. associated DMR id:
   std::sort(indices.begin(), indices.end(), [&ctx](unsigned ia, unsigned ib)->bool {
@@ -1036,9 +1034,9 @@ DM32UVCodeplug::GroupListElement::link(RXGroupList *gl, Context &ctx, const Erro
     if (! validId(i))
       continue;
     DMRContact* contact = nullptr;
-    for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
-      if (id(i) == ctx.get<DMRContact>(i)->number()) {
-        contact = ctx.get<DMRContact>(i);
+    for (unsigned int j=0; j<ctx.count<DigitalContact>(); j++) {
+      if (id(i) == ctx.get<DMRContact>(j)->number()) {
+        contact = ctx.get<DMRContact>(j);
         break;
       }
     }
@@ -3506,7 +3504,7 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
   }
 
   DMRContact *cont = nullptr;
-  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
     if (destinationId() == ctx.get<DMRContact>(i)->number()) {
       cont = ctx.get<DMRContact>(i);
       break;
@@ -4325,8 +4323,8 @@ DM32UVCodeplug::encodeContacts(Context &ctx, const ErrorStack &err) {
 
     // Allocate blocks
   auto numBlocks = Limit::contactBanks().limit(
-    ctx.count<DMRContact>()/ContactBankElement::Limit::contactsPerBlock()
-    + ((0 != ctx.count<DMRContact>() % ContactBankElement::Limit::contactsPerBlock()) ? 1 : 0));
+    ctx.count<DigitalContact>()/ContactBankElement::Limit::contactsPerBlock()
+    + ((0 != ctx.count<DigitalContact>() % ContactBankElement::Limit::contactsPerBlock()) ? 1 : 0));
   for (unsigned int b=0; b<numBlocks; b++) {
     unsigned int addr = Offset::contactBanks() + b*Limit::blockSize();
     if (! isAllocated(addr))
@@ -4338,7 +4336,7 @@ DM32UVCodeplug::encodeContacts(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
     unsigned int blockIndex    = i / ContactBankElement::Limit::contactsPerBlock(),
       indexInBlock = i % ContactBankElement::Limit::contactsPerBlock();
     uint32_t addr = Offset::contactBanks()

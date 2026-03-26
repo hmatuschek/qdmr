@@ -995,7 +995,7 @@ GD73Codeplug::ContactBankElement::createContacts(Context &ctx, const ErrorStack 
 
 bool
 GD73Codeplug::ContactBankElement::encode(Context &ctx, const ErrorStack &err) {
-  unsigned int count = std::min(ctx.count<DMRContact>(), Limit::contactCount());
+  unsigned int count = std::min(ctx.count<DigitalContact>(), Limit::contactCount());
   setUInt16_le(Offset::contactCount(), count);
 
   for (unsigned int i=0; i<count; i++) {

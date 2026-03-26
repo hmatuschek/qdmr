@@ -274,7 +274,7 @@ RD5RCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack 
   for (unsigned int i=0; i<Limit::contactCount(); i++) {
     ContactElement el(data(Offset::contacts() + i*ContactElement::size()));
     el.clear();
-    if (i >= (unsigned int) ctx.count<DMRContact>())
+    if (i >= (unsigned int) ctx.count<DigitalContact>())
       continue;
     if (! el.fromContactObj(ctx.get<DMRContact>(i+1), ctx, err)) {
       errMsg(err) << "Cannot encode contact '" << ctx.get<DMRContact>(i+1)->name()
