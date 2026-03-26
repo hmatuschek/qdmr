@@ -1,0 +1,4 @@
+settings:
+  anytone:
+    displaySettings:
+      volumeChangePrompt: false

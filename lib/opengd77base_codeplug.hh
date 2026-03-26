@@ -104,13 +104,13 @@ public:
     virtual void setTransmitTimeout(const Interval &interval);
 
     /** Returns @c true, if a fixed position is set for the channel. */
-    virtual bool hasFixedPosition() const;
+    virtual bool fixedPositionEnabled() const;
     /** Returns the fixed position. */
     virtual QGeoCoordinate fixedPosition() const;
     /** Sets the fixed position for this channel. */
     virtual void setFixedPosition(const QGeoCoordinate &coordinate);
     /** Resets the fixed position. */
-    virtual void clearFixedPosition();
+    virtual void enableFixedPosition(bool enable);
 
     /** Returns the RX subtone. */
     virtual SelectiveCall rxTone() const;
@@ -514,13 +514,13 @@ public:
     virtual void setSourceSSID(unsigned int ssid);
 
     /** Returns @c true, if a fixed position is send. */
-    virtual bool hasFixedPosition() const;
+    virtual bool fixedPositionEnabled() const;
     /** Returns the fixed position. */
     virtual QGeoCoordinate fixedPosition() const;
     /** Sets the fixed position. */
     virtual void setFixedPosition(const QGeoCoordinate &coor);
     /** Resets the fixed position. */
-    virtual void clearFixedPosition();
+    virtual void enableFixedPosition(bool enable);
 
     /** Returns the posiiton reporting precision. */
     virtual PositionPrecision positionPrecision() const;
@@ -550,9 +550,9 @@ public:
     virtual void clearVia2();
 
     /** Returns the icon. */
-    virtual APRSSystem::Icon icon() const;
+    virtual FMAPRSSystem::Icon icon() const;
     /** Sets the icon. */
-    virtual void setIcon(APRSSystem::Icon icon);
+    virtual void setIcon(FMAPRSSystem::Icon icon);
 
     /** Returns the comment text. */
     virtual QString comment() const;
@@ -568,11 +568,11 @@ public:
     void setFMFrequency(Frequency f);
 
     /** Encodes the APRS settings. */
-    virtual bool encode(const APRSSystem *system, const Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool encode(const FMAPRSSystem *system, const Context &ctx, const ErrorStack &err=ErrorStack());
     /** Decodes some APRS settings. */
-    virtual APRSSystem *decode(const Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    virtual FMAPRSSystem *decode(const Context &ctx, const ErrorStack &err=ErrorStack()) const;
     /** Links the ARPS settings. */
-    virtual bool link(APRSSystem *system, const Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool link(FMAPRSSystem *system, const Context &ctx, const ErrorStack &err=ErrorStack());
 
   public:
     /** Some limits. */

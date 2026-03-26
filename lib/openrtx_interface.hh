@@ -13,7 +13,7 @@
  * hardware UART. Ontop of that, there is SLIP. Followed by a simple framing layer, that determines
  * the higher-level protocol.
  * @ingroup ortx */
-class OpenRTXInterface : public USBSerial
+class OpenRTXInterface : public QObject, public RadioInterface
 {
   Q_OBJECT
 
@@ -38,6 +38,17 @@ public:
   bool write_finish(const ErrorStack &err=ErrorStack());
 
   bool reboot(const ErrorStack &err=ErrorStack());
+
+public:
+  /** Returns some information about this interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
+
+protected:
+  /** OpenRTX link interface. This is the protocol dispatcher for all implemented data transfer
+   * protocols. */
+  OpenRTXLink *_rtxLink;
 };
 
 #endif // OPENRTXINTERFACE_HH

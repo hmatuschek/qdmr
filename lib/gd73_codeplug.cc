@@ -214,23 +214,22 @@ GD73Codeplug::SettingsElement::setLanguage(Language lang) {
   setUInt8(Offset::language(), (unsigned int)lang);
 }
 
-unsigned int
+Level
 GD73Codeplug::SettingsElement::vox() const {
-  return getUInt8(Offset::voxLevel())*10/4;
+  return Level::fromValue(getUInt8(Offset::voxLevel()), Limit::vox());
 }
 void
-GD73Codeplug::SettingsElement::setVOX(unsigned int level) {
-  setUInt8(Offset::voxLevel(), level*4/10);
+GD73Codeplug::SettingsElement::setVOX(Level level) {
+  setUInt8(Offset::voxLevel(), level.mapTo(Limit::vox()));
 }
 
-unsigned int
+Level
 GD73Codeplug::SettingsElement::squelch() const {
-  return getUInt8(Offset::squelchLevel())*10/9;
+  return Level::fromValue(getUInt8(Offset::squelchLevel()), Limit::squelch());
 }
 void
-GD73Codeplug::SettingsElement::setSquelch(unsigned int level) {
-  level = std::min(9U, level);
-  setUInt8(Offset::squelchLevel(), level);
+GD73Codeplug::SettingsElement::setSquelch(Level level) {
+  setUInt8(Offset::squelchLevel(), level.mapTo(Limit::squelch()));
 }
 
 bool
@@ -326,21 +325,22 @@ GD73Codeplug::SettingsElement::setChannelDisplayMode(ChannelDisplayMode mode) {
   setUInt8(Offset::channelDisplayMode(), (unsigned int)mode);
 }
 
-unsigned int
+Level
 GD73Codeplug::SettingsElement::dmrMicGain() const {
-  return getUInt8(Offset::dmrMicGain())*9/5+1;
+  return Level::fromValue(getUInt8(Offset::dmrMicGain())+1, Limit::micGain());
 }
 void
-GD73Codeplug::SettingsElement::setDMRMicGain(unsigned int gain) {
-  setUInt8(Offset::dmrMicGain(), (gain-1)*5/9);
+GD73Codeplug::SettingsElement::setDMRMicGain(Level gain) {
+  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain())-1);
 }
-unsigned int
+
+Level
 GD73Codeplug::SettingsElement::fmMicGain() const {
-  return getUInt8(Offset::fmMicGain())*9/5+1;
+  return Level::fromValue(getUInt8(Offset::fmMicGain())+1, Limit::micGain());
 }
 void
-GD73Codeplug::SettingsElement::setFMMicGain(unsigned int gain) {
-  setUInt8(Offset::fmMicGain(), (gain-1)*5/9);
+GD73Codeplug::SettingsElement::setFMMicGain(Level gain) {
+  setUInt8(Offset::fmMicGain(), gain.mapTo(Limit::micGain())-1);
 }
 
 Interval
@@ -485,9 +485,9 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ctx.config()->settings()->setSquelch(squelch());
   ctx.config()->settings()->setVOX(vox());
   if (! totIsSet())
-    ctx.config()->settings()->setTOT(0);
+    ctx.config()->settings()->disableTOT();
   else
-    ctx.config()->settings()->setTOT(tot().seconds());
+    ctx.config()->settings()->setTOT(tot());
 
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
@@ -566,7 +566,7 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   if (ctx.config()->settings()->totDisabled())
     clearTOT();
   else
-    setTOT(Interval::fromSeconds(ctx.config()->settings()->tot()));
+    setTOT(ctx.config()->settings()->tot());
 
   setLanguage(Language::English);
   setUInt8(0x003c, 0x01);
@@ -722,13 +722,8 @@ bool
 GD73Codeplug::DMRSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  if (nullptr == ctx.config()->settings()->radioddityExtension()) {
-    ctx.config()->settings()->setRadioddityExtension(new RadiodditySettingsExtension());
-  }
-  auto ext = ctx.config()->settings()->radioddityExtension();
-
-  ext->setPrivateCallHangTime(callHangTime());
-  ext->setGroupCallHangTime(callHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(callHangTime());
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(callHangTime());
 
   return true;
 }
@@ -737,11 +732,8 @@ bool
 GD73Codeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  if (nullptr == ctx.config()->settings()->radioddityExtension())
-    return true;
-  auto ext = ctx.config()->settings()->radioddityExtension();
-
-  setCallHangTime(std::max(ext->privateCallHangTime(), ext->groupCallHangTime()));
+  setCallHangTime(std::max(ctx.config()->settings()->dmr()->privateCallHangTime(),
+                           ctx.config()->settings()->dmr()->groupCallHangTime()));
 
   return true;
 }
@@ -1647,6 +1639,7 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
     fm->setSquelchDefault();
     fm->setRXTone(rxTone());
     fm->setTXTone(txTone());
+    fm->extended()->enableTalkaround(talkaroundEnabled());
   } else if (Type::DMR == type()) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
     switch (admit()) {
@@ -1656,7 +1649,8 @@ GD73Codeplug::ChannelElement::toChannel(Context &ctx, const ErrorStack &err) {
     }
     dmr->setColorCode(colorCode());
     dmr->setTimeSlot(timeSlot());
-    dmr->setRadioIdObj(DefaultRadioID::get());
+    dmr->setRadioId(DefaultRadioID::get());
+    dmr->extended()->enableTalkaround(talkaroundEnabled());
   }
 
   ch->setName(name());
@@ -1677,7 +1671,7 @@ GD73Codeplug::ChannelElement::linkChannel(Channel *ch, Context &ctx, const Error
     DMRChannel *dmr = ch->as<DMRChannel>();
     if (hasTXContact()) {
       if (ctx.has<DMRContact>(txContactIndex()))
-        dmr->setTXContactObj(ctx.get<DMRContact>(txContactIndex()));
+        dmr->setContact(ctx.get<DMRContact>(txContactIndex()));
       else
         logWarn() << "Cannot link channel '" << name() << "', cannot resolve contact index "
                   << txContactIndex() << ".";
@@ -1733,8 +1727,8 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
   if (ch->is<DMRChannel>()) {
     DMRChannel *dmr = ch->as<DMRChannel>();
     setType(ChannelElement::Type::DMR);
-    if (! dmr->contact()->isNull())
-      setTXContactIndex(ctx.index(dmr->txContactObj()));
+    if (! dmr->contactRef()->isNull())
+      setTXContactIndex(ctx.index(dmr->contact()));
     if (dmr->groupListRef()->isNull())
       setGroupListAllMatch();
     else
@@ -1749,6 +1743,7 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     if (CommercialChannelExtension *ext = dmr->commercialExtension())
       if ((! ext->encryptionKeyRef()->isNull()) && (0 <= ctx.index(ext->encryptionKey())) )
         setEncryptionKeyIndex(ctx.index(ext->encryptionKey()));
+    enableTalkaround(dmr->extended()->talkaround());
   } else if (ch->is<FMChannel>()) {
     FMChannel *fm = ch->as<FMChannel>();
     setType(ChannelElement::Type::FM);
@@ -1760,6 +1755,7 @@ GD73Codeplug::ChannelElement::encode(Channel *ch, Context &ctx, const ErrorStack
     setBandwidth(fm->bandwidth());
     setRXTone(fm->rxTone());
     setTXTone(fm->txTone());
+    enableTalkaround(fm->extended()->talkaround());
   }
 
   return true;
@@ -2180,7 +2176,7 @@ GD73Codeplug::ScanListElement::encode(ScanList *lst, Context &ctx, const ErrorSt
   Q_UNUSED(err);
   setName(lst->name());
 
-  if (! lst->primary()->isNull()) {
+  if (! lst->primaryChannelRef()->isNull()) {
     if (SelectedChannel::get() == lst->primaryChannel()) {
       setPrimaryChannelMode(ChannelMode::Selected);
     } else {
@@ -2189,7 +2185,7 @@ GD73Codeplug::ScanListElement::encode(ScanList *lst, Context &ctx, const ErrorSt
     }
   }
 
-  if (! lst->secondary()->isNull()) {
+  if (! lst->secondaryChannelRef()->isNull()) {
     if (SelectedChannel::get() == lst->secondaryChannel()) {
       setSecondaryChannelMode(ChannelMode::Selected);
     } else {
@@ -2198,7 +2194,7 @@ GD73Codeplug::ScanListElement::encode(ScanList *lst, Context &ctx, const ErrorSt
     }
   }
 
-  if (! lst->revert()->isNull()) {
+  if (! lst->revertChannelRef()->isNull()) {
     if (SelectedChannel::get() == lst->revertChannel()) {
       setRevertChannelMode(ChannelMode::Selected);
     } else {
@@ -2279,9 +2275,10 @@ GD73Codeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   }
 
   // Map radio IDs
-  for (int i=0; i<ctx.config()->radioIDs()->count(); i++)
-    ctx.add(ctx.config()->radioIDs()->getId(i), i);
-
+  for (int i=0; i<ctx.config()->radioIDs()->count(); i++) {
+    if (ctx.config()->radioIDs()->get(i)->is<DMRContact>())
+      ctx.add(ctx.config()->radioIDs()->get(i)->as<DMRContact>(), i);
+  }
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
     if (ctx.config()->contacts()->contact(i)->is<DMRContact>()) {

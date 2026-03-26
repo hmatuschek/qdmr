@@ -27,12 +27,12 @@ GD73Limits::GD73Limits(QObject *parent)
       new RadioLimitItem{
         { "introLine1", new RadioLimitString(-1, GD73Codeplug::SettingsElement::Limit::bootTextLine(), RadioLimitString::Unicode) },
         { "introLine2", new RadioLimitString(-1, GD73Codeplug::SettingsElement::Limit::bootTextLine(), RadioLimitString::Unicode) },
-        { "micLevel", new RadioLimitUInt(1, 10) },
+        { "micLevel", new RadioLimitLevel({1, 10}, false) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
-        { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitUInt(0, 10) },
-        { "tot", new RadioLimitUInt(0, -1) }
+        { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "tot", new RadioLimitInterval() }
       });
 
   /* Define limits for radio IDs. */
@@ -79,16 +79,16 @@ GD73Limits::GD73Limits(QObject *parent)
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-              {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum{
                  (unsigned)FMChannel::Admit::Always,
                  (unsigned)FMChannel::Admit::Free,
                  (unsigned)FMChannel::Admit::Tone
                } },
-              {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"squelch", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"bandwidth", new RadioLimitEnum{
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
@@ -103,9 +103,9 @@ GD73Limits::GD73Limits(QObject *parent)
               {"rxFrequency", new RadioLimitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-              {"timeout", new RadioLimitUInt(0, 3825, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),

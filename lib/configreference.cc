@@ -247,27 +247,27 @@ PositioningSystemReference::PositioningSystemReference(const QMetaObject &elemen
 }
 
 PositioningSystemReference::PositioningSystemReference(QObject *parent)
-  : ConfigObjectReference(PositioningSystem::staticMetaObject, parent)
+  : ConfigObjectReference(PositionReportingSystem::staticMetaObject, parent)
 {
   // pass...
 }
 
 
 /* ********************************************************************************************* *
- * Implementation of APRSSystemReference
+ * Implementation of FMAPRSSystemReference
  * ********************************************************************************************* */
-APRSSystemReference::APRSSystemReference(QObject *parent)
-  : PositioningSystemReference(APRSSystem::staticMetaObject, parent)
+FMAPRSSystemReference::FMAPRSSystemReference(QObject *parent)
+  : PositioningSystemReference(FMAPRSSystem::staticMetaObject, parent)
 {
   // pass...
 }
 
 
 /* ********************************************************************************************* *
- * Implementation of GPSSystemReference
+ * Implementation of DMRAPRSSystemReference
  * ********************************************************************************************* */
-GPSSystemReference::GPSSystemReference(QObject *parent)
-  : PositioningSystemReference(APRSSystem::staticMetaObject, parent)
+DMRAPRSSystemReference::DMRAPRSSystemReference(QObject *parent)
+  : PositioningSystemReference(FMAPRSSystem::staticMetaObject, parent)
 {
   // pass...
 }

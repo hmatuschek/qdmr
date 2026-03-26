@@ -21,6 +21,11 @@ public:
   /** Destructor. */
   virtual ~PacketStream();
 
+  /** Returns @c true if the stream is open. */
+  virtual bool isOpen() const = 0;
+  /** Closes the stream. */
+  virtual void close() = 0;
+
   /** Receives a datagram. Blocks for up to @c timeout milliseconds. */
   virtual bool receive(QByteArray &buffer, int timeout=-1, const ErrorStack &err=ErrorStack()) = 0;
   /** Receives a datagram. Blocks for up to @c timeout milliseconds. */
@@ -39,8 +44,10 @@ public:
   SlipStream(QIODevice *device, QObject *parent=nullptr);
 
 public:
-  bool receive(QByteArray &buffer, int timeout=-1, const ErrorStack &err=ErrorStack());
-  bool send(const QByteArray& buffer, int timeout=-1, const ErrorStack &err=ErrorStack());
+  bool isOpen() const override;
+  void close() override;
+  bool receive(QByteArray &buffer, int timeout=-1, const ErrorStack &err=ErrorStack()) override;
+  bool send(const QByteArray& buffer, int timeout=-1, const ErrorStack &err=ErrorStack()) override;
 
 protected:
   QIODevice *_device;

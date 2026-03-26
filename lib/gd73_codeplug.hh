@@ -228,14 +228,14 @@ public:
     void setLanguage(Language lang);
 
     /** Returns the VOX level [0,10]. */
-    unsigned int vox() const;
+    Level vox() const;
     /** Sets the VOX level [0,10]. */
-    void setVOX(unsigned int level);
+    void setVOX(Level level);
 
     /** Returns the squelch level [0,10]. */
-    unsigned int squelch() const;
+    Level squelch() const;
     /** Sets the squelch level [0,10]. */
-    void setSquelch(unsigned int level);
+    void setSquelch(Level level);
 
     /** Returns @c true, if a transmit time-out is set. */
     bool totIsSet() const;
@@ -284,13 +284,13 @@ public:
     void setChannelDisplayMode(ChannelDisplayMode mode);
 
     /** Returns the DMR microphone gain [1,10]. */
-    unsigned int dmrMicGain() const;
+    Level dmrMicGain() const;
     /** Sets the DMR microphone gain [1,10]. */
-    void setDMRMicGain(unsigned int gain);
+    void setDMRMicGain(Level gain);
     /** Returns the FM microphone gain [1,10]. */
-    unsigned int fmMicGain() const;
+    Level fmMicGain() const;
     /** Sets the FM microphone gain [1,10]. */
-    void setFMMicGain(unsigned int gain);
+    void setFMMicGain(Level gain);
 
     /** Returns the lone-worker response time-out. */
     Interval loneWorkerResponseTimeout() const;
@@ -361,9 +361,16 @@ public:
 
   public:
     /** Some limits of the settings. */
-    struct Limit {
+    struct Limit: Element::Limit {
       /** Maximum name length. */
       static constexpr unsigned int name() { return 16; }
+      /** Valid VOX sensitivity levels. */
+      static constexpr Range<unsigned int> vox() { return {1, 4}; }
+      /** Valid squelch sensitivity levels. */
+      static constexpr Range<unsigned int> squelch() { return {1, 9}; }
+      /** Valid range for mic gains. */
+      static constexpr Range<unsigned int> micGain() { return {1, 6}; }
+
       /** Transmit time-out range. */
       static constexpr TimeRange tot() {
         return TimeRange{Interval::fromSeconds(20), Interval::fromSeconds(500)};

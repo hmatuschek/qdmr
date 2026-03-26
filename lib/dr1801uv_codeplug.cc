@@ -1,6 +1,5 @@
 #include "dr1801uv_codeplug.hh"
 #include "logger.hh"
-#include "utils.hh"
 #include "zone.hh"
 #include "config.hh"
 #include "intermediaterepresentation.hh"
@@ -481,6 +480,7 @@ DR1801UVCodeplug::ChannelElement::toChannelObj(Context &ctx, const ErrorStack &e
     fm->setBandwidth(bandwidth());
     fm->setRXTone(rxTone());
     fm->setTXTone(txTone());
+    fm->extended()->enableTalkaround(talkaround());
   } else if (Type::DMR == channelType()) {
     DMRChannel *dmr = new DMRChannel(); ch = dmr;
     switch (admitCriterion()) {
@@ -490,6 +490,10 @@ DR1801UVCodeplug::ChannelElement::toChannelObj(Context &ctx, const ErrorStack &e
     }
     dmr->setColorCode(colorCode());
     dmr->setTimeSlot(timeSlot());
+    dmr->extended()->enableTalkaround(talkaround());
+    dmr->extended()->enableDCDM(dcdm());
+    dmr->extended()->enablePrivateCallConfirm(confirmPrivateCall());
+    dmr->extended()->enableLoneWorker(loneWorker());
   } else {
     errMsg(err) <<  "Unknown channel type " << (uint8_t)channelType() << ".";
     return nullptr;
@@ -521,7 +525,7 @@ DR1801UVCodeplug::ChannelElement::linkChannelObj(Channel *channel, Context &ctx,
         errMsg(err) << "DMR contact with index " << transmitContactIndex() << " not known.";
         return false;
       }
-      dmr->setTXContactObj(ctx.get<DMRContact>(transmitContactIndex()));
+      dmr->setContact(ctx.get<DMRContact>(transmitContactIndex()));
     }
     if (hasGroupList()) {
       if (! ctx.has<RXGroupList>(groupListIndex())) {
@@ -560,12 +564,13 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
     case FMChannel::Admit::Free:   setAdmitCriterion(Admit::ChannelFree); break;
     case FMChannel::Admit::Tone:   setAdmitCriterion(Admit::ColorCode_or_Tone); break;
     }
+    enableTalkaround(fm->extended()->talkaround());
   } else if (channel->is<DMRChannel>()) {
     DMRChannel *dmr = channel->as<DMRChannel>();
     setChannelType(Type::DMR);
     setBandwidth(FMChannel::Bandwidth::Narrow);
-    if (dmr->txContactObj())
-      setTransmitContactIndex(ctx.index(dmr->txContactObj()));
+    if (dmr->contact())
+      setTransmitContactIndex(ctx.index(dmr->contact()));
     else
       clearTransmitContactIndex();
     switch (dmr->admit()) {
@@ -583,6 +588,10 @@ DR1801UVCodeplug::ChannelElement::encode(Channel *channel, Context &ctx, const E
       setGroupListIndex(ctx.index(dmr->groupList()));
     else
       clearGroupListIndex();
+    enableTalkaround(dmr->extended()->talkaround());
+    enableDCDM(dmr->extended()->dcdm());
+    enablePrivateCallConfirmation(dmr->extended()->privateCallConfirm());
+    enableLoneWorker(dmr->extended()->loneWorker());
   }
 
   return true;
@@ -1262,20 +1271,20 @@ DR1801UVCodeplug::SettingsElement::setPowerSaveMode(PowerSaveMode mode) {
   setUInt8(Offset::powerSaveMode(), (uint8_t) mode);
 }
 
-unsigned int
+Level
 DR1801UVCodeplug::SettingsElement::voxSensitivity() const {
   if (0x00 == getUInt8(Offset::voxEnabled())) {
-    return 0;
+    return Level::null();
   }
-  return getUInt8(Offset::voxSensitivity())*10/3;
+  return Level::fromValue(getUInt8(Offset::voxSensitivity()), Limit::vox());
 }
 void
-DR1801UVCodeplug::SettingsElement::setVOXSensitivity(unsigned int sens) {
-  if (0 == sens) {
+DR1801UVCodeplug::SettingsElement::setVOXSensitivity(Level sens) {
+  if (sens.isNull()) {
     setUInt8(Offset::voxEnabled(), 0x00);
   } else {
     setUInt8(Offset::voxEnabled(), 0x01);
-    setUInt8(Offset::voxSensitivity(), 1+sens*2/10);
+    setUInt8(Offset::voxSensitivity(), sens.mapTo(Limit::vox()));
   }
 }
 unsigned int
@@ -1602,8 +1611,8 @@ DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack
   Q_UNUSED(err);
 
   // Store radio ID
-  config->radioIDs()->add(new DMRRadioID(radioName(), dmrID()));
-  config->settings()->setDefaultId(config->radioIDs()->getId(0));
+  auto idx = config->radioIDs()->add(new DMRRadioID(radioName(), dmrID()));
+  config->settings()->setDefaultId(config->radioIDs()->get(idx)->as<DMRRadioID>());
 
   // Handle VOX settings.
   config->settings()->setVOX(voxSensitivity());
@@ -2908,15 +2917,18 @@ DR1801UVCodeplug::DMRSettingsElement::clear() {
   memset(_data, 0, _size);
 }
 
-unsigned int
-DR1801UVCodeplug::DMRSettingsElement::holdTime() const {
-  return getUInt8(Offset::holdTime());
+
+Interval
+DR1801UVCodeplug::DMRSettingsElement::callHangTime() const {
+  return Interval::fromSeconds(getUInt8(Offset::holdTime()));
 }
+
 void
-DR1801UVCodeplug::DMRSettingsElement::setHoldTime(unsigned int sec) {
-  sec = Limit::holdTime().limit(sec);
-  setUInt8(Offset::holdTime(), sec);
+DR1801UVCodeplug::DMRSettingsElement::setCallHangTime(const Interval &dur) {
+  auto t = Limit::holdTime().limit(dur);
+  setUInt8(Offset::holdTime(), t.seconds());
 }
+
 
 unsigned int
 DR1801UVCodeplug::DMRSettingsElement::remoteListen() const {
@@ -3066,6 +3078,9 @@ bool
 DR1801UVCodeplug::DMRSettingsElement::decode(Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(err);
 
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(callHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(callHangTime());
+
   switch(smsFormat()) {
   case SMSFormat::IPData: ctx.config()->smsExtension()->setFormat(SMSExtension::Format::Motorola); break;
   case SMSFormat::CompressedIP: ctx.config()->smsExtension()->setFormat(SMSExtension::Format::Hytera); break;
@@ -3078,6 +3093,8 @@ DR1801UVCodeplug::DMRSettingsElement::decode(Context &ctx, const ErrorStack &err
 bool
 DR1801UVCodeplug::DMRSettingsElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+
+  setCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
 
   switch(ctx.config()->smsExtension()->format()) {
   case SMSExtension::Format::Motorola: setSMSFormat(SMSFormat::IPData); break;
@@ -3282,8 +3299,10 @@ DR1801UVCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) con
   }
 
   // Map radio IDs
-  for (int i=0; i<ctx.config()->radioIDs()->count(); i++)
-    ctx.add(ctx.config()->radioIDs()->getId(i), i);
+  for (int i=0; i<ctx.config()->radioIDs()->count(); i++) {
+    if (ctx.config()->radioIDs()->get(i)->is<DMRRadioID>())
+      ctx.add(ctx.config()->radioIDs()->get(i)->as<DMRRadioID>(), i);
+  }
 
   // Map digital and DTMF contacts
   for (int i=0, d=0; i<config->contacts()->count(); i++) {

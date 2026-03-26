@@ -582,7 +582,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   Q_UNUSED(ctx)
 
   Channel *ch;
-  AnytoneChannelExtension *ch_ext = nullptr;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
     if (Mode::MixedAnalog == mode())
@@ -600,11 +599,12 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     ach->setBandwidth(bandwidth());
     // no per channel squelch settings
     ach->setSquelchDefault();
+    ach->extended()->enableTalkaround(talkaround());
+    ach->extended()->enableReverseBurst(ctcssPhaseReversal());
 
     // Create extension
-    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension(); ch_ext = ext;
+    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension();
     ach->setAnytoneChannelExtension(ext);
-    ext->enableReverseBurst(ctcssPhaseReversal());
     ext->enableRXCustomCTCSS(rxCTCSSIsCustom());
     ext->enableTXCustomCTCSS(txCTCSSIsCustom());
     ext->setCustomCTCSS(customCTCSSFrequency());
@@ -628,15 +628,16 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     }
     dch->setColorCode(colorCode());
     dch->setTimeSlot(timeSlot());
+    dch->extended()->enableTalkaround(talkaround());
+    dch->extended()->enablePrivateCallConfirm(callConfirm());
+    dch->extended()->enableSMSConfirm(smsConfirm());
+    dch->extended()->enableDCDM(simplexTDMA());
+    dch->extended()->enableLoneWorker(loneWorker());
 
     // Create extension
-    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension(); ch_ext = ext;
+    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension();
     dch->setAnytoneChannelExtension(ext);
-    ext->enableCallConfirm(callConfirm());
-    ext->enableSMSConfirm(smsConfirm());
-    ext->enableSimplexTDMA(simplexTDMA());
     ext->enableAdaptiveTDMA(adaptiveTDMA());
-    ext->enableLoneWorker(loneWorker());
     // Done
     ch = dch;
   } else {
@@ -655,11 +656,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   ch->setVOXDefault();
   ch->setDefaultTimeout();
 
-  // Apply common channel extension settings
-  if (nullptr != ch_ext) {
-    ch_ext->enableTalkaround(talkaround());
-  }
-
   return ch;
 }
 
@@ -677,7 +673,7 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
                  << c->name() << "'.";
       return false;
     }
-    dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
+    dc->setContact(ctx.get<DMRContact>(contactIndex()));
 
     // Set if RX group list is set
     if (hasGroupListIndex() && ctx.has<RXGroupList>(groupListIndex()))
@@ -686,9 +682,9 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
     // Link radio ID
     DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
     if (rid == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>())
-      dc->setRadioIdObj(DefaultRadioID::get());
+      dc->setRadioId(DefaultRadioID::get());
     else
-      dc->setRadioIdObj(rid);
+      dc->setRadioId(rid);
   } else if (Mode::Analog == mode()) {
     // If channel is analog
     FMChannel *ac = c->as<FMChannel>();
@@ -746,12 +742,12 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       setSquelchMode(AnytoneFMChannelExtension::SquelchMode::Carrier);
     // set bandwidth
     setBandwidth(ac->bandwidth());
+    // Apply common settings
+    enableTalkaround(ac->extended()->talkaround());
+    // Apply FM settings
+    enableCTCSSPhaseReversal(ac->extended()->reverseBurst());
     // Handle extension
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
-      // Apply common settings
-      enableTalkaround(ext->talkaround());
-      // Apply FM settings
-      enableCTCSSPhaseReversal(ext->reverseBurst());
       setCustomCTCSSFrequency(ext->customCTCSS());
       if (ext->rxCustomCTCSS())
         enableRXCustomCTCSS();
@@ -774,17 +770,17 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     // set time-slot
     setTimeSlot(dc->timeSlot());
     // link transmit contact
-    if (nullptr == dc->txContactObj())
+    if (nullptr == dc->contact())
       setContactIndex(0);
     else
-      setContactIndex(ctx.index(dc->txContactObj()));
+      setContactIndex(ctx.index(dc->contact()));
     // link RX group list
     if (nullptr == dc->groupList())
       clearGroupListIndex();
     else
       setGroupListIndex(ctx.index(dc->groupList()));
     // Set radio ID
-    if ((nullptr == dc->radioIdObj()) || (DefaultRadioID::get() == dc->radioIdObj())) {
+    if ((nullptr == dc->radioId()) || (DefaultRadioID::get() == dc->radioId())) {
       if (nullptr == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()) {
         logWarn() << "No default radio ID set: using index 0.";
         setRadioIDIndex(0);
@@ -792,18 +788,18 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
         setRadioIDIndex(ctx.index(ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()));
       }
     } else {
-      setRadioIDIndex(ctx.index(dc->radioIdObj()));
+      setRadioIDIndex(ctx.index(dc->radioId()));
     }
+    // Apply common settings
+    enableTalkaround(dc->extended()->talkaround());
+    // Apply DMR settings
+    enableCallConfirm(dc->extended()->privateCallConfirm());
+    enableSMSConfirm(dc->extended()->smsConfirm());
+    enableSimplexTDMA(dc->extended()->dcdm());
+    enableLoneWorker(dc->extended()->loneWorker());
     // Handle extension
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      // Apply common settings
-      enableTalkaround(ext->talkaround());
-      // Apply DMR settings
-      enableCallConfirm(ext->callConfirm());
-      enableSMSConfirm(ext->smsConfirm());
-      enableSimplexTDMA(ext->simplexTDMA());
       enableAdaptiveTDMA(ext->adaptiveTDMA());
-      enableLoneWorker(ext->loneWorker());
     }
   }
 
@@ -1567,20 +1563,21 @@ AnytoneCodeplug::GeneralSettingsElement::enableBootPassword(bool enable) {
   setUInt8(Offset::bootPassword(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Level
 AnytoneCodeplug::GeneralSettingsElement::squelchLevelA() const {
-  return getUInt8(Offset::squelchLevelA());
+  return Level::fromValue(getUInt8(Offset::squelchLevelA()), {1,5});
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelA(unsigned level) {
-  setUInt8(Offset::squelchLevelA(), level);
+AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelA(Level level) {
+  setUInt8(Offset::squelchLevelA(), level.mapTo({1,5}));
 }
-unsigned AnytoneCodeplug::GeneralSettingsElement::squelchLevelB() const {
-  return getUInt8(Offset::squelchLevelB());
+Level
+AnytoneCodeplug::GeneralSettingsElement::squelchLevelB() const {
+  return Level::fromValue(getUInt8(Offset::squelchLevelB()), {1,5});
 }
 void
-AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(unsigned level) {
-  setUInt8(Offset::squelchLevelB(), level);
+AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(Level level) {
+  setUInt8(Offset::squelchLevelB(), level.mapTo({1, 5}));
 }
 
 bool
@@ -1603,16 +1600,10 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     }
   }
   // Set default squelch level
-  if (0 == ctx.config()->settings()->squelch()) {
-    setSquelchLevelA(0);
-    setSquelchLevelB(0);
-  } else if (1 == ctx.config()->settings()->squelch()) {
-    setSquelchLevelA(1);
-    setSquelchLevelB(1);
-  } else {
-    setSquelchLevelA(ctx.config()->settings()->squelch()/2);
-    setSquelchLevelB(ctx.config()->settings()->squelch()/2);
-  }
+  setSquelchLevelA(ctx.config()->settings()->squelch());
+  setSquelchLevelB(ctx.config()->settings()->squelch());
+
+  enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
   // Handle extensions
   if (AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension()) {
@@ -1728,7 +1719,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
 
     // Encode GPS Settings
     setGPSTimeZone(ext->gpsSettings()->timeZone());
-    enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
 
     // Encode other settings
     enableKeepLastCaller(ext->keepLastCallerEnabled());
@@ -1746,7 +1736,11 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->setMicLevel(dmrMicGain());
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
-  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB())*2);
+  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB()));
+
+  ctx.config()->settings()->gnss()->setUnits(
+        this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
+                                   GNSSSettings::Units::Metric);
 
   // Set extension
   AnytoneSettingsExtension *ext = nullptr;
@@ -1832,8 +1826,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
   // Store GPS settings
-  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
-                                                          AnytoneGPSSettingsExtension::Units::Metric);
   ext->gpsSettings()->setTimeZone(gpsTimeZone());
 
   // Other settings
@@ -2361,21 +2353,28 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   Q_UNUSED(flags)
 
-  if (1 < ctx.config()->posSystems()->gpsCount()) {
+  // Encode fixed location if valid and enabled
+  if (ctx.config()->settings()->gnss()->fixedPosition().isValid()) {
+    setLocation(ctx.config()->settings()->gnss()->fixedPosition());
+    // Enable if there are no GNSS enabled
+    enableFixedLocation(ctx.config()->settings()->gnss()->fixedPositionEnabled());
+  }
+
+  if (1 < ctx.count<DMRAPRSSystem>()) {
     logDebug() << "D868UV only supports a single independent GPS positioning system.";
-  } else if (0 == ctx.config()->posSystems()->gpsCount()) {
+  } else if (0 == ctx.count<DMRAPRSSystem>()) {
     return true;
   }
 
-  GPSSystem *sys = ctx.config()->posSystems()->gpsSystem(0);
-  setDestination(sys->contactObj()->number());
-  setCallType(sys->contactObj()->type());
-  setManualInterval(Interval::fromSeconds(sys->period()));
-  setAutomaticInterval(Interval::fromSeconds(sys->period()));
+  DMRAPRSSystem *sys = ctx.get<DMRAPRSSystem>(0);
+  setDestination(sys->contact()->number());
+  setCallType(sys->contact()->type());
+  setManualInterval(sys->period());
+  setAutomaticInterval(sys->period());
   disableTimeSlotOverride();
   if (! sys->hasRevertChannel()) {
     setChannelSelected(0);
-  } else if (sys->revert()->is<DMRChannel>()) {
+  } else if (sys->revertChannelRef()->is<DMRChannel>()) {
     setChannelIndex(0, ctx.index(sys->revertChannel()));
   } else {
     clearChannel(0);
@@ -2383,9 +2382,23 @@ AnytoneCodeplug::DMRAPRSSettingsElement::fromConfig(const Flags &flags, Context 
   return true;
 }
 
+
+bool
+AnytoneCodeplug::DMRAPRSSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (location().isValid()) {
+    ctx.config()->settings()->gnss()->setFixedPosition(location());
+    ctx.config()->settings()->gnss()->enableFixedPosition(fixedLocation());
+  }
+
+  return true;
+}
+
+
 bool
 AnytoneCodeplug::DMRAPRSSettingsElement::createGPSSystem(uint8_t i, Context &ctx) {
-  GPSSystem *sys = new GPSSystem(QString("GPS sys %1").arg(i+1), nullptr, nullptr, automaticInterval().seconds());
+  DMRAPRSSystem *sys = new DMRAPRSSystem(QString("GPS sys %1").arg(i+1), nullptr, nullptr, automaticInterval());
   ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
   return true;
 }
@@ -2394,18 +2407,24 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) {
   DMRContact *cont = nullptr;
   // Find matching contact, if not found -> create one.
-  if (nullptr == (cont = ctx.config()->contacts()->findDMRContact(destination()))) {
+  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
+    if (ctx.get<DMRContact>(i)->number() == destination()) {
+      cont = ctx.get<DMRContact>(i);
+      break;
+    }
+  }
+  if (nullptr == cont) {
     cont = new DMRContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }
-  ctx.get<GPSSystem>(i)->setContactObj(cont);
+  ctx.get<DMRAPRSSystem>(i)->setContact(cont);
 
   // Check if there is a revert channel set
   if ((! channelIsSelected(i)) && (ctx.has<Channel>(channelIndex(i))) && (ctx.get<Channel>(channelIndex(i)))->is<DMRChannel>()) {
     DMRChannel *ch = ctx.get<Channel>(channelIndex(i))->as<DMRChannel>();
-    ctx.get<GPSSystem>(i)->setRevertChannel(ch);
+    ctx.get<DMRAPRSSystem>(i)->setRevertChannel(ch);
   } else {
-    ctx.get<GPSSystem>(i)->resetRevertChannel();
+    ctx.get<DMRAPRSSystem>(i)->resetRevertChannel();
   }
   return true;
 }
@@ -4415,11 +4434,14 @@ bool
 AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(err)
 
-  // All indices as 0-based. That is, the first channel gets index 0 etc.
+  // AM channels are indexed separately.
+  ctx.addTable(&AMChannel::staticMetaObject);
 
   // Map radio IDs
-  for (int i=0; i<config->radioIDs()->count(); i++)
-    ctx.add(config->radioIDs()->getId(i), i);
+  for (int i=0; i<config->radioIDs()->count(); i++) {
+    if (config->radioIDs()->get(i)->is<DMRRadioID>())
+      ctx.add(config->radioIDs()->get(i)->as<DMRRadioID>(), i);
+  }
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
@@ -4439,14 +4461,12 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
     ctx.add(config->rxGroupLists()->list(i), i);
 
   // Map channels
-  for (int i=0,c=0; i<config->channelList()->count(); i++) {
-    Channel *channel = config->channelList()->channel(i);
-    if ((channel->is<DMRChannel>()) || (channel->is<FMChannel>()) ) {
-      ctx.add(channel, c); c++;
-    } else {
-      logInfo() << "Cannot index channel '" << channel->name()
-                << "'. Channel type '" << channel->metaObject()->className()
-                << "' not supported by or implemented for AnyTone devices.";
+  for (int i=0, common=0, am=0; i<config->channelList()->count(); i++) {
+    if (config->channelList()->channel(i)->is<DMRChannel>() ||
+        config->channelList()->channel(i)->is<FMChannel>()) {
+      ctx.add(config->channelList()->channel(i), common++);
+    } else if (config->channelList()->channel(i)->is<AMChannel>()) {
+      ctx.add(config->channelList()->channel(i), am++);
     }
   }
 
@@ -4460,10 +4480,10 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
 
   // Map DMR APRS systems
   for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
-    if (config->posSystems()->system(i)->is<GPSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d); d++;
-    } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
-      auto *aprs = config->posSystems()->system(i)->as<APRSSystem>();
+    if (config->posSystems()->system(i)->is<DMRAPRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<DMRAPRSSystem>(), d); d++;
+    } else if (config->posSystems()->system(i)->is<FMAPRSSystem>()) {
+      auto *aprs = config->posSystems()->system(i)->as<FMAPRSSystem>();
       ctx.add(aprs, a); a++;
       // Index FM APRS frequencies (referenced in channel extensions).
       if (auto *ext = aprs->anytoneExtension()) {

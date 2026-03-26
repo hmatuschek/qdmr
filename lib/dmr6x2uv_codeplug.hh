@@ -129,6 +129,11 @@ public:
       TS1 = 0, TS2 = 1, Channel = 2
     };
 
+    /** Possible SMS formats. */
+    enum class SMSFormat {
+      Motorola = 0, Hytera = 1, DMR = 2
+    };
+
   protected:
     /** Hidden Constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
@@ -360,9 +365,9 @@ public:
     void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
-    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    virtual SMSExtension::Format smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+    virtual void setSMSFormat(SMSExtension::Format fmt);
 
     bool gpsUnitsImperial() const override;
     void enableGPSUnitsImperial(bool enable) override;
@@ -505,6 +510,12 @@ public:
   class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
   protected:
+    /** Talker alias encoding. */
+    enum class TalkerAliasEncoding {
+      ISO8 = 0, ISO7 = 1, Unicode = 2,
+    };
+
+  protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
 
@@ -529,9 +540,9 @@ public:
     virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
     /** Returns the talker alias encoding. */
-    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    virtual DMRSettings::TalkerAliasEncoding talkerAliasEncoding() const;
     /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    virtual void setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding encoding);
 
     /** Returns the font color. */
     virtual AnytoneDisplaySettingsExtension::Color fontColor() const;
@@ -617,7 +628,7 @@ public:
 
   public:
     /** Some limits for entries. */
-    struct Limit {
+    struct Limit: AnytoneCodeplug::ExtendedSettingsElement::Limit {
       /// Out of range reminder count limits.
       static constexpr IntRange repRangeReminder()    { return {1, 10}; }
       /// Repeater range check interval limits.
@@ -938,9 +949,9 @@ protected:
     virtual void setPath(const QString &path);
 
     /** Returns the APRS icon. */
-    virtual APRSSystem::Icon icon() const;
+    virtual FMAPRSSystem::Icon icon() const;
     /** Sets the APRS icon. */
-    virtual void setIcon(APRSSystem::Icon icon);
+    virtual void setIcon(FMAPRSSystem::Icon icon);
 
     /** Returns the transmit power. */
     virtual Channel::Power power() const;
@@ -991,22 +1002,22 @@ protected:
     virtual void setDMRPreWaveDelay(Interval ms);
 
     /** Configures this APRS system from the given generic config. */
-    virtual bool fromFMAPRSSystem(const APRSSystem *sys, Context &ctx,
+    virtual bool fromFMAPRSSystem(const FMAPRSSystem *sys, Context &ctx,
                                   const ErrorStack &err=ErrorStack());
     /** Constructs a generic APRS system configuration from this APRS system. */
-    virtual APRSSystem *toFMAPRSSystem();
+    virtual FMAPRSSystem *toFMAPRSSystem();
     /** Links the transmit channel within the generic APRS system based on the transmit frequency
      * defined within this APRS system. */
-    virtual bool linkFMAPRSSystem(APRSSystem *sys, Context &ctx);
+    virtual bool linkFMAPRSSystem(FMAPRSSystem *sys, Context &ctx);
 
     /** Constructs all GPS system from the generic configuration. */
     virtual bool fromDMRAPRSSystems(Context &ctx);
     /** Encodes the given GPS system. */
-    virtual bool fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx);
+    virtual bool fromDMRAPRSSystemObj(unsigned int idx, DMRAPRSSystem *sys, Context &ctx);
     /** Constructs a generic GPS system from the idx-th encoded GPS system. */
-    virtual GPSSystem *toDMRAPRSSystemObj(int idx) const;
+    virtual DMRAPRSSystem *toDMRAPRSSystemObj(int idx) const;
     /** Links the specified generic GPS system. */
-    virtual bool linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const;
+    virtual bool linkDMRAPRSSystem(int idx, DMRAPRSSystem *sys, Context &ctx) const;
 
   public:
     /** Some static limits for this element. */

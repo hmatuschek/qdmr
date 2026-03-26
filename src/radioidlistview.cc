@@ -66,7 +66,7 @@ RadioIDListView::onDeleteID() {
   QPair<int,int> rows = ui->radioIdTableView->selection();
   int numrows = rows.second-rows.first+1;
   if (rows.first == rows.second) {
-    QString name = _config->radioIDs()->getId(rows.first)->name();
+    QString name = _config->radioIDs()->get(rows.first)->as<RadioID>()->name();
     if (QMessageBox::No == QMessageBox::question(
           nullptr, tr("Delete radio ID?"), tr("Delete radio ID %1?").arg(name)))
       return;
@@ -77,19 +77,20 @@ RadioIDListView::onDeleteID() {
   }
   // collect all selected scan lists
   // need to collect them first as rows change when deleting
-  QList<DMRRadioID *> ids; ids.reserve(numrows);
+  QList<RadioID *> ids; ids.reserve(numrows);
   for(int i=rows.first; i<=rows.second; i++)
-    ids.push_back(_config->radioIDs()->getId(i));
+    ids.push_back(_config->radioIDs()->get(i)->as<RadioID>());
   // remove
-  foreach (DMRRadioID *id, ids)
+  foreach (RadioID *id, ids)
     _config->radioIDs()->del(id);
 }
 
 void
 RadioIDListView::onEditID(unsigned row) {
-  if (int(row) >= _config->radioIDs()->count())
+  if ((int(row) >= _config->radioIDs()->count()) ||
+      (! _config->radioIDs()->get(row)->as<DMRRadioID>()))
     return;
-  DMRRadioID *id = _config->radioIDs()->getId(row);
+  auto id = _config->radioIDs()->get(row)->as<DMRRadioID>();
   DMRIDDialog dialog(id, _config);
   if (QDialog::Accepted != dialog.exec())
     return;
@@ -99,9 +100,10 @@ RadioIDListView::onEditID(unsigned row) {
 
 void
 RadioIDListView::onDefaultIDSelected(int idx) {
-  if ((idx < 0) || (idx >= _config->radioIDs()->count()))
+  if (((idx < 0) || (idx >= _config->radioIDs()->count())
+       || (! _config->radioIDs()->get(idx)->is<DMRRadioID>())))
     return;
-  _config->settings()->setDefaultId(_config->radioIDs()->getId(idx));
+  _config->settings()->setDefaultId(_config->radioIDs()->get(idx)->as<DMRRadioID>());
 }
 
 void

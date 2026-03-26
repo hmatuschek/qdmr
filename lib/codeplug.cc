@@ -780,8 +780,8 @@ Codeplug::Context::Context(Config *config)
   addTable(&Channel::staticMetaObject);
   addTable(&Zone::staticMetaObject);
   addTable(&ScanList::staticMetaObject);
-  addTable(&GPSSystem::staticMetaObject);
-  addTable(&APRSSystem::staticMetaObject);
+  addTable(&DMRAPRSSystem::staticMetaObject);
+  addTable(&FMAPRSSystem::staticMetaObject);
   addTable(&RoamingChannel::staticMetaObject);
   addTable(&RoamingZone::staticMetaObject);
   addTable(&SMSTemplate::staticMetaObject);
@@ -802,12 +802,14 @@ Codeplug::Context::satellites() const {
 
 
 bool
-Codeplug::Context::hasTable(const QMetaObject *obj) const {
+Codeplug::Context::hasTable(const QMetaObject *obj, bool exact) const {
   // Find a matching table
   if (_tables.contains(obj->className()))
     return true;
-  else if (obj->superClass())
-    return hasTable(obj->superClass());
+  if (exact)
+    return false;
+  if (obj->superClass())
+    return hasTable(obj->superClass(), false);
   return false;
 }
 
@@ -820,15 +822,15 @@ Codeplug::Context::getTable(const QMetaObject *obj) {
 
 bool
 Codeplug::Context::addTable(const QMetaObject *obj) {
-  if (hasTable(obj))
+  if (hasTable(obj, true))
     return false;
   _tables.insert(obj->className(), Table());
   return true;
 }
 
 bool
-Codeplug::Context::remTable(const QMetaObject *obj) {
-  if (! hasTable(obj))
+Codeplug::Context::remTable(const QMetaObject *obj, bool exact) {
+  if (! hasTable(obj, exact))
     return false;
   if (_tables.contains(obj->className()))
     return _tables.remove(obj->className());
@@ -837,8 +839,8 @@ Codeplug::Context::remTable(const QMetaObject *obj) {
 
 
 ConfigItem *
-Codeplug::Context::obj(const QMetaObject *elementType, unsigned idx) {
-  if (! hasTable(elementType))
+Codeplug::Context::obj(const QMetaObject *elementType, unsigned idx, bool exact) {
+  if (! hasTable(elementType, exact))
     return nullptr;
   return getTable(elementType).objects.value(idx, nullptr);
 }

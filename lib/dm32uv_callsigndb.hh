@@ -61,10 +61,10 @@ public:
     /** Sets the DMR id of the entry. */
     virtual void setId(unsigned int id);
 
-    /** Retruns the repeater field. */
-    virtual QString repeater() const;
-    /** Sets the repeater field. */
-    virtual void setRepeater(const QString &rep);
+    /** Retruns the callsign field. */
+    virtual QString callsign() const;
+    /** Sets the callsign field. */
+    virtual void setCallsign(const QString &cal);
 
     /** Retruns the city field. */
     virtual QString city() const;
@@ -94,7 +94,7 @@ public:
     struct Limit: Codeplug::Element::Limit {
       /// Maximum name length.
       static constexpr unsigned int name()     { return 16; }
-      static constexpr unsigned int repeater() { return 8; }
+      static constexpr unsigned int callsign() { return 8; }
       static constexpr unsigned int city()     { return 16; }
       static constexpr unsigned int province() { return 16; }
       static constexpr unsigned int country()  { return 16; }
@@ -107,7 +107,7 @@ public:
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int name()     { return 0x0000; }
       static constexpr unsigned int id()       { return 0x0010; }
-      static constexpr unsigned int repeater() { return 0x0014; }
+      static constexpr unsigned int callsign() { return 0x0014; }
       static constexpr unsigned int city()     { return 0x001c; }
       static constexpr unsigned int province() { return 0x002c; }
       static constexpr unsigned int country()  { return 0x003c; }

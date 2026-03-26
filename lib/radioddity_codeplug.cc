@@ -37,7 +37,7 @@ RadioddityCodeplug::ChannelElement::clear() {
   setTXFrequency(0);
   setMode(MODE_ANALOG);
   setUInt8(0x0019, 0x00); setUInt8(0x001a, 0x00);
-  setTXTimeOut(0);
+  setTXTimeOut(Interval::infinity());
   setTXTimeOutRekeyDelay(0);
   setAdmitCriterion(ADMIT_ALWAYS);
   setUInt8(0x001e, 0x50);
@@ -94,13 +94,17 @@ RadioddityCodeplug::ChannelElement::setMode(Mode mode) {
   setUInt8(Offset::mode(), (unsigned)mode);
 }
 
-unsigned
-RadioddityCodeplug::ChannelElement::txTimeOut() const {
-  return getUInt8(Offset::txTimeout())*15;
+Interval RadioddityCodeplug::ChannelElement::txTimeOut() const {
+  if (0 == getUInt8(Offset::txTimeout()))
+    return Interval::infinity();
+  return Interval::fromSeconds(getUInt8(Offset::txTimeout())*15);
 }
 void
-RadioddityCodeplug::ChannelElement::setTXTimeOut(unsigned tot) {
-  setUInt8(Offset::txTimeout(), tot/15);
+RadioddityCodeplug::ChannelElement::setTXTimeOut(const Interval& tot) {
+  if (tot.isInfinite())
+    setUInt8(Offset::txTimeout(), 0);
+  else
+    setUInt8(Offset::txTimeout(), tot.seconds()/15);
 }
 unsigned
 RadioddityCodeplug::ChannelElement::txTimeOutRekeyDelay() const {
@@ -360,6 +364,7 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const E
     ach->setRXTone(rxTone());
     ach->setTXTone(txTone());
     ach->setSquelchDefault(); // There is no per-channel squelch setting
+    ach->extended()->enableTalkaround(talkaround());
   } else {
     DMRChannel *dch = new DMRChannel(); ch = dch;
     switch (admitCriterion()) {
@@ -370,6 +375,10 @@ RadioddityCodeplug::ChannelElement::toChannelObj(Codeplug::Context &ctx, const E
     }
     dch->setTimeSlot(timeSlot());
     dch->setColorCode(txColorCode());
+    dch->extended()->enableDataConfirm(dataCallConfirm());
+    dch->extended()->enablePrivateCallConfirm(privateCallConfirm());
+    dch->extended()->enableDCDM(dualCapacityDirectMode());
+    dch->extended()->enableTalkaround(talkaround());
   }
 
   // Apply common settings
@@ -401,7 +410,7 @@ RadioddityCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx, con
     if (hasGroupList() && ctx.has<RXGroupList>(groupListIndex()))
       dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     if (hasContact() && ctx.has<DMRContact>(contactIndex()))
-      dc->setTXContactObj(ctx.get<DMRContact>(contactIndex()));
+      dc->setContact(ctx.get<DMRContact>(contactIndex()));
   }
 
   return true;
@@ -444,6 +453,7 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
     setRXTone(ac->rxTone());
     setTXTone(ac->txTone());
     // no per channel squelch setting
+    enableTalkaround(ac->extended()->talkaround());
   } else if (c->is<DMRChannel>()) {
     const DMRChannel *dc = c->as<const DMRChannel>();
     setMode(MODE_DIGITAL);
@@ -457,8 +467,12 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
     setTXColorCode(dc->colorCode());
     if (dc->groupList())
       setGroupListIndex(ctx.index(dc->groupList()));
-    if (dc->txContactObj())
-      setContactIndex(ctx.index(dc->txContactObj()));
+    if (dc->contact())
+      setContactIndex(ctx.index(dc->contact()));
+    enableTalkaround(dc->extended()->talkaround());
+    enableDataCallConfirm(dc->extended()->dataConfirm());
+    enablePrivateCallConfirm(dc->extended()->privateCallConfirm());
+    enableDualCapacityDirectMode(dc->extended()->dcdm());
   } else {
     errMsg(err) << "Cannot encode channel of type '" << c->metaObject()->className()
                 << "': Not supported by the radio.";
@@ -1453,15 +1467,15 @@ RadioddityCodeplug::GeneralSettingsElement::clear() {
   setUInt32_be(0x000c, 0);
   setUInt8(0x0010, 0);
 
-  setPreambleDuration(360);
+  setPreambleDuration(Interval::fromMilliseconds(360));
   setMonitorType(MonitorType::Silent);
-  setVOXSensitivity(3);
+  setVOXSensitivity(Level::fromValue(3));
   setLowBatteryWarnInterval(30);
   setCallAlertDuration(120);
   setLoneWorkerResponsePeriod(1);
   setLoneWorkerReminderPeriod(10);
-  setGroupCallHangTime(3000);
-  setPrivateCallHangTime(3000);
+  setGroupCallHangTime(Interval::fromMilliseconds(3000));
+  setPrivateCallHangTime(Interval::fromMilliseconds(3000));
 
   enableDownChannelModeVFO(false);
   enableUpChannelModeVFO(false);
@@ -1514,13 +1528,13 @@ RadioddityCodeplug::GeneralSettingsElement::setRadioID(unsigned id) {
   setBCD8_be(0x0008, id);
 }
 
-unsigned
+Interval
 RadioddityCodeplug::GeneralSettingsElement::preambleDuration() const {
-  return unsigned(getUInt8(0x0011)*60);
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x0011)*60));
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setPreambleDuration(unsigned ms) {
-  setUInt8(0x0011, ms/60);
+RadioddityCodeplug::GeneralSettingsElement::setPreambleDuration(const Interval &dur) {
+  setUInt8(0x0011, dur.milliseconds()/60);
 }
 
 RadioddityCodeplug::GeneralSettingsElement::MonitorType
@@ -1532,14 +1546,13 @@ RadioddityCodeplug::GeneralSettingsElement::setMonitorType(MonitorType type) {
   setUInt8(0x0012, (unsigned)type);
 }
 
-unsigned
+Level
 RadioddityCodeplug::GeneralSettingsElement::voxSensitivity() const {
-  return getUInt8(0x0013);
+  return Level::fromValue(getUInt8(0x0013));
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setVOXSensitivity(unsigned value) {
-  value = std::min(10u, std::max(1u, value));
-  setUInt8(0x0013, value);
+RadioddityCodeplug::GeneralSettingsElement::setVOXSensitivity(Level value) {
+  setUInt8(0x0013, value.mapTo(Limit::vox()));
 }
 
 unsigned
@@ -1577,21 +1590,21 @@ RadioddityCodeplug::GeneralSettingsElement::setLoneWorkerReminderPeriod(unsigned
   setUInt8(0x0017, sec);
 }
 
-unsigned
+Interval
 RadioddityCodeplug::GeneralSettingsElement::groupCallHangTime() const {
-  return unsigned(getUInt8(0x0018))*500;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x0018))*500);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setGroupCallHangTime(unsigned ms) {
-  setUInt8(0x0018, ms/500);
+RadioddityCodeplug::GeneralSettingsElement::setGroupCallHangTime(const Interval &dur) {
+  setUInt8(0x0018, dur.milliseconds()/500);
 }
-unsigned
+Interval
 RadioddityCodeplug::GeneralSettingsElement::privateCallHangTime() const {
-  return unsigned(getUInt8(0x0019))*500;
+  return Interval::fromMilliseconds(unsigned(getUInt8(0x0019))*500);
 }
 void
-RadioddityCodeplug::GeneralSettingsElement::setPrivateCallHangTime(unsigned ms) {
-  setUInt8(0x0019, ms/500);
+RadioddityCodeplug::GeneralSettingsElement::setPrivateCallHangTime(const Interval &dur) {
+  setUInt8(0x0019, dur.milliseconds()/500);
 }
 
 bool
@@ -1783,27 +1796,27 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const Error
   if (! ctx.config()->settings()->defaultIdRef()->isNull()) {
     setName(ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()->name());
     setRadioID(ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()->number());
-  } else if (ctx.config()->radioIDs()->count()) {
-    setName(ctx.config()->radioIDs()->getId(0)->name());
-    setRadioID(ctx.config()->radioIDs()->getId(0)->number());
+  } else if (ctx.count<DMRRadioID>()) {
+    setName(ctx.get<DMRRadioID>(0)->name());
+    setRadioID(ctx.get<DMRRadioID>(0)->number());
   } else {
     errMsg(err) << "Cannot encode radioddity codeplug: No radio ID defined.";
     return false;
   }
 
   setVOXSensitivity(ctx.config()->settings()->vox());
+  setPreambleDuration(ctx.config()->settings()->dmr()->preamble());
+  setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
+  setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
   // There is no global squelch settings either
 
   // Handle Radioddity extension
   if (RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension()) {
-    setPreambleDuration(ext->preambleDuration().milliseconds());
     setMonitorType(ext->monitorType());
     setLowBatteryWarnInterval(ext->tone()->lowBatteryWarnInterval().seconds());
     setCallAlertDuration(ext->tone()->callAlertDuration().seconds());
     setLoneWorkerResponsePeriod(ext->loneWorkerResponseTime().minutes());
     setLoneWorkerReminderPeriod(ext->loneWorkerReminderPeriod().seconds());
-    setGroupCallHangTime(ext->groupCallHangTime().milliseconds());
-    setPrivateCallHangTime(ext->privateCallHangTime().milliseconds());
     enableDownChannelModeVFO(ext->downChannelModeVFO());
     enableUpChannelModeVFO(ext->upChannelModeVFO());
     enableResetTone(ext->tone()->resetTone());
@@ -1839,14 +1852,19 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
 
   if (ctx.config()->settings()->defaultIdRef()->isNull()) {
     int idx = ctx.config()->radioIDs()->add(new DMRRadioID(name(), radioID()));
-    ctx.config()->settings()->defaultIdRef()->set(ctx.config()->radioIDs()->getId(idx));
+    ctx.config()->settings()->defaultIdRef()->set(
+      ctx.config()->radioIDs()->get(idx)->as<DMRRadioID>());
   } else {
     ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()->setName(name());
     ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()->setNumber(radioID());
   }
   ctx.config()->settings()->setVOX(voxSensitivity());
+  ctx.config()->settings()->dmr()->setPreamble(preambleDuration());
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
+
   // There is no global squelch settings either, so set it to 1
-  ctx.config()->settings()->setSquelch(1);
+  ctx.config()->settings()->setSquelch(Level::fromValue(1));
 
   // Allocate Radioddity extension if needed
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
@@ -1855,14 +1873,11 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
     ctx.config()->settings()->setRadioddityExtension(ext);
   }
   // Update settings extension
-  ext->setPreambleDuration(Interval::fromMilliseconds(preambleDuration()));
   ext->setMonitorType(monitorType());
   ext->tone()->setLowBatteryWarnInterval(Interval::fromSeconds(lowBatteryWarnInterval()));
   ext->tone()->setCallAlertDuration(Interval::fromSeconds(callAlertDuration()));
   ext->setLoneWorkerResponseTime(Interval::fromMinutes(loneWorkerResponsePeriod()));
   ext->setLoneWorkerReminderPeriod(Interval::fromSeconds(loneWorkerReminderPeriod()));
-  ext->setGroupCallHangTime(Interval::fromMilliseconds(groupCallHangTime()));
-  ext->setPrivateCallHangTime(Interval::fromMilliseconds(privateCallHangTime()));
   ext->enableDownChannelModeVFO(downChannelModeVFO());
   ext->enableUpChannelModeVFO(upChannelModeVFO());
   ext->tone()->enableResetTone(resetTone());
@@ -2836,8 +2851,10 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
   // All indices as 1-based. That is, the first channel gets index 1.
 
   // Map radio IDs
-  for (int i=0; i<config->radioIDs()->count(); i++)
-    ctx.add(config->radioIDs()->getId(i), i+1);
+  for (int i=0; i<config->radioIDs()->count(); i++) {
+    if (config->radioIDs()->get(i)->is<DMRRadioID>())
+      ctx.add(config->radioIDs()->get(i)->as<DMRRadioID>(), i+1);
+  }
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
@@ -2879,10 +2896,10 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
 
   // Map DMR APRS systems
   for (int i=0,a=0,d=0; i<config->posSystems()->count(); i++) {
-    if (config->posSystems()->system(i)->is<GPSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<GPSSystem>(), d+1); d++;
-    } else if (config->posSystems()->system(i)->is<APRSSystem>()) {
-      ctx.add(config->posSystems()->system(i)->as<APRSSystem>(), a+1); a++;
+    if (config->posSystems()->system(i)->is<DMRAPRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<DMRAPRSSystem>(), d+1); d++;
+    } else if (config->posSystems()->system(i)->is<FMAPRSSystem>()) {
+      ctx.add(config->posSystems()->system(i)->as<FMAPRSSystem>(), a+1); a++;
     }
   }
 

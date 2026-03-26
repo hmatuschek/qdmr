@@ -924,22 +924,22 @@ public:
     /** Enables/disables boot password. */
     virtual void enableBootPassword(bool enable);
     /** Squelch level of VFO A, (0=off). */
-    virtual unsigned squelchLevelA() const;
+    virtual Level squelchLevelA() const;
     /** Returns the squelch level for VFO A, (0=off). */
-    virtual void setSquelchLevelA(unsigned level);
+    virtual void setSquelchLevelA(Level level);
     /** Squelch level of VFO B, (0=off). */
-    virtual unsigned squelchLevelB() const;
+    virtual Level squelchLevelB() const;
     /** Returns the squelch level for VFO B, (0=off). */
-    virtual void setSquelchLevelB(unsigned level);
+    virtual void setSquelchLevelB(Level level);
 
     /** Returns the VFO scan type. */
     virtual AnytoneSettingsExtension::VFOScanType vfoScanType() const = 0;
     /** Sets the VFO scan type. */
     virtual void setVFOScanType(AnytoneSettingsExtension::VFOScanType type) = 0;
     /** Returns the mirophone gain. */
-    virtual unsigned dmrMicGain() const = 0;
+    virtual Level dmrMicGain() const = 0;
     /** Sets the microphone gain. */
-    virtual void setDMRMicGain(unsigned int gain) = 0;
+    virtual void setDMRMicGain(Level gain) = 0;
 
     /** Returns the key function for a short press on the function key 1/A. */
     virtual AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const = 0;
@@ -1532,6 +1532,8 @@ public:
 
     /** Updates the GPS settings from the given config. */
     virtual bool fromConfig(const Flags &flags, Context &ctx);
+    /** Updates the global config. */
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Creates GPS system from this GPS settings. */
     virtual bool createGPSSystem(uint8_t i, Context &ctx);
     /** Links GPS system from this GPS settings. */

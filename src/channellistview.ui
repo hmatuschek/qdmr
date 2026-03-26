@@ -28,11 +28,11 @@
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
       <widget class="QPushButton" name="addChannel">
-       <property name="contextMenuPolicy">
-        <enum>Qt::ActionsContextMenu</enum>
-       </property>
        <property name="text">
-        <string>Add Channel</string>
+        <string>Add Channel ...</string>
+       </property>
+       <property name="shortcut">
+        <string>Alt+A</string>
        </property>
       </widget>
      </item>
@@ -59,28 +59,37 @@
     </layout>
    </item>
   </layout>
-  <action name="actionAdd_FM_Channel">
+  <action name="actionAddFMChannel">
    <property name="text">
     <string>Add FM Channel</string>
    </property>
    <property name="toolTip">
-    <string>Adds an FM channel to the list.</string>
+    <string>Adds a new FM channel</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-  <action name="actionAdd_DMR_Channel">
+  <action name="actionAddDMRChannel">
    <property name="text">
     <string>Add DMR Channel</string>
    </property>
    <property name="toolTip">
-    <string>Adds a new DMR channel to the list.</string>
+    <string>Adds a new DMR channel.</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-  <action name="actionAdd_M17_Channel">
+  <action name="actionAddAMChannel">
    <property name="text">
-    <string>Add M17 Channel</string>
+    <string>Add AM Channel</string>
    </property>
    <property name="toolTip">
-    <string>Adds an M17 channel to the list.</string>
+    <string>Adds a new AM channel.</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

@@ -823,10 +823,10 @@ public:
 
     /** Returns the VOX sensitivity [0,10].
      * 0 means VOX off. */
-    virtual unsigned int voxSensitivity() const;
+    virtual Level voxSensitivity() const;
     /** Sets the VOX sensitivity [0,10].
      * 0 means VOX off. */
-    virtual void setVOXSensitivity(unsigned int sens);
+    virtual void setVOXSensitivity(Level sens);
     /** Returns the VOX delay in ms. */
     virtual unsigned int voxDelay() const;
     /** Sets the VOX delay in ms. */
@@ -1049,7 +1049,7 @@ public:
 
   public:
     /** Some limits. */
-    struct Limit {
+    struct Limit: Element::Limit {
       /** Maximum radio name length. */
       static constexpr unsigned int radioNameLength()     { return 16; }
       /** Maximum boot-text lines length. */
@@ -1058,6 +1058,8 @@ public:
       static constexpr unsigned int bootPasswordLength()  { return 6; }
       /** Maximum programming password length. */
       static constexpr unsigned int progPasswordLength()  { return 6; }
+      /** VOX sensitivity levels. */
+      static constexpr Range<unsigned int> vox() { return {1, 3}; }
     };
   };
 
@@ -2127,9 +2129,9 @@ public:
     static constexpr unsigned int size() { return 0x0010; }
 
     /** Returns the hold-time in seconds. */
-    virtual unsigned int holdTime() const;
+    virtual Interval callHangTime() const;
     /** Sets the hold-time in seconds. */
-    virtual void setHoldTime(unsigned int sec);
+    virtual void setCallHangTime(const Interval &dur);
 
     /** Returns the remote-listen duration in seconds. */
     virtual unsigned int remoteListen() const;
@@ -2216,7 +2218,8 @@ public:
     /** Some limits. */
     struct Limit: public Element::Limit {
       /** The range of hold time. */
-      static constexpr Range<unsigned int> holdTime() { return {1, 90}; }
+      static constexpr Range<Interval> holdTime() {
+        return {Interval::fromSeconds(1), Interval::fromSeconds(90)}; }
       /** The range of remote listen duration. */
       static constexpr Range<unsigned int> remoteListen() { return {10, 120}; }
       /** The range of active wait period. */

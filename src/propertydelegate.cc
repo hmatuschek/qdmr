@@ -1,10 +1,12 @@
 #include "propertydelegate.hh"
 #include "extensionwrapper.hh"
 
+#include <QListWidget>
 #include <QComboBox>
 #include <QSpinBox>
 #include <QLineEdit>
 #include <QDoubleValidator>
+#include "flageditdialog.hh"
 #include "configreference.hh"
 #include "extensionwrapper.hh"
 #include "config.hh"
@@ -13,7 +15,7 @@
 
 
 PropertyDelegate::PropertyDelegate(QObject *parent)
-  : QItemDelegate(parent), _config(nullptr)
+  : QStyledItemDelegate(parent), _config(nullptr)
 {
   // pass...
 }
@@ -41,7 +43,9 @@ PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &opti
     return nullptr;
 
   // Dispatch by type
-  if (prop.isEnumType()) {
+  if (prop.isFlagType()) {
+    return new FlagEditDialog(prop.enumerator(), parent);
+  } if (prop.isEnumType()) {
     return new QComboBox(parent);
   } else if (QMetaType::Bool == prop.typeId()) {
     return new QComboBox(parent);
@@ -61,9 +65,18 @@ PropertyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &opti
     return edit;
   } else if (QMetaType::QString == prop.typeId()) {
     return new QLineEdit(parent);
-  } else if (QString("Frequency") == prop.typeName()) {
+  } else if (QMetaType::fromType<Frequency>() == prop.metaType()) {
     return new QLineEdit(parent);
-  } else if (QString("Interval") == prop.typeName()) {
+  } else if (QMetaType::fromType<Interval>() == prop.metaType()) {
+    return new QLineEdit(parent);
+  } else if (QMetaType::fromType<Level>() == prop.metaType()) {
+    auto box = new QComboBox(parent);
+    box->addItem(tr("None"), QVariant::fromValue(Level::invalid()));
+    box->addItem(tr("Off"), QVariant::fromValue(Level::null()));
+    for (uint i=1; i<=10; i++)
+      box->addItem(QString::number(i), QVariant::fromValue(Level::fromValue(i)));
+    return box;
+  } else if (QMetaType::fromType<QGeoCoordinate>() == prop.metaType()) {
     return new QLineEdit(parent);
   } else if (prop.read(obj).value<ConfigObjectReference *>()) {
     return new QComboBox(parent);
@@ -83,7 +96,10 @@ PropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
     return;
 
   // Dispatch by type
-  if (prop.isEnumType()) {
+  if (prop.isFlagType()) {
+    auto box = dynamic_cast<FlagEditDialog *>(editor);
+    box->setValue(prop.read(obj).toInt());
+  } else if (prop.isEnumType()) {
     QComboBox *box = dynamic_cast<QComboBox *>(editor);
     QMetaEnum etype = prop.enumerator();
     for (int i=0; i<etype.keyCount(); i++) {
@@ -105,10 +121,16 @@ PropertyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
     dynamic_cast<QLineEdit *>(editor)->setText(QString::number(prop.read(obj).toDouble()));
   } else if (QMetaType::QString == prop.typeId()) {
     dynamic_cast<QLineEdit *>(editor)->setText(prop.read(obj).toString());
-  } else if (QString("Frequency") == prop.typeName()) {
+  } else if (QMetaType::fromType<Frequency>() == prop.metaType()) {
     dynamic_cast<QLineEdit *>(editor)->setText(prop.read(obj).value<Frequency>().format());
-  } else if (QString("Interval") == prop.typeName()) {
+  } else if (QMetaType::fromType<Interval>() == prop.metaType()) {
     dynamic_cast<QLineEdit *>(editor)->setText(prop.read(obj).value<Interval>().format());
+  } else if (QMetaType::fromType<Level>() == prop.metaType()) {
+    auto box = dynamic_cast<QComboBox*>(editor);
+    auto level = prop.read(obj).value<Level>();
+    for (int i=0; i<box->count(); i++)
+      if (box->itemData(i).value<Level>() == level)
+        box->setCurrentIndex(i);
   } else if (prop.read(obj).value<ConfigObjectReference *>()) {
     ConfigObjectReference *ref = prop.read(obj).value<ConfigObjectReference *>();
     // Find all matching elements in config that can be referenced
@@ -135,8 +157,12 @@ PropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *abstractmode
   QMetaProperty prop = model->propertyAt(index);
   if (! prop.isValid())
     return;
+
   // Dispatch by type
-  if (prop.isEnumType()) {
+  if (prop.isFlagType()) {
+    auto edit = dynamic_cast<FlagEditDialog *>(editor);
+    prop.write(obj, edit->value());
+  } else if (prop.isEnumType()) {
     prop.write(obj, dynamic_cast<QComboBox *>(editor)->currentData());
   } else if (QMetaType::Bool == prop.typeId()) {
     prop.write(obj, dynamic_cast<QComboBox *>(editor)->currentData());
@@ -146,14 +172,16 @@ PropertyDelegate::setModelData(QWidget *editor, QAbstractItemModel *abstractmode
     prop.write(obj, dynamic_cast<QLineEdit *>(editor)->text().toDouble());
   } else if (QMetaType::QString == prop.typeId()) {
     prop.write(obj, dynamic_cast<QLineEdit *>(editor)->text());
-  } else if (QString("Frequency") == prop.typeName()) {
+  } else if (QMetaType::fromType<Frequency>() == prop.metaType()) {
     Frequency f;
     if (f.parse(dynamic_cast<QLineEdit *>(editor)->text()))
       prop.write(obj, QVariant::fromValue(f));
-  } else if (QString("Interval") == prop.typeName()) {
+  } else if (QMetaType::fromType<Interval>() == prop.metaType()) {
     Interval I;
     if (I.parse(dynamic_cast<QLineEdit *>(editor)->text()))
       prop.write(obj, QVariant::fromValue(I));
+  } else if (QMetaType::fromType<Level>() == prop.metaType()) {
+    prop.write(obj, qobject_cast<QComboBox*>(editor)->currentData());
   } else if (prop.read(obj).value<ConfigObjectReference *>()) {
     ConfigObjectReference *ref = prop.read(obj).value<ConfigObjectReference *>();
     ref->set(dynamic_cast<QComboBox *>(editor)->currentData().value<ConfigObject*>());

@@ -1804,7 +1804,7 @@ CSVReader::handleMicLevel(unsigned level, qint64 line, qint64 column, QString &e
   Q_UNUSED(errorMessage);
 
   if (_link) {
-    _config->settings()->setMicLevel(level);
+    _config->settings()->setMicLevel(Level::fromValue(level));
   }
   return true;
 }
@@ -1922,7 +1922,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(contact);
         return false;
       }
-      _channels[idx]->as<DMRChannel>()->setTXContactObj(_digital_contacts[contact]);
+      _channels[idx]->as<DMRChannel>()->setContact(_digital_contacts[contact]);
     }
 
     // Check scanlist
@@ -1942,13 +1942,13 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(gps);
         return false;
       }
-      _channels[idx]->as<DMRChannel>()->setAPRSObj(_posSystems[gps]);
+      _channels[idx]->as<DMRChannel>()->setAPRS(_posSystems[gps]);
     }
 
     // Check roaming zone
     if (0 == roam) {
       // index 0 mean default zone -> just set it
-      _channels[idx]->as<DMRChannel>()->setRoamingZone(DefaultRoamingZone::get());
+      _channels[idx]->as<DMRChannel>()->setRoaming(DefaultRoamingZone::get());
     } else if (0 < roam) {
       // positive index means reference to roaming specific roaming zone
       if (! _roamingZones.contains(roam)) {
@@ -1956,14 +1956,14 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
             .arg(line).arg(column).arg(name).arg(roam);
         return false;
       }
-      _channels[idx]->as<DMRChannel>()->setRoamingZone(_roamingZones[roam]);
+      _channels[idx]->as<DMRChannel>()->setRoaming(_roamingZones[roam]);
     }
 
     // check radio ID
     if (-1 == radioID) {
-      _channels[idx]->as<DMRChannel>()->setRadioIdObj(DefaultRadioID::get());
+      _channels[idx]->as<DMRChannel>()->setRadioId(DefaultRadioID::get());
     } else if ((0 < radioID) && (_radioIDs.contains(radioID))) {
-      _channels[idx]->as<DMRChannel>()->setRadioIdObj(_radioIDs[radioID]);
+      _channels[idx]->as<DMRChannel>()->setRadioId(_radioIDs[radioID]);
     } else {
       errorMessage = QString("Parse error @ %1,%2: Cannot link digital channel '%3', unknown radio ID index %4.")
           .arg(line).arg(column).arg(name).arg(radioID);
@@ -1985,7 +1985,7 @@ CSVReader::handleDigitalChannel(qint64 idx, const QString &name, double rx, doub
   chan->setRXFrequency(Frequency::fromMHz(rx));
   chan->setTXFrequency(Frequency::fromMHz(tx));
   chan->setPower(power);
-  chan->setTimeout(tot);
+  chan->setTimeout(Interval::fromSeconds(tot));
   chan->setRXOnly(ro);
   chan->setAdmit(admit);
   chan->setColorCode(color);
@@ -2021,12 +2021,12 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
             .arg(line).arg(column).arg(name).arg(aprs);
         return false;
       }
-      if (! _posSystems[aprs]->is<APRSSystem>()) {
+      if (! _posSystems[aprs]->is<FMAPRSSystem>()) {
         errorMessage = QString("Parse error @ %1,%2: Cannot link analog channel '%3', positioning system %4 ('%5') is not an APRS system!.")
             .arg(line).arg(column).arg(name).arg(aprs).arg(_posSystems[aprs]->name());
         return false;
       }
-      _channels[idx]->as<FMChannel>()->setAPRSSystem(_posSystems[aprs]->as<APRSSystem>());
+      _channels[idx]->as<FMChannel>()->setAPRS(_posSystems[aprs]->as<FMAPRSSystem>());
     }
     return true;
   }
@@ -2043,10 +2043,10 @@ CSVReader::handleAnalogChannel(qint64 idx, const QString &name, double rx, doubl
   chan->setRXFrequency(Frequency::fromMHz(rx));
   chan->setTXFrequency(Frequency::fromMHz(tx));
   chan->setPower(power);
-  chan->setTimeout(tot);
+  chan->setTimeout(Interval::fromSeconds(tot));
   chan->setRXOnly(ro);
   chan->setAdmit(admit);
-  chan->setSquelch(squelch);
+  chan->setSquelch(Level::fromValue(squelch));
   chan->setRXTone(rxTone);
   chan->setTXTone(txTone);
   chan->setBandwidth(bw);
@@ -2094,7 +2094,7 @@ CSVReader::handleGPSSystem(
     qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
-    GPSSystem *gps = _posSystems[idx]->as<GPSSystem>();
+    DMRAPRSSystem *gps = _posSystems[idx]->as<DMRAPRSSystem>();
     // Check contact ID
     if (! _digital_contacts.contains(contactIdx)) {
       errorMessage = QString("Parse error @ %1,%2: Cannot create GPS system '%3', unknown destination contact ID %4.")
@@ -2102,7 +2102,7 @@ CSVReader::handleGPSSystem(
       logError() << errorMessage;
       return false;
     }
-    gps->setContactObj(_digital_contacts[contactIdx]);
+    gps->setContact(_digital_contacts[contactIdx]);
 
     if (revertChannelIdx) {
       if (! _channels.contains(revertChannelIdx))  {
@@ -2128,7 +2128,7 @@ CSVReader::handleGPSSystem(
     return false;
   }
 
-  GPSSystem *gps = new GPSSystem(name, nullptr, nullptr, period);
+  DMRAPRSSystem *gps = new DMRAPRSSystem(name, nullptr, nullptr, Interval::fromSeconds(period));
   _posSystems[idx] = gps;
   _config->posSystems()->add(gps);
 
@@ -2143,7 +2143,7 @@ CSVReader::handleAPRSSystem(
     qint64 line, qint64 column, QString &errorMessage)
 {
   if (_link) {
-    APRSSystem *aprs = _posSystems[idx]->as<APRSSystem>();
+    FMAPRSSystem *aprs = _posSystems[idx]->as<FMAPRSSystem>();
     if (! _channels.contains(channelIdx))  {
       errorMessage = QString("Parse error @ %1,%2: Cannot create APRS system '%3', unknown channel ID %4.")
           .arg(line).arg(column).arg(name).arg(channelIdx);
@@ -2166,9 +2166,9 @@ CSVReader::handleAPRSSystem(
     return false;
   }
 
-  APRSSystem::Icon icon = name2aprsicon(iconname);
-  APRSSystem *aprs = new APRSSystem(name, nullptr, dest, destSSID, src, srcSSID, path,
-                                    icon, message, period);
+  FMAPRSSystem::Icon icon = name2aprsicon(iconname);
+  FMAPRSSystem *aprs = new FMAPRSSystem(name, nullptr, dest, destSSID, src, srcSSID, path,
+                                        icon, message, Interval::fromSeconds(period));
   _posSystems[idx] = aprs;
   _config->posSystems()->add(aprs);
 

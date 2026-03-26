@@ -430,15 +430,14 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::enableFMIdleTone(bool enable) {
 }
 
 
-unsigned int
+Level
 DMR6X2UV2Codeplug::ExtendedSettingsElement::fmMicGain() const {
-  return 2*(1 + getUInt8(Offset::fmMicGain()));
+  return Level::fromValue(getUInt8(Offset::fmMicGain()), Limit::micGain());
 }
 
 void
-DMR6X2UV2Codeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
-  gain = std::max(1U, std::min(10U, gain));
-  setUInt8(Offset::fmMicGain(), (gain-1)/2);
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setFMMicGain(Level gain) {
+  setUInt8(Offset::fmMicGain(), gain.mapTo(Limit::micGain()));
 }
 
 
@@ -464,34 +463,23 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::enableATPC(bool enable) {
 }
 
 
-AnytoneGPSSettingsExtension::GPSMode
-DMR6X2UV2Codeplug::ExtendedSettingsElement::gnss() const {
+GNSSSettings::Systems DMR6X2UV2Codeplug::ExtendedSettingsElement::gnss() const {
   switch ((GNSS) getUInt8(Offset::gnss())) {
-  case GNSS::GPS: return AnytoneGPSSettingsExtension::GPSMode::GPS;
-  case GNSS::BeiDou: return AnytoneGPSSettingsExtension::GPSMode::Beidou;
-  case GNSS::Both: return AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou;
+  case GNSS::GPS: return GNSSSettings::System::GPS;
+  case GNSS::BeiDou: return GNSSSettings::System::Beidou;
+  case GNSS::Both: return GNSSSettings::System::GPS|GNSSSettings::System::Beidou;
   }
-
-  return AnytoneGPSSettingsExtension::GPSMode::GPS;
+  return GNSSSettings::System::GPS;
 }
 
 void
-DMR6X2UV2Codeplug::ExtendedSettingsElement::setGNSS(AnytoneGPSSettingsExtension::GPSMode gnss) {
-  switch (gnss) {
-  case AnytoneGPSSettingsExtension::GPSMode::GPS:
+DMR6X2UV2Codeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems gnss) {
+  if (gnss.testFlag(GNSSSettings::System::GPS))
     setUInt8(Offset::gnss(), (unsigned int)GNSS::GPS);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::Glonass:
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou_Glonass:
+  if (gnss.testFlag(GNSSSettings::System::Beidou))
     setUInt8(Offset::gnss(), (unsigned int)GNSS::BeiDou);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Glonas:
-  case AnytoneGPSSettingsExtension::GPSMode::All:
+  if (gnss.testAnyFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
     setUInt8(Offset::gnss(), (unsigned int)GNSS::Both);
-    break;
-  }
 }
 
 
@@ -590,6 +578,10 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
     return false;
   }
 
+  // GPS settings
+  setGNSS(ctx.config()->settings()->gnss()->systems());
+
+
   // Encode device specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -618,9 +610,6 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   // Power settings
   enableATPC(ext->powerSaveSettings()->atpc());
 
-  // GPS settings
-  setGNSS(ext->gpsSettings()->mode());
-
   // Display settings
   setChannelIndexDisplay(ext->displaySettings()->showGlobalChannelNumber() ?
                            ChannelIndexDisplay::GlobalIndex :
@@ -641,6 +630,9 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
     return false;
   }
 
+  // Store GPS settings
+  ctx.config()->settings()->gnss()->setSystems(gnss());
+
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
     ext = new AnytoneSettingsExtension();
@@ -658,20 +650,17 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   ext->bluetoothSettings()->enablePTTLatch(bluetoothPTTLatchEnabled());
   ext->bluetoothSettings()->setPTTSleepTimer(bluetoothPTTSleepTimeout());
 
-  // Store FM mic gain separately
+  // Store FM mic gain separately, if different
   ext->toneSettings()->enableFMIdleChannelTone(fmIdleToneEnabled());
-  ext->audioSettings()->setFMMicGain(fmMicGain());
-  // Enable separate mic gain, if it differs from the DMR mic gain:
-  ext->audioSettings()->enableFMMicGain(
-        ctx.config()->settings()->micLevel() != fmMicGain());
+  if (ctx.config()->settings()->micLevel() == fmMicGain())
+    ext->audioSettings()->disableFMMicGain();
+  else
+    ext->audioSettings()->setFMMicGain(fmMicGain());
   ext->toneSettings()->enableTOTNotification(totWarningToneEnabled());
   ext->toneSettings()->enableWXAlarm(wxAlarmEnabled());
 
   // Power settings
   ext->powerSaveSettings()->enableATPC(atpcEnabled());
-
-  // Store GPS settings
-  ext->gpsSettings()->setMode(gnss());
 
   // Display settings
   ext->displaySettings()->enableShowGlobalChannelNumber(

@@ -507,6 +507,78 @@ RadioLimitTransmitFrequencies::verify(const ConfigItem *item, const QMetaPropert
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioLimitInterval
+ * ********************************************************************************************* */
+RadioLimitInterval::RadioLimitInterval(RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(severity, parent), _durations{Interval::null(), Interval::infinity()}
+{
+  // pass...
+}
+
+RadioLimitInterval::RadioLimitInterval(const Range<Interval> &range,
+                                       RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(severity, parent), _durations{range}
+{
+  // pass...
+}
+
+bool
+RadioLimitInterval::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  if (qMetaTypeId<Interval>() != prop.userType()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    msg << "Cannot check property " << prop.name() << ": Expected interval.";
+    return false;
+  }
+
+  auto value = prop.read(item).value<Interval>();
+  if (_durations.contains(value))
+    return true;
+
+  auto &msg = context.newMessage(_severity);
+  msg << "Interval " << value.format() << " is outside of allowed range.";
+
+  return _severity < RadioLimitIssue::Severity::Critical;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitLevel
+ * ********************************************************************************************* */
+RadioLimitLevel::RadioLimitLevel(const Range<unsigned int> &range, bool allowInvalid,
+                                 RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitValue(severity, parent), _range(range), _allowInvalid(allowInvalid)
+{
+  // pass...
+}
+
+bool
+RadioLimitLevel::verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const {
+  Q_UNUSED(item);
+
+  if (qMetaTypeId<Level>() != prop.userType()) {
+    auto &msg = context.newMessage(RadioLimitIssue::Critical);
+    msg << "Cannot check property " << prop.name() << ": Expected interval.";
+    return false;
+  }
+
+  Level value = prop.read(item).value<Level>();
+  if (value.isInvalid() && (! _allowInvalid)) {
+    auto &msg = context.newMessage(_severity);
+    msg << "Invalid level not allowed for property " << prop.name() << ".";
+    return _severity <= RadioLimitIssue::Warning;
+  }
+
+  if (_range.contains(value.value())) {
+    auto &msg = context.newMessage(_severity);
+    msg << "Value of property " << prop.name() << " " << value.value() << " exceeds range [" << _range.lower << ", " << _range.upper << "].";
+    return _severity <= RadioLimitIssue::Warning;
+  }
+
+  return true;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadioLimitItem
  * ********************************************************************************************* */
 RadioLimitItem::RadioLimitItem(QObject *parent)

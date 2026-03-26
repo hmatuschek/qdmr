@@ -58,6 +58,16 @@ OpenRTXLinkDatagram::OpenRTXLinkDatagram(OpenRTXLink::Protocol proto, OpenRTXLin
 }
 
 bool
+OpenRTXLinkDatagram::isOpen() const {
+  return _link->isOpen();
+}
+
+void
+OpenRTXLinkDatagram::close() {
+  // Cannot close data-gram socket by its own.
+}
+
+bool
 OpenRTXLinkDatagram::receive(QByteArray &buffer, int timeout, const ErrorStack &err) {
   return _link->receive(_proto, buffer, timeout, err);
 }
@@ -77,6 +87,31 @@ OpenRTXCAT::OpenRTXCAT(OpenRTXLink *link)
   // pass...
 }
 
+QByteArray
+OpenRTXCAT::info(const ErrorStack &err) {
+  if (! send(QByteArray("GIN",3), _link->timeout(), err)) {
+    errMsg(err) << "Cannot request device info.";
+    return QByteArray();
+  }
+
+  QByteArray res;
+  if (! receive(res, _link->timeout(), err)) {
+    errMsg(err) << "Cannot receive device info.";
+    return QByteArray();
+  }
+
+  if ('A' == res[0]) {
+    errMsg(err) << "Cannot obtain device info. Received error code " << (int8_t)res[1];
+    return QByteArray();
+  } else if ('D' == res[0]) {
+    return res.right(16);
+  }
+
+  errMsg(err) << "Obtained unexpected response " << res.toHex(' ');
+  return QByteArray();
+}
+
+
 
 /* ******************************************************************************************** *
  * Implements the OpenRTX link protocol dispatcher
@@ -86,10 +121,27 @@ OpenRTXLink::OpenRTXLink(PacketStream *link, QObject *parent)
     _stdio(new OpenRTXLinkStream(Protocol::Stdio, this)),
     _cat(new OpenRTXCAT(this)),
     _fmp(new OpenRTXLinkDatagram(Protocol::FMP, this)),
-    _xmodem(new OpenRTXLinkStream(Protocol::XMODEM, this))
+    _xmodem(new OpenRTXLinkStream(Protocol::XMODEM, this)),
+    _timeout(2000)
 {
-  // pass...
+  if (_link) _link->setParent(this);
 }
+
+OpenRTXLink::~OpenRTXLink() {
+  if (_link)
+    _link->close();
+}
+
+bool
+OpenRTXLink::isOpen() const {
+  return _link && _link->isOpen();
+}
+
+void
+OpenRTXLink::close() {
+  if (_link) _link->close();
+}
+
 
 OpenRTXLinkStream *
 OpenRTXLink::stdio() const {
@@ -110,28 +162,30 @@ OpenRTXLink::xmodem() const {
   return _xmodem;
 }
 
-uint8_t
-OpenRTXLink::crc8(const QByteArray &data) {
-  constexpr uint8_t poly = 0xA6;
-  uint8_t crc = 0;
-  for (int i=0; i<data.size(); i++) {
-    crc ^= data[i];
-    for (int j=0; j<8; j++) {
-      if (crc & 0x80)
-        crc = ( (crc<<1) ^ poly );
-      else
-        crc <<= 1;
-    }
+unsigned int
+OpenRTXLink::timeout() const {
+  return _timeout;
+}
+
+uint16_t
+OpenRTXLink::crc16(const QByteArray &data) {
+  uint16_t x = 0, crc = 0;
+  for (qsizetype i=0; i<data.length(); i++) {
+    x = (crc >> 8) ^ data[i];
+    x ^= x >> 4;
+    crc = (crc << 8) ^ (x << 12) ^ (x << 5) ^ x;
   }
   return crc;
 }
 
 bool
 OpenRTXLink::send(Protocol proto, const QByteArray &data, int timeout, const ErrorStack &err) {
-  QByteArray packet; packet.reserve(data.size()+2);
+  QByteArray packet; packet.reserve(data.size()+3);
   packet.append((char)proto);
   packet.append(data);
-  packet.append(crc8(packet));
+  uint16_t crc = crc16(data);
+  packet.append(crc&0xff);
+  packet.append(crc>>8);
   return this->_link->send(packet, timeout, err);
 }
 
@@ -144,7 +198,7 @@ OpenRTXLink::receive(Protocol proto, QByteArray &data, int timeout, const ErrorS
       return false;
 
     // Check CRC
-    if (0 != crc8(buffer)) {
+    if (0 != crc16(buffer)) {
       errMsg(err) << "Invalid CRC in RTXLink packet.";
       return false;
     }

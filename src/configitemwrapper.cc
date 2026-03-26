@@ -273,14 +273,14 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
 
   switch (index.column()) {
   case 0:
-    if (channel->is<FMChannel>())
-      return tr("FM");
-    else if (channel->is<DMRChannel>())
+    if (channel->is<DMRChannel>())
       return tr("DMR");
-    else if (channel->is<M17Channel>())
-      return tr("M17");
+    else if (channel->is<FMChannel>())
+      return tr("FM");
+    else if (channel->is<AMChannel>())
+      return tr("AM");
     else
-      return QVariant();
+      return channel->metaObject()->className();
   case 1:
     return channel->name();
   case 2:
@@ -303,7 +303,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       return tr("[Default]");
     if (channel->timeoutDisabled())
       return tr("Off");
-    return QString::number(channel->timeout());
+    return channel->timeout().format();
   case 6:
     return channel->rxOnly() ? tr("On") : tr("Off");
   case 7:
@@ -319,7 +319,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       case FMChannel::Admit::Free: return tr("Free"); break;
       case FMChannel::Admit::Tone: return tr("Tone"); break;
       }
-    } else if (channel->is<M17Channel>()) {
+    } else {
       return tr("[None]");
     }
     break;
@@ -348,103 +348,103 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     }
     break;
   case 11:
-    if (DMRChannel *dmr = channel->as<DMRChannel>()) {
-      return (DMRChannel::TimeSlot::TS1 == dmr->timeSlot()) ? 1 : 2;
-    } else if (channel->is<FMChannel>() || channel->is<M17Channel>()) {
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
+      return (DMRChannel::TimeSlot::TS1 == digi->timeSlot()) ? 1 : 2;
+    } else {
       return tr("[None]");
     }
     break;
   case 12:
-    if (DMRChannel *dmr = channel->as<DMRChannel>()) {
-      if (dmr->groupList()) {
-        return dmr->groupList()->name();
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
+      if (digi->groupList()) {
+        return digi->groupList()->name();
       } else {
         return QString("-");
       }
-    } else if (channel->is<FMChannel>() || channel->is<M17Channel>()) {
+    } else {
       return tr("[None]");
     }
     break;
   case 13:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if (digi->txContactObj())
-        return digi->txContactObj()->name();
+      if (digi->contact())
+        return digi->contact()->name();
       else
         return QString("-");
-    } else if (M17Channel *m17 = channel->as<M17Channel>()) {
-      if (m17->contact())
-        return m17->contact()->name();
-      else
-        return QString("-");
-    } else if (channel->is<FMChannel>()) {
+    } else {
       return tr("[None]");
     }
     break;
   case 14:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if ((nullptr == digi->radioIdObj()) || (DefaultRadioID::get() == digi->radioIdObj()))
+      if ((nullptr == digi->radioId()) || (DefaultRadioID::get() == digi->radioId()))
         return tr("[Default]");
-      return digi->radioIdObj()->name();
-    } else if (channel->is<FMChannel>() || channel->is<M17Channel>()) {
+      return digi->radioId()->name();
+    } else {
       return tr("[None]");
     }
     break;
   case 15:
-    if (DMRChannel *dmr = channel->as<DMRChannel>()) {
-      if (dmr->aprsObj())
-        return dmr->aprsObj()->name();
+    if (DMRChannel *digi = channel->as<DMRChannel>()) {
+      if (digi->aprs())
+        return digi->aprs()->name();
       else
         return QString("-");
-    } else if (M17Channel *m17 = channel->as<M17Channel>()) {
-      if (m17->gpsEnabled())
-        return tr("Enabled");
-      return tr("Disabled");
-    } else if (FMChannel *fm = channel->as<FMChannel>()) {
-      if (fm->aprsSystem())
-        return fm->aprsSystem()->name();
+    } else if (FMChannel *analog = channel->as<FMChannel>()) {
+      if (analog->aprs())
+        return analog->aprs()->name();
       else
         return QString("-");
+    } else {
+      return QString("-");
     }
     break;
   case 16:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      if (nullptr == digi->roamingZone())
+      if (nullptr == digi->roaming())
         return QString("-");
-      else if (DefaultRoamingZone::get() == digi->roamingZone())
+      else if (DefaultRoamingZone::get() == digi->roaming())
         return tr("[Default]");
-      return digi->roamingZone()->name();
-    } else if (channel->is<FMChannel>() || channel->is<M17Channel>()) {
+      return digi->roaming()->name();
+    } else {
       return tr("[None]");
     }
     break;
   case 17:
     if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
-    } else if (FMChannel *analog = channel->as<FMChannel>()) {
-      if (analog->defaultSquelch())
+    } else if (FMChannel *fm = channel->as<FMChannel>()) {
+      if (fm->defaultSquelch())
         return tr("[Default]");
-      if (analog->squelchDisabled())
+      if (fm->squelchDisabled())
         return tr("Open");
       else
-        return analog->squelch();
+        return fm->squelch().value();
+    } else if (AMChannel *am = channel->as<AMChannel>()) {
+      if (am->defaultSquelch())
+        return tr("[Default]");
+      if (am->squelchDisabled())
+        return tr("Open");
+      else
+        return am->squelch().value();
     }
     break;
   case 18:
-    if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
+    if (channel->is<DMRChannel>() || channel->is<AMChannel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       return analog->rxTone().format();
     }
     break;
   case 19:
-    if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
+    if (channel->is<DMRChannel>() || channel->is<AMChannel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       return analog->txTone().format();
     }
     break;
   case 20:
-    if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
+    if (channel->is<DMRChannel>() || channel->is<AMChannel>()) {
       return tr("[None]");
     } else if (FMChannel *analog = channel->as<FMChannel>()) {
       if (FMChannel::Bandwidth::Wide == analog->bandwidth()) {
@@ -762,7 +762,7 @@ ZoneListWrapper::headerData(int section, Qt::Orientation orientation, int role) 
 /* ********************************************************************************************* *
  * Implementation of PositioningSystemListWrapper
  * ********************************************************************************************* */
-PositioningSystemListWrapper::PositioningSystemListWrapper(PositioningSystems *list, QObject *parent)
+PositioningSystemListWrapper::PositioningSystemListWrapper(PositionReportingSystems *list, QObject *parent)
   : GenericTableWrapper(list, parent)
 {
   // pass...
@@ -781,13 +781,13 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
   if ((Qt::DisplayRole!=role) && (Qt::EditRole!=role))
     return QVariant();
 
-  PositioningSystem *sys = _list->get(index.row())->as<PositioningSystem>();
+  PositionReportingSystem *sys = _list->get(index.row())->as<PositionReportingSystem>();
 
   switch (index.column()) {
   case 0:
-    if (sys->is<GPSSystem>())
+    if (sys->is<DMRAPRSSystem>())
       return tr("DMR");
-    else if (sys->is<APRSSystem>())
+    else if (sys->is<FMAPRSSystem>())
       return tr("APRS");
     else
       return QString("Oops!");
@@ -796,35 +796,39 @@ PositioningSystemListWrapper::data(const QModelIndex &index, int role) const {
     return sys->name();
 
   case 2:
-    if (sys->is<GPSSystem>()) {
-      if (! sys->as<GPSSystem>()->hasContact())
+    if (sys->is<DMRAPRSSystem>()) {
+      if (! sys->as<DMRAPRSSystem>()->hasContact())
         return tr("[None]");
-      return sys->as<GPSSystem>()->contactObj()->name();
-    } else if (sys->is<APRSSystem>())
-      return QString("%1-%2").arg(sys->as<APRSSystem>()->destination())
-          .arg(sys->as<APRSSystem>()->destSSID());
+      return sys->as<DMRAPRSSystem>()->contact()->name();
+    } else if (sys->is<FMAPRSSystem>())
+      return QString("%1-%2").arg(sys->as<FMAPRSSystem>()->destination())
+          .arg(sys->as<FMAPRSSystem>()->destSSID());
     break;
 
   case 3:
-    return sys->period();
+    if (Qt::DisplayRole == role)
+      return sys->period().format();
+    else if (Qt::EditRole == role)
+      return QVariant::fromValue(sys->period());
+    break;
 
   case 4:
-    if (sys->is<GPSSystem>()) {
-      if (! sys->as<GPSSystem>()->hasRevertChannel())
+    if (sys->is<DMRAPRSSystem>()) {
+      if (! sys->as<DMRAPRSSystem>()->hasRevertChannel())
         return tr("[Selected]");
-      return sys->as<GPSSystem>()->revertChannel()->name();
-    } else if (sys->is<APRSSystem>()) {
-      if (! sys->as<APRSSystem>()->hasRevertChannel())
+      return sys->as<DMRAPRSSystem>()->revertChannel()->name();
+    } else if (sys->is<FMAPRSSystem>()) {
+      if (! sys->as<FMAPRSSystem>()->hasRevertChannel())
         return tr("[Selected]");
-      return sys->as<APRSSystem>()->revertChannel()->name();
+      return sys->as<FMAPRSSystem>()->revertChannel()->name();
     }
   break;
 
   case 5:
-    if (sys->is<GPSSystem>())
+    if (sys->is<DMRAPRSSystem>())
       return tr("[None]");
-    else if (sys->is<APRSSystem>())
-      return sys->as<APRSSystem>()->message();
+    else if (sys->is<FMAPRSSystem>())
+      return sys->as<FMAPRSSystem>()->message();
   break;
 
   case 6: {
@@ -849,7 +853,7 @@ PositioningSystemListWrapper::headerData(int section, Qt::Orientation orientatio
   case 0: return tr("Type");
   case 1: return tr("Name");
   case 2: return tr("Destination");
-  case 3: return tr("Period [s]");
+  case 3: return tr("Period");
   case 4: return tr("Channel");
   case 5: return tr("Message");
   case 6: return tr("Extensions");

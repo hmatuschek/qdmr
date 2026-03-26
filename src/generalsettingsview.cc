@@ -14,7 +14,7 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   }
   ui->introLine1->setText(_config->settings()->introLine1());
   ui->introLine2->setText(_config->settings()->introLine2());
-  ui->mic->setValue(_config->settings()->micLevel());
+  ui->mic->setValue(_config->settings()->micLevel().value());
   ui->speech->setChecked(_config->settings()->speech());
 
   ui->powerValue->setItemData(0, (unsigned)Channel::Power::Max);
@@ -31,9 +31,12 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
   }
 
-  ui->squelchValue->setValue(_config->settings()->squelch());
-  ui->totValue->setValue(_config->settings()->tot());
-  ui->voxValue->setValue(_config->settings()->vox());
+  ui->squelchValue->setValue(_config->settings()->squelch().value());
+  if (_config->settings()->totDisabled())
+    ui->totValue->setValue(0);
+  else
+    ui->totValue->setValue(_config->settings()->tot().seconds());
+  ui->voxValue->setValue(_config->settings()->vox().value());
 
   ui->extensionView->setObjectName("radioSettingsExtension");
   ui->extensionView->setObject(_config->settings(), _config);
@@ -76,7 +79,7 @@ GeneralSettingsView::onConfigModified() {
   }
   ui->introLine1->setText(_config->settings()->introLine1());
   ui->introLine2->setText(_config->settings()->introLine2());
-  ui->mic->setValue(_config->settings()->micLevel());
+  ui->mic->setValue(_config->settings()->micLevel().value());
   ui->speech->setChecked(_config->settings()->speech());
   switch(_config->settings()->power()) {
   case Channel::Power::Max: ui->powerValue->setCurrentIndex(0); break;
@@ -85,9 +88,12 @@ GeneralSettingsView::onConfigModified() {
   case Channel::Power::Low: ui->powerValue->setCurrentIndex(3); break;
   case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
   }
-  ui->squelchValue->setValue(_config->settings()->squelch());
-  ui->totValue->setValue(_config->settings()->tot());
-  ui->voxValue->setValue(_config->settings()->vox());
+  ui->squelchValue->setValue(_config->settings()->squelch().value());
+  if (_config->settings()->totDisabled())
+    ui->totValue->setValue(0);
+  else
+    ui->totValue->setValue(_config->settings()->tot().seconds());
+  ui->voxValue->setValue(_config->settings()->vox().value());
 }
 
 void
@@ -128,7 +134,7 @@ GeneralSettingsView::onIntroLine2Edited() {
 
 void
 GeneralSettingsView::onMicLevelChanged() {
-  _config->settings()->setMicLevel(ui->mic->value());
+  _config->settings()->setMicLevel(Level::fromValue(ui->mic->value()));
 }
 
 void
@@ -142,13 +148,16 @@ GeneralSettingsView::onPowerChanged() {
 }
 void
 GeneralSettingsView::onSquelchChanged() {
-  _config->settings()->setSquelch(ui->squelchValue->value());
+  _config->settings()->setSquelch(Level::fromValue(ui->squelchValue->value()));
 }
 void
 GeneralSettingsView::onTOTChanged() {
-  _config->settings()->setTOT(ui->totValue->value());
+  if (0 == ui->totValue->value())
+    _config->settings()->disableTOT();
+  else
+    _config->settings()->setTOT(Interval::fromSeconds(ui->totValue->value()));
 }
 void
 GeneralSettingsView::onVOXChanged() {
-  _config->settings()->setVOX(ui->voxValue->value());
+  _config->settings()->setVOX(Level::fromValue(ui->voxValue->value()));
 }

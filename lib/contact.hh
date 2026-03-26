@@ -276,10 +276,17 @@ public:
 
   int add(ConfigObject *obj, int row=-1, bool unique=true);
 
+  /** Returns the number of digital contacts. */
+  [[deprecated("Use indexing instead.")]] int digitalCount() const;
+  /** Returns the number of DTMF contacts. */
+  [[deprecated("Use indexing instead.")]] int dtmfCount() const;
+
   /** Returns the contact at index @c idx. */
   Contact *contact(int idx) const;
-  /** Searches for a digital contact with the given number. */
-  DMRContact *findDMRContact(unsigned number) const;
+  /** Returns the digital contact at index @c idx among digital contacts. */
+  [[deprecated("Use indexing instead.")]] DMRContact *digitalContact(int idx) const;
+  /** Returns the DTMF contact at index @c idx among DTMF contacts. */
+  [[deprecated("Use indexing instead.")]] DTMFContact *dtmfContact(int idx) const;
 
 public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());

@@ -170,7 +170,7 @@ public:
   void clear();
 
   /** Returns the radio ID at the given index. */
-  DMRRadioID *getId(int idx) const;
+  [[deprecated("Use indexing instead.")]] DMRRadioID *getId(int idx) const;
   /** Searches the DMR ID object associated with the given DMR ID. */
   DMRRadioID *find(uint32_t id) const;
 

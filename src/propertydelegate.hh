@@ -1,12 +1,12 @@
 #ifndef PROPERTYDELEGATE_HH
 #define PROPERTYDELEGATE_HH
 
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 
 class Config;
 class PropertyWrapper;
 
-class PropertyDelegate : public QItemDelegate
+class PropertyDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
 

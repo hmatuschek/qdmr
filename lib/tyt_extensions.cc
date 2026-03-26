@@ -1,16 +1,15 @@
 #include "tyt_extensions.hh"
-#include "logger.hh"
+#include "level.hh"
 
 /* ******************************************************************************************** *
  * Implementation of TyTChannelExtension
  * ******************************************************************************************** */
 TyTChannelExtension::TyTChannelExtension(QObject *parent)
-  : ConfigExtension(parent), _loneWorker(false), _autoScan(false), _talkaround(false),
-    _dataCallConfirmed(false), _privateCallConfirmed(false), _emergencyAlarmConfirmed(false),
+  : ConfigExtension(parent), _autoScan(false), _emergencyAlarmConfirmed(false),
     _displayPTTId(true), _rxRefFrequency(RefFrequency::Low), _txRefFrequency(RefFrequency::Low),
-    _tightSquelch(false), _compressedUDPHeader(false), _reverseBurst(true),
+    _tightSquelch(false), _compressedUDPHeader(false),
     _killTone(KillTone::Off), _inCallCriterion(InCallCriterion::Always), _allowInterrupt(false),
-    _dcdm(false), _dcdmLeader(false), _dmrSquelch(1)
+    _dcdmLeader(false), _dmrSquelch(Level::fromValue(1))
 {
   // pass...
 }
@@ -27,21 +26,10 @@ TyTChannelExtension::clone() const {
 
 
 bool
-TyTChannelExtension::loneWorker() const {
-  return _loneWorker;
-}
-void
-TyTChannelExtension::enableLoneWorker(bool enable) {
-  if (_loneWorker == enable)
-    return;
-  _loneWorker = enable;
-  emit modified(this);
-}
-
-bool
 TyTChannelExtension::autoScan() const {
   return _autoScan;
 }
+
 void
 TyTChannelExtension::enableAutoScan(bool enable) {
   if (_autoScan == enable)
@@ -50,46 +38,12 @@ TyTChannelExtension::enableAutoScan(bool enable) {
   emit modified(this);
 }
 
-bool
-TyTChannelExtension::talkaround() const {
-  return _talkaround;
-}
-void
-TyTChannelExtension::enableTalkaround(bool enable) {
-  if (_talkaround == enable)
-    return;
-  _talkaround = enable;
-  emit modified(this);
-}
-
-bool
-TyTChannelExtension::dataCallConfirmed() const {
-  return _dataCallConfirmed;
-}
-void
-TyTChannelExtension::enableDataCallConfirmed(bool enable) {
-  if (_dataCallConfirmed == enable)
-    return;
-  _dataCallConfirmed = enable;
-  emit modified(this);
-}
-
-bool
-TyTChannelExtension::privateCallConfirmed() const {
-  return _privateCallConfirmed;
-}
-void
-TyTChannelExtension::enablePrivateCallConfirmed(bool enable) {
-  if (_privateCallConfirmed == enable)
-    return;
-  _privateCallConfirmed = enable;
-  emit modified(this);
-}
 
 bool
 TyTChannelExtension::emergencyAlarmConfirmed() const {
   return _emergencyAlarmConfirmed;
 }
+
 void
 TyTChannelExtension::enableEmergencyAlarmConfirmed(bool enable) {
   if (_emergencyAlarmConfirmed == enable)
@@ -98,10 +52,12 @@ TyTChannelExtension::enableEmergencyAlarmConfirmed(bool enable) {
   emit modified(this);
 }
 
+
 bool
 TyTChannelExtension::displayPTTId() const {
   return _displayPTTId;
 }
+
 void
 TyTChannelExtension::enableDisplayPTTId(bool enable) {
   if (_displayPTTId == enable)
@@ -110,10 +66,12 @@ TyTChannelExtension::enableDisplayPTTId(bool enable) {
   emit modified(this);
 }
 
+
 TyTChannelExtension::RefFrequency
 TyTChannelExtension::rxRefFrequency() const {
   return _rxRefFrequency;
 }
+
 void
 TyTChannelExtension::setRXRefFrequency(RefFrequency ref) {
   if (_rxRefFrequency == ref)
@@ -122,10 +80,12 @@ TyTChannelExtension::setRXRefFrequency(RefFrequency ref) {
   emit modified(this);
 }
 
+
 TyTChannelExtension::RefFrequency
 TyTChannelExtension::txRefFrequency() const {
   return _txRefFrequency;
 }
+
 void
 TyTChannelExtension::setTXRefFrequency(RefFrequency ref) {
   if (_txRefFrequency == ref)
@@ -134,22 +94,26 @@ TyTChannelExtension::setTXRefFrequency(RefFrequency ref) {
   emit modified(this);
 }
 
-unsigned int
+
+Level
 TyTChannelExtension::dmrSquelch() const {
   return _dmrSquelch;
 }
+
 void
-TyTChannelExtension::setDMRSquelch(unsigned int sq) {
+TyTChannelExtension::setDMRSquelch(Level sq) {
   if (_dmrSquelch == sq)
     return;
   _dmrSquelch = sq;
   emit modified(this);
 }
 
+
 bool
 TyTChannelExtension::tightSquelch() const {
   return _tightSquelch;
 }
+
 void
 TyTChannelExtension::enableTightSquelch(bool enable) {
   if (_tightSquelch == enable)
@@ -158,10 +122,12 @@ TyTChannelExtension::enableTightSquelch(bool enable) {
   emit modified(this);
 }
 
+
 bool
 TyTChannelExtension::compressedUDPHeader() const {
   return _compressedUDPHeader;
 }
+
 void
 TyTChannelExtension::enableCompressedUDPHeader(bool enable) {
   if (_compressedUDPHeader == enable)
@@ -170,22 +136,12 @@ TyTChannelExtension::enableCompressedUDPHeader(bool enable) {
   emit modified(this);
 }
 
-bool
-TyTChannelExtension::reverseBurst() const {
-  return _reverseBurst;
-}
-void
-TyTChannelExtension::enableReverseBurst(bool enable) {
-  if (_reverseBurst == enable)
-    return;
-  _reverseBurst = enable;
-  emit modified(this);
-}
 
 TyTChannelExtension::KillTone
 TyTChannelExtension::killTone() const {
   return _killTone;
 }
+
 void
 TyTChannelExtension::setKillTone(KillTone tone) {
   if (_killTone == tone)
@@ -194,10 +150,12 @@ TyTChannelExtension::setKillTone(KillTone tone) {
   emit modified(this);
 }
 
+
 TyTChannelExtension::InCallCriterion
 TyTChannelExtension::inCallCriterion() const {
   return _inCallCriterion;
 }
+
 void
 TyTChannelExtension::setInCallCriterion(InCallCriterion crit) {
   if (_inCallCriterion == crit)
@@ -206,10 +164,12 @@ TyTChannelExtension::setInCallCriterion(InCallCriterion crit) {
   emit modified(this);
 }
 
+
 bool
 TyTChannelExtension::allowInterrupt() const {
   return _allowInterrupt;
 }
+
 void
 TyTChannelExtension::enableAllowInterrupt(bool enable) {
   if (_allowInterrupt == enable)
@@ -218,22 +178,12 @@ TyTChannelExtension::enableAllowInterrupt(bool enable) {
   emit modified(this);
 }
 
-bool
-TyTChannelExtension::dcdm() const {
-  return _dcdm;
-}
-void
-TyTChannelExtension::enableDCDM(bool enable) {
-  if (_dcdm == enable)
-    return;
-  _dcdm = enable;
-  emit modified(this);
-}
 
 bool
 TyTChannelExtension::dcdmLeader() const {
   return _dcdmLeader;
 }
+
 void
 TyTChannelExtension::enableDCDMLeader(bool enable) {
   if (_dcdmLeader == enable)
@@ -241,15 +191,6 @@ TyTChannelExtension::enableDCDMLeader(bool enable) {
   _dcdmLeader = enable;
   emit modified(this);
 }
-
-/*ConfigItem *
-TyTChannelExtension::allocateChild(QMetaProperty &prop, const YAML::Node &node,
-                                   const Context &ctx, const ErrorStack &err)
-{
-  Q_UNUSED(prop); Q_UNUSED(node); Q_UNUSED(ctx); Q_UNUSED(err)
-  // There are no further extension/children to TyTChannelExtension.
-  return nullptr;
-}*/
 
 
 /* ******************************************************************************************** *
@@ -1024,42 +965,6 @@ TyTSettingsExtension::enableChannelModeB(bool enable) {
 }
 
 unsigned
-TyTSettingsExtension::txPreambleDuration() const {
-  return _txPreambleDuration;
-}
-void
-TyTSettingsExtension::setTXPreambleDuration(unsigned ms) {
-  if (_txPreambleDuration == ms)
-    return;
-  _txPreambleDuration = ms;
-  emit modified(this);
-}
-
-unsigned
-TyTSettingsExtension::groupCallHangTime() const {
-  return _groupCallHangTime;
-}
-void
-TyTSettingsExtension::setGroupCallHangTime(unsigned ms) {
-  if (_groupCallHangTime == ms)
-    return;
-  _groupCallHangTime = ms;
-  emit modified(this);
-}
-
-unsigned
-TyTSettingsExtension::privateCallHangTime() const {
-  return _privateCallHangTime;
-}
-void
-TyTSettingsExtension::setPrivateCallHangTime(unsigned ms) {
-  if (_privateCallHangTime == ms)
-    return;
-  _privateCallHangTime = ms;
-  emit modified(this);
-}
-
-unsigned
 TyTSettingsExtension::lowBatteryWarnInterval() const {
   return _lowBatteryWarnInterval;
 }
@@ -1243,30 +1148,6 @@ TyTSettingsExtension::setPCProgPassword(const QString &passwd) {
   if (_pcProgPassword == passwd)
     return;
   _pcProgPassword = passwd;
-  emit modified(this);
-}
-
-bool
-TyTSettingsExtension::privateCallMatch() const {
-  return _privateCallMatch;
-}
-void
-TyTSettingsExtension::enablePrivateCallMatch(bool enable) {
-  if (_privateCallMatch == enable)
-    return;
-  _privateCallMatch = enable;
-  emit modified(this);
-}
-
-bool
-TyTSettingsExtension::groupCallMatch() const {
-  return _groupCallMatch;
-}
-void
-TyTSettingsExtension::enableGroupCallMatch(bool enable) {
-  if (_groupCallMatch == enable)
-    return;
-  _groupCallMatch = enable;
   emit modified(this);
 }
 

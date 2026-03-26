@@ -238,23 +238,23 @@ public:
 
 /** Implements a reference to an APRS system.
  * @ingroup conf */
-class APRSSystemReference: public PositioningSystemReference {
+class FMAPRSSystemReference: public PositioningSystemReference {
   Q_OBJECT
 
 public:
   /** Constructor. */
-  explicit APRSSystemReference(QObject *parent=nullptr);
+  explicit FMAPRSSystemReference(QObject *parent=nullptr);
 };
 
 
 /** Implements a reference to a GPS system.
  * @ingroup conf */
-class GPSSystemReference: public PositioningSystemReference {
+class DMRAPRSSystemReference: public PositioningSystemReference {
   Q_OBJECT
 
 public:
   /** Constructor. */
-  explicit GPSSystemReference(QObject *parent=nullptr);
+  explicit DMRAPRSSystemReference(QObject *parent=nullptr);
 };
 
 

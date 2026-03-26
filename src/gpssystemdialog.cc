@@ -3,14 +3,14 @@
 
 
 GPSSystemDialog::GPSSystemDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _myGPSSystem(new GPSSystem(this)), _gpsSystem(nullptr)
+  : QDialog(parent), _config(config), _myGPSSystem(new DMRAPRSSystem(this)), _gpsSystem(nullptr)
 {
   setWindowTitle(tr("Create DMR APRS System"));
   construct();
 }
 
-GPSSystemDialog::GPSSystemDialog(Config *config, GPSSystem *gps, QWidget *parent)
-  : QDialog(parent), _config(config), _myGPSSystem(new GPSSystem(this)), _gpsSystem(gps)
+GPSSystemDialog::GPSSystemDialog(Config *config, DMRAPRSSystem *gps, QWidget *parent)
+  : QDialog(parent), _config(config), _myGPSSystem(new DMRAPRSSystem(this)), _gpsSystem(gps)
 {
   setWindowTitle(tr("Edit DMR APRS System"));
   if (_gpsSystem)
@@ -27,18 +27,20 @@ GPSSystemDialog::construct() {
   name->setText(_myGPSSystem->name());
 
   // setup contact entry
-  for (int i=0,r=0; i<_config->contacts()->count(); i++) {
-    if (! _config->contacts()->contact(i)->is<DMRContact>())
+  for (int i=0; i<_config->contacts()->count(); i++) {
+    if (! _config->contacts()->get(i)->is<DMRContact>())
       continue;
-    destination->addItem(_config->contacts()->contact(i)->name(),
-                         QVariant::fromValue(_config->contacts()->contact(i)->as<DMRContact>()));
-    if (_myGPSSystem->contactObj() == _config->contacts()->contact(i)->as<DMRContact>())
-      destination->setCurrentIndex(r);
-    r++;
+    auto cont = _config->contacts()->get(i)->as<DMRContact>();
+    destination->addItem(cont->name(), QVariant::fromValue(cont));
+    if (_myGPSSystem->contact() == cont)
+      destination->setCurrentIndex(i);
   }
 
   // setup period
-  period->setValue(_myGPSSystem->period());
+  if (_myGPSSystem->periodDisabled())
+    period->setValue(0);
+  else
+    period->setValue(_myGPSSystem->period().seconds());
 
   // setup revert channel
   revChannel->addItem(tr("[Selected]"), QVariant::fromValue<DMRChannel *>(nullptr));
@@ -61,17 +63,20 @@ GPSSystemDialog::construct() {
     return tabWidget->tabBar()->hide();
 }
 
-GPSSystem *
+DMRAPRSSystem *
 GPSSystemDialog::gpsSystem() {
   _myGPSSystem->setName(name->text().simplified());
-  _myGPSSystem->setContactObj(destination->currentData().value<DMRContact*>());
-  _myGPSSystem->setPeriod(period->value());
+  _myGPSSystem->setContact(destination->currentData().value<DMRContact*>());
+  if (0 == period->value())
+    _myGPSSystem->disablePeriod();
+  else
+    _myGPSSystem->setPeriod(Interval::fromSeconds(period->value()));
   if (revChannel->currentData().isNull())
     _myGPSSystem->resetRevertChannel();
   else
     _myGPSSystem->setRevertChannel(revChannel->currentData().value<DMRChannel*>());
 
-  GPSSystem *sys = _myGPSSystem;
+  DMRAPRSSystem *sys = _myGPSSystem;
   if (_gpsSystem) {
     _gpsSystem->copy(*_myGPSSystem);
     sys = _gpsSystem;

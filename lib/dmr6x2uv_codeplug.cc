@@ -827,14 +827,33 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
   setUInt8(Offset::showLastHeard(), (enable ? 0x01 : 0x00));
 }
 
-AnytoneDMRSettingsExtension::SMSFormat
+
+SMSExtension::Format
 DMR6X2UVCodeplug::GeneralSettingsElement::smsFormat() const {
-  return (AnytoneDMRSettingsExtension::SMSFormat) getUInt8(Offset::smsFormat());
+  switch ((SMSFormat) getUInt8(Offset::smsFormat())) {
+  case SMSFormat::Motorola: return SMSExtension::Format::Motorola;
+  case SMSFormat::Hytera: return SMSExtension::Format::Hytera;
+  case SMSFormat::DMR: return SMSExtension::Format::DMR;
+  }
+
+  return SMSExtension::Format::Motorola;
 }
+
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat format) {
-  setUInt8(Offset::smsFormat(), (unsigned int)format);
+DMR6X2UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSExtension::Format format) {
+  switch (format) {
+  case SMSExtension::Format::Motorola:
+    setUInt8(Offset::smsFormat(), (unsigned int)SMSFormat::Motorola);
+    break;
+  case SMSExtension::Format::Hytera:
+    setUInt8(Offset::smsFormat(), (unsigned int)SMSFormat::Hytera);
+    break;
+  case SMSExtension::Format::DMR:
+    setUInt8(Offset::smsFormat(), (unsigned int)SMSFormat::DMR);
+    break;
+  }
 }
+
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::gpsUnitsImperial() const {
@@ -1015,6 +1034,12 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   if (! D868UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
 
+  enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
+  setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
+  setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
+  setPreWaveDelay(ctx.config()->settings()->dmr()->preamble());
+  setSMSFormat(ctx.config()->smsExtension()->format());
+
   // apply DMR-6X2UV specific settings.
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -1055,19 +1080,14 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
 
   // Encode DMR settings
-  setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
-  setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
-  setPreWaveDelay(ext->dmrSettings()->preWaveDelay());
   setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
   enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
   setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
   enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
   enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
   enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
-  setSMSFormat(ext->dmrSettings()->smsFormat());
 
   // Encode GPS settings.
-  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
   setGPSTimeZone(ext->gpsSettings()->timeZone());
   enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
   setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
@@ -1093,6 +1113,15 @@ bool
 DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   if (! D868UVCodeplug::GeneralSettingsElement::updateConfig(ctx))
     return false;
+
+  ctx.config()->settings()->gnss()->setUnits(
+        this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
+                                   GNSSSettings::Units::Metric);
+
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(this->groupCallHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(this->privateCallHangTime());
+  ctx.config()->settings()->dmr()->setPreamble(this->preWaveDelay());
+  ctx.config()->smsExtension()->setFormat(this->smsFormat());
 
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
@@ -1128,20 +1157,14 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
   // Encode dmr settings
-  ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
-  ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
-  ext->dmrSettings()->setPreWaveDelay(this->preWaveDelay());
   ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
   ext->dmrSettings()->enableFilterOwnID(this->filterOwnID());
   ext->dmrSettings()->setMonitorSlotMatch(this->monitorSlotMatch());
   ext->dmrSettings()->enableMonitorColorCodeMatch(this->monitorColorCodeMatch());
   ext->dmrSettings()->enableMonitorIDMatch(this->monitorIDMatch());
   ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
-  ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
   // Encode GPS settings
-  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
-                                                          AnytoneGPSSettingsExtension::Units::Metric);
   ext->gpsSettings()->setTimeZone(this->gpsTimeZone());
   ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
   ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
@@ -1202,14 +1225,33 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(AnytoneDMRSettin
   setUInt8(Offset::talkerAliasDisplay(), (uint8_t)source);
 }
 
-AnytoneDMRSettingsExtension::TalkerAliasEncoding
+
+DMRSettings::TalkerAliasEncoding
 DMR6X2UVCodeplug::ExtendedSettingsElement::talkerAliasEncoding() const {
-  return (AnytoneDMRSettingsExtension::TalkerAliasEncoding) getUInt8(Offset::talkerAliasEncoding());
+  switch ((TalkerAliasEncoding) getUInt8(Offset::talkerAliasEncoding())) {
+  case TalkerAliasEncoding::ISO7: return DMRSettings::TalkerAliasEncoding::Iso7;
+  case TalkerAliasEncoding::ISO8: return DMRSettings::TalkerAliasEncoding::Iso8;
+  case TalkerAliasEncoding::Unicode: return DMRSettings::TalkerAliasEncoding::Unicode;
+  }
+
+  return DMRSettings::TalkerAliasEncoding::Iso8;
 }
+
 void
-DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding) {
-  setUInt8(Offset::talkerAliasEncoding(), (uint8_t)encoding);
+DMR6X2UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding encoding) {
+  switch (encoding) {
+  case DMRSettings::TalkerAliasEncoding::Iso7:
+    setUInt8(Offset::talkerAliasEncoding(), (uint8_t)TalkerAliasEncoding::ISO7);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Iso8:
+    setUInt8(Offset::talkerAliasEncoding(), (uint8_t)TalkerAliasEncoding::ISO8);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Unicode:
+    setUInt8(Offset::talkerAliasEncoding(), (uint8_t)TalkerAliasEncoding::Unicode);
+    break;
+  }
 }
+
 
 AnytoneDisplaySettingsExtension::Color
 DMR6X2UVCodeplug::ExtendedSettingsElement::fontColor() const {
@@ -1396,15 +1438,16 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Contex
   // By default, use strong encryption
   setEncryptionType(AnytoneDMRSettingsExtension::EncryptionType::AES);
 
+  enableSendTalkerAlias(ctx.config()->settings()->dmr()->sendTalkerAliasEnabled());
+  setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
+
   // Encode device specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
     return true;
 
   // Encode DMR settings
-  enableSendTalkerAlias(ext->dmrSettings()->sendTalkerAlias());
   setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
-  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
 
   // Encode audio settings
   setMuteTimer(ext->audioSettings()->muteDelay());
@@ -1442,6 +1485,9 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Erro
     return false;
   }
 
+  ctx.config()->settings()->dmr()->enableSendTalkerAlias(sendTalkerAlias());
+  ctx.config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
+
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
     ext = new AnytoneSettingsExtension();
@@ -1449,9 +1495,7 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Erro
   }
 
   // Store DMR settings
-  ext->dmrSettings()->enableSendTalkerAlias(sendTalkerAlias());
   ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
-  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Decode audio settings
   ext->audioSettings()->setMuteDelay(this->muteTimer());
@@ -1683,7 +1727,7 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
     return false;
 
   if (const FMChannel *fm = c->as<FMChannel>()) {
-    if (fm->aprsSystem()) {
+    if (! fm->aprsRef()->isNull()) {
       setAPRSType(APRSType::FM);
       if (auto ext = fm->anytoneChannelExtension()) {
         switch (ext->aprsPTT()) {
@@ -1694,8 +1738,8 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
       }
     }
   } else if (const DMRChannel *dmr = c->as<DMRChannel>()) {
-    if (dmr->aprs()) {
-      if (dmr->aprs()->is<APRSSystem>()) {
+    if (! dmr->aprsRef()->isNull()) {
+      if (dmr->aprsRef()->is<FMAPRSSystem>()) {
         setAPRSType(APRSType::FM);
         if (auto ext = dmr->anytoneChannelExtension()) {
           switch (ext->aprsPTT()) {
@@ -1704,7 +1748,7 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
           case AnytoneChannelExtension::APRSPTT::End: setFMAPRSPTTMode(FMAPRSPTTMode::End); break;
           }
         }
-      } else if (GPSSystem *sys = dmr->aprs()->as<GPSSystem>()){
+      } else if (DMRAPRSSystem *sys = dmr->aprsRef()->as<DMRAPRSSystem>()){
         if (0 <= ctx.index(sys)) {
           setAPRSType(APRSType::DMR);
           setDMRAPRSChannelIndex(ctx.index(sys));
@@ -1712,25 +1756,25 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
             enableDMRAPRSPTT(AnytoneChannelExtension::APRSPTT::Off != ext->aprsPTT());
         }
       }
+    }
 
-      // Handle encryption
-      clearAESEncryptionKeyIndex();
-      clearDMREncryptionKeyIndex();
+    // Handle encryption
+    clearAESEncryptionKeyIndex();
+    clearDMREncryptionKeyIndex();
 
-      if (CommercialChannelExtension *cex = dmr->commercialExtension()) {
-        // By default, we assume we have strong encryption unless otherwise set by AnyTone DMR extension.
-        bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
-            ( ctx.config()->settings()->anytoneExtension() &&
-              (AnytoneDMRSettingsExtension::EncryptionType::AES ==
-               ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
-        if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
-          setAESEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
-        } else if ((! hasStrongEncryption) && cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
-          setDMREncryptionType(DMREncryptionType::Basic);
-          setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
-        }
+    if (CommercialChannelExtension *cex = dmr->commercialExtension()) {
+      // By default, we assume we have strong encryption unless otherwise set by AnyTone DMR extension.
+      bool hasStrongEncryption = (! ctx.config()->settings()->anytoneExtension()) ||
+          ( ctx.config()->settings()->anytoneExtension() &&
+            (AnytoneDMRSettingsExtension::EncryptionType::AES ==
+             ctx.config()->settings()->anytoneExtension()->dmrSettings()->encryption()) );
+      if (hasStrongEncryption && cex->encryptionKey() && cex->encryptionKey()->is<AESEncryptionKey>()) {
+        setAESEncryptionKeyIndex(ctx.index(cex->encryptionKey()));
+      } else if ((! hasStrongEncryption) && cex->encryptionKey() && cex->encryptionKey()->is<BasicEncryptionKey>()) {
+        setDMREncryptionType(DMREncryptionType::Basic);
+        setDMREncryptionKeyIndex(ctx.index(cex->encryptionKey()));
       }
-    }    
+    }
   }
 
   return true;
@@ -1744,28 +1788,28 @@ DMR6X2UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const
     auto ext = fm->anytoneChannelExtension();
     if (nullptr == ext)
       fm->setAnytoneChannelExtension(ext = new AnytoneFMChannelExtension());
-    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>()) {
+    if ((APRSType::FM == aprsType()) && ctx.count<FMAPRSSystem>()) {
       switch (fmAPRSPTTMode()) {
       case FMAPRSPTTMode::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
       case FMAPRSPTTMode::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
       case FMAPRSPTTMode::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
       }
-      fm->setAPRSSystem(ctx.get<APRSSystem>(0));
+      fm->setAPRS(ctx.get<FMAPRSSystem>(0));
     }
   } else if (DMRChannel *dmr = c->as<DMRChannel>()) {
     auto ext = dmr->anytoneChannelExtension();
     if (nullptr == ext)
       dmr->setAnytoneChannelExtension(ext = new AnytoneDMRChannelExtension());
-    if ((APRSType::FM == aprsType()) && ctx.count<APRSSystem>()) {
+    if ((APRSType::FM == aprsType()) && ctx.count<FMAPRSSystem>()) {
       switch (fmAPRSPTTMode()) {
       case FMAPRSPTTMode::Off: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Off); break;
       case FMAPRSPTTMode::Start: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start); break;
       case FMAPRSPTTMode::End: ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::End); break;
       }
-      dmr->setAPRSObj(ctx.get<APRSSystem>(0));
-    } else if ((APRSType::DMR == aprsType()) && ctx.has<GPSSystem>(dmrAPRSChannelIndex())) {
+      dmr->setAPRS(ctx.get<FMAPRSSystem>(0));
+    } else if ((APRSType::DMR == aprsType()) && ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
       ext->setAPRSPTT(dmrAPRSPTTEnabled() ? AnytoneChannelExtension::APRSPTT::Start : AnytoneChannelExtension::APRSPTT::Off);
-      dmr->setAPRSObj(ctx.get<GPSSystem>(dmrAPRSChannelIndex()));
+      dmr->setAPRS(ctx.get<DMRAPRSSystem>(dmrAPRSChannelIndex()));
     }
 
     // By default, we assume we have strong encryption unless otherwise set by AnyTone DMR extension.
@@ -2071,12 +2115,12 @@ DMR6X2UVCodeplug::APRSSettingsElement::setPath(const QString &path) {
   writeASCII(Offset::path(), path, 20, 0x00);
 }
 
-APRSSystem::Icon
+FMAPRSSystem::Icon
 DMR6X2UVCodeplug::APRSSettingsElement::icon() const {
   return code2aprsicon(getUInt8(Offset::symbolTable()), getUInt8(Offset::symbol()));
 }
 void
-DMR6X2UVCodeplug::APRSSettingsElement::setIcon(APRSSystem::Icon icon) {
+DMR6X2UVCodeplug::APRSSettingsElement::setIcon(FMAPRSSystem::Icon icon) {
   setUInt8(Offset::symbolTable(), aprsicon2tablecode(icon));
   setUInt8(Offset::symbol(), aprsicon2iconcode(icon));
 }
@@ -2198,7 +2242,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::setDMRPreWaveDelay(Interval ms) {
 }
 
 bool
-DMR6X2UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, Context &ctx, const ErrorStack &err) {
+DMR6X2UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const FMAPRSSystem *sys, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
   clear();
 
@@ -2210,8 +2254,8 @@ DMR6X2UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, C
   setFMFrequency(sys->revertChannel()->txFrequency());
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
-  setManualTXInterval(Interval::fromSeconds(sys->period()));
-  setAutoTXInterval(Interval::fromSeconds(sys->period()));
+  setManualTXInterval(sys->period());
+  setAutoTXInterval(sys->period());
   setDestination(sys->destination(), sys->destSSID());
   setSource(sys->source(), sys->srcSSID());
   setPath(sys->path());
@@ -2227,12 +2271,12 @@ DMR6X2UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(const APRSSystem *sys, C
   return true;
 }
 
-APRSSystem *
+FMAPRSSystem *
 DMR6X2UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
-  APRSSystem *sys = new APRSSystem(
+  FMAPRSSystem *sys = new FMAPRSSystem(
         tr("APRS %1").arg(destination()), nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
-        path(), icon(), "", autoTXInterval().seconds());
+        path(), icon(), "", autoTXInterval());
 
   AnytoneFMAPRSSettingsExtension *ext = new AnytoneFMAPRSSettingsExtension();
   ext->setPreWaveDelay(fmPreWaveDelay());
@@ -2243,7 +2287,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
 }
 
 bool
-DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context &ctx) {
+DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(FMAPRSSystem *sys, Context &ctx) {
   // First, try to find a matching analog channel in list
   Frequency f = fmFrequency();
   FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(f);
@@ -2265,17 +2309,17 @@ DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(APRSSystem *sys, Context
 
 bool
 DMR6X2UVCodeplug::APRSSettingsElement::fromDMRAPRSSystems(Context &ctx) {
-  unsigned int n = std::min(ctx.count<GPSSystem>(), Limit::dmrSystems());
+  unsigned int n = std::min(ctx.count<DMRAPRSSystem>(), Limit::dmrSystems());
   for (unsigned int idx=0; idx<n; idx++)
-    fromDMRAPRSSystemObj(idx, ctx.get<GPSSystem>(idx), ctx);
+    fromDMRAPRSSystemObj(idx, ctx.get<DMRAPRSSystem>(idx), ctx);
   return true;
 }
 
 bool
-DMR6X2UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, GPSSystem *sys, Context &ctx) {
+DMR6X2UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, DMRAPRSSystem *sys, Context &ctx) {
   if (sys->hasContact()) {
-    setDMRDestination(idx, sys->contactObj()->number());
-    setDMRCallType(idx, sys->contactObj()->type());
+    setDMRDestination(idx, sys->contact()->number());
+    setDMRCallType(idx, sys->contact()->type());
   }
   if (sys->hasRevertChannel()) {
     setDMRChannelIndex(idx, ctx.index(sys->revertChannel()));
@@ -2286,15 +2330,15 @@ DMR6X2UVCodeplug::APRSSettingsElement::fromDMRAPRSSystemObj(unsigned int idx, GP
   return true;
 }
 
-GPSSystem *
+DMRAPRSSystem *
 DMR6X2UVCodeplug::APRSSettingsElement::toDMRAPRSSystemObj(int idx) const {
   if (0 == dmrDestination(idx))
     return nullptr;
-  return new GPSSystem(tr("GPS Sys #%1").arg(idx+1));
+  return new DMRAPRSSystem(tr("GPS Sys #%1").arg(idx+1));
 }
 
 bool
-DMR6X2UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys, Context &ctx) const {
+DMR6X2UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, DMRAPRSSystem *sys, Context &ctx) const {
   // if a revert channel is defined -> link to it
   if (dmrChannelIsSelected(idx))
     sys->resetRevertChannel();
@@ -2303,7 +2347,13 @@ DMR6X2UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys
     sys->setRevertChannel(ctx.get<Channel>(dmrChannelIndex(idx))->as<DMRChannel>());
 
   // Search for a matching contact in contacts
-  DMRContact *cont = ctx.config()->contacts()->findDMRContact(dmrDestination(idx));
+  DMRContact *cont = nullptr;
+  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
+    if (ctx.get<DMRContact>(i)->number() == dmrDestination(idx)) {
+      cont = ctx.get<DMRContact>(i);
+      break;
+    }
+  }
   // If no matching contact is found, create one
   if (nullptr == cont) {
     cont = new DMRContact(dmrCallType(idx), tr("GPS #%1 Contact").arg(idx+1),
@@ -2311,7 +2361,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, GPSSystem *sys
     ctx.config()->contacts()->add(cont);
   }
   // link contact to GPS system.
-  sys->setContactObj(cont);
+  sys->setContact(cont);
 
   return true;
 }
@@ -2526,15 +2576,15 @@ DMR6X2UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorSt
   Q_UNUSED(flags);
 
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()+ idx*ChannelElement::size();
     ChannelElement ch(data(addr));
-    if (! ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx))
+    if (! ch.fromChannelObj(ctx.get<Channel>(i), ctx))
       return false;
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
-    if (! ext.fromChannelObj(ctx.config()->channelList()->channel(i), ctx, err))
+    if (! ext.fromChannelObj(ctx.get<Channel>(i), ctx, err))
       return false;
   }
   return true;
@@ -2553,7 +2603,8 @@ DMR6X2UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
     if (Channel *obj = ch.toChannelObj(ctx)) {
-      ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+      ctx.config()->channelList()->add(obj);
+      ctx.add(obj, i);
     }
   }
   return true;
@@ -2603,20 +2654,20 @@ DMR6X2UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const Error
   APRSSettingsElement aprs(data(Offset::aprsSettings())); aprs.clear();
 
   // Encode APRS system (there can only be one)
-  if (0 < ctx.count<APRSSystem>()) {
-    aprs.fromFMAPRSSystem(ctx.get<APRSSystem>(0), ctx, err);
+  if (0 < ctx.count<FMAPRSSystem>()) {
+    aprs.fromFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx, err);
     uint8_t *aprsmsg = (uint8_t *)data(Offset::fmAPRSMessage());
-    encode_ascii(aprsmsg, ctx.get<APRSSystem>(0)->message(), Limit::fmAPRSMessage(), 0x00);
+    encode_ascii(aprsmsg, ctx.get<FMAPRSSystem>(0)->message(), Limit::fmAPRSMessage(), 0x00);
   }
 
   // Encode GPS systems
   if (! aprs.fromDMRAPRSSystems(ctx))
     return false;
-  if (0 < ctx.count<GPSSystem>()) {
+  if (0 < ctx.count<DMRAPRSSystem>()) {
     // If there is at least one GPS system defined -> set auto TX interval.
     //  This setting might be overridden by any analog APRS system below
-    aprs.setAutoTXInterval(Interval::fromSeconds(ctx.get<GPSSystem>(0)->period()));
-    aprs.setManualTXInterval(Interval::fromSeconds(ctx.get<GPSSystem>(0)->period()));
+    aprs.setAutoTXInterval(ctx.get<DMRAPRSSystem>(0)->period());
+    aprs.setManualTXInterval(ctx.get<DMRAPRSSystem>(0)->period());
   }
 
   return true;
@@ -2630,17 +2681,16 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Before creating any GPS/APRS systems, get global auto TX interval
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
-  unsigned pos_interval = aprs.autoTXInterval().seconds();
 
   // Create APRS system (if enabled)
   uint8_t *aprsmsg = (uint8_t *)data(Offset::fmAPRSMessage());
   if (aprs.isValid()) {
-    APRSSystem *sys = aprs.toFMAPRSSystem();
+    FMAPRSSystem *sys = aprs.toFMAPRSSystem();
     if (nullptr == sys) {
       errMsg(err) << "Cannot decode positioning systems.";
       return false;
     }
-    sys->setPeriod(pos_interval);
+    sys->setPeriod(aprs.autoTXInterval());
     sys->setMessage(decode_ascii(aprsmsg, Limit::fmAPRSMessage(), 0x00));
     ctx.config()->posSystems()->add(sys); ctx.add(sys,0);
   }
@@ -2649,8 +2699,8 @@ DMR6X2UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<APRSSettingsElement::Limit::dmrSystems(); i++) {
     if (0 == aprs.dmrDestination(i))
       continue;
-    if (GPSSystem *sys = aprs.toDMRAPRSSystemObj(i)) {
-      sys->setPeriod(pos_interval);
+    if (DMRAPRSSystem *sys = aprs.toDMRAPRSSystemObj(i)) {
+      sys->setPeriod(aprs.autoTXInterval());
       ctx.config()->posSystems()->add(sys); ctx.add(sys, i);
     } else {
       return false;
@@ -2667,14 +2717,14 @@ DMR6X2UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   // Link APRS system
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
   if (aprs.isValid()) {
-    aprs.linkFMAPRSSystem(ctx.config()->posSystems()->aprsSystem(0), ctx);
+    aprs.linkFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx);
   }
 
   // Link GPS systems
   for (unsigned int i=0; i<APRSSettingsElement::Limit::dmrSystems(); i++) {
     if (0 == aprs.dmrDestination(i))
       continue;
-    aprs.linkDMRAPRSSystem(i, ctx.get<GPSSystem>(i), ctx);
+    aprs.linkDMRAPRSSystem(i, ctx.get<DMRAPRSSystem>(i), ctx);
   }
 
   return true;

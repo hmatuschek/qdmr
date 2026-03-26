@@ -109,10 +109,10 @@ RadioddityButtonSettingsExtension::setFuncKey3Long(Function func) {
  * ********************************************************************************************* */
 RadioddityToneSettingsExtension::RadioddityToneSettingsExtension(QObject *parent)
   : ConfigItem(parent), _lowBatteryWarn(true), _lowBatteryWarnInterval(Interval::fromSeconds(30)),
-    _lowBatteryWarnVolume(5), _callAlertDuration(Interval::fromSeconds(120)), _resetTone(false),
-    _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _digitalTalkPermitTone(false),
-    _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
-    _disableAllTones(false), _txExitTone(false), _keyTone(false), _keyToneVolume(5), _fmMicGain(5)
+  _lowBatteryWarnVolume(5), _callAlertDuration(Interval::fromSeconds(120)), _resetTone(false),
+  _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _digitalTalkPermitTone(false),
+  _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
+  _disableAllTones(false), _txExitTone(false), _keyTone(false), _keyToneVolume(5), _fmMicGain(Level::fromValue(5))
 {
   // pass...
 }
@@ -309,13 +309,12 @@ RadioddityToneSettingsExtension::setKeyToneVolume(unsigned int volume) {
   emit modified(this);
 }
 
-unsigned int
+Level
 RadioddityToneSettingsExtension::fmMicGain() const {
   return _fmMicGain;
 }
 void
-RadioddityToneSettingsExtension::setFMMicGain(unsigned int gain) {
-  gain = std::min(10U, std::max(1U, gain));
+RadioddityToneSettingsExtension::setFMMicGain(Level gain) {
   if (gain == _fmMicGain)
     return;
   _fmMicGain = gain;
@@ -387,10 +386,9 @@ RadiodditySettingsExtension::RadiodditySettingsExtension(QObject *parent)
   : ConfigExtension(parent), _monitorType(MonitorType::Silent),
     _loneWorkerResponseTime(Interval::fromMinutes(1)),
     _loneWorkerReminderPeriod(Interval::fromSeconds(10)),
-    _groupCallHangTime(Interval::fromMilliseconds(3000)),
-    _privateCallHangTime(Interval::fromMilliseconds(3000)), _downChannelModeVFO(false),
+    _downChannelModeVFO(false),
     _upChannelModeVFO(false), _powerSaveMode(true), _wakeupPreamble(true),
-    _preambleDuration(Interval::fromMilliseconds(360)), _powerSaveDelay(Interval::fromSeconds(10)),
+    _powerSaveDelay(Interval::fromSeconds(10)),
     _disableAllLEDs(false), _quickKeyOverrideInhibited(false), _txOnActiveChannel(true),
     _scanMode(ScanMode::Time), _repeaterEndDelay(), _repeaterSTE(), _txInterrupt(false),
     _language(Language::English),
@@ -447,29 +445,6 @@ RadiodditySettingsExtension::setLoneWorkerReminderPeriod(Interval sec) {
   emit modified(this);
 }
 
-Interval
-RadiodditySettingsExtension::groupCallHangTime() const {
-  return _groupCallHangTime;
-}
-void
-RadiodditySettingsExtension::setGroupCallHangTime(Interval ms) {
-  if (_groupCallHangTime == ms)
-    return;
-  _groupCallHangTime = ms;
-  emit modified(this);
-}
-
-Interval
-RadiodditySettingsExtension::privateCallHangTime() const {
-  return _privateCallHangTime;
-}
-void
-RadiodditySettingsExtension::setPrivateCallHangTime(Interval ms) {
-  if (_privateCallHangTime == ms)
-    return;
-  _privateCallHangTime = ms;
-  emit modified(this);
-}
 
 bool
 RadiodditySettingsExtension::downChannelModeVFO() const {
@@ -516,18 +491,6 @@ RadiodditySettingsExtension::enableWakeupPreamble(bool enable) {
   if (_wakeupPreamble == enable)
     return;
   _wakeupPreamble = enable;
-  emit modified(this);
-}
-
-Interval
-RadiodditySettingsExtension::preambleDuration() const {
-  return _preambleDuration;
-}
-void
-RadiodditySettingsExtension::setPreambleDuration(Interval ms) {
-  if (_preambleDuration == ms)
-    return;
-  _preambleDuration = ms;
   emit modified(this);
 }
 

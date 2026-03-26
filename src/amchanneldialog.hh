@@ -1,31 +1,34 @@
-#ifndef ANALOGCHANNELDIALOG_HH
-#define ANALOGCHANNELDIALOG_HH
+#ifndef AMCHANNELDIALOG_HH
+#define AMCHANNELDIALOG_HH
 
 #include <QDialog>
-#include "config.hh"
 
-#include "ui_analogchanneldialog.h"
+namespace Ui {
+class AMChannelDialog;
+}
+class Config;
+class AMChannel;
 
-class FMChannelDialog: public QDialog, private Ui::AnalogChannelDialog
+
+class AMChannelDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  FMChannelDialog(Config *config, QWidget *parent=nullptr);
-  FMChannelDialog(Config *config, FMChannel *channel, QWidget *parent=nullptr);
+  AMChannelDialog(Config *config, QWidget *parent=nullptr);
+  AMChannelDialog(Config *config, AMChannel *channel, QWidget *parent=nullptr);
+  ~AMChannelDialog();
 
-  FMChannel *channel();
+  AMChannel *channel();
 
 protected:
   void construct();
 
 protected slots:
-  void onRepeaterSelected(const QModelIndex &index);
   void onPowerDefaultToggled(bool checked);
   void onTimeoutDefaultToggled(bool checked);
   void onSquelchDefaultToggled(bool checked);
   void onVOXDefaultToggled(bool checked);
-  void onHideChannelHint();
 
 private slots:
   void onRxFrequencyEdited();
@@ -39,9 +42,11 @@ private:
 
 protected:
   Config *_config;
-  FMChannel *_myChannel;
-  FMChannel *_channel;
+  AMChannel *_myChannel;
+  AMChannel *_channel;
+
+private:
+  Ui::AMChannelDialog *ui;
 };
 
-
-#endif // ANALOGCHANNELDIALOG_HH
+#endif // AMCHANNELDIALOG_HH

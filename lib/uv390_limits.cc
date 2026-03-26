@@ -26,15 +26,15 @@ UV390Limits::UV390Limits(QObject *parent)
   add("settings", new RadioLimitItem {
         { "introLine1", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
         { "introLine2", new RadioLimitString(-1, 10, RadioLimitString::Unicode) },
-        { "micLevel", new RadioLimitUInt(1, 10) },
+        { "micLevel", new RadioLimitLevel({1, 10}, false) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum {
             unsigned(Channel::Power::Low),
             unsigned(Channel::Power::Mid),
             unsigned(Channel::Power::High) } },
-        { "squlech", new RadioLimitUInt(0, 10) },
-        { "vox", new RadioLimitUInt(0, 10) },
-        { "tot", new RadioLimitUInt(0, -1) }
+        { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+        { "tot", new RadioLimitInterval() }
         /// @todo check default radio ID.
       } );
 
@@ -82,9 +82,9 @@ UV390Limits::UV390Limits(QObject *parent)
                                                                  {Frequency::fromMHz(400.),
                                                                   Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef({ScanList::staticMetaObject})},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
               {"tyt", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -93,7 +93,7 @@ UV390Limits::UV390Limits(QObject *parent)
                  (unsigned)FMChannel::Admit::Free,
                  (unsigned)FMChannel::Admit::Tone
                } },
-              {"squelch", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"squelch", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"bandwidth", new RadioLimitEnum{
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
@@ -112,9 +112,9 @@ UV390Limits::UV390Limits(QObject *parent)
                  unsigned(Channel::Power::Mid),
                  unsigned(Channel::Power::High),
                }},
-              {"timeout", new RadioLimitUInt(0, -1, std::numeric_limits<unsigned>::max())},
+              {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
-              {"vox", new RadioLimitUInt(0, 10, std::numeric_limits<unsigned>::max())},
+              {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
               {"rxOnly", new RadioLimitBool()},
               {"admit", new RadioLimitEnum {
                  unsigned(DMRChannel::Admit::Always),
@@ -155,13 +155,13 @@ UV390Limits::UV390Limits(QObject *parent)
 
   /* Define limits for positioning systems in case, this is a MD-380G/MD-390G. */
   add("positioning", new RadioLimitList({
-        { GPSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
+        { DMRAPRSSystem::staticMetaObject, 0, 16, new RadioLimitObject {
           { "name", new RadioLimitStringIgnored() },
-          { "period", new RadioLimitUInt(0, 7650) },
+          { "period", new RadioLimitInterval({Interval::null(), Interval::fromMinutes(127)}) },
           { "contact", new RadioLimitObjRef(DMRContact::staticMetaObject, false) },
           { "revert", new RadioLimitObjRef({SelectedChannel::staticMetaObject, DMRChannel::staticMetaObject}, true) }
           } },
-        { APRSSystem::staticMetaObject, 0, -1, new RadioLimitIgnored() } }) );
+        { FMAPRSSystem::staticMetaObject, 0, -1, new RadioLimitIgnored() } }) );
 
   /* Check encryption keys. */
   add("commercial", new RadioLimitItem {

@@ -7,7 +7,7 @@ class ConfigObject;
 class RadioID;
 class Channel;
 class Contact;
-class PositioningSystem;
+class PositionReportingSystem;
 class RoamingChannel;
 class ConfigObjectRefList;
 class RXGroupList;
@@ -62,7 +62,7 @@ protected:
   /** Handles a Contact object of the source configuration. */
   bool processContact(Contact *item, const ErrorStack &err = ErrorStack());
   /** Handles a PositioningSystem object of the source configuration. */
-  bool processPositioningSystem(PositioningSystem *item, const ErrorStack &err = ErrorStack());
+  bool processPositioningSystem(PositionReportingSystem *item, const ErrorStack &err = ErrorStack());
   /** Handles a RoamingChannel object of the source configuration. */
   bool processRoamingChannel(RoamingChannel *item, const ErrorStack &err = ErrorStack());
   /** Handles a RXGroupList object of the source configuration. */

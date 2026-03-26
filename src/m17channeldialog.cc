@@ -91,12 +91,12 @@ M17ChannelDialog::construct() {
     }
     if (! _myChannel->defaultTimeout()) {
       ui->totDefault->setChecked(false); ui->totValue->setEnabled(true);
-      ui->totValue->setValue(_channel->timeout());
+      ui->totValue->setValue(_channel->timeout().seconds());
     }
     ui->rxOnly->setChecked(_myChannel->rxOnly());
     if (! _myChannel->defaultVOX()) {
       ui->voxDefault->setChecked(false); ui->voxValue->setEnabled(true);
-      ui->voxValue->setValue(_channel->vox());
+      ui->voxValue->setValue(_channel->vox().value());
     }
     switch (_myChannel->mode()) {
     case M17Channel::Mode::Voice: ui->channelMode->setCurrentIndex(0); break;
@@ -123,7 +123,7 @@ M17ChannelDialog::channel() {
   if (ui->totDefault->isChecked())
     _myChannel->setDefaultTimeout();
   else
-    _myChannel->setTimeout(ui->totValue->value());
+    _myChannel->setTimeout(Interval::fromSeconds(ui->totValue->value()));
   _myChannel->setRXOnly(ui->rxOnly->isChecked());
   _myChannel->setScanList(ui->scanList->currentData().value<ScanList *>());
   _myChannel->setMode(ui->channelMode->currentData().value<M17Channel::Mode>());

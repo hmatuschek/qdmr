@@ -60,7 +60,7 @@ SMSTemplates::message(unsigned int i) const {
  * Implementation of RadioSettingsExtension
  * ********************************************************************************************* */
 SMSExtension::SMSExtension(QObject *parent)
-  : ConfigExtension{parent}, _format(Format::DMR), _smsTemplates(new SMSTemplates(this))
+  : ConfigExtension{parent}, _format(Format::Motorola), _smsTemplates(new SMSTemplates(this))
 {
   // pass...
 }

@@ -1,15 +1,28 @@
 #include "d868uve_test.hh"
 #include "config.hh"
-#include "d868uv.hh"
 #include "d868uv_codeplug.hh"
 #include "errorstack.hh"
-#include <iostream>
 #include <QTest>
 
 D868UVETest::D868UVETest(QObject *parent)
   : UnitTestBase(parent)
 {
   // pass...
+}
+
+void
+D868UVETest::encodeDecode(Config &input, Config &output) {
+  ErrorStack err;
+  D868UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&input, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D868UVE: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  if (! codeplug.decode(&output, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D868UVE: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
 }
 
 void
@@ -310,6 +323,58 @@ D868UVETest::testRegressionDefaultChannel() {
   QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->channelB()->as<Channel>()->name(),
            decoded.zones()->zone(1)->A()->get(0)->name());
 }
+
+
+void
+D868UVETest::testChannelDataACK() {
+  ErrorStack err;
+  Config config;
+
+  if (! config.readYAML(":/data/anytone_channel_data_ack.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(config.channelList()->count(), 2);
+  QVERIFY(config.channelList()->channel(0)->is<DMRChannel>());
+  QCOMPARE(config.channelList()->channel(0)->as<DMRChannel>()
+             ->extended()->dataConfirm(), false);
+  QVERIFY(config.channelList()->channel(1)->is<DMRChannel>());
+  QCOMPARE(config.channelList()->channel(1)->as<DMRChannel>()
+             ->extended()->dataConfirm(), true);
+
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  D868UVCodeplug codeplug;
+  codeplug.clear();
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  Config testConfig;
+  if (! codeplug.decode(&testConfig, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone D578UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(testConfig.channelList()->channel(0)->as<DMRChannel>()
+             ->extended()->dataConfirm(), false);
+  QCOMPARE(testConfig.channelList()->channel(1)->as<DMRChannel>()
+             ->extended()->dataConfirm(), true);
+}
+
+void
+D868UVETest::testMicGain() {
+  ErrorStack err;
+  Config copy, config; config.copy(_basicConfig);
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  for (auto pair: pairs) {
+    config.settings()->setMicLevel(Level::fromValue(pair.first));
+    encodeDecode(config, copy);
+    QCOMPARE(copy.settings()->micLevel().value(), Level::fromValue(pair.second).value());
+  }
+}
+
 
 
 QTEST_GUILESS_MAIN(D868UVETest)

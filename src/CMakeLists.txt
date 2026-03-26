@@ -9,8 +9,9 @@ qt6_add_executable(qdmr WIN32
   dtmfcontactdialog.cc dtmfcontactdialog.hh dtmfcontactdialog.ui
   m17contactdialog.cc m17contactdialog.hh m17contactdialog.ui
   rxgrouplistdialog.cc rxgrouplistdialog.hh rxgrouplistdialog.ui
-  analogchanneldialog.cc analogchanneldialog.hh analogchanneldialog.ui
-  digitalchanneldialog.cc digitalchanneldialog.hh digitalchanneldialog.ui
+  fmchanneldialog.cc fmchanneldialog.hh fmchanneldialog.ui
+  amchanneldialog.hh amchanneldialog.cc amchanneldialog.ui
+  dmrchanneldialog.cc dmrchanneldialog.hh dmrchanneldialog.ui
   m17channeldialog.cc m17channeldialog.hh m17channeldialog.ui
   channelvalidator.cc channelvalidator.hh
   channelcombobox.cc channelcombobox.hh
@@ -59,7 +60,9 @@ qt6_add_executable(qdmr WIN32
   selectivecallbox.cc selectivecallbox.hh
   transponderfrequencydelegate.cc transponderfrequencydelegate.hh
   mainwindow.cc mainwindow.hh mainwindow.ui
-  ${qdmr_RCC_SOURCES})
+  flageditdialog.hh flageditdialog.cc flageditdialog.ui
+  ${qdmr_RCC_SOURCES}
+)
 
 #
 # Translations

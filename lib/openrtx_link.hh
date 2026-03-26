@@ -48,6 +48,10 @@ public:
    * @param link Specifies the datagram socket to talk to the radio (SLIP).
    * @param parent Specifies the QObject parent. */
   explicit OpenRTXLink(PacketStream *link, QObject *parent = nullptr);
+  virtual ~OpenRTXLink();
+
+  virtual bool isOpen() const;
+  virtual void close();
 
   /** Returns a stream to the stdio of the radio. Implements the @c QIODevice interface. */
   OpenRTXLinkStream *stdio() const;
@@ -58,21 +62,26 @@ public:
   /** An XMODEM channel to transfer files. */
   OpenRTXLinkStream *xmodem() const;
 
+  /** Returns the timeout in milliseconds. */
+  unsigned int timeout() const;
+
 protected:
   /** Dispatcher to receive datagrams over OpenRTXLink. */
   bool receive(Protocol proto, QByteArray &data, int timeout=-1, const ErrorStack &err=ErrorStack());
   /** Dispatcher to send datagrams over OpenRTXLink. */
   bool send(Protocol proto, const QByteArray &data, int timeout=-1, const ErrorStack &err=ErrorStack());
 
-  static uint8_t crc8(const QByteArray &data);
+  static uint16_t crc16(const QByteArray &data);
 
 protected:
+  /** Owns the packet stream to the device. */
   PacketStream *_link;
   QHash<unsigned int, QList<QByteArray>> _inBuffers;
   OpenRTXLinkStream *_stdio;
   OpenRTXCAT        *_cat;
   OpenRTXLinkDatagram *_fmp;
   OpenRTXLinkStream *_xmodem;
+  unsigned int _timeout;
 
   friend class OpenRTXLinkStream;
   friend class OpenRTXLinkDatagram;
@@ -109,8 +118,10 @@ protected:
   OpenRTXLinkDatagram(OpenRTXLink::Protocol proto, OpenRTXLink *link);
 
 public:
-  bool receive(QByteArray &buffer, int timeout, const ErrorStack &err);
-  bool send(const QByteArray &buffer, int timeout, const ErrorStack &err);
+  bool isOpen() const override;
+  void close() override;
+  bool receive(QByteArray &buffer, int timeout, const ErrorStack &err) override;
+  bool send(const QByteArray &buffer, int timeout, const ErrorStack &err) override;
 
 protected:
   OpenRTXLink::Protocol _proto;
@@ -120,6 +131,7 @@ protected:
 };
 
 
+/** Implements the CAT interface to OpenRTX devices. */
 class OpenRTXCAT: public OpenRTXLinkDatagram
 {
   Q_OBJECT
@@ -129,6 +141,11 @@ protected:
    *  @param link Specifies the unerlying RTX-link to the the device. */
   explicit OpenRTXCAT(OpenRTXLink *link);
 
+public:
+  QByteArray info(const ErrorStack &err=ErrorStack());
+  bool enterFMPMode(const ErrorStack &err=ErrorStack());
+
+protected:
   friend class OpenRTXLink;
 };
 

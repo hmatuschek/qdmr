@@ -4,7 +4,6 @@
 #include "channel.hh"
 #include "gpssystem.hh"
 #include "smsextension.hh"
-#include "userdatabase.hh"
 #include "config.h"
 #include "logger.hh"
 #include "utils.hh"
@@ -171,9 +170,10 @@ D868UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
   if (ch->is<DMRChannel>()) {
     DMRChannel *dch = ch->as<DMRChannel>();
+    dch->extended()->enableSMS(sms());
+    dch->extended()->enableDataConfirm(dataACK());
+
     if (AnytoneDMRChannelExtension *ext = dch->anytoneChannelExtension()) {
-      ext->enableSMS(sms());
-      ext->enableDataACK(dataACK());
       ext->enableThroughMode(throughMode());
     }
   }
@@ -189,10 +189,10 @@ D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
   if (c->is<DMRChannel>()) {
     DMRChannel *dc = c->as<DMRChannel>();
     // Link to GPS system
-    if ((APRSType::Off != txAPRSType())  && (! ctx.has<GPSSystem>(digitalAPRSSystemIndex())))
+    if ((APRSType::Off != txAPRSType())  && (! ctx.has<DMRAPRSSystem>(digitalAPRSSystemIndex())))
       logWarn() << "Cannot link to DMR APRS system index " << digitalAPRSSystemIndex() << ": undefined DMR APRS system.";
-    else if (ctx.has<GPSSystem>(digitalAPRSSystemIndex()))
-      dc->setAPRSObj(ctx.get<GPSSystem>(digitalAPRSSystemIndex()));
+    else if (ctx.has<DMRAPRSSystem>(digitalAPRSSystemIndex()))
+      dc->setAPRS(ctx.get<DMRAPRSSystem>(digitalAPRSSystemIndex()));
     // Link to encryption key (only basic implemented)
     if (hasDMREncryptionKeyIndex() && (DMREncryptionType::Basic == dmrEncryptionType())) {
       if (ctx.has<BasicEncryptionKey>(dmrEncryptionKeyIndex())) {
@@ -218,14 +218,17 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
   if (c->is<DMRChannel>()) {
     const DMRChannel *dc = c->as<const DMRChannel>();
     // Set GPS system index
-    if (dc->aprsObj() && dc->aprsObj()->is<GPSSystem>()) {
-      setDigitalAPRSSystemIndex(ctx.index(dc->aprsObj()->as<GPSSystem>()));
+    if (dc->aprs() && dc->aprs()->is<DMRAPRSSystem>()) {
+      setDigitalAPRSSystemIndex(ctx.index(dc->aprs()->as<DMRAPRSSystem>()));
       setTXAPRSType(APRSType::DMR);
       enableRXAPRS(false);
     } else {
       setTXAPRSType(APRSType::Off);
       enableRXAPRS(false);
     }
+
+    enableSMS(dc->extended()->sms());
+    enableDataACK(dc->extended()->dataConfirm());
 
     clearDMREncryptionKeyIndex();
     bool hasStrongEncryption = ctx.config()->settings()->anytoneExtension() &&
@@ -243,8 +246,6 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 
     // Handle extension
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      enableSMS(ext->sms());
-      enableDataACK(ext->dataACK());
       enableThroughMode(ext->throughMode());
     }
   }
@@ -387,13 +388,13 @@ D868UVCodeplug::GeneralSettingsElement::setPowerSave(AnytonePowerSaveSettingsExt
   setUInt8(Offset::powerSaveMode(), (unsigned int)mode);
 }
 
-unsigned
+Level
 D868UVCodeplug::GeneralSettingsElement::voxLevel() const {
-  return ((unsigned)getUInt8(Offset::voxLevel()))*3;
+  return Level::fromValue(getUInt8(Offset::voxLevel()), Limit::vox());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setVOXLevel(unsigned level) {
-  setUInt8(Offset::voxLevel(), level/3);
+D868UVCodeplug::GeneralSettingsElement::setVOXLevel(Level level) {
+  setUInt8(Offset::voxLevel(), level.mapTo(Limit::vox()));
 }
 
 Interval
@@ -414,14 +415,13 @@ D868UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension:
   setUInt8(Offset::vfoScanType(), (unsigned)type);
 }
 
-unsigned
+Level
 D868UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
-  return (((unsigned)getUInt8(Offset::dmrMicGain())+1)*10)/4;
+  return Level::fromValue(getUInt8(Offset::dmrMicGain()), Limit::micGain());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
-  gain = std::max(1U, std::min(10U, gain));
-  setUInt8(Offset::dmrMicGain(), (gain*4)/10);
+D868UVCodeplug::GeneralSettingsElement::setDMRMicGain(Level gain) {
+  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain()));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
@@ -783,7 +783,7 @@ D868UVCodeplug::GeneralSettingsElement::enableGetGPSPosition(bool enable) {
 
 bool
 D868UVCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
-  return getUInt8(Offset::volumeChangePrompt());
+  return 0x01 == getUInt8(Offset::volumeChangePrompt());
 }
 void
 D868UVCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
@@ -1831,8 +1831,8 @@ D868UVCodeplug::encodeRadioID(const Flags &flags, Context &ctx, const ErrorStack
 
   // Encode radio IDs
   for (unsigned int i=0; i<ctx.count<DMRRadioID>(); i++) {
-    RadioIDElement(data(Offset::radioIDs() + i*RadioIDElement::size())).fromRadioID(
-          ctx.config()->radioIDs()->getId(i));
+    RadioIDElement(data(Offset::radioIDs() + i*RadioIDElement::size()))
+      .fromRadioID(ctx.get<DMRRadioID>(i));
   }
   return true;
 }
@@ -2206,6 +2206,10 @@ D868UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
   }
   // Then create all referenced GPS systems
   DMRAPRSSettingsElement gps(data(Offset::aprsSettings()));
+  if (! gps.updateConfig(ctx, err)) {
+    errMsg(err) << "Cannot update config from DMR-APRS settings.";
+    return false;
+  }
   for (QSet<uint8_t>::iterator idx=systems.begin(); idx!=systems.end(); idx++)
     gps.createGPSSystem(*idx, ctx);
   return true;
@@ -2218,7 +2222,7 @@ D868UVCodeplug::linkGPSSystems(Context &ctx, const ErrorStack &err) {
   DMRAPRSSettingsElement gps(data(Offset::aprsSettings()));
   // Then link all referenced GPS systems
   for (uint8_t i=0; i<Limit::dmrAPRSSystems(); i++) {
-    if (! ctx.has<GPSSystem>(i))
+    if (! ctx.has<DMRAPRSSystem>(i))
       continue;
     gps.linkGPSSystem(i, ctx);
   }

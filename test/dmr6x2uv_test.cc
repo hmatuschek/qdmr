@@ -1,15 +1,28 @@
 #include "dmr6x2uv_test.hh"
 #include "config.hh"
-#include "dmr6x2uv.hh"
 #include "dmr6x2uv_codeplug.hh"
 #include "errorstack.hh"
-#include <iostream>
 #include <QTest>
 
 DMR6X2UVTest::DMR6X2UVTest(QObject *parent)
   : UnitTestBase(parent)
 {
   // pass...
+}
+
+void
+DMR6X2UVTest::encodeDecode(Config &input, Config &output) {
+  ErrorStack err;
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&input, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  if (! codeplug.decode(&output, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DMR-6X2UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
 }
 
 
@@ -75,19 +88,25 @@ DMR6X2UVTest::testFMAPRSSettings() {
           .arg(err.format()).toStdString().c_str());
   }
 
-  auto ch_ext = new AnytoneFMChannelExtension();
-  ch_ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start);
-  config.channelList()->channel(1)->as<FMChannel>()->setAnytoneChannelExtension(ch_ext);
-
   // Check config
   QCOMPARE(config.posSystems()->count(), 1);
-  QVERIFY(config.posSystems()->get(0)->is<APRSSystem>());
+  QVERIFY(config.posSystems()->get(0)->is<FMAPRSSystem>());
 
-  APRSSystem *aprs = config.posSystems()->get(0)->as<APRSSystem>();
+  FMAPRSSystem *aprs = config.posSystems()->get(0)->as<FMAPRSSystem>();
   QCOMPARE(aprs->source(), "DM3MAT"); QCOMPARE(aprs->srcSSID(), 7);
   QCOMPARE(aprs->destination(), "APAT81"); QCOMPARE(aprs->destSSID(), 0);
   QCOMPARE(aprs->path(), "WIDE1-1,WIDE2-1");
-  QCOMPARE(aprs->period(), 300);
+  QCOMPARE(aprs->period(), Interval::fromMinutes(5));
+
+  QCOMPARE(config.channelList()->count(), 2);
+  QVERIFY(config.channelList()->channel(0)->is<FMChannel>());
+  QVERIFY(config.channelList()->channel(1)->is<FMChannel>());
+  QVERIFY(! config.channelList()->channel(1)->as<FMChannel>()->aprsRef()->isNull());
+
+  // Add extensions
+  auto ch_ext = new AnytoneFMChannelExtension();
+  ch_ext->setAPRSPTT(AnytoneChannelExtension::APRSPTT::Start);
+  config.channelList()->channel(1)->as<FMChannel>()->setAnytoneChannelExtension(ch_ext);
 
   // test extension settings
   auto ext = new AnytoneFMAPRSSettingsExtension();
@@ -120,9 +139,9 @@ DMR6X2UVTest::testFMAPRSSettings() {
 
   // Check config
   QCOMPARE(comp_config.posSystems()->count(), 1);
-  QVERIFY(comp_config.posSystems()->get(0)->is<APRSSystem>());
+  QVERIFY(comp_config.posSystems()->get(0)->is<FMAPRSSystem>());
 
-  APRSSystem *comp_aprs = comp_config.posSystems()->get(0)->as<APRSSystem>();
+  FMAPRSSystem *comp_aprs = comp_config.posSystems()->get(0)->as<FMAPRSSystem>();
   QCOMPARE(comp_aprs->source(), aprs->source()); QCOMPARE(comp_aprs->srcSSID(), aprs->srcSSID());
   QCOMPARE(comp_aprs->destination(), aprs->destination()); QCOMPARE(comp_aprs->destSSID(), aprs->destSSID());
   QCOMPARE(comp_aprs->path(), aprs->path());
@@ -161,16 +180,24 @@ DMR6X2UVTest::testAESEncryption() {
           .arg(err.format(" ")).toStdString().c_str());
   }
 
+  // Check parser
+  QVERIFY(nullptr != config.commercialExtension());
+  QCOMPARE(config.commercialExtension()->encryptionKeys()->count(), 1);
+  QCOMPARE(config.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("11223344556677889900AABBCCDDEEFF"));
+  QVERIFY(nullptr != config.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(config.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
+           config.commercialExtension()->encryptionKeys()->key(0));
+
   DMR6X2UVCodeplug codeplug;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+    QFAIL(QString("Cannot encode codeplug for BETCH DMR6X2UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config decoded;
   if (! codeplug.decode(&decoded, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+    QFAIL(QString("Cannot decode codeplug for BETCH DMR6X2UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
@@ -200,13 +227,13 @@ DMR6X2UVTest::testARC4Encryption() {
   DMR6X2UVCodeplug codeplug;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   if (! codeplug.encode(&config, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+    QFAIL(QString("Cannot encode codeplug for BETCH DMR6X2UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
   Config decoded;
   if (! codeplug.decode(&decoded, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+    QFAIL(QString("Cannot decode codeplug for BETCH DMR6X2UV: %1")
           .arg(err.format()).toStdString().c_str());
   }
 
@@ -219,6 +246,19 @@ DMR6X2UVTest::testARC4Encryption() {
   QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
   QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
            decoded.commercialExtension()->encryptionKeys()->key(0));
+}
+
+
+void
+DMR6X2UVTest::testMicGain() {
+  ErrorStack err;
+  Config copy, config; config.copy(_basicConfig);
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  for (auto pair: pairs) {
+    config.settings()->setMicLevel(Level::fromValue(pair.first));
+    encodeDecode(config, copy);
+    QCOMPARE(copy.settings()->micLevel(), Level::fromValue(pair.second));
+  }
 }
 
 

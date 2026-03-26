@@ -11,6 +11,8 @@
 #include "ranges.hh"
 #include "roamingchannel.hh"
 #include "smsextension.hh"
+#include "gnsssettings.hh"
+#include "dmrsettings.hh"
 
 // forward declaration
 class Zone;
@@ -103,10 +105,10 @@ public:
     /** Invalidates the scan list index. */
     virtual void clearScanListIndex();
 
-    /** Returns @c true if talkaround cannot be enabled on this channel. */
-    virtual bool preventTalkaroundEnabled() const;
-    /** Enables/disables prevention of talkaround feature on this channel. */
-    virtual void enablePreventTalkaround(bool enable);
+    /** Returns @c true if talkaround is enabled on this channel. */
+    virtual bool talkaroundEnabled() const;
+    /** Enables/disables talkaround feature on this channel. */
+    virtual void enableTalkaround(bool enable);
 
     /** Returns the admit criterion. */
     virtual Admit admitCriterion() const;
@@ -136,9 +138,9 @@ public:
     virtual void clearEmergencySystemIndex();
 
     /** Returns FM and DMR squelch level. */
-    virtual unsigned int squelchLevel() const;
+    virtual Level squelchLevel() const;
     /** Sets the FM and DMR squelch level. */
-    virtual void setSquelchLevel(unsigned int level);
+    virtual void setSquelchLevel(Level level);
 
     /** Returns @c true if the channel is RX only. */
     virtual bool rxOnlyEnabled() const;
@@ -223,7 +225,7 @@ public:
       /** Maximum name length. */
       static constexpr unsigned int nameLength() { return 16; }
       /** Maximum squelch level. */
-      static constexpr unsigned int squelchLevel() { return 15; }
+      static constexpr Range<unsigned int> squelchLevel() { return {0, 15}; }
     };
 
   protected:
@@ -295,7 +297,7 @@ public:
       /** Maximum number of channels. */
       static constexpr unsigned int channels() { return 4000; }
       /** Maximum number of channels per block. */
-      static constexpr unsigned int channelsPerBlock() { return 85; }
+      static constexpr unsigned int channelsPerBlock() { return 84; }
     };
 
     /** Some internal offsets. */
@@ -307,6 +309,67 @@ public:
         return DM32UVCodeplug::Limit::blockSize();
       }
       /// @endcond
+    };
+  };
+
+
+  /** Implements an extended settings field for each channel.
+   * This is obviously a bug fix by a very unexperienced FW engineer. They hot-fixed the missing
+   * transmit contact via these extended settings although there are enough unused bits available
+   * within the channel element. Moveover, the encoding is a wild mix of little and big endian. */
+  class ChannelExtensionElement: public Element
+  {
+  public:
+    /** Constructor. */
+    ChannelExtensionElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0002; }
+
+    /** Resets the element. */
+    void clear() override;
+
+    /** Returns @c true if a TX contact index is set. */
+    virtual bool hasContactIndex() const;
+    /** Returns the TX contact index. */
+    virtual unsigned int contactIndex() const;
+    /** Sets the contact index. */
+    virtual void setContactIndex(unsigned int index);
+    /** Resets the contact index. */
+    virtual void clearContactIndex();
+
+    /** Encodes the extended settings from the given channel. */
+    virtual bool encode(const Channel *ch, Context &ctx, const ErrorStack &err);
+    /** Updates the given channel. */
+    virtual bool decode(Channel *ch, Context &ctx, const ErrorStack &err) const;
+    /** Links the given channel. */
+    virtual bool link(Channel *ch, Context &ctx, const ErrorStack &err) const;
+
+  protected:
+    /** Some internal offsets within the element. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Bit indexMSN() { return { 0x0000, 4}; }
+      static constexpr unsigned int indexLSB() { return 0x0001; }
+      /// @endcond
+    };
+  };
+
+
+  /** Encodes a bank of channel extension settings. */
+  class ChannelExtensionBankElement: public Element
+  {
+  public:
+    /** Some limits. */
+    struct Limit : Element::Limit {
+      /** The number of elements within each bank. */
+      static constexpr unsigned int count() { return 2047; }
+    };
+
+    /** Some offsets. */
+    struct Offset: Element::Offset {
+      /** Offset betwenn banks. */
+      static constexpr unsigned int betweenBanks(){ return DM32UVCodeplug::Limit::blockSize(); }
     };
   };
 
@@ -1364,7 +1427,7 @@ public:
 
     /** GNSS modes. */
     enum class GNSSMode {
-      GPS = 0, Baidou = 1, Both = 0
+      GPS = 0, Beidou = 1, Both = 2
     };
 
     /** Possible recording modes. */
@@ -1585,9 +1648,9 @@ public:
     virtual void setPositionFormat(PositionFormat format);
 
     /** Returns the GNSS mode. */
-    virtual GNSSMode gnssMode() const;
+    virtual GNSSSettings::Systems gnss() const;
     /** Sets the GNSS mode. */
-    virtual void setGNSSMode(GNSSMode mode);
+    virtual void setGNSS(GNSSSettings::Systems mode);
 
     /** Returns @c true if GNSS is enabled. */
     virtual bool gnssEnabled() const;
@@ -1685,9 +1748,9 @@ public:
     virtual void setDMRRemoteMonitorDuration(Interval duration);
 
     /** Returns the talker alias format. */
-    virtual TalkerAliasFormat talkerAliasFormat() const;
+    virtual DMRSettings::TalkerAliasEncoding talkerAliasEncoding() const;
     /** Sets the talker alias format. */
-    virtual void setTalkerAliasFormat(TalkerAliasFormat format);
+    virtual void setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding format);
 
     /** Returns @c true, if transmission of talker alias is enabled. */
     virtual bool txTalkerAliasEnabled() const;
@@ -1799,9 +1862,9 @@ public:
     virtual void setTransmitTimeoutReminder(Interval timeout);
 
     /** Returns the VOX level. */
-    virtual unsigned int voxLevel() const;
+    virtual Level voxLevel() const;
     /** Sets the VOX level. */
-    virtual void setVOXLevel(unsigned int voxLevel);
+    virtual void setVOXLevel(Level voxLevel);
     /** Retruns the VOX delay. */
     virtual Interval voxDelay() const;
     /** Sets the VOX delay. */
@@ -1833,14 +1896,14 @@ public:
     virtual void setSTEMode(STEMode mode);
 
     /** Returns the FM mic level. */
-    virtual unsigned int fmMicLevel() const;
+    virtual Level fmMicLevel() const;
     /** Sets the FM mic level.*/
-    virtual void setFMMicLevel(unsigned int level);
+    virtual void setFMMicLevel(Level level);
 
     /** Returns the DMR mic level. */
-    virtual unsigned int dmrMicLevel() const;
+    virtual Level dmrMicLevel() const;
     /** Sets the DMR mic level.*/
-    virtual void setDMRMicLevel(unsigned int level);
+    virtual void setDMRMicLevel(Level level);
 
     /** Decodes the general settings. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1868,6 +1931,10 @@ public:
       static constexpr Range<Interval> voxDelay() {
         return {Interval::fromMilliseconds(300), Interval::fromSeconds(5)};
       }
+      /** Valid VOX sensitivity levels. */
+      static constexpr Range<unsigned int> vox() { return {1,5}; }
+      /** Valid mic gain settings. */
+      static constexpr Range<unsigned int> micGain() { return {0,4}; }
     };
 
   protected:
@@ -1984,14 +2051,14 @@ public:
     /** Sets the update interval. */
     virtual void setUpdatePeriod(Interval interval);
 
-    /** Returns @c true if the fixed location is set. */
-    virtual bool fixedLocationValid() const;
+    /** Returns @c true if the fixed location is used. */
+    virtual bool fixedLocationEnabled() const;
     /** Returns the fixed location. */
     virtual QGeoCoordinate fixedLocation() const;
     /** Sets the fixed location. */
     virtual void setFixedLocation(const QGeoCoordinate &coordinate);
-    /** Clears the fixed location. */
-    virtual void clearFixedLocation();
+    /** Enabled fixed location. */
+    virtual void enableFixedLocation(bool enable);
 
     /** Returns @c true if the n-th revert channel is set. */
     virtual bool revertChannelIsCurrent(unsigned int n);
@@ -2341,19 +2408,20 @@ protected:
   /** Some internal offsets. */
   struct Offset {
     /// @cond DO_NOT_DOCUMENT
-    static constexpr unsigned int generalSettings()     { return 0x00004000; }
-    static constexpr unsigned int aprsSettings()        { return 0x00004300; }
-    static constexpr unsigned int contactIndex()        { return 0x0000b000; }
-    static constexpr unsigned int groupListBank()       { return 0x0000f000; }
-    static constexpr unsigned int extendedSettings()    { return 0x00010000; }
-    static constexpr unsigned int encryptionKeys()      { return 0x00010300; }
-    static constexpr unsigned int scanListBank()        { return 0x00011000; }
-    static constexpr unsigned int channelBanks()        { return 0x00012000; }
-    static constexpr unsigned int contactBanks()        { return 0x00044000; }
-    static constexpr unsigned int zoneBanks()           { return 0x0005c000; }
-    static constexpr unsigned int roamingZoneBank()     { return 0x00065000; }
-    static constexpr unsigned int roamingChannelBank()  { return 0x00066000; }
-    static constexpr unsigned int radioIdBank()         { return 0x00067000; }
+    static constexpr unsigned int generalSettings()       { return 0x00004000; }
+    static constexpr unsigned int aprsSettings()          { return 0x00004300; }
+    static constexpr unsigned int contactIndex()          { return 0x0000b000; }
+    static constexpr unsigned int groupListBank()         { return 0x0000f000; }
+    static constexpr unsigned int extendedSettings()      { return 0x00010000; }
+    static constexpr unsigned int encryptionKeys()        { return 0x00010300; }
+    static constexpr unsigned int scanListBank()          { return 0x00011000; }
+    static constexpr unsigned int channelBanks()          { return 0x00012000; }
+    static constexpr unsigned int channelExtensionBanks() { return 0x00042000; }
+    static constexpr unsigned int contactBanks()          { return 0x00044000; }
+    static constexpr unsigned int zoneBanks()             { return 0x0005c000; }
+    static constexpr unsigned int roamingZoneBank()       { return 0x00065000; }
+    static constexpr unsigned int roamingChannelBank()    { return 0x00066000; }
+    static constexpr unsigned int radioIdBank()           { return 0x00067000; }
     /// @endcond
   };
 };

@@ -16,6 +16,7 @@ PacketStream::~PacketStream() {
 }
 
 
+
 /* ******************************************************************************************** *
  * Implementation of SlipStream
  * ******************************************************************************************** */
@@ -25,6 +26,20 @@ SlipStream::SlipStream(QIODevice *device, QObject *parent)
   if (_device)
     _device->setParent(this);
 }
+
+
+bool
+SlipStream::isOpen() const {
+  return _device && _device->isOpen();
+}
+
+
+void
+SlipStream::close() {
+  if (_device)
+    _device->close();
+}
+
 
 bool
 SlipStream::receive(QByteArray &buffer, int timeout, const ErrorStack &err) {
@@ -69,10 +84,11 @@ SlipStream::receive(QByteArray &buffer, int timeout, const ErrorStack &err) {
 bool
 SlipStream::send(const QByteArray &buffer, int timeout, const ErrorStack &err) {
   QByteArray outBuffer;
-  outBuffer.reserve(buffer.size() + 1
+  outBuffer.reserve(buffer.size() + 2
                     + buffer.count(END_OF_PACKET)
                     + buffer.count(ESCAPE));
 
+  outBuffer.append(END_OF_PACKET);
   for (int i=0; i<buffer.size(); i++) {
     if (END_OF_PACKET == buffer[i]) {
       outBuffer.append(ESCAPE);

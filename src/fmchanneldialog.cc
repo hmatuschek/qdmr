@@ -1,14 +1,13 @@
-#include "analogchanneldialog.hh"
+#include "fmchanneldialog.hh"
 #include "application.hh"
 #include <QCompleter>
-#include "utils.hh"
 #include "settings.hh"
 #include "repeatercompleter.hh"
 #include "repeaterdatabase.hh"
 
 
 /* ********************************************************************************************* *
- * Implementation of AnalogChannelDialog
+ * Implementation of FMChannelDialog
  * ********************************************************************************************* */
 FMChannelDialog::FMChannelDialog(Config *config, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(new FMChannel(this)), _channel(nullptr)
@@ -73,12 +72,14 @@ FMChannelDialog::construct() {
   }
   bandwidth->setItemData(0, unsigned(FMChannel::Bandwidth::Narrow));
   bandwidth->setItemData(1, unsigned(FMChannel::Bandwidth::Wide));
-  aprsList->addItem(tr("[None]"), QVariant::fromValue((APRSSystem *)nullptr));
+  aprsList->addItem(tr("[None]"), QVariant::fromValue((FMAPRSSystem *)nullptr));
   aprsList->setCurrentIndex(0);
-  for (int i=0; i<_config->posSystems()->aprsCount(); i++) {
-    APRSSystem *sys = _config->posSystems()->aprsSystem(i);
-    aprsList->addItem(sys->name(),QVariant::fromValue(sys));
-    if (_myChannel && (_myChannel->aprsSystem() == sys))
+  for (int i=0; i<_config->posSystems()->count(); i++) {
+    if (! _config->posSystems()->get(i)->is<FMAPRSSystem>())
+      continue;
+    FMAPRSSystem *sys = _config->posSystems()->get(i)->as<FMAPRSSystem>();
+    aprsList->addItem(sys->name(), QVariant::fromValue(sys));
+    if (_myChannel && (_myChannel->aprs() == sys))
       aprsList->setCurrentIndex(i+1);
   }
   voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
@@ -106,10 +107,14 @@ FMChannelDialog::construct() {
     case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
     }
   }
-  if (! _myChannel->defaultTimeout()) {
+  if (_myChannel->timeoutDisabled()) {
     totDefault->setChecked(false); totValue->setEnabled(true);
-    totValue->setValue(_myChannel->timeout());
+    totValue->setValue(0);
+  } else if (! _myChannel->defaultTimeout()) {
+    totDefault->setChecked(false); totValue->setEnabled(true);
+    totValue->setValue(_myChannel->timeout().seconds());
   }
+
   rxOnly->setChecked(_myChannel->rxOnly());
   switch (_myChannel->admit()) {
   case FMChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
@@ -118,7 +123,7 @@ FMChannelDialog::construct() {
   }
   if (! _myChannel->defaultSquelch()) {
     squelchDefault->setChecked(false); squelchValue->setEnabled(true);
-    squelchValue->setValue(_myChannel->squelch());
+    squelchValue->setValue(_myChannel->squelch().value());
   }
   if (FMChannel::Bandwidth::Narrow == _myChannel->bandwidth())
     bandwidth->setCurrentIndex(0);
@@ -126,7 +131,7 @@ FMChannelDialog::construct() {
     bandwidth->setCurrentIndex(1);
   if (! _myChannel->defaultVOX()) {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
-    voxValue->setValue(_myChannel->vox());
+    voxValue->setValue(_myChannel->vox().value());
   }
 
   if (! settings.showExtensions())
@@ -143,10 +148,10 @@ FMChannelDialog::construct() {
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
-  connect(txFrequency, &QLineEdit::editingFinished, this, &::FMChannelDialog::onTxFrequencyEdited);
-  connect(rxFrequency, &QLineEdit::editingFinished, this, &::FMChannelDialog::onRxFrequencyEdited);
-  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &::FMChannelDialog::onOffsetFrequencyEdited);
-  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &::FMChannelDialog::onOffsetDirectionChanged);
+  connect(txFrequency, &QLineEdit::editingFinished, this, &FMChannelDialog::onTxFrequencyEdited);
+  connect(rxFrequency, &QLineEdit::editingFinished, this, &FMChannelDialog::onRxFrequencyEdited);
+  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &FMChannelDialog::onOffsetFrequencyEdited);
+  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &FMChannelDialog::onOffsetDirectionChanged);
 }
 
 FMChannel *
@@ -162,23 +167,25 @@ FMChannelDialog::channel()
   }
   if (totDefault->isChecked())
     _myChannel->setDefaultTimeout();
+  else if (0 == totValue->value())
+    _myChannel->disableTimeout();
   else
-    _myChannel->setTimeout(totValue->value());
+    _myChannel->setTimeout(Interval::fromSeconds(totValue->value()));
   _myChannel->setRXOnly(rxOnly->isChecked());
   _myChannel->setAdmit(FMChannel::Admit(txAdmit->currentData().toUInt()));
   if (squelchDefault->isChecked())
     _myChannel->setSquelchDefault();
   else
-    _myChannel->setSquelch(squelchValue->value());
+    _myChannel->setSquelch(Level::fromValue(squelchValue->value()));
   _myChannel->setRXTone(rxTone->selectiveCall());
   _myChannel->setTXTone(txTone->selectiveCall());
   _myChannel->setBandwidth(FMChannel::Bandwidth(bandwidth->currentData().toUInt()));
   _myChannel->setScanList(scanList->currentData().value<ScanList *>());
-  _myChannel->setAPRSSystem(aprsList->currentData().value<APRSSystem *>());
+  _myChannel->setAPRS(aprsList->currentData().value<FMAPRSSystem *>());
   if (voxDefault->isChecked())
     _myChannel->setVOXDefault();
   else
-    _myChannel->setVOX(voxValue->value());
+    _myChannel->setVOX(Level::fromValue(voxValue->value()));
 
   FMChannel *channel = _myChannel;
   if (nullptr == _channel) {

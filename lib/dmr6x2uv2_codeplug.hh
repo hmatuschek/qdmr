@@ -174,9 +174,9 @@ public:
     virtual void enableFMIdleTone(bool enable);
 
     /** Returns the FM mic gain [1-10]. */
-    virtual unsigned int fmMicGain() const;
+    virtual Level fmMicGain() const;
     /** Sets the FM mic gain [1-10]. */
-    virtual void setFMMicGain(unsigned int gain);
+    virtual void setFMMicGain(Level gain);
 
     /** Returns @c true, if transmit timeout warning tone is enabled. */
     virtual bool totWarningToneEnabled() const;
@@ -189,9 +189,9 @@ public:
     virtual void enableATPC(bool enable);
 
     /** Returns enabled GNSSs */
-    virtual AnytoneGPSSettingsExtension::GPSMode gnss() const;
+    virtual GNSSSettings::Systems gnss() const;
     /** Sets enabled GNSSs */
-    virtual void setGNSS(AnytoneGPSSettingsExtension::GPSMode gnss);
+    virtual void setGNSS(GNSSSettings::Systems gnss);
 
     /** Returns the channel index display mode. */
     virtual ChannelIndexDisplay channelIndexDisplay() const;
@@ -225,6 +225,12 @@ public:
     bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
     bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits. */
+    struct Limit: DMR6X2UVCodeplug::ExtendedSettingsElement::Limit {
+      static constexpr Range<unsigned int> micGain() { return {0,4}; }    ///< Valid mic gain settings.
+    };
 
   protected:
     /** Some internal offset within the codeplug element. */

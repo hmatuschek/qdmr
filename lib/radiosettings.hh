@@ -4,6 +4,8 @@
 #include "configobject.hh"
 #include "channel.hh"
 
+#include "gnsssettings.hh"
+#include "dmrsettings.hh"
 #include "radioddity_extensions.hh"
 #include "anytone_settingsextension.hh"
 #include "tyt_extensions.hh"
@@ -19,19 +21,23 @@ class RadioSettings : public ConfigItem
   /** The second intro line. */
   Q_PROPERTY(QString introLine2 READ introLine2 WRITE setIntroLine2)
   /** The mic amplification level. */
-  Q_PROPERTY(unsigned micLevel READ micLevel WRITE setMicLevel)
+  Q_PROPERTY(Level micLevel READ micLevel WRITE setMicLevel)
   /** Speech synthesis flag. */
   Q_PROPERTY(bool speech READ speech WRITE enableSpeech)
   /** The default channel power */
   Q_PROPERTY(Channel::Power power READ power WRITE setPower)
   /** The squelch level. */
-  Q_PROPERTY(unsigned squelch READ squelch WRITE setSquelch)
+  Q_PROPERTY(Level squelch READ squelch WRITE setSquelch)
   /** The default vox sensitivity */
-  Q_PROPERTY(unsigned vox READ vox WRITE setVOX)
+  Q_PROPERTY(Level vox READ vox WRITE setVOX)
   /** The default transmit timeout */
-  Q_PROPERTY(unsigned tot READ tot WRITE setTOT)
+  Q_PROPERTY(Interval tot READ tot WRITE setTOT SCRIPTABLE false)
   /** The default DMR radio ID. */
   Q_PROPERTY(DMRRadioIDReference *defaultID READ defaultIdRef)
+  /** The GNSS settings. */
+  Q_PROPERTY(GNSSSettings *gnss READ gnss);
+  /** The common DMR settings. */
+  Q_PROPERTY(DMRSettings *dmr READ dmr);
   /** The settings extension for TyT devices. */
   Q_PROPERTY(TyTSettingsExtension* tyt READ tytExtension WRITE setTyTExtension)
   /** The settings extension for Radioddity devices. */
@@ -60,9 +66,9 @@ public:
   void setIntroLine2(const QString &line);
 
   /** Returns the MIC amplification level [1,10]. */
-  unsigned micLevel() const;
+  Level micLevel() const;
   /** (Re-)Sets the MIC amplification level [1,10]. */
-  void setMicLevel(unsigned value);
+  void setMicLevel(Level value);
 
   /** Returns @c true if the speech synthesis is enabled. */
   bool speech() const;
@@ -70,9 +76,9 @@ public:
   void enableSpeech(bool enabled);
 
   /** Returns the default squelch level [0-10]. */
-  unsigned squelch() const;
+  Level squelch() const;
   /** Sets the default squelch level. */
-  void setSquelch(unsigned squelch);
+  void setSquelch(Level squelch);
 
   /** Returns the default channel power. */
   Channel::Power power() const;
@@ -82,18 +88,18 @@ public:
   /** Returns @c true if VOX is disabled by default. */
   bool voxDisabled() const;
   /** Returns the default VOX level [0-10], 0=disabled. */
-  unsigned vox() const;
+  Level vox() const;
   /** Sets the default VOX level [0-10], 0=disabled. */
-  void setVOX(unsigned level);
+  void setVOX(Level level);
   /** Disables VOX by default. */
   void disableVOX();
 
   /** Returns @c true if the transmit timeout (TOT) is disabled. */
   bool totDisabled() const;
   /** Returns the default transmit timeout (TOT) in seconds, 0=disabled. */
-  unsigned tot() const;
+  Interval tot() const;
   /** Sets the default transmit timeout (TOT) in seconds, 0=disabled. */
-  void setTOT(unsigned sec);
+  void setTOT(const Interval &sec);
   /** Disables the transmit timeout (TOT). */
   void disableTOT();
 
@@ -103,6 +109,11 @@ public:
   DMRRadioID *defaultId() const;
   /** Sets the default DMR ID. */
   void setDefaultId(DMRRadioID *id);
+
+  /** Returns the GNSS settings. */
+  GNSSSettings *gnss() const;
+  /** Returns the DMR settings. */
+  DMRSettings *dmr() const;
 
   /** Returns the TyT device specific radio settings. */
   TyTSettingsExtension *tytExtension() const;
@@ -119,6 +130,11 @@ public:
   /** Sets the AnyTone device specific radio settings. */
   void setAnytoneExtension(AnytoneSettingsExtension *ext);
 
+  bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
+
+protected:
+  bool populate(YAML::Node &node, const Context &context, const ErrorStack &err=ErrorStack());
+
 protected slots:
   /** Internal used callback whenever an extension is modified. */
   void onExtensionModified();
@@ -129,19 +145,23 @@ protected:
   /** Holds the second intro line. */
   QString _introLine2;
   /** Holds the mic amplification level. */
-  unsigned _micLevel;
+  Level _micLevel;
   /** Holds the speech synthesis flag. */
   bool _speech;
   /** Holds the global squelch setting. */
-  unsigned _squelch;
+  Level _squelch;
   /** Holds the global power setting. */
   Channel::Power _power;
   /** Holds the global VOX level. */
-  unsigned _vox;
+  Level _vox;
   /** Holds the global transmit timeout. */
-  unsigned _transmitTimeOut;
+  Interval _transmitTimeOut;
   /** Reference to the default DMR radio ID. */
   DMRRadioIDReference *_defaultId;
+  /** The GNSS settings. */
+  GNSSSettings *_gnss;
+  /** The DMR settings. */
+  DMRSettings *_dmr;
   /** Device specific settings extension for TyT devices. */
   TyTSettingsExtension *_tytExtension;
   /** Device specific settings extension for Radioddity devices. */

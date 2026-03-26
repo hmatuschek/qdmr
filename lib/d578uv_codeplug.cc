@@ -4,6 +4,7 @@
 #include "utils.hh"
 #include "channel.hh"
 #include "config.h"
+#include "intermediaterepresentation.hh"
 
 #include <QTimeZone>
 #include <QtEndian>
@@ -117,13 +118,13 @@ D578UVCodeplug::ChannelElement::enableSMS(bool enable) {
 bool
 D578UVCodeplug::ChannelElement::dataACK() const {
   // inverted!
-  return !getBit(0x003d,3);
+  return !getBit(Offset::dataACK());
 }
 
 void
 D578UVCodeplug::ChannelElement::enableDataACK(bool enable) {
   // inverted!
-  setBit(0x003d, 3, !enable);
+  setBit(Offset::dataACK(), !enable);
 }
 
 
@@ -541,13 +542,13 @@ D578UVCodeplug::GeneralSettingsElement::enableKeyTone(bool enable) {
   setUInt8(Offset::enableKeyTone(), enable ? 0x01 : 0x00);
 }
 
-unsigned
+Interval
 D578UVCodeplug::GeneralSettingsElement::transmitTimeout() const {
-  return ((unsigned)getUInt8(Offset::transmitTimeout()))*30;
+  return Interval::fromSeconds((unsigned)getUInt8(Offset::transmitTimeout())*30);
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setTransmitTimeout(unsigned tot) {
-  setUInt8(Offset::transmitTimeout(), tot/30);
+D578UVCodeplug::GeneralSettingsElement::setTransmitTimeout(const Interval &tot) {
+  setUInt8(Offset::transmitTimeout(), tot.seconds()/30);
 }
 
 AnytoneDisplaySettingsExtension::Language
@@ -605,17 +606,14 @@ D578UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension:
 }
 
 
-unsigned
+Level
 D578UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
-  return Limit::Range<unsigned int>{0,4}
-    .mapTo({1,10},
-           getUInt8(Offset::dmrMicGain()));
+  return Level::fromValue(getUInt8(Offset::dmrMicGain()), Limit::micGain());
 }
 
 void
-D578UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
-  gain = Limit::Range<unsigned int>{1,10}.mapTo({0,4}, gain);
-  setUInt8(Offset::dmrMicGain(), gain);
+D578UVCodeplug::GeneralSettingsElement::setDMRMicGain(Level gain) {
+  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain()));
 }
 
 
@@ -967,7 +965,7 @@ D578UVCodeplug::GeneralSettingsElement::volumeChangePrompt() const {
 }
 void
 D578UVCodeplug::GeneralSettingsElement::enableVolumeChangePrompt(bool enable) {
-  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x01));
+  setUInt8(Offset::volumeChangePrompt(), (enable ? 0x01 : 0x00));
 }
 
 AnytoneAutoRepeaterSettingsExtension::Direction
@@ -1429,14 +1427,32 @@ D578UVCodeplug::GeneralSettingsElement::enableShowLastHeard(bool enable) {
   setUInt8(Offset::showLastHeard(), (enable ? 0x01 : 0x00));
 }
 
-AnytoneDMRSettingsExtension::SMSFormat
+
+SMSExtension::Format
 D578UVCodeplug::GeneralSettingsElement::smsFormat() const {
-  return (AnytoneDMRSettingsExtension::SMSFormat) getUInt8(Offset::smsFormat());
+  switch ((SMSFormat) getUInt8(Offset::smsFormat())) {
+  case SMSFormat::Motorola: return SMSExtension::Format::Motorola;
+  case SMSFormat::Hytera: return SMSExtension::Format::Hytera;
+  case SMSFormat::DMR: return SMSExtension::Format::DMR;
+  }
+  return SMSExtension::Format::Motorola;
 }
+
 void
-D578UVCodeplug::GeneralSettingsElement::setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt) {
-  setUInt8(Offset::smsFormat(), (unsigned)fmt);
+D578UVCodeplug::GeneralSettingsElement::setSMSFormat(SMSExtension::Format fmt) {
+  switch (fmt) {
+  case SMSExtension::Format::Motorola:
+    setUInt8(Offset::smsFormat(), (unsigned)SMSFormat::Motorola);
+    break;
+  case SMSExtension::Format::Hytera:
+    setUInt8(Offset::smsFormat(), (unsigned)SMSFormat::Hytera);
+    break;
+  case SMSExtension::Format::DMR:
+    setUInt8(Offset::smsFormat(), (unsigned)SMSFormat::DMR);
+    break;
+  }
 }
+
 
 AnytoneAutoRepeaterSettingsExtension::Direction
 D578UVCodeplug::GeneralSettingsElement::autoRepeaterDirectionB() const {
@@ -1794,8 +1810,8 @@ D578UVCodeplug::GeneralSettingsElement::repeaterCheckNumNotifications() const {
 }
 void
 D578UVCodeplug::GeneralSettingsElement::setRepeaterCheckNumNotifications(unsigned int n) {
-  n = std::max(1U, std::min(10U, n));
-  setUInt8(Offset::repCheckNumNotify(), n);
+  n = Limit::repeaterOORNotificationCount().limit(n);
+  setUInt8(Offset::repCheckNumNotify(), n-1);
 }
 
 
@@ -1866,10 +1882,16 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
     return false;
 
-  // Set measurement system based on system locale (0x00==Metric)
-  enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
+
+  // Set measurement system based on system locale (0x00==Metric)
+  enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
+
+  setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
+  setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
+  setSMSFormat(ctx.config()->smsExtension()->format());
+
 
   // Handle D578UV specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -1929,18 +1951,14 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setAutoRepeaterMaxFrequencyUHF(ext->autoRepeaterSettings()->uhfMax());
 
   // Encode DMR settings
-  setGroupCallHangTime(ext->dmrSettings()->groupCallHangTime());
-  setPrivateCallHangTime(ext->dmrSettings()->privateCallHangTime());
   setWakeHeadPeriod(ext->dmrSettings()->wakeHeadPeriod());
   enableFilterOwnID(ext->dmrSettings()->filterOwnIDEnabled());
   setMonitorSlotMatch(ext->dmrSettings()->monitorSlotMatch());
   enableMonitorColorCodeMatch(ext->dmrSettings()->monitorColorCodeMatchEnabled());
   enableMonitorIDMatch(ext->dmrSettings()->monitorIDMatchEnabled());
   enableMonitorTimeSlotHold(ext->dmrSettings()->monitorTimeSlotHoldEnabled());
-  setSMSFormat(ext->dmrSettings()->smsFormat());
 
   // Encode GPS settings
-  enableGPSUnitsImperial(AnytoneGPSSettingsExtension::Units::Archaic == ext->gpsSettings()->units());
   setGPSTimeZone(ext->gpsSettings()->timeZone());
   enableGPSMessage(ext->gpsSettings()->positionReportingEnabled());
   setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
@@ -1970,6 +1988,14 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
+
+  ctx.config()->settings()->gnss()->setUnits(
+        this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
+                                   GNSSSettings::Units::Metric);
+
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(this->groupCallHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(this->privateCallHangTime());
+  ctx.config()->smsExtension()->setFormat(this->smsFormat());
 
   // Handle D578UV specific extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -2016,19 +2042,14 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->autoRepeaterSettings()->setUHFMax(this->autoRepeaterMaxFrequencyUHF());
 
   // Encode dmr settings
-  ext->dmrSettings()->setGroupCallHangTime(this->groupCallHangTime());
-  ext->dmrSettings()->setPrivateCallHangTime(this->privateCallHangTime());
   ext->dmrSettings()->setWakeHeadPeriod(this->wakeHeadPeriod());
   ext->dmrSettings()->enableFilterOwnID(this->filterOwnID());
   ext->dmrSettings()->setMonitorSlotMatch(this->monitorSlotMatch());
   ext->dmrSettings()->enableMonitorColorCodeMatch(this->monitorColorCodeMatch());
   ext->dmrSettings()->enableMonitorIDMatch(this->monitorIDMatch());
   ext->dmrSettings()->enableMonitorTimeSlotHold(this->monitorTimeSlotHold());
-  ext->dmrSettings()->setSMSFormat(this->smsFormat());
 
   // Encode GPS settings
-  ext->gpsSettings()->setUnits(this->gpsUnitsImperial() ? AnytoneGPSSettingsExtension::Units::Archaic :
-                                                          AnytoneGPSSettingsExtension::Units::Metric);
   ext->gpsSettings()->setTimeZone(this->gpsTimeZone());
   ext->gpsSettings()->enablePositionReporting(this->gpsMessageEnabled());
   ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
@@ -2115,13 +2136,28 @@ D578UVCodeplug::ExtendedSettingsElement::setTalkerAliasSource(AnytoneDMRSettings
 }
 
 
-AnytoneDMRSettingsExtension::TalkerAliasEncoding
+DMRSettings::TalkerAliasEncoding
 D578UVCodeplug::ExtendedSettingsElement::talkerAliasEncoding() const {
-  return (AnytoneDMRSettingsExtension::TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding());
+  switch ((TalkerAliasEncoding)getUInt8(Offset::talkerAliasEncoding())) {
+  case TalkerAliasEncoding::ISO7: return DMRSettings::TalkerAliasEncoding::Iso7;
+  case TalkerAliasEncoding::ISO8: return DMRSettings::TalkerAliasEncoding::Iso8;
+  case TalkerAliasEncoding::Unicode: return DMRSettings::TalkerAliasEncoding::Unicode;
+  }
+  return DMRSettings::TalkerAliasEncoding::Iso8;
 }
 void
-D578UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding enc) {
-  setUInt8(Offset::talkerAliasEncoding(), (unsigned)enc);
+D578UVCodeplug::ExtendedSettingsElement::setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding enc) {
+  switch (enc) {
+  case DMRSettings::TalkerAliasEncoding::Iso7:
+    setUInt8(Offset::talkerAliasEncoding(), (unsigned)TalkerAliasEncoding::ISO7);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Iso8:
+    setUInt8(Offset::talkerAliasEncoding(), (unsigned)TalkerAliasEncoding::ISO8);
+    break;
+  case DMRSettings::TalkerAliasEncoding::Unicode:
+    setUInt8(Offset::talkerAliasEncoding(), (unsigned)TalkerAliasEncoding::Unicode);
+    break;
+  }
 }
 
 
@@ -2197,33 +2233,24 @@ D578UVCodeplug::ExtendedSettingsElement::setMicSpeakerSource(AnytoneAudioSetting
 }
 
 
-AnytoneGPSSettingsExtension::GPSMode
-D578UVCodeplug::ExtendedSettingsElement::gpsMode() const {
+GNSSSettings::Systems
+D578UVCodeplug::ExtendedSettingsElement::gnss() const {
   switch ((GPSMode)getUInt8(Offset::gpsMode())) {
-  case GPSMode::GPS: return AnytoneGPSSettingsExtension::GPSMode::GPS;
-  case GPSMode::Beidou: return AnytoneGPSSettingsExtension::GPSMode::Beidou;
-  case GPSMode::GPS_Beidou: return AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou;
+  case GPSMode::GPS: return GNSSSettings::System::GPS;
+  case GPSMode::Beidou: return GNSSSettings::System::Beidou;
+  case GPSMode::GPS_Beidou: return GNSSSettings::System::GPS | GNSSSettings::System::Beidou;
   }
-  return AnytoneGPSSettingsExtension::GPSMode::GPS;
+  return GNSSSettings::System::GPS;
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode) {
-  switch (mode) {
-  case AnytoneGPSSettingsExtension::GPSMode::GPS:
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Glonas:
-  case AnytoneGPSSettingsExtension::GPSMode::Glonass:
+D578UVCodeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems mode) {
+  if (mode.testFlag(GNSSSettings::System::GPS))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::GPS);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::Beidou_Glonass:
+  if (mode.testFlag(GNSSSettings::System::Beidou))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::Beidou);
-    break;
-  case AnytoneGPSSettingsExtension::GPSMode::GPS_Beidou:
-  case AnytoneGPSSettingsExtension::GPSMode::All:
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
     setUInt8(Offset::gpsMode(), (unsigned)GPSMode::GPS_Beidou);
-    break;
-  }
 }
 
 
@@ -2524,15 +2551,14 @@ D578UVCodeplug::ExtendedSettingsElement::setDateFormat(AnytoneDisplaySettingsExt
 }
 
 
-unsigned int
+Level
 D578UVCodeplug::ExtendedSettingsElement::fmMicGain() const {
-  return (getUInt8(Offset::analogMicGain())+1)*10/5;
+  return Level::fromValue(getUInt8(Offset::analogMicGain())+1, Limit::micGain());
 }
 
 void
-D578UVCodeplug::ExtendedSettingsElement::setFMMicGain(unsigned int gain) {
-  gain = std::min(10U, std::max(1U, gain));
-  setUInt8(Offset::analogMicGain(), gain*4/10);
+D578UVCodeplug::ExtendedSettingsElement::setFMMicGain(Level gain) {
+  setUInt8(Offset::analogMicGain(), gain.mapTo(Limit::micGain())-1);
 }
 
 
@@ -2946,6 +2972,11 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
+  // Encode GPS settings
+  setGNSS(ctx.config()->settings()->gnss()->systems());
+
+  setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
+
   if (nullptr == ctx.config()->settings()->anytoneExtension()) {
     // If there is no extension, reuse DMR mic gain setting
     setFMMicGain(ctx.config()->settings()->micLevel());
@@ -2957,7 +2988,6 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Encode DMR settings
   setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
-  setTalkerAliasEncoding(ext->dmrSettings()->talkerAliasEncoding());
 
   // Some general settings
   setSTEDuration(ext->steDuration());
@@ -2996,9 +3026,6 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   enableShowTimeSlot(ext->displaySettings()->showTimeSlot());
   enableShowChannelType(ext->displaySettings()->showChannelType());
   setDateFormat(ext->displaySettings()->dateFormat());
-
-  // Encode GPS settings
-  setGPSMode(ext->gpsSettings()->mode());
 
   // Encode roaming settings
   enableGPSRoaming(ext->roamingSettings()->gpsRoaming());
@@ -3044,6 +3071,11 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err))
     return false;
 
+  // Store GPS settings
+  ctx.config()->settings()->gnss()->setSystems(this->gnss());
+
+  ctx.config()->config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
+
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
@@ -3053,7 +3085,6 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store DMR settings
   ext->dmrSettings()->setTalkerAliasSource(talkerAliasSource());
-  ext->dmrSettings()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Some general settings
   ext->setSTEDuration(this->steDuration());
@@ -3073,11 +3104,11 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
   this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
 
-  // Store FM mic gain separately
-  ext->audioSettings()->setFMMicGain(fmMicGain());
-  // Enable separate mic gain, if it differs from the DMR mic gain:
-  ext->audioSettings()->enableFMMicGain(
-      ctx.config()->settings()->micLevel() != fmMicGain());
+  // Store FM mic gain separately, if different
+  if (ctx.config()->settings()->micLevel() == fmMicGain())
+    ext->audioSettings()->disableFMMicGain();
+  else
+    ext->audioSettings()->setFMMicGain(fmMicGain());
   ext->audioSettings()->setSpeaker(speaker());
   ext->audioSettings()->setHandsetSpeaker(micSpeakerSource());
   ext->audioSettings()->setHandsetType(micType());
@@ -3092,9 +3123,6 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->dmrSettings()->setManualGroupCallHangTime(this->manDialGroupCallHangTime());
   ext->dmrSettings()->setManualPrivateCallHangTime(this->manDialPrivateCallHangTime());
   ext->dmrSettings()->setEncryption(this->encryption());
-
-  // Store GPS settings
-  ext->gpsSettings()->setMode(this->gpsMode());
 
   // Store roaming settings
   ext->roamingSettings()->enableGPSRoaming(this->gpsRoaming());
@@ -3160,34 +3188,66 @@ D578UVCodeplug::AirBandChannelElement::AirBandChannelElement(uint8_t *ptr, size_
   // pass...
 }
 
+
 D578UVCodeplug::AirBandChannelElement::AirBandChannelElement(uint8_t *ptr)
   : Element(ptr, AirBandChannelElement::size())
 {
   // pass...
 }
 
+
 void
 D578UVCodeplug::AirBandChannelElement::clear() {
   memset(_data, 0, _size);
 }
 
+
 Frequency
 D578UVCodeplug::AirBandChannelElement::frequency() const {
   return Frequency::fromHz(((unsigned long long)getBCD8_be(Offset::frequency()))*10);
 }
+
 void
 D578UVCodeplug::AirBandChannelElement::setFrequency(Frequency freq) {
   setBCD8_be(Offset::frequency(), freq.inHz()/10);
 }
 
+
 QString
 D578UVCodeplug::AirBandChannelElement::name() const {
   return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
+
 void
 D578UVCodeplug::AirBandChannelElement::setName(const QString &name) {
   writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
+
+
+bool
+D578UVCodeplug::AirBandChannelElement::encode(AMChannel *am, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  if (nullptr == am)
+    return false;
+
+  setName(am->name());
+  setFrequency(am->rxFrequency());
+
+  return true;
+}
+
+
+AMChannel *
+D578UVCodeplug::AirBandChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
+  auto am = new AMChannel();
+  am->setName(name());
+  am->setRXFrequency(frequency());
+
+  return am;
+}
+
 
 
 /* ******************************************************************************************** *
@@ -3221,7 +3281,8 @@ D578UVCodeplug::D578UVCodeplug(QObject *parent)
   // pass...
 }
 
-bool D578UVCodeplug::allocateBitmaps() {
+bool
+D578UVCodeplug::allocateBitmaps() {
   if (! D878UVCodeplug::allocateBitmaps())
     return false;
 
@@ -3231,30 +3292,115 @@ bool D578UVCodeplug::allocateBitmaps() {
   return true;
 }
 
-void
-D578UVCodeplug::allocateUpdated() {
-  D878UVCodeplug::allocateUpdated();
 
-  this->allocateAirBand();
+void
+D578UVCodeplug::setBitmaps(Context &ctx) {
+  D878UVCodeplug::setBitmaps(ctx);
+
+  AirBandBitmapElement air_band_bitmap(data(Offset::airBandChannelBitmap())),
+    air_scan_bitmap(data(Offset::airBandScanBitmap()));
+  unsigned int num_am_channels = std::min(Limit::airBandChannels(), ctx.count<AMChannel>());
+  air_band_bitmap.clear(); air_band_bitmap.enableFirst(num_am_channels);
+  air_scan_bitmap.clear(); air_scan_bitmap.enableFirst(num_am_channels);
 }
+
+
+void
+D578UVCodeplug::allocateForEncoding() {
+  // First allocate everything common
+  D878UVCodeplug::allocateForEncoding();
+  this->allocateAirBandChannels();
+}
+
+void
+D578UVCodeplug::allocateForDecoding() {
+  // First allocate everything common
+  D878UVCodeplug::allocateForDecoding();
+  this->allocateAirBandChannels();
+}
+
 
 void
 D578UVCodeplug::allocateHotKeySettings() {
   image(0).addElement(Offset::hotKeySettings(), HotKeySettingsElement::size());
 }
 
+
+Config *
+D578UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  // Apply base preprocessing
+  auto intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot apply preprocessing for D578UV.";
+    return nullptr;
+  }
+
+  // Split A/B zones into two.
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Split multi-VFO zones.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  // Keep 16bit DMR, 128 bit AES and 256 bit AES keys.
+  EncryptionKeyFilterVisitor filter(
+    { EncryptionKeyFilterVisitor::Filter(BasicEncryptionKey::staticMetaObject, 16, 16),
+      EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 128, 128),
+      EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 256, 256),});
+  if (! filter.process(intermediate, err)) {
+    errMsg(err) << "Cannot remove unsupported exncryption.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
+bool
+D578UVCodeplug:: encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! D878UVCodeplug::encodeElements(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode elements for D578UV.";
+    return false;
+  }
+
+  if (! encodeAirBandChannels(flags, ctx, err)) {
+    errMsg(err) << "Cannot encode AM channels.";
+    return false;
+  }
+
+  return true;
+}
+
+bool
+D578UVCodeplug::createElements(Context &ctx, const ErrorStack &err) {
+  if (! D878UVCodeplug::createElements(ctx, err)) {
+    errMsg(err) << "Cannot create elements for D578UV.";
+    return false;
+  }
+
+  if (! createAirBandChannels(ctx, err)) {
+    errMsg(err) << "Cannot create AM channels.";
+    return false;
+  }
+
+  return true;
+}
+
+
 bool
 D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                     + idx*ChannelElement::size();
     ChannelElement ch(data(addr));
-    ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    ch.fromChannelObj(ctx.get<Channel>(i), ctx);
 
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
     ext.clear();
@@ -3303,6 +3449,7 @@ D578UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 
   return true;
 }
+
 
 void
 D578UVCodeplug::allocateContacts() {
@@ -3357,6 +3504,7 @@ D578UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
   return true;
 }
 
+
 void
 D578UVCodeplug::allocateGeneralSettings() {
   // override allocation of general settings for D878UV code-plug. General settings are larger!
@@ -3365,6 +3513,7 @@ D578UVCodeplug::allocateGeneralSettings() {
   image(0).addElement(Offset::settingsExtension(), ExtendedSettingsElement::size());
 
 }
+
 bool
 D578UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
@@ -3374,6 +3523,7 @@ D578UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const Er
   ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx);
   return true;
 }
+
 bool
 D578UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
@@ -3383,6 +3533,7 @@ D578UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx);
   return true;
 }
+
 bool
 D578UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
   if (! GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err)) {
@@ -3398,18 +3549,61 @@ D578UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
-void
-D578UVCodeplug::allocateAirBand() {
+
+bool
+D578UVCodeplug::allocateAirBandChannels() {
   // Allocate valid air-band channels
   AirBandBitmapElement bitmap(data(Offset::airBandChannelBitmap()));
   for (unsigned int i=0; i<Limit::airBandChannels(); i++)  {
     if (! bitmap.isEncoded(i))
-      return;
+      continue;
     image(0).addElement(Offset::airBandChannels() + i*AirBandChannelElement::size(),
                         AirBandChannelElement::size());
   }
   // allocate air-band VFO channel
   image(0).addElement(Offset::airBandVFO(), AirBandChannelElement::size());
+  return true;
 }
 
 
+bool
+D578UVCodeplug::encodeAirBandChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags);
+
+  AirBandBitmapElement air_band_bitmap(data(Offset::airBandChannelBitmap()));
+  for (unsigned int i=0; i<Limit::airBandChannels(); i++) {
+    if (! air_band_bitmap.isEncoded(i))
+      continue;
+    if (! ctx.has<AMChannel>(i)) {
+      errMsg(err) << "Cannot resolve AM channel at index " << i << ". Not defined!";
+      return false;
+    }
+    AirBandChannelElement ch(data(Offset::airBandChannels() + i*AirBandChannelElement::size()));
+    if (! ch.encode(ctx.get<AMChannel>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode AM channel at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool
+D578UVCodeplug::createAirBandChannels(Context &ctx, const ErrorStack &err) {
+  AirBandBitmapElement air_band_bitmap(data(Offset::airBandChannelBitmap()));
+  for (unsigned int i=0; i<Limit::airBandChannels(); i++) {
+    if (! air_band_bitmap.isEncoded(i))
+      continue;
+    AirBandChannelElement ch(data(Offset::airBandChannels() + i*AirBandChannelElement::size()));
+    auto am = ch.decode(ctx, err);
+    if (nullptr == am) {
+      errMsg(err) << "Cannot decode AM channel at index " << i << ".";
+      return false;
+    }
+    ctx.config()->channelList()->add(am);
+    ctx.add(am, i);
+  }
+
+  return true;
+}

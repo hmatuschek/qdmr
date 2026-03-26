@@ -22,7 +22,8 @@ ConfigCloneVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop,
       || (QString("int") == prop.typeName()) || (QString("uint") == prop.typeName())
       || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName())
       || (QString("Frequency") == prop.typeName()) || (QString("Interval") == prop.typeName())
-      || (QString("SelectiveCall") == prop.typeName())) {
+      || (QString("Level") == prop.typeName()) || (QString("SelectiveCall") == prop.typeName())
+      || (QString("QGeoCoordinate") == prop.typeName())) {
     if ((! prop.isReadable()) && (!prop.isWritable())) {
       logDebug() << "Skip property " << prop.name()
                  << " of item " << item->metaObject()->className() << ": Not readable or writable.";

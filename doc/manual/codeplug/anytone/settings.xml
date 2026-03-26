@@ -1347,14 +1347,6 @@
 
 <variablelist>
 <varlistentry>
-  <term><token>units</token></term>
-  <listitem>
-    <para>Specifies the unit system to use for distance reporting (ranging). This must be one of 
-    <token>Metric</token> or <token>Archaic</token>. This software was developed by a European, so 
-    don't mail me to tell me, that I am silly.</para>
-  </listitem>
-</varlistentry>
-<varlistentry>
   <term><token>timeZone</token></term>
   <listitem>
     <para>Specifies the time-zone for the device. Any IANA time-zone ID is valid here. E.g., 
@@ -1372,14 +1364,6 @@
   <listitem>
     <para>Specifies the update/reporting interval in seconds. Any interval specification is valid 
     here. E.g., <code>5 min</code> or <code>360 s</code>.</para>
-  </listitem>
-</varlistentry>
-<varlistentry>
-  <term><token>mode</token></term>
-  <listitem>
-    <para>Specifies the GPS mode. Must be one of <token>GPS</token>, <token>Beidou</token>, 
-    <token>GPS_Beidou</token>, <token>Glonass</token>, <token>GPS_Glonass</token>, 
-    <token>Beidou_Glonass</token> or <token>All</token>.</para>
   </listitem>
 </varlistentry>
 </variablelist>

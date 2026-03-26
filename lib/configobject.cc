@@ -3,10 +3,13 @@
 #include "logger.hh"
 #include "frequency.hh"
 #include "interval.hh"
+#include "level.hh"
 #include "signaling.hh"
+#include "gnsssettings.hh"
 
 #include <QMetaProperty>
 #include <QMetaEnum>
+
 
 // Helper function to extract key names for a QMetaEnum
 inline QStringList enumKeys(const QMetaEnum &e) {
@@ -30,10 +33,8 @@ inline bool isInstanceOf(QObject *obj, const QStringList &typeNames) {
 /* ********************************************************************************************* *
  * Implementation of ConfigObject::Context
  * ********************************************************************************************* */
-QHash<QString, QHash<QString, ConfigObject *>> ConfigObject::Context::_tagObjects =
-    QHash<QString, QHash<QString, ConfigObject *>>();
-QHash<QString, QHash<ConfigObject *, QString>> ConfigObject::Context::_tagNames =
-    QHash<QString, QHash<ConfigObject *, QString>>();
+QHash<QString, QList<QPair<QString, QVariant>>> ConfigObject::Context::_tags =
+    QHash<QString, QList<QPair<QString, QVariant>>>();
 
 ConfigItem::Context::Context()
   : _version(), _objects(), _ids()
@@ -84,45 +85,70 @@ ConfigItem::Context::add(const QString &id, ConfigObject *obj) {
 }
 
 bool
-ConfigItem::Context::hasTag(const QString &className, const QString &property, const QString &tag) {
+ConfigItem::Context::tagIsSet(const QString &className, const QString &property, const QString &tag) {
   QString qname = className+"::"+property;
-  return _tagObjects.contains(qname) && _tagObjects[qname].contains(tag);
+  if (! _tags.contains(qname))
+    return false;
+  for(auto pair: _tags[qname]) {
+    if (pair.first == tag)
+      return true;
+  }
+  return false;
 }
 
 bool
-ConfigItem::Context::hasTag(const QString &className, const QString &property, ConfigObject *obj) {
+ConfigItem::Context::hasTag(const QString &className, const QString &property, QVariant value) {
   QString qname = className+"::"+property;
-  return _tagNames.contains(qname) && _tagNames[qname].contains(obj);
+  if (! _tags.contains(qname))
+    return false;
+  for(auto pair: _tags[qname]) {
+    if (QPartialOrdering::Equivalent == QVariant::compare(pair.second, value))
+      return true;
+  }
+  return false;
 }
 
-ConfigObject *
-ConfigItem::Context::getTag(const QString &className, const QString &property, const QString &tag) {
-  //logDebug() << "Request " << tag << " for " << property << " in " << className << ".";
+QVariant
+ConfigItem::Context::tagGetValue(const QString &className, const QString &property, const QString &tag) {
   QString qname = className+"::"+property;
-  if (! _tagObjects.contains(qname))
-    return nullptr;
-  return _tagObjects[qname].value(tag, nullptr);
+  if (! _tags.contains(qname))
+    return QVariant();
+  for(auto pair: _tags[qname]) {
+    if (pair.first == tag)
+      return pair.second;
+  }
+  return QVariant();
 }
 
 QString
-ConfigItem::Context::getTag(const QString &className, const QString &property, ConfigObject *obj) {
-  //logDebug() << "Request tag for " << property << " in " << className << ".";
+ConfigItem::Context::getTag(const QString &className, const QString &property, QVariant value) {
   QString qname = className+"::"+property;
-  if (! _tagNames.contains(qname))
-    return nullptr;
-  return _tagNames[qname].value(obj);
+  if (! _tags.contains(qname))
+    return QString();
+  for(auto pair: _tags[qname]) {
+    if (QPartialOrdering::Equivalent == QVariant::compare(pair.second, value))
+      return pair.first;
+  }
+  return QString();
 }
 
 void
-ConfigItem::Context::setTag(const QString &className, const QString &property, const QString &tag, ConfigObject *obj) {
+ConfigItem::Context::setTag(const QString &className, const QString &property, const QString &tag, QVariant value) {
   //logDebug() << "Register tag " << tag << " for " << property << " in " << className << ".";
   QString qname = className+"::"+property;
-  if (! _tagObjects.contains(qname))
-    _tagObjects[qname] = QHash<QString, ConfigObject*>();
-  _tagObjects[qname].insert(tag, obj);
-  if (! _tagNames.contains(qname))
-    _tagNames[qname] = QHash<ConfigObject*, QString>();
-  _tagNames[qname].insert(obj, tag);
+  if (! _tags.contains(qname)) {
+    _tags[qname] = QList<QPair<QString, QVariant>>();
+    _tags[qname].append({tag, value});
+    return;
+  }
+
+  for (auto it=_tags[qname].begin(); it != _tags[qname].end(); it++) {
+    if (tag == it->first) {
+      *it = {tag, value};
+      return;
+    }
+  }
+  _tags[qname].append({tag, value});
 }
 
 
@@ -162,11 +188,15 @@ ConfigItem::copy(const ConfigItem &other) {
     }
 
     // true if the property is a basic type
-    bool isBasicType = ( prop.isEnumType() || (QMetaType::Bool==prop.typeId()) ||
+    bool isBasicType = ( prop.isEnumType() || prop.isFlagType() ||
+                         (QMetaType::Bool==prop.typeId()) ||
                          (QMetaType::Int==prop.typeId()) || (QMetaType::UInt==prop.typeId()) ||
                          (QMetaType::Double==prop.typeId()) || (QMetaType::QString==prop.typeId()) ||
                          (QString("Frequency")==prop.typeName()) ||
-                         (QString("Interval")==prop.typeName()) );
+                         (QString("Interval")==prop.typeName()) ||
+                         (QString("Level")==prop.typeName()) ||
+                         (QString("SelectiveCall")==prop.typeName()) ||
+                         (QString("QGeoCoordinate")==prop.typeName()));
 
     // If a basic type -> simply copy value
     if (isBasicType && prop.isWritable() && (prop.typeId()==oprop.typeId())) {
@@ -253,7 +283,8 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
 
     // Handle comparison of basic types
-    if ((prop.isEnumType()) || (QMetaType::Bool == prop.typeId()) || (QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())) {
+    if (prop.isEnumType() || prop.isFlagType() || (QMetaType::Bool == prop.typeId()) ||
+        (QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())) {
       int a=prop.read(this).toInt(), b=oprop.read(&other).toInt();
       if (a<b)
         return -1;
@@ -289,6 +320,15 @@ ConfigItem::compare(const ConfigItem &other) const {
 
     if (QString("Interval") == prop.typeName()) {
       Interval a = prop.read(this).value<Interval>(), b = oprop.read(&other).value<Interval>();
+      if (a<b)
+        return -1;
+      if (b<a)
+        return 1;
+      continue;
+    }
+
+    if (QString("Level") == prop.typeName()) {
+      Level a = prop.read(this).value<Level>(), b = oprop.read(&other).value<Level>();
       if (a<b)
         return -1;
       if (b<a)
@@ -397,12 +437,27 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
     QMetaProperty prop = meta->property(p);
     if (! prop.isValid())
       continue;
-    if (! prop.isScriptable()) {
-      /*logDebug() << "Do not serialize property '"
-                 << prop.name() << "': Marked as not scriptable.";*/
+    if (! prop.isScriptable())
+      continue;
+
+    // Handle tags:
+    if (context.hasTag(prop.enclosingMetaObject()->className(), prop.name(), prop.read(this))) {
+      YAML::Node tag(YAML::NodeType::Scalar);
+      tag.SetTag(context.getTag(prop.enclosingMetaObject()->className(),
+                                prop.name(), prop.read(this)).toStdString());
+      node[prop.name()] = tag;
       continue;
     }
-    if (prop.isEnumType()) {
+
+    // Dispatch by type
+    if (prop.isFlagType()) {
+      QMetaEnum e = prop.enumerator();
+      QStringList keys = QString::fromLatin1(e.valueToKeys(prop.read(this).toInt())).split("|");
+      YAML::Node list;
+      for(auto key: keys)
+        list.push_back(key.toStdString());
+      node[prop.name()] = list;
+    } else if (prop.isEnumType()) {
       QMetaEnum e = prop.enumerator();
       QVariant value = prop.read(this);
       const char *key = e.valueToKey(value.toInt());
@@ -429,15 +484,21 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       node[prop.name()] = this->property(prop.name()).value<Frequency>();
     } else if (QString("Interval") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).value<Interval>();
+    } else if (QString("Level") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<Level>();
     } else if (QString("SelectiveCall") == prop.typeName()) {
       node[prop.name()] = this->property(prop.name()).value<SelectiveCall>();
+    } else if (QString("QGeoCoordinate") == prop.typeName()) {
+      node[prop.name()] = this->property(prop.name()).value<QGeoCoordinate>();
     } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       ConfigObject *obj = ref->as<ConfigObject>();
       if (nullptr == obj)
         continue;
-      if (context.hasTag(prop.enclosingMetaObject()->className(), prop.name(), obj)) {
+      if (context.hasTag(prop.enclosingMetaObject()->className(),
+                         prop.name(), QVariant::fromValue(obj))) {
         YAML::Node tag(YAML::NodeType::Scalar);
-        tag.SetTag(context.getTag(prop.enclosingMetaObject()->className(), prop.name(), obj).toStdString());
+        tag.SetTag(context.getTag(prop.enclosingMetaObject()->className(),
+                                  prop.name(), QVariant::fromValue(obj)).toStdString());
         node[prop.name()] = tag;
         continue;
       } else if (! context.contains(obj)) {
@@ -452,13 +513,7 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       list.SetStyle(YAML::EmitterStyle::Flow);
       for (int i=0; i<refs->count(); i++) {
         ConfigObject *obj = refs->get(i);
-        if (context.hasTag(prop.enclosingMetaObject()->className(), prop.name(), obj)) {
-          YAML::Node tag(YAML::NodeType::Scalar);
-          tag.SetTag(context.getTag(prop.enclosingMetaObject()->className(), prop.name(), obj).toStdString());
-          //tag = tag.Tag().substr(1);
-          list.push_back(tag);
-          continue;
-        } else if (! context.contains(obj)) {
+        if (! context.contains(obj)) {
           errMsg(err) << "Cannot reference object of type " << obj->metaObject()->className()
                       << " object not labeled.";
           return false;
@@ -515,8 +570,10 @@ bool
 ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx)
 
-  if (! node)
+  if (! node) {
+    errMsg(err) << "YAML node is null!";
     return false;
+  }
 
   if (! node.IsMap()) {
     errMsg(err) << node.Mark().line << ":" << node.Mark().column
@@ -528,19 +585,49 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
   for (int p=QObject::staticMetaObject.propertyOffset(); p<meta->propertyCount(); p++) {
     QMetaProperty prop = meta->property(p);
 
-    if (! prop.isValid())
-      continue;
-    // If marked as non-scriptable, skip that property.
-    // It is handled separately or not at all.
-    if (! prop.isScriptable())
+    if ((! prop.isValid()) || (! prop.isScriptable()))
       continue;
 
-    /// @todo With Qt 5.15, we can use the REQUIRED flag to check for mandatory properties.
-    /// However, Ubuntu 20.04 (Focal) comes with Qt 5.12.
+    if (prop.isRequired() && !node[prop.name()]) {
+      errMsg(err) << "Required property '" << prop.name() << "' not set!";
+      return false;
+    }
 
-    if (prop.isEnumType()) {
+    // Tags are handled during linking
+    if (node[prop.name()] && (! node[prop.name()].IsNull()) && node[prop.name()].IsScalar()
+        && (node[prop.name()].Scalar().empty()) && (! node[prop.name()].Tag().empty()))
+      continue;
+
+    if (prop.isFlagType()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
+        continue;
+      // parse & check enum key
+      if (! node[prop.name()].IsSequence()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected list of enum key.";
+        return false;
+      }
+      QMetaEnum e = prop.enumerator();
+      QByteArray keys;
+      for (auto i: node[prop.name()]) {
+        if (!keys.isEmpty())
+          keys.append("|");
+        keys.append(i.as<std::string>());
+      }
+      bool ok=true; int value = e.keysToValue(keys.constData(), &ok);
+      if (! ok) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Unknown key-combination '" << keys << "' for enum '" << prop.name()
+                    << "'. Expected one of " << enumKeys(e).join(", ") << ".";
+        return false;
+      }
+      // finally set property
+      prop.write(this, value);
+    } else if (prop.isEnumType()) {
+      // If property is not set -> skip
+      if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
       // parse & check enum key
       if (! node[prop.name()].IsScalar()) {
@@ -562,7 +649,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, value);
     } else if (QString("bool") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -574,7 +661,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, node[prop.name()].as<bool>());
     } else if (QString("int") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -586,7 +673,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, node[prop.name()].as<int>());
     } else if (QString("uint") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -598,7 +685,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, node[prop.name()].as<unsigned>());
     } else if (QString("double") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -610,7 +697,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, node[prop.name()].as<double>());
     } else if (QString("QString") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ( (!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -622,7 +709,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, QString::fromStdString(node[prop.name()].as<std::string>()));
     } else if (QString("Frequency") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((! node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -635,7 +722,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       prop.write(this, QVariant::fromValue(f));
     } else if (QString("Interval") == prop.typeName()) {
       // If property is not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
       // parse & check type
       if (! node[prop.name()].IsScalar()) {
@@ -645,9 +732,21 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
+    } else if (QString("Level") == prop.typeName()) {
+      // If property is not set -> skip
+      if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
+        continue;
+      // parse & check type
+      if (! node[prop.name()].IsScalar()) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected level.";
+        return false;
+      }
+      prop.write(this, QVariant::fromValue(node[prop.name()].as<Level>()));
     } else if (QString("SelectiveCall") == prop.typeName()) {
       // If property is not set -> skip
-      if ((! node[prop.name()]) || (node[prop.name()].IsNull())) {
+      if ((! node[prop.name()]) || (node[prop.name()].IsNull()) || (!prop.isWritable())) {
         prop.write(this, QVariant::fromValue(SelectiveCall()));
         continue;
       }
@@ -659,6 +758,22 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QVariant::fromValue(node[prop.name()].as<SelectiveCall>()));
+    } else if (QString("QGeoCoordinate") == prop.typeName()) {
+      // If property is not set -> skip
+      if ((! node[prop.name()]) || (node[prop.name()].IsNull()) || (!prop.isWritable())) {
+        prop.write(this, QVariant::fromValue(QGeoCoordinate()));
+        continue;
+      }
+      // parse & check type
+      if ((! node[prop.name()].IsMap()) || (2 > node[prop.name()].size())) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot parse " << prop.name() << " of " << meta->className()
+                    << ": Expected geo coordinate.";
+        return false;
+      }
+      QGeoCoordinate value = node[prop.name()].as<QGeoCoordinate>(QGeoCoordinate());
+      qDebug() << "Write to property" << prop.name() << "value" << value;
+      prop.write(this, QVariant::fromValue(value));
     } else if (prop.read(this).value<ConfigObjectReference *>()) {
       // references are linked later
       continue;
@@ -666,7 +781,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       // reference lists are linked later
       continue;
     } else if (propIsInstance<ConfigItem>(prop)) {
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // check type
       if (! node[prop.name()].IsMap()) {
@@ -699,14 +814,14 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       // parse instance
       YAML::Node propNode = node[prop.name()];
       if (obj && (! obj->parse(propNode, ctx, err))) {
-        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+        errMsg(err) << propNode.Mark().line << ":" << propNode.Mark().column
                     << ": Cannot parse " << prop.name() << " of " << meta->className() << ".";
         if (nullptr == obj->parent())
           obj->deleteLater();
         return false;
       }
     } else if (prop.read(this).value<ConfigObjectList *>()) {
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // check type
       if (! node[prop.name()].IsSequence()) {
@@ -783,12 +898,10 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
       //logDebug() << "Do not link property '" << prop.name() << "': Marked as not scriptable.";
       continue;
     }
-    if ((prop.isEnumType()) || (QString("bool") == prop.typeName()) || (QString("int") == prop.typeName()) ||
-        (QString("uint") == prop.typeName()) || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName()) ) {
-      continue;
-    } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
+
+    if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       // If not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // check type
       if (! node[prop.name()].IsScalar()) {
@@ -800,7 +913,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
       // handle tags
       QString tag = QString::fromStdString(node[prop.name()].Tag());
       if ((!node[prop.name()].Scalar().size()) && (!tag.isEmpty())) {
-        if (! ref->set(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
+        if (! ref->set(ctx.tagGetValue(prop.enclosingMetaObject()->className(), prop.name(), tag).value<ConfigObject *>())) {
           errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                       << ": Cannot link " << prop.name() << " of " << meta->className()
                       << ": Unknown tag " << tag << ".";
@@ -826,7 +939,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
                  << " '" << ctx.getObj(id)->name() << "'.";*/
     } else if (ConfigObjectRefList *lst = prop.read(this).value<ConfigObjectRefList *>()) {
       // If not set -> skip
-      if (! node[prop.name()])
+      if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // check type
       if (! node[prop.name()].IsSequence()) {
@@ -845,7 +958,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
         // check for tags
         QString tag = QString::fromStdString(it->Tag());
         if ((!it->Scalar().size()) && (!tag.isEmpty())) {
-          if (0 > lst->add(ctx.getTag(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
+          if (0 > lst->add(ctx.tagGetValue(prop.enclosingMetaObject()->className(), prop.name(), tag).value<ConfigObject*>())) {
             errMsg(err) << it->Mark().line << ":" << it->Mark().column
                         << ": Cannot link " << prop.name() << " of " << meta->className()
                         << ": Cannot add reference for tag '" << tag << "'.";
@@ -867,10 +980,9 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
           return false;
         }
       }
-
     } else if (ConfigItem *obj = prop.read(this).value<ConfigItem *>()) {
       // If not set -> skip
-      if (! node[prop.name()])
+      if ((! node[prop.name()]) || node[prop.name()].IsNull())
         continue;
 
       // check type
@@ -888,7 +1000,7 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
       }
     } else if (ConfigObjectList *lst = prop.read(this).value<ConfigObjectList *>()) {
       // If not set -> skip
-      if (! node[prop.name()])
+      if ((! node[prop.name()]) || node[prop.name()].IsNull())
         continue;
 
       // check type
@@ -902,6 +1014,20 @@ ConfigItem::link(const YAML::Node &node, const ConfigItem::Context &ctx, const E
       if (! lst->link(node[prop.name()], ctx, err)) {
         errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
                     << ": Cannot link " << prop.name() << " of " << meta->className() << ".";
+        return false;
+      }
+    } else {
+      YAML::Node element = node[prop.name()];
+      // If not set, not scalar or not tagged -> skip
+      if ((!element) || element.IsNull() || (! element.IsScalar()) || (! element.Scalar().empty())
+          || element.Tag().empty())
+        continue;
+      // Handle tagged values
+      QString tag = QString::fromStdString(node[prop.name()].Tag());
+      if (! prop.write(this, ctx.tagGetValue(prop.enclosingMetaObject()->className(), prop.name(), tag))) {
+        errMsg(err) << node[prop.name()].Mark().line << ":" << node[prop.name()].Mark().column
+                    << ": Cannot link " << prop.name() << " of " << meta->className()
+                    << ": Unknown tag " << tag << ".";
         return false;
       }
     }
@@ -1079,7 +1205,7 @@ ConfigObject::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err)
     }
   }
 
-  return ConfigItem::parse(node, ctx);
+  return ConfigItem::parse(node, ctx, err);
 }
 
 bool

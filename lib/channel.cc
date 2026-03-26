@@ -19,11 +19,16 @@
  * ********************************************************************************************* */
 Channel::Channel(QObject *parent)
   : ConfigObject("ch", parent), _rxFreq(Frequency::fromHz(0)), _txFreq(Frequency::fromHz(0)),
-    _defaultPower(true), _power(Power::Low), _txTimeOut(std::numeric_limits<unsigned>::max()),
-    _rxOnly(false), _vox(std::numeric_limits<unsigned>::max()), _scanlist(),
+    _defaultPower(true), _power(Power::Low), _txTimeOut(Interval::null()),
+    _rxOnly(false), _vox(), _scanlist(),
     _openGD77ChannelExtension(nullptr),
     _tytChannelExtension(nullptr)
 {
+  Context::setTag(staticMetaObject.className(), "timeout",
+                  "!default", QVariant::fromValue(Interval::null()));
+  Context::setTag(staticMetaObject.className(), "vox",
+                  "!default", QVariant::fromValue(Level::invalid()));
+
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -151,21 +156,21 @@ Channel::setDefaultPower() {
 
 bool
 Channel::defaultTimeout() const {
-  return std::numeric_limits<unsigned>::max() == timeout();
+  return timeout().isNull();
 }
 
 bool
 Channel::timeoutDisabled() const {
-  return 0 == timeout();
+  return timeout().isInfinite();
 }
 
-unsigned
+Interval
 Channel::timeout() const {
   return _txTimeOut;
 }
 
 bool
-Channel::setTimeout(unsigned dur) {
+Channel::setTimeout(const Interval& dur) {
   if (dur == _txTimeOut)
     return true;
 
@@ -180,13 +185,13 @@ Channel::setDefaultTimeout() {
   if (defaultTimeout())
     return;
 
-  setTimeout(std::numeric_limits<unsigned>::max());
+  setTimeout(Interval::null());
   emit modified(this);
 }
 
 void
 Channel::disableTimeout() {
-  setTimeout(0);
+  setTimeout(Interval::infinity());
 }
 
 
@@ -203,28 +208,30 @@ Channel::setRXOnly(bool enable) {
 
 bool
 Channel::voxDisabled() const {
-  return 0==vox();
+  return _vox.isNull();
 }
 bool
 Channel::defaultVOX() const {
-  return std::numeric_limits<unsigned>::max() == vox();
+  return _vox.isInvalid();
 }
-unsigned
+Level
 Channel::vox() const {
   return _vox;
 }
 void
-Channel::setVOX(unsigned level) {
+Channel::setVOX(Level level) {
+  if (_vox == level)
+    return;
   _vox = level;
   emit modified(this);
 }
 void
 Channel::setVOXDefault() {
-  setVOX(std::numeric_limits<unsigned>::max());
+  setVOX(Level::invalid());
 }
 void
 Channel::disableVOX() {
-  setVOX(0);
+  setVOX(Level::null());
 }
 
 const ScanListReference *
@@ -290,10 +297,6 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
   if (! ConfigObject::populate(node, context, err))
     return false;
 
-  // Serialize freuqencies in MHz
-  node["rxFrequency"] = _rxFreq;
-  node["txFrequency"] = _txFreq;
-
   if (defaultPower()) {
     YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
     node["power"] = def;
@@ -302,27 +305,15 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
     node["power"] = metaEnum.valueToKey((unsigned)power());
   }
 
-  if (defaultTimeout()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["timeout"] = def;
-  } else {
-    node["timeout"] = timeout();
-  }
-
-  if (defaultVOX()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["vox"] = def;
-  } else {
-    node["vox"] = vox();
-  }
-
   return true;
 }
 
 bool
 Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
-  if (! node)
+  if (! node) {
+    errMsg(err) << "YAML node is null!";
     return false;
+  }
 
   if ((! node.IsMap()) || (1 != node.size())) {
     errMsg(err) << node.Mark().line << ":" << node.Mark().column
@@ -331,38 +322,11 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
   }
 
   YAML::Node ch = node.begin()->second;
-  // Parse frequencies
-  if (ch["rxFrequency"].IsNull()) {
-    errMsg(err) << node.Mark().line << ":" << node.Mark().column
-                << "Cannot parse channel. No rxFreuqency specified.";
-    return false;
-  }
-  setRXFrequency(ch["rxFrequency"].as<Frequency>());
-
-  if (ch["txFrequency"].IsNull()) {
-    errMsg(err) << node.Mark().line << ":" << node.Mark().column
-                << "Cannot parse channel. No txFrequency specified.";
-    return false;
-  }
-  setTXFrequency(ch["txFrequency"].as<Frequency>());
-
   if ((!ch["power"]) || ("!default" == ch["power"].Tag())) {
     setDefaultPower();
   } else if (ch["power"] && ch["power"].IsScalar()) {
     QMetaEnum meta = QMetaEnum::fromType<Channel::Power>();
     setPower((Channel::Power)meta.keyToValue(ch["power"].as<std::string>().c_str()));
-  }
-
-  if ((!ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
-    setDefaultTimeout();
-  } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
-    setTimeout(ch["timeout"].as<unsigned>());
-  }
-
-  if ((!ch["vox"]) || ("!default" == ch["vox"].Tag())) {
-    setVOXDefault();
-  } else if (ch["vox"] && ch["vox"].IsScalar()) {
-    setVOX(ch["vox"].as<unsigned>());
   }
 
   return ConfigObject::parse(ch, ctx, err);
@@ -387,16 +351,48 @@ Channel::link(const YAML::Node &node, const ConfigItem::Context &ctx, const Erro
  * Implementation of AnalogChannel
  * ********************************************************************************************* */
 AnalogChannel::AnalogChannel(QObject *parent)
-  : Channel(parent)
+  : Channel(parent), _squelch(Level::invalid())
 {
-  // pass...
+  Context::setTag(staticMetaObject.className(), "squelch",
+                  "!default", QVariant::fromValue(Level::invalid()));
 }
 
 AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
-  : Channel(other, parent)
+  : Channel(other, parent), _squelch(Level::invalid())
 {
-  // pass...
+  Context::setTag(staticMetaObject.className(), "squelch",
+                  "!default", QVariant::fromValue(Level::invalid()));
 }
+
+bool
+AnalogChannel::defaultSquelch() const {
+  return _squelch.isInvalid();
+}
+bool
+AnalogChannel::squelchDisabled() const {
+  return _squelch.isNull();
+}
+Level
+AnalogChannel::squelch() const {
+  return _squelch;
+}
+bool
+AnalogChannel::setSquelch(Level level) {
+  if (_squelch == level)
+    return true;
+  _squelch = level;
+  emit modified(this);
+  return true;
+}
+void
+AnalogChannel::disableSquelch() {
+  setSquelch(Level::null());
+}
+void
+AnalogChannel::setSquelchDefault() {
+  setSquelch(Level::invalid());
+}
+
 
 
 
@@ -405,12 +401,13 @@ AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
  * ********************************************************************************************* */
 FMChannel::FMChannel(QObject *parent)
   : AnalogChannel(parent),
-    _admit(Admit::Always), _squelch(std::numeric_limits<unsigned>::max()),
-    _rxTone(), _txTone(), _bw(Bandwidth::Narrow),
-    _aprsSystem(), _anytoneExtension(nullptr)
+    _admit(Admit::Always), _rxTone(), _txTone(), _bw(Bandwidth::Narrow),
+    _aprsSystem(), _extended(new FMChannelExtension(this)), _anytoneExtension(nullptr)
 {
   // Link APRS system reference
-  connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_aprsSystem, &FMAPRSSystemReference::modified, this, &FMChannel::onReferenceModified);
+  // Link extended settings
+  connect(_extended, &FMChannelExtension::modified, this, &FMChannel::modified);
 }
 
 bool
@@ -443,7 +440,7 @@ FMChannel::clear() {
   setRXTone(SelectiveCall());
   setTXTone(SelectiveCall());
   setBandwidth(Bandwidth::Narrow);
-  setAPRSSystem(nullptr);
+  setAPRS(nullptr);
   setAnytoneChannelExtension(nullptr);
 }
 
@@ -455,33 +452,6 @@ void
 FMChannel::setAdmit(Admit admit) {
   _admit = admit;
   emit modified(this);
-}
-
-bool
-FMChannel::defaultSquelch() const {
-  return std::numeric_limits<unsigned>::max()==squelch();
-}
-bool
-FMChannel::squelchDisabled() const {
-  return 0==squelch();
-}
-unsigned
-FMChannel::squelch() const {
-  return _squelch;
-}
-bool
-FMChannel::setSquelch(unsigned val) {
-  _squelch = val;
-  emit modified(this);
-  return true;
-}
-void
-FMChannel::disableSquelch() {
-  setSquelch(0);
-}
-void
-FMChannel::setSquelchDefault() {
-  setSquelch(std::numeric_limits<unsigned>::max());
 }
 
 SelectiveCall
@@ -517,31 +487,31 @@ FMChannel::setBandwidth(Bandwidth bw) {
   return true;
 }
 
-const APRSSystemReference *
+const FMAPRSSystemReference *
+FMChannel::aprsRef() const {
+  return &_aprsSystem;
+}
+
+FMAPRSSystemReference *
+FMChannel::aprsRef() {
+  return &_aprsSystem;
+}
+
+FMAPRSSystem *
 FMChannel::aprs() const {
-  return &_aprsSystem;
-}
-
-APRSSystemReference *
-FMChannel::aprs() {
-  return &_aprsSystem;
-}
-
-void
-FMChannel::setAPRS(APRSSystemReference *ref) {
-  if (nullptr == ref)
-    return _aprsSystem.clear();
-  _aprsSystem.copy(ref);
-}
-
-APRSSystem *
-FMChannel::aprsSystem() const {
-  return _aprsSystem.as<APRSSystem>();
+  return _aprsSystem.as<FMAPRSSystem>();
 }
 void
-FMChannel::setAPRSSystem(APRSSystem *sys) {
+FMChannel::setAPRS(FMAPRSSystem *sys) {
   _aprsSystem.set(sys);
 }
+
+
+FMChannelExtension *
+FMChannel::extended() const {
+  return _extended;
+}
+
 
 AnytoneFMChannelExtension *
 FMChannel::anytoneChannelExtension() const {
@@ -572,21 +542,6 @@ FMChannel::serialize(const Context &context, const ErrorStack &err) {
 }
 
 bool
-FMChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
-  if (! AnalogChannel::populate(node, context, err))
-    return false;
-
-  if (defaultSquelch()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["squelch"] = def;
-  } else {
-    node["squelch"] = squelch();
-  }
-
-  return true;
-}
-
-bool
 FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
@@ -599,12 +554,6 @@ FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
 
   YAML::Node ch = node.begin()->second;
 
-  if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
-    setSquelchDefault();
-  } else if (ch["squelch"].IsDefined() && ch["squelch"].IsScalar()) {
-    setSquelch(ch["squelch"].as<unsigned>());
-  }
-
   return AnalogChannel::parse(node, ctx, err);
 }
 
@@ -614,7 +563,7 @@ FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
  * Implementation of AMChannel
  * ********************************************************************************************* */
 AMChannel::AMChannel(QObject *parent)
-  : AnalogChannel(parent), _squelch(std::numeric_limits<unsigned>::max())
+  : AnalogChannel(parent)
 {
   // pass...
 }
@@ -644,39 +593,6 @@ AMChannel::clear() {
   setSquelchDefault();
 }
 
-
-bool
-AMChannel::defaultSquelch() const {
-  return std::numeric_limits<unsigned>::max()==squelch();
-}
-
-bool
-AMChannel::squelchDisabled() const {
-  return 0==squelch();
-}
-
-unsigned
-AMChannel::squelch() const {
-  return _squelch;
-}
-
-bool
-AMChannel::setSquelch(unsigned val) {
-  _squelch = val;
-  emit modified(this);
-  return true;
-}
-
-void
-AMChannel::disableSquelch() {
-  setSquelch(0);
-}
-
-void
-AMChannel::setSquelchDefault() {
-  setSquelch(std::numeric_limits<unsigned>::max());
-}
-
 YAML::Node
 AMChannel::serialize(const Context &context, const ErrorStack &err) {
   YAML::Node node = AnalogChannel::serialize(context, err);
@@ -686,21 +602,6 @@ AMChannel::serialize(const Context &context, const ErrorStack &err) {
   YAML::Node type;
   type["am"] = node;
   return type;
-}
-
-bool
-AMChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
-  if (! AnalogChannel::populate(node, context, err))
-    return false;
-
-  if (defaultSquelch()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["squelch"] = def;
-  } else {
-    node["squelch"] = squelch();
-  }
-
-  return true;
 }
 
 bool
@@ -715,12 +616,6 @@ AMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   }
 
   YAML::Node ch = node.begin()->second;
-
-  if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
-    setSquelchDefault();
-  } else if (ch["squelch"].IsDefined() && ch["squelch"].IsScalar()) {
-    setSquelch(ch["squelch"].as<unsigned>());
-  }
 
   return AnalogChannel::parse(node, ctx, err);
 }
@@ -750,13 +645,14 @@ DMRChannel::DMRChannel(QObject *parent)
   : DigitalChannel(parent), _admit(Admit::Always),
     _colorCode(1), _timeSlot(TimeSlot::TS1),
     _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
+    _extended(new DMRChannelExtension(this)),
     _commercialExtension(nullptr), _anytoneExtension(nullptr)
 {
   // Register default tags
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "roaming", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "radioId", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::tagIsSet(staticMetaObject.className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", QVariant::fromValue(DefaultRoamingZone::get()));
+  if (! ConfigItem::Context::tagIsSet(staticMetaObject.className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", QVariant::fromValue(DefaultRadioID::get()));
 
   // Set default DMR Id
   _radioId.set(DefaultRadioID::get());
@@ -767,6 +663,7 @@ DMRChannel::DMRChannel(QObject *parent)
   connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(_extended, &DMRChannelExtension::modified, this, &DMRChannel::modified);
 }
 
 void
@@ -775,10 +672,10 @@ DMRChannel::clear() {
   setColorCode(1);
   setTimeSlot(TimeSlot::TS1);
   setGroupList(nullptr);
-  setTXContactObj(nullptr);
-  setAPRSObj(nullptr);
-  setRoamingZone(nullptr);
-  setRadioIdObj(DefaultRadioID::get());
+  setContact(nullptr);
+  setAPRS(nullptr);
+  setRoaming(nullptr);
+  setRadioId(DefaultRadioID::get());
   setCommercialExtension(nullptr);
   setAnytoneChannelExtension(nullptr);
 }
@@ -839,14 +736,6 @@ DMRChannel::groupListRef() {
   return &_rxGroup;
 }
 
-void
-DMRChannel::setGroupListRef(GroupListReference *ref) {
-  if (nullptr == ref)
-    _rxGroup.clear();
-  else
-    _rxGroup.copy(ref);
-}
-
 RXGroupList *
 DMRChannel::groupList() const {
   return _rxGroup.as<RXGroupList>();
@@ -861,30 +750,22 @@ DMRChannel::setGroupList(RXGroupList *g) {
 }
 
 const DMRContactReference *
-DMRChannel::contact() const {
+DMRChannel::contactRef() const {
   return &_txContact;
 }
 
 DMRContactReference *
-DMRChannel::contact() {
+DMRChannel::contactRef() {
   return &_txContact;
 }
 
-void
-DMRChannel::setContact(DMRContactReference *ref) {
-  if (nullptr == ref)
-    _txContact.clear();
-  else
-    _txContact.copy(ref);
-}
-
 DMRContact *
-DMRChannel::txContactObj() const {
+DMRChannel::contact() const {
   return _txContact.as<DMRContact>();
 }
 
 bool
-DMRChannel::setTXContactObj(DMRContact *c) {
+DMRChannel::setContact(DMRContact *c) {
   if(! _txContact.set(c))
     return false;
   emit modified(this);
@@ -892,30 +773,22 @@ DMRChannel::setTXContactObj(DMRContact *c) {
 }
 
 const PositioningSystemReference *
-DMRChannel::aprs() const {
+DMRChannel::aprsRef() const {
   return &_posSystem;
 }
 
 PositioningSystemReference *
-DMRChannel::aprs() {
+DMRChannel::aprsRef() {
   return &_posSystem;
 }
 
-void
-DMRChannel::setAPRS(PositioningSystemReference *ref) {
-  if (nullptr == ref)
-    _posSystem.clear();
-  else
-    _posSystem.copy(ref);
-}
-
-PositioningSystem *
-DMRChannel::aprsObj() const {
-  return _posSystem.as<PositioningSystem>();
+PositionReportingSystem *
+DMRChannel::aprs() const {
+  return _posSystem.as<PositionReportingSystem>();
 }
 
 bool
-DMRChannel::setAPRSObj(PositioningSystem *sys) {
+DMRChannel::setAPRS(PositionReportingSystem *sys) {
   if (! _posSystem.set(sys))
     return false;
   emit modified(this);
@@ -923,65 +796,56 @@ DMRChannel::setAPRSObj(PositioningSystem *sys) {
 }
 
 const RoamingZoneReference *
-DMRChannel::roaming() const {
+DMRChannel::roamingRef() const {
   return &_roaming;
 }
 
 RoamingZoneReference *
-DMRChannel::roaming() {
+DMRChannel::roamingRef() {
   return &_roaming;
 }
 
-void
-DMRChannel::setRoaming(RoamingZoneReference *ref) {
-  if (nullptr == ref)
-    _roaming.clear();
-  else
-    _roaming.copy(ref);
-}
-
 RoamingZone *
-DMRChannel::roamingZone() const {
+DMRChannel::roaming() const {
   return _roaming.as<RoamingZone>();
 }
 
 bool
-DMRChannel::setRoamingZone(RoamingZone *zone) {
+DMRChannel::setRoaming(RoamingZone *zone) {
   _roaming.set(zone);
   emit modified(this);
   return true;
 }
 
 const DMRRadioIDReference *
-DMRChannel::radioId() const {
+DMRChannel::radioIdRef() const {
   return &_radioId;
 }
 
 DMRRadioIDReference *
-DMRChannel::radioId() {
+DMRChannel::radioIdRef() {
   return &_radioId;
 }
 
-void
-DMRChannel::setRadioId(DMRRadioIDReference *ref) {
-  if (nullptr == ref)
-    _radioId.clear();
-  else
-    _radioId.copy(ref);
-}
-
 DMRRadioID *
-DMRChannel::radioIdObj() const {
+DMRChannel::radioId() const {
   return _radioId.as<DMRRadioID>();
 }
 
 bool
-DMRChannel::setRadioIdObj(DMRRadioID *id) {
+DMRChannel::setRadioId(DMRRadioID *id) {
   if (! _radioId.set(id))
     return false;
   emit modified(this);
   return true;
 }
+
+
+DMRChannelExtension *
+DMRChannel::extended() const {
+  return _extended;
+}
+
 
 CommercialChannelExtension *
 DMRChannel::commercialExtension() const {
@@ -1284,6 +1148,8 @@ ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
     return new FMChannel();
   } else if ("m17" == type) {
     return new M17Channel();
+  } else if ("am" == type) {
+    return new AMChannel();
   }
 
   errMsg(err) << node.Mark().line << ":" << node.Mark().column

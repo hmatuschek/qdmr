@@ -5,6 +5,8 @@
 #include "configobjecttypeselectiondialog.hh"
 #include "frequency.hh"
 #include "interval.hh"
+#include <QGeoCoordinate>
+#include "level.hh"
 
 
 /* ******************************************************************************************** *
@@ -312,7 +314,7 @@ PropertyWrapper::deleteInstanceAt(const QModelIndex &item) {
   if (! propIsInstance<ConfigItem>(prop))
     return false;
   // If property is set -> delete
-  if (nullptr != prop.read(obj).value<ConfigItem*>()) {
+  if (prop.read(obj).value<ConfigItem*>()) {
     if (! prop.isWritable())
       return false;
     beginRemoveRows(item, 0, rowCount(item));
@@ -564,7 +566,13 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
     }
 
     QVariant value = prop.read(pobj);
-    if (prop.isEnumType() && ((Qt::DisplayRole == role) || (Qt::EditRole == role))) {
+    if (prop.isFlagType()) {
+      if (Qt::EditRole == role)
+        return value;
+      QMetaEnum e = prop.enumerator();
+      if (Qt::DisplayRole == role)
+        return e.valueToKeys(value.toInt());
+    } if (prop.isEnumType() && ((Qt::DisplayRole == role) || (Qt::EditRole == role))) {
       QMetaEnum e = prop.enumerator();
       const char *key = e.valueToKey(value.toInt());
       if (nullptr == key) {
@@ -585,12 +593,12 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
                  (QMetaType::Double == prop.typeId()) || (QMetaType::QString == prop.typeId()))
                 && ((Qt::DisplayRole == role) || (Qt::EditRole==role)) ) {
       return value;
-    } else if (QString("Frequency") == prop.typeName()) {
+    } else if (QMetaType::fromType<Frequency>() == prop.metaType()) {
       if (Qt::DisplayRole == role)
         return value.value<Frequency>().format();
       else if (Qt::EditRole == role)
         return value;
-    } else if (QString("Interval") == prop.typeName()) {
+    } else if (QMetaType::fromType<Interval>() == prop.metaType()) {
       if (Qt::DisplayRole == role) {
         if (value.value<Interval>().isInfinite())
           return QChar(0x221e);
@@ -598,6 +606,26 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
       } else if (Qt::EditRole == role) {
         return value;
       }
+    } else if (QMetaType::fromType<Level>() == prop.metaType()) {
+      if (Qt::DisplayRole == role) {
+        if (value.value<Level>().isInvalid())
+          return tr("None");
+        if (value.value<Level>().isNull())
+          return tr("Off");
+        return value.value<Level>().value();
+      } else if (Qt::EditRole == role) {
+        return value;
+      }
+    } else if (QMetaType::fromType<QGeoCoordinate>().id() == prop.typeId()) {
+      if (Qt::DisplayRole == role) {
+        if (value.value<QGeoCoordinate>().isValid())
+          return QString("%1 / %2")
+              .arg(value.value<QGeoCoordinate>().latitude())
+              .arg(value.value<QGeoCoordinate>().longitude());
+        return tr("[None]");
+      }
+      if (Qt::EditRole == role)
+        return value;
     } else if (value.value<ConfigObjectReference *>() && (Qt::DisplayRole == role)) {
       ConfigObjectReference *ref = value.value<ConfigObjectReference *>();
       ConfigObject *obj = ref->as<ConfigObject>();

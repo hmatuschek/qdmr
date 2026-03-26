@@ -60,10 +60,12 @@ Application::Application(int &argc, char *argv[])
   setApplicationName("qdmr");
   setOrganizationName("DM3MAT");
   setOrganizationDomain("hmatuschek.github.io");
+  setApplicationVersion(VERSION_STRING);
 
   // open logfile
   QString logdir = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-  Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log"));
+  // Log all messages to file
+  Logger::get().addHandler(new FileLogHandler(logdir+"/qdmr.log", LogMessage::Level::DEBUG));
 
   // register icon themes
   QStringList iconPaths = QIcon::themeSearchPaths();
@@ -100,30 +102,6 @@ Application::Application(int &argc, char *argv[])
 
   // create empty codeplug
   _config     = new Config(this);
-
-  // Handle args (if there are some)
-  if (argc > 1) {
-    QFileInfo info(argv[1]);
-    QFile file(argv[1]);
-    if (! file.open(QIODevice::ReadOnly)) {
-      logError() << "Cannot open codeplug file '" << argv[1] << "': " << file.errorString();
-      return;
-    }
-    if (("conf" == info.suffix()) || ("csv" == info.suffix())) {
-      QString errorMessage; QTextStream stream(&file);
-      if (! _config->readCSV(stream, errorMessage)) {
-        logError() << errorMessage;
-        return;
-      }
-    } else if ("yaml" == info.suffix()) {
-      ErrorStack err;
-      if (! _config->readYAML(argv[1], err)) {
-        logError() << "Cannot read yaml codeplug file '" << argv[1]
-                   << "': " << err.format();
-        return;
-      }
-    }
-  }
 
   // load position
   _currentPosition = settings.position();
@@ -231,39 +209,51 @@ Application::loadCodeplug() {
         tr("Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)"));
   if (filename.isEmpty())
     return;
-  QFile file(filename);
-  if (!file.open(QIODevice::ReadOnly)) {
-    QMessageBox::critical(
-          nullptr, tr("Cannot open file"),
-          tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(file.errorString()));
+
+
+  ErrorStack err;
+  if (! loadCodeplug(filename, err)) {
+    QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
+                          tr("Cannot read codeplug from file '%1': %2")
+                              .arg(filename).arg(err.format()));
     return;
   }
 
-  logDebug() << "Load codeplug from '" << filename << "'.";
-  QFileInfo info(filename);
-  settings.setLastDirectoryDir(info.absoluteDir());
+  processEvents();
+  _config->setModified(false);
+}
 
-  if ("yaml" == info.suffix()){
+
+bool
+Application::loadCodeplug(const QString &filename, const ErrorStack &err) {
+  QFile file(filename);
+  if (!file.open(QIODevice::ReadOnly)) {
+    errMsg(err) << tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(file.errorString());
+    return false;;
+  }
+
+  logDebug() << "Load codeplug from '" << filename << "'.";
+
+  QFileInfo info(filename);
+  Settings().setLastDirectoryDir(info.absoluteDir());
+
+  if (("yaml" == info.suffix()) || ("yml" == info.suffix())) {
     ErrorStack err;
     if (! _config->readYAML(filename, err)) {
-      QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
-                            tr("Cannot read codeplug from file '%1': %2")
-                            .arg(filename).arg(err.format()));
       _config->clear();
+      return false;
     }
   } else {
     QString errorMessage;
     QTextStream stream(&file);
     if (!_config->readCSV(stream, errorMessage)) {
-      QMessageBox::critical(nullptr, tr("Cannot read codeplug."),
-                            tr("Cannot read codeplug from file '%1': %2")
-                            .arg(filename).arg(errorMessage));
+      errMsg(err) << tr("Cannot read codeplug from file '%1': %2").arg(filename).arg(errorMessage);
       _config->clear();
+      return false;
     }
   }
 
-  processEvents();
-  _config->setModified(false);
+  return true;
 }
 
 

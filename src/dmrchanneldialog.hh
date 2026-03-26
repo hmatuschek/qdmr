@@ -1,10 +1,10 @@
-#ifndef DIGITALCHANNELDIALOG_HH
-#define DIGITALCHANNELDIALOG_HH
+#ifndef DMRCHANNELDIALOG_H
+#define DMRCHANNELDIALOG_H
 
 #include <QDialog>
 #include "config.hh"
 
-#include "ui_digitalchanneldialog.h"
+#include "ui_dmrchanneldialog.h"
 
 class DMRChannelDialog: public QDialog, private Ui::DigitalChannelDialog
 {
@@ -42,4 +42,4 @@ protected:
   DMRChannel *_channel;
 };
 
-#endif // DIGITALCHANNELDIALOG_HH
+#endif // DMRCHANNELDIALOG_H

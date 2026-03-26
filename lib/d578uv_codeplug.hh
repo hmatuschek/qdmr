@@ -10,7 +10,7 @@ class DMRContact;
 class Zone;
 class RXGroupList;
 class ScanList;
-class GPSSystem;
+class DMRAPRSSystem;
 
 
 /** Represents the device specific binary codeplug for Anytone AT-D578UV radios.
@@ -156,9 +156,9 @@ public:
       static constexpr Bit roaming()                       { return {0x0034, 6}; }
       static constexpr unsigned int fmScrambler()          { return 0x003a; }
       static constexpr unsigned int customScrambler()      { return 0x003b; }
-      static constexpr Bit multipleKeyEncryption()         { return {0x003b, 0}; }
-      static constexpr Bit randomKey()                     { return {0x003b, 1}; }
-      static constexpr Bit sms()                           { return {0x003b, 2}; }
+      static constexpr Bit multipleKeyEncryption()         { return {0x003d, 0}; }
+      static constexpr Bit randomKey()                     { return {0x003d, 1}; }
+      static constexpr Bit sms()                           { return {0x003d, 2}; }
       static constexpr Bit dataACK()                       { return {0x003d, 3}; }
       static constexpr Bit autoScan()                      { return {0x003d, 4}; }
       static constexpr Bit talkerAlias()                   { return {0x003d, 5}; }
@@ -245,6 +245,12 @@ public:
       kHz25 = 7, kHz30 = 8, kHz50=9
     };
 
+    /** Possible SMS formats. */
+    enum class SMSFormat {
+      Motorola = 0, Hytera = 1, DMR = 2
+    };
+
+
   protected:
     /** Hidden constructor. */
     GeneralSettingsElement(uint8_t *ptr, unsigned size);
@@ -260,9 +266,9 @@ public:
     void enableKeyTone(bool enable) override;
 
     /** Returns the transmit timeout in seconds. */
-    virtual unsigned transmitTimeout() const;
+    virtual Interval transmitTimeout() const;
     /** Sets the transmit timeout in seconds. */
-    virtual void setTransmitTimeout(unsigned tot);
+    virtual void setTransmitTimeout(const Interval &tot);
 
     /** Returns the UI language. */
     virtual AnytoneDisplaySettingsExtension::Language language() const;
@@ -277,8 +283,8 @@ public:
     AnytoneSettingsExtension::VFOScanType vfoScanType() const override;
     void setVFOScanType(AnytoneSettingsExtension::VFOScanType type) override;
 
-    unsigned int dmrMicGain() const override;
-    void setDMRMicGain(unsigned int gain) override;
+    Level dmrMicGain() const override;
+    void setDMRMicGain(Level gain) override;
 
     bool vfoModeA() const override;
     void enableVFOModeA(bool enable) override;
@@ -572,9 +578,9 @@ public:
     void enableShowLastHeard(bool enable) override;
 
     /** Returns the SMS format. */
-    virtual AnytoneDMRSettingsExtension::SMSFormat smsFormat() const;
+    virtual SMSExtension::Format smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSMSFormat(AnytoneDMRSettingsExtension::SMSFormat fmt);
+    virtual void setSMSFormat(SMSExtension::Format fmt);
 
     AnytoneAutoRepeaterSettingsExtension::Direction autoRepeaterDirectionB() const override;
     void setAutoRepeaterDirectionB(AnytoneAutoRepeaterSettingsExtension::Direction dir) override;
@@ -737,6 +743,12 @@ public:
     bool fromConfig(const Flags &flags, Context &ctx) override;
     bool updateConfig(Context &ctx) override;
     bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) override;
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: D878UVCodeplug::GeneralSettingsElement::Limit {
+      // pass...
+    };
 
   protected:
     /** Some internal offsets. */
@@ -936,6 +948,11 @@ public:
       Any = 0, RX1_TX2 = 1, RX2_TX1 = 2
     };
 
+    /** Talker alias encoding. */
+    enum class TalkerAliasEncoding {
+      ISO8 = 0, ISO7 = 1, Unicode = 2,
+    };
+
   protected:
     /** Hidden Constructor. */
     ExtendedSettingsElement(uint8_t *ptr, unsigned size);
@@ -956,9 +973,9 @@ public:
     virtual void setTalkerAliasSource(AnytoneDMRSettingsExtension::TalkerAliasSource mode);
 
     /** Returns the talker alias encoding. */
-    virtual AnytoneDMRSettingsExtension::TalkerAliasEncoding talkerAliasEncoding() const;
+    virtual DMRSettings::TalkerAliasEncoding talkerAliasEncoding() const;
     /** Sets the talker alias encoding. */
-    virtual void setTalkerAliasEncoding(AnytoneDMRSettingsExtension::TalkerAliasEncoding encoding);
+    virtual void setTalkerAliasEncoding(DMRSettings::TalkerAliasEncoding encoding);
 
     /** Returns @c true if the weather alarm is enabled. */
     virtual bool weatherAlarmEnabled() const;
@@ -981,9 +998,9 @@ public:
     virtual void setMicSpeakerSource(AnytoneAudioSettingsExtension::HandsetSpeakerSource source);
 
     /** Returns the GPS mode. */
-    virtual AnytoneGPSSettingsExtension::GPSMode gpsMode() const;
+    virtual GNSSSettings::Systems gnss() const;
     /** Sets the GPS mode. */
-    virtual void setGPSMode(AnytoneGPSSettingsExtension::GPSMode mode);
+    virtual void setGNSS(GNSSSettings::Systems mode);
 
     /** Returns @c true if the BT PTT latch is enabled. */
     virtual bool bluetoothPTTLatch() const;
@@ -1093,9 +1110,9 @@ public:
     virtual void setDateFormat(AnytoneDisplaySettingsExtension::DateFormat format);
 
     /** Returns the FM Mic gain [1,10]. */
-    virtual unsigned int fmMicGain() const;
+    virtual Level fmMicGain() const;
     /** Sets the analog mic gain [1,10]. */
-    virtual void setFMMicGain(unsigned int gain);
+    virtual void setFMMicGain(Level gain);
 
     /** Returns the short-press function for SK1 of the BT handset. */
     virtual AnytoneKeySettingsExtension::KeyFunction btSK1ShortPressFunction() const;
@@ -1226,9 +1243,10 @@ public:
 
   public:
     /** Some limits for the settings. */
-    struct Limit {
-      static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }    ///< Maximum delay in minutes.
-      static constexpr unsigned int maxWeatherChannelIndex()    { return 9; }    ///< Maximum weather channel index.
+    struct Limit: AnytoneCodeplug::ExtendedSettingsElement::Limit {
+      static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }     ///< Maximum delay in minutes.
+      static constexpr unsigned int maxWeatherChannelIndex()    { return 9; }     ///< Maximum weather channel index.
+      static constexpr Range<unsigned int> micGain()            { return {1,5}; } ///< Valid range for mic gain settings.
     };
 
   protected:
@@ -1361,6 +1379,11 @@ public:
     /** Sets the name of the channel. */
     virtual void setName(const QString &name);
 
+    /** Encodes the given AM channel. */
+    virtual bool encode(AMChannel *ch, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Decodes the given AM channel. */
+    virtual AMChannel *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
   public:
     /** Some limits of the channel. */
     struct Limit {
@@ -1401,27 +1424,37 @@ public:
   /** Empty constructor. */
   explicit D578UVCodeplug(QObject *parent = nullptr);
 
+  Config *preprocess(Config *config, const ErrorStack &err) const override;
+
 protected:
-  bool allocateBitmaps();
+  bool allocateBitmaps() override;
+  void setBitmaps(Context &ctx) override;
+  void allocateForDecoding() override;
+  void allocateForEncoding() override;
 
-  void allocateUpdated();
+  void allocateHotKeySettings() override;
 
-  void allocateHotKeySettings();
+  bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool createElements(Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
-  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
-  void allocateContacts();
-  bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Allocate Air band channels. */
+  virtual bool allocateAirBandChannels();
+  /** Encode all defined air band channels. */
+  virtual bool encodeAirBandChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decode all air band channels. */
+  virtual bool createAirBandChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  void allocateGeneralSettings();
-  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  void allocateContacts() override;
+  bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
-  /** Allocates the air-band channels und VFO settings. */
-  virtual void allocateAirBand();
+  void allocateGeneralSettings() override;
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
 public:
   /** Some limits for the codeplug. */

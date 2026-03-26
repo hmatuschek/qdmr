@@ -1,6 +1,5 @@
 #include "scanlist.hh"
 #include "channel.hh"
-#include "config.hh"
 
 
 /* ********************************************************************************************* *
@@ -10,20 +9,20 @@ ScanList::ScanList(QObject *parent)
   : ConfigObject(parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
 {
   // Register "selected" channel tags for primary, secondary, revert and the channel list.
-  Context::setTag(staticMetaObject.className(), "primary", "!selected", SelectedChannel::get());
-  Context::setTag(staticMetaObject.className(), "secondary", "!selected", SelectedChannel::get());
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
-  Context::setTag(staticMetaObject.className(), "channels", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "primary", "!selected", QVariant::fromValue(SelectedChannel::get()));
+  Context::setTag(staticMetaObject.className(), "secondary", "!selected", QVariant::fromValue(SelectedChannel::get()));
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", QVariant::fromValue(SelectedChannel::get()));
+  Context::setTag(staticMetaObject.className(), "channels", "!selected", QVariant::fromValue(SelectedChannel::get()));
 }
 
 ScanList::ScanList(const QString &name, QObject *parent)
   : ConfigObject(name, parent), _channels(), _primary(), _secondary(), _revert(), _tyt(nullptr)
 {
   // Register "selected" channel tags for primary, secondary, revert and the channel list.
-  Context::setTag(staticMetaObject.className(), "primary", "!selected", SelectedChannel::get());
-  Context::setTag(staticMetaObject.className(), "secondary", "!selected", SelectedChannel::get());
-  Context::setTag(staticMetaObject.className(), "revert", "!selected", SelectedChannel::get());
-  Context::setTag(staticMetaObject.className(), "channels", "!selected", SelectedChannel::get());
+  Context::setTag(staticMetaObject.className(), "primary", "!selected", QVariant::fromValue(SelectedChannel::get()));
+  Context::setTag(staticMetaObject.className(), "secondary", "!selected", QVariant::fromValue(SelectedChannel::get()));
+  Context::setTag(staticMetaObject.className(), "revert", "!selected", QVariant::fromValue(SelectedChannel::get()));
+  Context::setTag(staticMetaObject.className(), "channels", "!selected", QVariant::fromValue(SelectedChannel::get()));
 }
 
 ScanList &
@@ -99,12 +98,12 @@ ScanList::remChannel(Channel *channel) {
 
 
 const ChannelReference *
-ScanList::primary() const {
+ScanList::primaryChannelRef() const {
   return &_primary;
 }
 
 ChannelReference *
-ScanList::primary() {
+ScanList::primaryChannelRef() {
   return &_primary;
 }
 
@@ -121,12 +120,12 @@ ScanList::setPrimaryChannel(Channel *channel) {
 
 
 const ChannelReference *
-ScanList::secondary() const {
+ScanList::secondaryChannelRef() const {
   return &_secondary;
 }
 
 ChannelReference *
-ScanList::secondary() {
+ScanList::secondaryChannelRef() {
   return &_secondary;
 }
 
@@ -143,12 +142,12 @@ ScanList::setSecondaryChannel(Channel *channel) {
 
 
 const ChannelReference *
-ScanList::revert() const {
+ScanList::revertChannelRef() const {
   return &_revert;
 }
 
 ChannelReference *
-ScanList::revert() {
+ScanList::revertChannelRef() {
   return &_revert;
 }
 

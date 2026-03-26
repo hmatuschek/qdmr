@@ -348,16 +348,6 @@ ContactList::contact(int idx) const {
   return _items[idx]->as<Contact>();
 }
 
-DMRContact *
-ContactList::findDMRContact(unsigned number) const {
-  for (int i=0; i<_items.size(); i++) {
-    if (! _items.at(i)->is<DMRContact>())
-      continue;
-    if (_items.at(i)->as<DMRContact>()->number() == number)
-      return _items.at(i)->as<DMRContact>();
-  }
-  return nullptr;
-}
 
 ConfigItem *
 ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {

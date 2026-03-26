@@ -26,6 +26,20 @@
   squelch: 1
   vox: 0
   power: High
+  gnss:
+    fixedLocationEnabled: false
+    fixedLocation: JO62jl45
+    systems: [GPS, Beidou]
+    units: Metric
+  dmr:
+    privateCallMatch: true
+    groupCallMatch: true
+    privateCallHangTime: 5s
+    groupCallHangTime: 3s
+    sendTalkerAlias: false
+    talkerAliasEncoding: Iso8
+    smsFormat: DMR
+    preamble: 100ms
 ]]></programlisting>
 </example>
 
@@ -103,6 +117,95 @@
   </varlistentry>
 </variablelist>
 
+
+<section>
+  <info><title>GNSS settings</title></info>         
+
+<para>
+  This section collects some global GNSS settings that many radio support. Especially, it allows to
+  specify a fixed location that can be used by the radio, if it does not support GPS.
+</para>
+
+<variablelist>
+  <title>Radio-wide GNSS Setting Fields</title>
+  <varlistentry>
+    <term><token>fixedLocationEnabled</token>, <token>fixedLocation</token></term>
+    <listitem>
+      <para>Specifies and enables a fixed location. This location can be used instead of a GNSS 
+        position. The location is specified in terms of a locator.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>systems</token></term>
+    <listitem>
+      <para>Specifies the GNSSs to use in terms of a list of <token>GPS</token>, 
+        <token>Glonass</token>, <token>Galileo</token>, <token>Beidou</token>. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>units</token></term>
+    <listitem>
+      <para>Specifies the units to use to show distances and speeds. Must be one of 
+        <token>Metric</token> or <token>Archaic</token>. </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+  <info><title>DMR settings</title></info>         
+
+<para>
+  This section collects some global DMR settings that many radio support. Like sending a talker 
+  alias and specifying the SMS format.
+</para>
+
+<variablelist>
+  <title>Radio-wide DMR Setting Fields</title>
+  <varlistentry>
+    <term><token>privateCallMatch</token>, <token>groupCallMatch</token></term>
+    <listitem>
+      <para>Enable private and group call matches. Must either be <token>true</token> or 
+        <token>false</token>.</para>
+      <para>If private-call match is enabled, the radio only receives private calls for the radio.
+        all other private calls are ignored. </para>
+      <para>If group-call match is enabled, the radio only receives group calls that are in the 
+        group list of the current channel. All other group calls are ignored.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>privateCallHangTime</token>, <token>groupCallHangTime</token></term>
+    <listitem>
+      <para>Specifies, how long a private and group call can be answered directly by pressing PTT.
+        That is, how long the call hangs around, before the default transmit contact for the 
+        current channel gets active again. </para>
+      <para>The duration must be specified with units. By default, the duration for private calls 
+        is 5s while the duration for group calls is 3s. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>sendTalkerAlias</token>, <token>talkerAliasEncoding</token></term>
+    <listitem>
+      <para>Enables sending the talker alias -- that is, the radio name along with the DMR ID. 
+        This enables receives to show your radio name, if the receiver does not contain your DMR 
+        ID in its call-sign DB. </para>
+      <para>Current DMR networks inject the talker alias based on the global DMR ID database. 
+        Consequently, this feature is of little use. It might be relevant for commercial 
+        applications and simplex connections. </para>
+      <para>If used, <token>talkerAliasEncoding</token> specifies the encoding of the alias.
+        It must be one of <token>Iso7</token>, <token>Iso8</token> or 
+        <token>Unicode</token>. </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>preamble</token></term>
+    <listitem>
+      <para>Specifies the duration of the DMR transmit preamble. The duration must be specified 
+        with units. Usually this is set to 100ms. </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
 </section>
 
   

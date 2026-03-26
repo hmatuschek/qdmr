@@ -20,8 +20,9 @@ public:
 
 protected slots:
   void onAddFMChannel();
+  void onAddAMChannel();
+  //void onAddM17Channel();
   void onAddDMRChannel();
-  void onAddM17Channel();
   void onCloneChannel();
   void onRemChannel();
   void onEditChannel(unsigned row);

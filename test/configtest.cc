@@ -1,5 +1,6 @@
 #include "configtest.hh"
 #include "config.hh"
+#include "gnsssettings.hh"
 #include "errorstack.hh"
 #include "melody.hh"
 #include <iostream>
@@ -38,13 +39,13 @@ ConfigTest::testImmediateRefInvalidation() {
   QCOMPARE(_basicConfig.posSystems()->count(), 1);
   QVERIFY(_basicConfig.channelList()->get(1));
   QVERIFY(_basicConfig.channelList()->get(1)->is<DMRChannel>());
-  QCOMPARE(_basicConfig.channelList()->get(1)->as<DMRChannel>()->aprsObj(),
-           _basicConfig.posSystems()->get(0)->as<GPSSystem>());
+  QCOMPARE(_basicConfig.channelList()->get(1)->as<DMRChannel>()->aprs(),
+           _basicConfig.posSystems()->get(0)->as<DMRAPRSSystem>());
 
   // Delete DMR APRS system and check if reference to it (channel 2) is removed as well.
   QVERIFY(copy->posSystems()->del(copy->posSystems()->get(0)));
   QCOMPARE(copy->posSystems()->count(), 0);
-  QCOMPARE(copy->channelList()->get(1)->as<DMRChannel>()->aprsObj(), nullptr);
+  QCOMPARE(copy->channelList()->get(1)->as<DMRChannel>()->aprs(), nullptr);
 
   QVERIFY(_basicConfig.channelList()->get(2));
   QCOMPARE(_basicConfig.zones()->get(0)->as<Zone>()->B()->count(), 1);
@@ -151,6 +152,36 @@ ConfigTest::testMelodyDecoding() {
 
 
 void
+ConfigTest::testGNSSSettings() {
+  Config config; config.readYAML(":/data/config_test.yaml");
+  config.settings()->gnss()->setFixedPositionLocator("JO62jl45");
+  config.settings()->gnss()->setSystems(GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
+
+  qDebug() << "Before" << config.settings()->gnss()->fixedPositionLocator();
+
+  QString buffer;
+  QTextStream stream(&buffer);
+  ErrorStack err;
+  if (! config.toYAML(stream, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  Config testConfig;
+  Config::Context ctx;
+  YAML::Node doc = YAML::Load(buffer.toStdString());
+  if (! testConfig.parse(doc, ctx, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+  if (! testConfig.link(doc, ctx, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  qDebug() << "After" << testConfig.settings()->gnss()->fixedPositionLocator();
+
+  QCOMPARE(testConfig.settings()->gnss()->fixedPositionEnabled(), true);
+  QCOMPARE(testConfig.settings()->gnss()->fixedPositionLocator(), "JO62jl45");
+  QCOMPARE(testConfig.settings()->gnss()->systems(), GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
+}
+
+
+void
 ConfigTest::testCTCSSNull() {
   ErrorStack err;
   Config ctcssConfig;
@@ -184,10 +215,14 @@ ConfigTest::testDMRIdVerification() {
           .arg(err.format()).toStdString().c_str());
   }
 
+  /*limits.verifyConfig(&cfg, ctx);
+  for (unsigned int i=0; i<ctx.count(); i++)
+    qDebug() << ctx.message(i).format();*/
+
   QVERIFY(limits.verifyConfig(&cfg, ctx));
   QVERIFY(ctx.maxSeverity() < RadioLimitIssue::Severity::Critical);
 
-  cfg.radioIDs()->getId(0)->setNumber(0x12345678);
+  cfg.radioIDs()->get(0)->as<DMRRadioID>()->setNumber(0x12345678);
 
   QVERIFY(!limits.verifyConfig(&cfg, ctx));
   QVERIFY(ctx.maxSeverity() == RadioLimitIssue::Severity::Critical);

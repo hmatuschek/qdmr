@@ -1,5 +1,4 @@
 #include "radioid.hh"
-#include "logger.hh"
 #include "utils.hh"
 #include "contact.hh"
 #include "config.hh"
@@ -264,8 +263,8 @@ RadioIDList::getId(int idx) const {
 DMRRadioID *
 RadioIDList::find(uint32_t id) const {
   for (int i=0; i<count(); i++) {
-    if (id == getId(i)->number())
-      return getId(i);
+    if (get(i)->is<DMRRadioID>() && (id == get(i)->as<DMRRadioID>()->number()))
+      return get(i)->as<DMRRadioID>();
   }
   return nullptr;
 }

@@ -1,7 +1,3 @@
-/** @defgroup ogd77 Open GD-77 Firmware
- * Implements a radio running the Open GD77 firmware.
- * @ingroup dsc */
-
 #ifndef OPENGD77_HH
 #define OPENGD77_HH
 

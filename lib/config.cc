@@ -22,7 +22,7 @@ Config::Config(QObject *parent)
     _radioIDs(new RadioIDList(this)), _contacts(new ContactList(this)),
     _rxGroupLists(new RXGroupLists(this)), _channels(new ChannelList(this)),
     _zones(new ZoneList(this)), _scanlists(new ScanLists(this)),
-    _gpsSystems(new PositioningSystems(this)),
+    _gpsSystems(new PositionReportingSystems(this)),
     _roamingChannels(new RoamingChannelList(this)), _roamingZones(new RoamingZoneList(this)),
     _tytExtension(nullptr), _commercialExtension(new CommercialExtension(this)),
     _smsExtension(new SMSExtension(this))
@@ -201,7 +201,7 @@ Config::scanlists() const {
   return _scanlists;
 }
 
-PositioningSystems *
+PositionReportingSystems *
 Config::posSystems() const {
   return _gpsSystems;
 }
@@ -224,7 +224,7 @@ Config::requiresRoaming() const {
     const DMRChannel *digi = channelList()->channel(i)->as<const DMRChannel>();
     if (nullptr == digi)
       continue;
-    if (nullptr != digi->roamingZone()) {
+    if (nullptr != digi->roaming()) {
       chHasRoaming = true;
       break;
     }
@@ -240,8 +240,8 @@ Config::requiresGPS() const {
     Channel *ch = channelList()->channel(i);
     // For analog channels if APRS system is set or
     // for digital channels if any positioning system is set
-    if ( (ch->is<FMChannel>() && ch->as<FMChannel>()->aprsSystem()) ||
-         (ch->is<DMRChannel>() && ch->as<DMRChannel>()->aprsObj()) ) {
+    if ( (ch->is<FMChannel>() && ch->as<FMChannel>()->aprs()) ||
+         (ch->is<DMRChannel>() && ch->as<DMRChannel>()->aprs()) ) {
       chHasGPS = true;
       break;
     }

@@ -7,15 +7,11 @@
  * Implementation of AnytoneDMRSettingsExtension
  * ********************************************************************************************* */
 AnytoneDMRSettingsExtension::AnytoneDMRSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _groupCallHangTime(Interval::fromSeconds(3)),
-    _manualGroupCallHangTime(Interval::fromSeconds(5)),
-    _privateCallHangTime(Interval::fromSeconds(5)),
+  : ConfigItem(parent), _manualGroupCallHangTime(Interval::fromSeconds(5)),
     _manualPrivateCallHangTime(Interval::fromSeconds(7)),
-    _preWaveDelay(Interval::fromMilliseconds(100)),
     _wakeHeadPeriod(Interval::fromMilliseconds(100)), _filterOwnID(true),
     _monitorSlotMatch(SlotMatch::Off), _monitorColorCodeMatch(false), _monitorIDMatch(false),
-    _monitorTimeSlotHold(true), _smsFormat(SMSFormat::Motorola), _sendTalkerAlias(false),
-    _talkerAliasSource(TalkerAliasSource::UserDB), _talkerAliasEncoding(TalkerAliasEncoding::ISO7),
+    _monitorTimeSlotHold(true), _talkerAliasSource(TalkerAliasSource::UserDB),
     _encryption(EncryptionType::DMR)
 {
   // pass...
@@ -31,17 +27,6 @@ AnytoneDMRSettingsExtension::clone() const {
   return ext;
 }
 
-Interval
-AnytoneDMRSettingsExtension::groupCallHangTime() const {
-  return _groupCallHangTime;
-}
-void
-AnytoneDMRSettingsExtension::setGroupCallHangTime(Interval sec) {
-  if (_groupCallHangTime == sec)
-    return;
-  _groupCallHangTime = sec;
-  emit modified(this);
-}
 
 Interval
 AnytoneDMRSettingsExtension::manualGroupCallHangTime() const {
@@ -55,17 +40,6 @@ AnytoneDMRSettingsExtension::setManualGroupCallHangTime(Interval sec) {
   emit modified(this);
 }
 
-Interval
-AnytoneDMRSettingsExtension::privateCallHangTime() const {
-  return _privateCallHangTime;
-}
-void
-AnytoneDMRSettingsExtension::setPrivateCallHangTime(Interval sec) {
-  if (_privateCallHangTime == sec)
-    return;
-  _privateCallHangTime = sec;
-  emit modified(this);
-}
 
 Interval
 AnytoneDMRSettingsExtension::manualPrivateCallHangTime() const {
@@ -79,17 +53,6 @@ AnytoneDMRSettingsExtension::setManualPrivateCallHangTime(Interval sec) {
   emit modified(this);
 }
 
-Interval
-AnytoneDMRSettingsExtension::preWaveDelay() const {
-  return _preWaveDelay;
-}
-void
-AnytoneDMRSettingsExtension::setPreWaveDelay(Interval ms) {
-  if (_preWaveDelay == ms)
-    return;
-  _preWaveDelay = ms;
-  emit modified(this);
-}
 
 Interval
 AnytoneDMRSettingsExtension::wakeHeadPeriod() const {
@@ -163,29 +126,6 @@ AnytoneDMRSettingsExtension::enableMonitorTimeSlotHold(bool enable) {
   emit modified(this);
 }
 
-AnytoneDMRSettingsExtension::SMSFormat
-AnytoneDMRSettingsExtension::smsFormat() const {
-  return _smsFormat;
-}
-void
-AnytoneDMRSettingsExtension::setSMSFormat(SMSFormat format) {
-  if (_smsFormat == format)
-    return;
-  _smsFormat = format;
-  emit modified(this);
-}
-
-bool
-AnytoneDMRSettingsExtension::sendTalkerAlias() const {
-  return _sendTalkerAlias;
-}
-void
-AnytoneDMRSettingsExtension::enableSendTalkerAlias(bool enable) {
-  if (_sendTalkerAlias == enable)
-    return;
-  _sendTalkerAlias = enable;
-  emit modified(this);
-}
 
 AnytoneDMRSettingsExtension::TalkerAliasSource
 AnytoneDMRSettingsExtension::talkerAliasSource() const {
@@ -199,17 +139,6 @@ AnytoneDMRSettingsExtension::setTalkerAliasSource(TalkerAliasSource mode) {
   emit modified(this);
 }
 
-AnytoneDMRSettingsExtension::TalkerAliasEncoding
-AnytoneDMRSettingsExtension::talkerAliasEncoding() const {
-  return _talkerAliasEncoding;
-}
-void
-AnytoneDMRSettingsExtension::setTalkerAliasEncoding(TalkerAliasEncoding encoding) {
-  if (_talkerAliasEncoding == encoding)
-    return;
-  _talkerAliasEncoding = encoding;
-  emit modified(this);
-}
 
 AnytoneDMRSettingsExtension::EncryptionType
 AnytoneDMRSettingsExtension::encryption() const {
@@ -228,8 +157,8 @@ AnytoneDMRSettingsExtension::setEncryption(EncryptionType type) {
  * Implementation of AnytoneGPSSettingsExtension
  * ********************************************************************************************* */
 AnytoneGPSSettingsExtension::AnytoneGPSSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _gpsUnits(Units::Metric), _timeZone(QTimeZone::utc()),
-    _gpsRangeReporting(false), _gpsRangingInterval(Interval::fromSeconds(300)), _mode(GPSMode::GPS)
+  : ConfigItem(parent), _timeZone(QTimeZone::utc()),
+    _gpsRangeReporting(false), _gpsRangingInterval(Interval::fromSeconds(300))
 {
   // pass...
 }
@@ -244,26 +173,17 @@ AnytoneGPSSettingsExtension::clone() const {
   return ext;
 }
 
-AnytoneGPSSettingsExtension::Units
-AnytoneGPSSettingsExtension::units() const {
-  return _gpsUnits;
-}
-void
-AnytoneGPSSettingsExtension::setUnits(Units units) {
-  if (_gpsUnits == units)
-    return;
-  _gpsUnits = units;
-  emit modified(this);
-}
 
 QTimeZone
 AnytoneGPSSettingsExtension::timeZone() const {
   return _timeZone;
 }
+
 QString
 AnytoneGPSSettingsExtension::ianaTimeZone() const {
   return QString::fromLocal8Bit(_timeZone.id());
 }
+
 void
 AnytoneGPSSettingsExtension::setTimeZone(const QTimeZone &zone) {
   if (_timeZone == zone)
@@ -271,15 +191,18 @@ AnytoneGPSSettingsExtension::setTimeZone(const QTimeZone &zone) {
   _timeZone = zone;
   emit modified(this);
 }
+
 void
 AnytoneGPSSettingsExtension::setIANATimeZone(const QString &id) {
   setTimeZone(QTimeZone(id.toLocal8Bit()));
 }
 
+
 bool
 AnytoneGPSSettingsExtension::positionReportingEnabled() const {
   return _gpsRangeReporting;
 }
+
 void
 AnytoneGPSSettingsExtension::enablePositionReporting(bool enable) {
   if (_gpsRangeReporting == enable)
@@ -288,10 +211,12 @@ AnytoneGPSSettingsExtension::enablePositionReporting(bool enable) {
   emit modified(this);
 }
 
+
 Interval
 AnytoneGPSSettingsExtension::updatePeriod() const {
   return _gpsRangingInterval;
 }
+
 void
 AnytoneGPSSettingsExtension::setUpdatePeriod(Interval sec) {
   if (_gpsRangingInterval == sec)
@@ -300,17 +225,6 @@ AnytoneGPSSettingsExtension::setUpdatePeriod(Interval sec) {
   emit modified(this);
 }
 
-AnytoneGPSSettingsExtension::GPSMode
-AnytoneGPSSettingsExtension::mode() const {
-  return _mode;
-}
-void
-AnytoneGPSSettingsExtension::setMode(GPSMode mode) {
-  if (mode == _mode)
-    return;
-  _mode = mode;
-  emit modified(this);
-}
 
 
 /* ********************************************************************************************* *
@@ -511,7 +425,7 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _minVFOScanFrequencyVHF(Frequency::fromMHz(144)), _maxVFOScanFrequencyVHF(Frequency::fromMHz(146)),
     _keepLastCaller(false), _vfoStep(Frequency::fromkHz(5)), _steType(STEType::Off), _steFrequency(0),
     _steDuration(Interval::fromMilliseconds(300)), _tbstFrequency(Frequency::fromHz(1750)),
-    _proMode(false), _maintainCallChannel(false)
+    _proMode(false), _maintainCallChannel(false), _fan(FanControl::Temperature)
 {
   connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
@@ -1980,8 +1894,8 @@ AnytoneDisplaySettingsExtension::enableCustomChannelBackground(bool enable) {
 AnytoneAudioSettingsExtension::AnytoneAudioSettingsExtension(QObject *parent)
   : ConfigItem(parent),  _voxDelay(), _recording(false), _voxSource(VoxSource::Both),
   _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1)),
-  _enableAnalogMicGain(false), _analogMicGain(1), _speaker(Speaker::Radio),
-  _handsetSpeaker(HandsetSpeakerSource::MainChannel), _handsetType(HandsetType::Anytone)
+  _analogMicGain(Level::invalid()), _speaker(Speaker::Radio), _handsetSpeaker(HandsetSpeakerSource::MainChannel),
+  _handsetType(HandsetType::Anytone)
 {
   // pass...
 }
@@ -2081,25 +1995,22 @@ AnytoneAudioSettingsExtension::setMuteDelay(Interval intv) {
 
 bool
 AnytoneAudioSettingsExtension::fmMicGainEnabled() const {
-  return _enableAnalogMicGain;
+  return _analogMicGain.isFinite();
 }
-void
-AnytoneAudioSettingsExtension::enableFMMicGain(bool enable) {
-  if (_enableAnalogMicGain == enable)
-    return;
-  _enableAnalogMicGain = enable;
-  emit modified(this);
-}
-unsigned int
+Level
 AnytoneAudioSettingsExtension::fmMicGain() const {
   return _analogMicGain;
 }
 void
-AnytoneAudioSettingsExtension::setFMMicGain(unsigned int gain) {
+AnytoneAudioSettingsExtension::setFMMicGain(Level gain) {
   if (_analogMicGain == gain)
     return;
   _analogMicGain = gain;
   emit modified(this);
+}
+void
+AnytoneAudioSettingsExtension::disableFMMicGain() {
+  _analogMicGain = Level::invalid();
 }
 
 

@@ -23,25 +23,16 @@
     name: Example DMR channel 
     # ...
     anytone:
-      talkaround: false
       frequencyCorrection: 0
       handsFree: false
-      callConfirm: false
-      sms: true
-      smsConfirm: false
-      dataACK: true
-      simplexTDMA: false
       adaptiveTDMA: false
-      loneWorker: false
       throughMode: false
   - fm:
     name: Example FM channel 
     # ...
     anytone:
-      talkaround: false
       frequencyCorrection: 0
       handsFree: false
-      reverseBurst: false
       rxCustomCTCSS: false
       txCustomCTCSS: false
       customCTCSS: 0.0
@@ -61,13 +52,6 @@
 </para>
 
 <variablelist>
-  <varlistentry>
-    <term><token>talkaround</token></term>
-    <listitem>
-      <para>If <token>true</token>, talkaround is enabled for this channel. This will bypass the
-        repeater on repeater channels and allows to talk to other participants directly.  </para>
-    </listitem>
-  </varlistentry>
   <varlistentry>
     <term><token>frequencyCorrection</token></term>
     <listitem>
@@ -119,17 +103,6 @@
 
   <variablelist>
     <varlistentry>
-      <term><token>reverseBurst</token></term>
-      <listitem>
-        <para>If <token>true</token>, a CTCSS phase-reverse burst is sent at the end of 
-          transmission. This phase reversal of the CTCSS tone at the end of the transmission
-          can be used to prevent a noise tail at the end of the transmission on the receiver 
-          side. See 
-          <ulink url="https://en.wikipedia.org/wiki/Continuous_Tone-Coded_Squelch_System#Reverse_CTCSS">Reverse CTCSS</ulink> 
-          for details.</para>
-      </listitem>
-    </varlistentry>
-    <varlistentry>
       <term><token>rxCustomCTCSS</token></term>
       <listitem>
         <para>If <token>true</token>, the custom CTCSS frequency (see <token>customCTCSS</token>) 
@@ -176,49 +149,11 @@
 
   <variablelist>
     <varlistentry>
-      <term><token>callConfirm</token></term>
-      <listitem>
-        <para>If <token>true</token>, the call confirmation is enabled.</para>
-      </listitem>
-    </varlistentry>
-    <varlistentry>
-      <term><token>sms</token></term>
-      <listitem>
-        <para>If <token>true</token>, the SMS reception is enabled.</para>
-      </listitem>
-    </varlistentry>
-    <varlistentry>
-      <term><token>smsConfirm</token></term>
-      <listitem>
-        <para>If <token>true</token>, the SMS confirmation is enabled.</para>
-      </listitem>
-    </varlistentry>
-    <varlistentry>
-      <term><token>dataACK</token></term>
-      <listitem>
-        <para>If <token>true</token>, the transmission of data acknowledgement is enabled.</para>
-      </listitem>
-    </varlistentry>
-    <varlistentry>
-      <term><token>simplexTDMA</token></term>
-      <listitem>
-        <para>If <token>true</token>, TDMA mode for simplex channels is enabled. This mode is also 
-          known as DCDM (dual-capacity direct mode, see <xref linkend="glDCDM">DCDM</xref>)</para>
-      </listitem>
-    </varlistentry>
-    <varlistentry>
       <term><token>adaptiveTDMA</token></term>
       <listitem>
         <para>If <token>true</token>, the adaptive TDMA mode is enabled. This makes only sense, if 
           <token>simplexTDMA</token> is enabled too. In this case, the radio is able to receive both
           simplex TDMA as well as normal simplex DMR on the channel.</para>
-      </listitem>
-    </varlistentry>
-    <varlistentry>
-      <term><token>loneWorker</token></term>
-      <listitem>
-        <para>If <token>true</token>, the lone-worker feature (see <xref linkend="glLoneWorker">Lone Worker</xref>) 
-          is enabled for this channel. Usually not used in HAM radio.</para>
       </listitem>
     </varlistentry>
     <varlistentry>

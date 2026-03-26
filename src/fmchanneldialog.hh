@@ -1,0 +1,47 @@
+#ifndef FMCHANNELDIALOG_H
+#define FMCHANNELDIALOG_H
+
+#include <QDialog>
+#include "config.hh"
+
+#include "ui_fmchanneldialog.h"
+
+class FMChannelDialog: public QDialog, private Ui::AnalogChannelDialog
+{
+  Q_OBJECT
+
+public:
+  FMChannelDialog(Config *config, QWidget *parent=nullptr);
+  FMChannelDialog(Config *config, FMChannel *channel, QWidget *parent=nullptr);
+
+  FMChannel *channel();
+
+protected:
+  void construct();
+
+protected slots:
+  void onRepeaterSelected(const QModelIndex &index);
+  void onPowerDefaultToggled(bool checked);
+  void onTimeoutDefaultToggled(bool checked);
+  void onSquelchDefaultToggled(bool checked);
+  void onVOXDefaultToggled(bool checked);
+  void onHideChannelHint();
+
+private slots:
+  void onRxFrequencyEdited();
+  void onTxFrequencyEdited();
+  void onOffsetFrequencyEdited();
+  void onOffsetDirectionChanged(int index);
+  void updateOffsetFrequency();
+
+private:
+  void updateComboBox();
+
+protected:
+  Config *_config;
+  FMChannel *_myChannel;
+  FMChannel *_channel;
+};
+
+
+#endif // FMCHANNELDIALOG_H

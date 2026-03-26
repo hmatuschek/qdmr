@@ -87,9 +87,9 @@ public:
     virtual void setMode(Mode mode);
 
     /** Returns the TX timeout in seconds. A value of 0 means disabled. */
-    virtual unsigned txTimeOut() const;
+    virtual Interval txTimeOut() const;
     /** Sets the TX timeout in seconds. Setting it to 0 disables the timeout. */
-    virtual void setTXTimeOut(unsigned tot);
+    virtual void setTXTimeOut(const Interval &tot);
     /** Returns the transmit time-out re-key delay in seconds. */
     virtual unsigned txTimeOutRekeyDelay() const;
     /** Sets the transmit time-out re-key delay in seconds. */
@@ -990,9 +990,9 @@ public:
     virtual void setRadioID(unsigned id);
 
     /** Returns the preamble duration in ms. */
-    virtual unsigned preambleDuration() const;
+    virtual Interval preambleDuration() const;
     /** Sets the preamble duration in ms. */
-    virtual void setPreambleDuration(unsigned ms);
+    virtual void setPreambleDuration(const Interval &dur);
 
     /** Returns the monitor type. */
     virtual MonitorType monitorType() const;
@@ -1000,9 +1000,9 @@ public:
     virtual void setMonitorType(MonitorType type);
 
     /** Returns the VOX sensitivity [1-10], 0=disabled. */
-    virtual unsigned voxSensitivity() const;
+    virtual Level voxSensitivity() const;
     /** Sets the VOX sensitivity. */
-    virtual void setVOXSensitivity(unsigned value);
+    virtual void setVOXSensitivity(Level value);
 
     /** Returns the low-battery warn interval in seconds. */
     virtual unsigned lowBatteryWarnInterval() const;
@@ -1024,13 +1024,13 @@ public:
     virtual void setLoneWorkerReminderPeriod(unsigned sec);
 
     /** Returns the group call hang time in ms. */
-    virtual unsigned groupCallHangTime() const;
+    virtual Interval groupCallHangTime() const;
     /** Sets the group call hang time in ms. */
-    virtual void setGroupCallHangTime(unsigned ms);
+    virtual void setGroupCallHangTime(const Interval &dur);
     /** Returns the private call hang time in ms. */
-    virtual unsigned privateCallHangTime() const;
+    virtual Interval privateCallHangTime() const;
     /** Sets the private call hang time in ms. */
-    virtual void setPrivateCallHangTime(unsigned ms);
+    virtual void setPrivateCallHangTime(const Interval &dur);
 
     /** Returns @c true if the down-channel mode is VFO. */
     virtual bool downChannelModeVFO() const;
@@ -1130,6 +1130,13 @@ public:
     virtual bool fromConfig(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Updates the given config from this settings. */
     virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: Element::Limit {
+      // VOX sensitivity settings.
+      static constexpr Range<unsigned int> vox() { return {1,10}; }
+    };
   };
 
   /** Implements the base class of button settings for all Radioddity codeplugs.

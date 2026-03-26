@@ -67,10 +67,10 @@ public:
     explicit ChannelElement(uint8_t *ptr);
 
     /** Clears/resets the channel and therefore disables it. */
-    void clear();
+    void clear() override;
 
-    bool talkaround() const;
-    void enableTalkaround(bool enable);
+    bool talkaround() const override;
+    void enableTalkaround(bool enable) override;
 
     /** Returns @c true, if the privacy switch is enabled. */
     virtual bool privacySwitch() const;
@@ -92,9 +92,9 @@ public:
     virtual void setTurnOffFreq(TyTChannelExtension::KillTone freq);
 
     /** Returns the squelch level [0-10]. */
-    virtual unsigned squelch() const;
+    virtual Level squelch() const;
     /** Sets the squelch level [0-10]. */
-    virtual void setSquelch(unsigned value);
+    virtual void setSquelch(Level value);
 
     /** Returns the power of this channel. */
     virtual Channel::Power power() const;
@@ -117,9 +117,9 @@ public:
     virtual void enableDCDMLeader(bool enable);
 
     /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj(const ErrorStack &err=ErrorStack()) const;
+    virtual Channel *toChannelObj(const ErrorStack &err=ErrorStack()) const override;
     /** Initializes this codeplug channel from the given generic configuration. */
-    virtual void fromChannelObj(const Channel *c, Context &ctx);
+    virtual void fromChannelObj(const Channel *c, Context &ctx) override;
 
   protected:
     /** Some internal offsets. */
@@ -216,9 +216,9 @@ public:
     virtual void setAdditionalDMRId(unsigned n, uint32_t id);
 
     /** Returns the microphone gain. */
-    virtual unsigned micLevel() const;
+    virtual Level micLevel() const;
     /** Sets the microphone gain. */
-    virtual void setMICLevel(unsigned val);
+    virtual void setMICLevel(Level val);
 
     /** If @c true, radio ID editing is enabled. */
     virtual bool editRadioID() const;
@@ -229,6 +229,21 @@ public:
     virtual bool fromConfig(const Config *config);
     /** Updates config from general settings. */
     virtual bool updateConfig(Config *config);
+
+  public:
+    /** Some limits. */
+    struct Limit: DM1701Codeplug::GeneralSettingsElement::Limit {
+      /** Specifies the valid range for mic gain. */
+      static constexpr Range<unsigned int> micGain() { return {0,6}; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: DM1701Codeplug::GeneralSettingsElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Bit micGain() { return {0x00a0, 3}; }
+      /// @endcond
+    };
   };
 
   /** Represents the boot-time settings (selected zone and channels) within the UV390 code-plug.
@@ -337,45 +352,45 @@ public:
   bool encodeTimestamp();
 
   void clearGeneralSettings();
-  bool encodeGeneralSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeGeneralSettings(Config *config, const ErrorStack &err=ErrorStack());
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearChannels();
-  bool encodeChannels(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createChannels(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeChannels( const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearContacts();
-  bool encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createContacts(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createContacts(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearZones();
-  bool encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createZones(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createZones(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkZones(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearGroupLists();
-  bool encodeGroupLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createGroupLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeGroupLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkGroupLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearScanLists();
-  bool encodeScanLists(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createScanLists(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeScanLists(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkScanLists(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearPositioningSystems();
-  bool encodePositioningSystems(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createPositioningSystems(Config *config, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodePositioningSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool createPositioningSystems(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkPositioningSystems(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearButtonSettings();
-  bool encodeButtonSettings(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeButtonSetttings(Config *config, const ErrorStack &err=ErrorStack());
+  bool encodeButtonSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeButtonSetttings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearPrivacyKeys();
-  bool encodePrivacyKeys(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err);
-  bool decodePrivacyKeys(Config *config, Context &ctx, const ErrorStack &err);
+  bool encodePrivacyKeys(const Flags &flags, Context &ctx, const ErrorStack &err);
+  bool decodePrivacyKeys(Context &ctx, const ErrorStack &err);
 
   void clearTextMessages();
   bool encodeTextMessages(Context &ctx, const Flags &flags, const ErrorStack &err);

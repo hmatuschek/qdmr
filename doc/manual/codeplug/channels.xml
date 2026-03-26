@@ -370,4 +370,90 @@
 </variablelist>
 </section>
 
+
+<section>
+<info><title>Extended channel settings</title></info>
+
+<para>
+  All channels have some extended settings section. This section allows to specify usually unused 
+  settings that are common among many of the supported radios. The extended settings are stored 
+  under the <token>extended</token> key.
+</para>
+
+<section>
+<info><title>Common extended channel settings</title></info>
+
+<para>
+  There is only one setting common to all channel types. The talkaround flag.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><token>talkaround</token></term>
+    <listterm>
+      <para>For a repeater channel, if enabled, the radio transmits on the RX frequency. This 
+        allows to bypass the repeater and answer directly on the RX frequency. </para>
+    </listterm>
+  </varlistentry>
+</variablelist>
+</section>
+
+<section>
+<info><title>Extended FM channel settings</title></info>
+<para>
+  Additional to the common extended channel settings, this section describes all extended settings
+  applicable to FM channels.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><token>reverseBurst</token></term>
+    <listitem>
+      <para>Enables the CTCSS phase-reversal at the end of the transmission. This can be used 
+        to mitigate an issue with the CTCSS squelch, where a short burst of noise may heard at
+        the end of the transmission. </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+
+<section>
+<info><title>Extended DMR channel settings</title></info>
+<para>
+  Additional to the common extended channel settings, this section describes all extended settings
+  applicable to FM channels.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><token>privateCallConfirm</token>, <token>smsConfirm</token>, <token>dataConfirm</token></term>
+    <listitem>
+      <para>Enables confirmation of SMS, data and private call reception.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dcdm</token></term>
+    <listitem>
+      <para>Enables the dual-capacity direct mode. For simplex operation, allows to utilize both 
+        time-slots. This requires one radio to dictate a clock to define TS1 and TS2. Not used in 
+        amateur radio.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>sms</token></term>
+    <listitem>
+      <para>Enables SMS reception.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>loneWorker</token></term>
+    <listitem>
+      <para>Enables lone-worker feature of some radios.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+</section>
+
 </section>

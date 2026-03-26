@@ -1,4 +1,4 @@
-#include "digitalchanneldialog.hh"
+#include "dmrchanneldialog.hh"
 #include "application.hh"
 #include <QCompleter>
 #include "rxgrouplistdialog.hh"
@@ -12,7 +12,7 @@
 
 
 /* ********************************************************************************************* *
- * Implementation of DigitalChannelDialog
+ * Implementation of DMRChannelDialog
  * ********************************************************************************************* */
 DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
   : QDialog(parent), _config(config), _myChannel(new DMRChannel(this)), _channel(nullptr)
@@ -73,40 +73,41 @@ DMRChannelDialog::construct() {
   populateRXGroupListBox(rxGroupList, _config->rxGroupLists(),
                          (nullptr != _myChannel ? _myChannel->groupList() : nullptr));
   txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));
-  if (_myChannel && (nullptr == _myChannel->txContactObj()))
+  if (_myChannel && (nullptr == _myChannel->contact()))
     txContact->setCurrentIndex(0);
   for (int i=0,c=1; i<_config->contacts()->count(); i++) {
     if (! _config->contacts()->contact(i)->is<DMRContact>())
       continue;
     txContact->addItem(_config->contacts()->contact(i)->name(),
                        QVariant::fromValue(_config->contacts()->contact(i)));
-    if (_myChannel && (_myChannel->txContactObj() == _config->contacts()->contact(i)) )
-      txContact->setCurrentIndex(c);
-    c++;
+    if (_myChannel && (_myChannel->contact() == _config->contacts()->contact(i)) )
+      txContact->setCurrentIndex(i+1);
   }
-  gpsSystem->addItem(tr("[None]"), QVariant::fromValue((GPSSystem *)nullptr));
+  gpsSystem->addItem(tr("[None]"), QVariant::fromValue((DMRAPRSSystem *)nullptr));
   for (int i=0; i<_config->posSystems()->count(); i++) {
-    PositioningSystem *sys = _config->posSystems()->system(i);
+    PositionReportingSystem *sys = _config->posSystems()->system(i);
     gpsSystem->addItem(sys->name(), QVariant::fromValue(sys));
-    if (_myChannel && (_myChannel->aprsObj() == sys))
+    if (_myChannel && (_myChannel->aprs() == sys))
       gpsSystem->setCurrentIndex(i+1);
   }
   roaming->addItem(tr("[None]"), QVariant::fromValue((RoamingZone *)nullptr));
   roaming->addItem(tr("[Default]"), QVariant::fromValue(DefaultRoamingZone::get()));
-  if (_myChannel && (_myChannel->roamingZone() == DefaultRoamingZone::get()))
+  if (_myChannel && (_myChannel->roaming() == DefaultRoamingZone::get()))
     roaming->setCurrentIndex(1);
   for (int i=0; i<_config->roamingZones()->count(); i++) {
     RoamingZone *zone = _config->roamingZones()->zone(i);
     roaming->addItem(zone->name(), QVariant::fromValue(zone));
-    if (_myChannel && (_myChannel->roamingZone() == zone))
+    if (_myChannel && (_myChannel->roaming() == zone))
       roaming->setCurrentIndex(i+2);
   }
   dmrID->addItem(tr("[Default]"), QVariant::fromValue(DefaultRadioID::get()));
   dmrID->setCurrentIndex(0);
   for (int i=0; i<_config->radioIDs()->count(); i++) {
-    dmrID->addItem(_config->radioIDs()->getId(i)->name(),
-                   QVariant::fromValue(_config->radioIDs()->getId(i)));
-    if (_myChannel && (_config->radioIDs()->getId(i) == _myChannel->radioIdObj())) {
+    if (! _config->radioIDs()->get(i)->is<DMRRadioID>())
+      continue;
+    auto id = _config->radioIDs()->get(i)->as<DMRRadioID>();
+    dmrID->addItem(id->name(), QVariant::fromValue(id));
+    if (_myChannel && (id == _myChannel->radioId())) {
       dmrID->setCurrentIndex(i+1);
     }
   }
@@ -136,9 +137,12 @@ DMRChannelDialog::construct() {
     case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
     }
   }
-  if (! _myChannel->defaultTimeout()) {
+  if (_myChannel->timeoutDisabled()) {
     totDefault->setChecked(false); totValue->setEnabled(true);
-    totValue->setValue(_channel->timeout());
+    totValue->setValue(0);
+  } else if (! _myChannel->defaultTimeout()) {
+    totDefault->setChecked(false); totValue->setEnabled(true);
+    totValue->setValue(_channel->timeout().seconds());
   }
   rxOnly->setChecked(_myChannel->rxOnly());
   switch (_myChannel->admit()) {
@@ -153,7 +157,7 @@ DMRChannelDialog::construct() {
     timeSlot->setCurrentIndex(1);
   if (! _myChannel->defaultVOX()) {
     voxDefault->setChecked(false); voxValue->setEnabled(true);
-    voxValue->setValue(_channel->vox());
+    voxValue->setValue(_channel->vox().value());
   }
 
   extensionView->setObjectName("digitalChannelExtension");
@@ -176,7 +180,7 @@ DMRChannelDialog::construct() {
 DMRChannel *
 DMRChannelDialog::channel()
 {
-  _myChannel->setRadioIdObj(dmrID->currentData().value<DMRRadioID*>());
+  _myChannel->setRadioId(dmrID->currentData().value<DMRRadioID*>());
   _myChannel->setName(channelName->text());
   _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
   _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
@@ -186,21 +190,23 @@ DMRChannelDialog::channel()
     _myChannel->setPower(Channel::Power(powerValue->currentData().toUInt()));
   if (totDefault->isChecked())
     _myChannel->setDefaultTimeout();
+  else if (0 == totValue->value())
+    _myChannel->disableTimeout();
   else
-    _myChannel->setTimeout(totValue->value());
+    _myChannel->setTimeout(Interval::fromSeconds(totValue->value()));
   _myChannel->setRXOnly(rxOnly->isChecked());
   _myChannel->setScanList(scanList->currentData().value<ScanList *>());
   _myChannel->setAdmit(DMRChannel::Admit(txAdmit->currentData().toUInt()));
   _myChannel->setColorCode(colorCode->value());
   _myChannel->setTimeSlot(DMRChannel::TimeSlot(timeSlot->currentData().toUInt()));
   _myChannel->setGroupList(rxGroupList->currentData().value<RXGroupList *>());
-  _myChannel->setTXContactObj(txContact->currentData().value<DMRContact *>());
-  _myChannel->setAPRSObj(gpsSystem->currentData().value<PositioningSystem *>());
-  _myChannel->setRoamingZone(roaming->currentData().value<RoamingZone *>());
+  _myChannel->setContact(txContact->currentData().value<DMRContact *>());
+  _myChannel->setAPRS(gpsSystem->currentData().value<PositionReportingSystem *>());
+  _myChannel->setRoaming(roaming->currentData().value<RoamingZone *>());
   if (voxDefault->isChecked())
     _myChannel->setVOXDefault();
   else
-    _myChannel->setVOX(voxValue->value());
+    _myChannel->setVOX(Level::fromValue(voxValue->value()));
 
   DMRChannel *channel = _myChannel;
   if (nullptr == _channel) {

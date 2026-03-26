@@ -13,7 +13,9 @@
 
   <info>
     <author>
-      <personname><firstname>Hannes</firstname> <surname>Matuschek</surname></personname>
+      <personname>
+        <firstname>Hannes</firstname> <surname>Matuschek</surname>
+      </personname>
       <email>dm3mat@darc.de</email>
       <contrib>Main author</contrib>
     </author>
@@ -154,7 +156,7 @@
         <term><option>-c</option> or <option>--csv</option></term>
         <listitem>
           <para>
-            Specifies the file format for the input file for the 
+            Specifies the file format for the input file for 
             <command>verify</command>, <command>encode</command> and 
             <command>write</command> commands. This option is not needed if the
             filetype can be inferred from the filename. That is, if the file 
@@ -170,7 +172,7 @@
             <command>verify</command>, <command>read</command> and 
             <command>write</command> commands. This option is not needed if the
             filetype can be inferred from the filename. That is, if the file 
-            ends on <filename>.yaml</filename>.
+            ends on <filename>.yaml</filename> or <filename>.yml</filename>.
           </para>
         </listitem>
       </varlistentry>
@@ -202,8 +204,8 @@
           <para>
             Specifies the device to use. Either a USB <token>BUS:DEVICE</token> 
             number combination or the name of a serial interface. The device
-            must be specified if the automatic radio detection fails or if 
-            more than one radio is connected to the host.
+            must be specified if the automatic radio detection fails, is unsave 
+            or if more than one radio is connected to the host.
           </para>
         </listitem>
       </varlistentry>
@@ -246,7 +248,8 @@
         <term><option>-B</option> or <option>--database=</option>JSON_FILE</term>
         <listitem>
           <para>
-            Specifies the call-sign database to use for writing a user-db to the device.
+            Specifies the call-sign database to use for writing a user-db to the 
+            device.
           </para>
         </listitem>
       </varlistentry>
@@ -256,7 +259,18 @@
           <para>
             Initializes the code-plug from scratch. If omitted (default) the 
             codeplug on the device gets updated. This maintains all settings 
-            made earlier via the manufacturer CPS or on the radio itself.
+            made earlier via the manufacturer CPS or on the radio itself, that 
+            are not part of the codeplug.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--update-device-clock</option></term>
+        <listitem>
+          <para>
+            If set, the device clock gets updated with the transfer to the 
+            radio. That is, with any codeplug or call-sign DB being written to 
+            the device. Not all radios support this feature.
           </para>
         </listitem>
       </varlistentry>
@@ -328,6 +342,7 @@
     <variablelist>
       <varlistentry>
         <term><option>opengd77</option></term>
+        <term><option>openuv380</option></term>
         <listitem>
           <para>
             All radios running the Open GD77 firmware.
@@ -335,11 +350,11 @@
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>d868uv</option></term>
         <term><option>d868uve</option></term>
-        <term><option>dmr6x2</option></term>
         <listitem>
           <para>
-            Anytone AT-D868UVE or Baofeng DMR-6X2.
+            Anytone AT-D868UV(E).
           </para>
         </listitem>
       </varlistentry>
@@ -361,9 +376,10 @@
       </varlistentry>
       <varlistentry>
         <term><option>d578uv</option></term>
+        <term><option>d578uv2</option></term>
         <listitem>
           <para>
-            Anytone AT-D578UV.
+            Anytone AT-D578UV (II).
           </para>
         </listitem>
       </varlistentry>
@@ -395,10 +411,18 @@
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term><option>gd73</option></term>
+        <listitem>
+          <para>
+            Radioddity GD-73.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term><option>gd77</option></term>
         <listitem>
           <para>
-            Retevis GD-77.
+            Radioddity GD-77.
           </para>
         </listitem>
       </varlistentry>
@@ -416,6 +440,22 @@
         <listitem>
           <para>
             Baofeng DM1701 or Retevis RT84.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>dr1801uv</option></term>
+        <listitem>
+          <para>
+            Baofeng DR1801UV-A6.
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>dm32uv</option></term>
+        <listitem>
+          <para>
+            Baofeng DM-32UV.
           </para>
         </listitem>
       </varlistentry>
