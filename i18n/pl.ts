@@ -115,7 +115,7 @@
     <message>
         <location filename="../src/amchanneldialog.cc" line="47"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/amchanneldialog.cc" line="63"/>
@@ -1280,7 +1280,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="687"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="705"/>
@@ -1316,7 +1316,7 @@
         <location filename="../src/dmrchanneldialog.cc" line="84"/>
         <location filename="../src/dmrchanneldialog.cc" line="91"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="92"/>
@@ -1705,7 +1705,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="7"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
@@ -2149,7 +2149,7 @@
         <location filename="../src/fmchanneldialog.cc" line="57"/>
         <location filename="../src/fmchanneldialog.cc" line="75"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="92"/>
@@ -2164,6 +2164,14 @@
     <message>
         <location filename="../src/fmchanneldialog.cc" line="96"/>
         <source>Negative offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FlagEditDialog</name>
+    <message>
+        <location filename="../src/flageditdialog.ui" line="14"/>
+        <source>Select Flags</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2876,7 +2884,7 @@
         <location filename="../src/configitemwrapper.cc" line="811"/>
         <location filename="../src/configitemwrapper.cc" line="819"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="800"/>
@@ -2923,66 +2931,87 @@
 <context>
     <name>PropertyDelegate</name>
     <message>
-        <location filename="../src/propertydelegate.cc" line="96"/>
+        <location filename="../src/propertydelegate.cc" line="74"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/propertydelegate.cc" line="75"/>
+        <source>Off</source>
+        <translation type="unfinished">Wyłącz</translation>
+    </message>
+    <message>
+        <location filename="../src/propertydelegate.cc" line="112"/>
         <source>False</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="97"/>
+        <location filename="../src/propertydelegate.cc" line="113"/>
         <source>True</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="120"/>
+        <location filename="../src/propertydelegate.cc" line="142"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
 </context>
 <context>
     <name>PropertyWrapper</name>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="348"/>
+        <location filename="../src/extensionwrapper.cc" line="350"/>
         <source>new element</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="524"/>
+        <location filename="../src/extensionwrapper.cc" line="526"/>
         <source>Property</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="525"/>
+        <location filename="../src/extensionwrapper.cc" line="527"/>
         <source>Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="526"/>
+        <location filename="../src/extensionwrapper.cc" line="528"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="582"/>
+        <location filename="../src/extensionwrapper.cc" line="590"/>
         <source>true</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="583"/>
+        <location filename="../src/extensionwrapper.cc" line="591"/>
         <source>false</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="605"/>
-        <location filename="../src/extensionwrapper.cc" line="613"/>
-        <source>[None]</source>
+        <location filename="../src/extensionwrapper.cc" line="612"/>
+        <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="615"/>
+        <location filename="../src/extensionwrapper.cc" line="614"/>
+        <source>Off</source>
+        <translation type="unfinished">Wyłącz</translation>
+    </message>
+    <message>
+        <location filename="../src/extensionwrapper.cc" line="625"/>
+        <location filename="../src/extensionwrapper.cc" line="633"/>
+        <location filename="../src/extensionwrapper.cc" line="641"/>
+        <source>[None]</source>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
+    </message>
+    <message>
+        <location filename="../src/extensionwrapper.cc" line="643"/>
         <source>Instance of %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="620"/>
+        <location filename="../src/extensionwrapper.cc" line="648"/>
         <source>List of %1 instances</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2992,7 +3021,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="111"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
 </context>
 <context>
@@ -3106,7 +3135,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="980"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="995"/>
@@ -3277,7 +3306,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="578"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="593"/>
@@ -3566,7 +3595,7 @@
         <location filename="../src/scanlistdialog.cc" line="34"/>
         <location filename="../src/scanlistdialog.cc" line="36"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Znaczenie mocno zależy od kontekstu. Sprawdź kontekst źródłowy.</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="35"/>

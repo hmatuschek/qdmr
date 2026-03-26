@@ -2168,6 +2168,14 @@
     </message>
 </context>
 <context>
+    <name>FlagEditDialog</name>
+    <message>
+        <location filename="../src/flageditdialog.ui" line="14"/>
+        <source>Select Flags</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>GPSSystemDialog</name>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="8"/>
@@ -2923,17 +2931,27 @@
 <context>
     <name>PropertyDelegate</name>
     <message>
-        <location filename="../src/propertydelegate.cc" line="96"/>
+        <location filename="../src/propertydelegate.cc" line="74"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/propertydelegate.cc" line="75"/>
+        <source>Off</source>
+        <translation type="unfinished">Uit</translation>
+    </message>
+    <message>
+        <location filename="../src/propertydelegate.cc" line="112"/>
         <source>False</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="97"/>
+        <location filename="../src/propertydelegate.cc" line="113"/>
         <source>True</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="120"/>
+        <location filename="../src/propertydelegate.cc" line="142"/>
         <source>[None]</source>
         <translation>[Geen]</translation>
     </message>
@@ -2941,48 +2959,59 @@
 <context>
     <name>PropertyWrapper</name>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="348"/>
+        <location filename="../src/extensionwrapper.cc" line="350"/>
         <source>new element</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="524"/>
+        <location filename="../src/extensionwrapper.cc" line="526"/>
         <source>Property</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="525"/>
+        <location filename="../src/extensionwrapper.cc" line="527"/>
         <source>Value</source>
         <translation>Waarde</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="526"/>
+        <location filename="../src/extensionwrapper.cc" line="528"/>
         <source>Description</source>
         <translation>Beschrijving</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="582"/>
+        <location filename="../src/extensionwrapper.cc" line="590"/>
         <source>true</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="583"/>
+        <location filename="../src/extensionwrapper.cc" line="591"/>
         <source>false</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="605"/>
-        <location filename="../src/extensionwrapper.cc" line="613"/>
+        <location filename="../src/extensionwrapper.cc" line="612"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/extensionwrapper.cc" line="614"/>
+        <source>Off</source>
+        <translation type="unfinished">Uit</translation>
+    </message>
+    <message>
+        <location filename="../src/extensionwrapper.cc" line="625"/>
+        <location filename="../src/extensionwrapper.cc" line="633"/>
+        <location filename="../src/extensionwrapper.cc" line="641"/>
         <source>[None]</source>
         <translation>[Geen]</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="615"/>
+        <location filename="../src/extensionwrapper.cc" line="643"/>
         <source>Instance of %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="620"/>
+        <location filename="../src/extensionwrapper.cc" line="648"/>
         <source>List of %1 instances</source>
         <translation type="unfinished"></translation>
     </message>
