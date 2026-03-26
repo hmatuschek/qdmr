@@ -425,7 +425,7 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _minVFOScanFrequencyVHF(Frequency::fromMHz(144)), _maxVFOScanFrequencyVHF(Frequency::fromMHz(146)),
     _keepLastCaller(false), _vfoStep(Frequency::fromkHz(5)), _steType(STEType::Off), _steFrequency(0),
     _steDuration(Interval::fromMilliseconds(300)), _tbstFrequency(Frequency::fromHz(1750)),
-    _proMode(false), _maintainCallChannel(false)
+    _proMode(false), _maintainCallChannel(false), _fan(FanControl::Temperature)
 {
   connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
