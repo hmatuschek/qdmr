@@ -425,7 +425,7 @@ AnytoneSettingsExtension::AnytoneSettingsExtension(QObject *parent)
     _minVFOScanFrequencyVHF(Frequency::fromMHz(144)), _maxVFOScanFrequencyVHF(Frequency::fromMHz(146)),
     _keepLastCaller(false), _vfoStep(Frequency::fromkHz(5)), _steType(STEType::Off), _steFrequency(0),
     _steDuration(Interval::fromMilliseconds(300)), _tbstFrequency(Frequency::fromHz(1750)),
-    _proMode(false), _maintainCallChannel(false)
+    _proMode(false), _maintainCallChannel(false), _fan(FanControl::Temperature)
 {
   connect(_bootSettings, &AnytoneBootSettingsExtension::modified,
           this, &AnytoneSettingsExtension::modified);
@@ -1894,8 +1894,8 @@ AnytoneDisplaySettingsExtension::enableCustomChannelBackground(bool enable) {
 AnytoneAudioSettingsExtension::AnytoneAudioSettingsExtension(QObject *parent)
   : ConfigItem(parent),  _voxDelay(), _recording(false), _voxSource(VoxSource::Both),
   _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1)),
-  _enableAnalogMicGain(false), _analogMicGain(1), _speaker(Speaker::Radio),
-  _handsetSpeaker(HandsetSpeakerSource::MainChannel), _handsetType(HandsetType::Anytone)
+  _analogMicGain(Level::invalid()), _speaker(Speaker::Radio), _handsetSpeaker(HandsetSpeakerSource::MainChannel),
+  _handsetType(HandsetType::Anytone)
 {
   // pass...
 }
@@ -1995,25 +1995,22 @@ AnytoneAudioSettingsExtension::setMuteDelay(Interval intv) {
 
 bool
 AnytoneAudioSettingsExtension::fmMicGainEnabled() const {
-  return _enableAnalogMicGain;
+  return _analogMicGain.isFinite();
 }
-void
-AnytoneAudioSettingsExtension::enableFMMicGain(bool enable) {
-  if (_enableAnalogMicGain == enable)
-    return;
-  _enableAnalogMicGain = enable;
-  emit modified(this);
-}
-unsigned int
+Level
 AnytoneAudioSettingsExtension::fmMicGain() const {
   return _analogMicGain;
 }
 void
-AnytoneAudioSettingsExtension::setFMMicGain(unsigned int gain) {
+AnytoneAudioSettingsExtension::setFMMicGain(Level gain) {
   if (_analogMicGain == gain)
     return;
   _analogMicGain = gain;
   emit modified(this);
+}
+void
+AnytoneAudioSettingsExtension::disableFMMicGain() {
+  _analogMicGain = Level::invalid();
 }
 
 

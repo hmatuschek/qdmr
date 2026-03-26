@@ -15,7 +15,7 @@
 
 %define ext_man .gz
 %define sover   0
-%define realver 0.13.2
+%define realver 0.14.0
 Name:           qdmr
 Version:        %{realver}
 Release:        0fedora
@@ -55,7 +55,7 @@ Currently supported devices are:
  * Retevis RT8, RT3S, RT82
  * Open GD77 firmware (GD77, RD-5R, DM-1801, MD-UV390, RT-3S & DM1701)
  * AnyTone AT-D868UVE, AT-D878UV, AT-878UVII, AT-D578UV, AT-D578UVII
- * BTech DMR-6X2, DMR-6X2PRO, DM-1701, DR-1801UVA6
+ * BTech DMR-6X2, DMR-6X2PRO, DM-1701, DR-1801UVA6, DM-32UV
 
 %package -n libdmrconf%{sover}
 Summary:        Graphical code-plug programming tool for DMR radios
@@ -112,6 +112,8 @@ applications that want to make use of libdmrconf.
 %{_libdir}/libdmrconf.so
 
 %changelog
+* Sat Mar 21 2026 Hannes Matuschek <dm3mat@darc.de>
+  - Updated to 0.14.0
 * Sun Nov 30 2025 Hannes Matuschek <dm3mat@darc.de>
   - Updated to 0.13.2
 * Tue Oct 21 2025 Hannes Matuschek <dm3mat@darc.de>

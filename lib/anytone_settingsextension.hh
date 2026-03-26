@@ -904,10 +904,8 @@ class AnytoneAudioSettingsExtension: public ConfigItem
   /** The maximum head-phone volume setting [0-10]. */
   Q_PROPERTY(unsigned int maxHeadPhoneVolume READ maxHeadPhoneVolume WRITE setMaxHeadPhoneVolume)
 
-  /** Enables the separate FM mic gain. If disabled, the DMR mic gain setting is used for FM too. */
-  Q_PROPERTY(bool enableFMMicGain READ fmMicGainEnabled WRITE enableFMMicGain)
   /** The FM mic gain [1,10]. */
-  Q_PROPERTY(unsigned int fmMicGain READ fmMicGain WRITE setFMMicGain)
+  Q_PROPERTY(Level fmMicGain READ fmMicGain WRITE setFMMicGain)
 
   /** The enables speakers. */
   Q_PROPERTY(Speaker speaker READ speaker WRITE setSpeaker)
@@ -983,12 +981,12 @@ public:
 
   /** Returns @c true, if the FM mic gain is set independently. */
   bool fmMicGainEnabled() const;
-  /** Enables/disables the FM mic gain. */
-  void enableFMMicGain(bool enable);
   /** Returns the FM mic gain. */
-  unsigned int fmMicGain() const;
+  Level fmMicGain() const;
   /** Sets the FM mic gain. */
-  void setFMMicGain(unsigned int gain);
+  void setFMMicGain(Level gain);
+  /** Disables the FM mic gain. */
+  void disableFMMicGain();
 
   /** Returns the speaker that are enabled. */
   Speaker speaker() const;
@@ -1013,8 +1011,7 @@ protected:
   unsigned int _maxHeadPhoneVolume; ///< The maximum head-phone volume.
   bool _enhanceAudio;               ///< Enhance audio.
   Interval _muteDelay;              ///< Mute delay in minutes.
-  bool _enableAnalogMicGain;        ///< Enables separate analog mic gain.
-  unsigned int _analogMicGain;      ///< The FM mic gain.
+  Level _analogMicGain;             ///< The FM mic gain.
   Speaker _speaker;                 ///< Specifies which speaker are enabled.
   HandsetSpeakerSource _handsetSpeaker; ///< Specifies the handset speaker source.
   HandsetType _handsetType;         ///< Handset type.

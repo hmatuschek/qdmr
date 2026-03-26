@@ -3,6 +3,7 @@
 
 #include "configobject.hh"
 #include "interval.hh"
+#include "level.hh"
 
 
 /** Represents the button settings extension for all radioddity devices.
@@ -129,7 +130,7 @@ class RadioddityToneSettingsExtension: public ConfigItem
   /** If @c true, the TX exit tone is enabled. */
   Q_PROPERTY(bool txExitTone READ txExitTone WRITE enableTXExitTone)
   /** Sets the FM mic gain (GD-73 only). */
-  Q_PROPERTY(unsigned int fmMicGain READ fmMicGain WRITE setFMMicGain);
+  Q_PROPERTY(Level fmMicGain READ fmMicGain WRITE setFMMicGain);
 
 public:
   /** Possible ARTS tone settings. */
@@ -218,9 +219,9 @@ public:
   void enableTXExitTone(bool enable);
 
   /** Returns the FM mic gain [1,10]. */
-  unsigned int fmMicGain() const;
+  Level fmMicGain() const;
   /** Sets the FM mic gain [1,10]. */
-  void setFMMicGain(unsigned int gain);
+  void setFMMicGain(Level gain);
 
 protected:
   /** If @c true, a low-battery charge is indicated by a warning. */
@@ -254,7 +255,7 @@ protected:
   /** Holds the key-tone volume [1,10]. */
   unsigned int _keyToneVolume;
   /** The FM mic gain. */
-  unsigned int _fmMicGain;
+  Level _fmMicGain;
 };
 
 /** Represents the boot settings for Radioddity devices.

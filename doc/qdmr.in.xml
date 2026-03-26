@@ -54,8 +54,9 @@
         <term><option>CODEPLUG_FILE</option></term>
         <listitem>
           <para>
-            If the optional codeplug file is passed to qdmr, it gets loaded on 
-            startup. Otherwise, the application starts with an empty codeplug.
+            If the optional codeplug file is passed to <command>qdmr</command>, 
+            it gets loaded on startup. Otherwise, the application starts with 
+            an empty codeplug.
           </para>
         </listitem>
       </varlistentry>
@@ -65,19 +66,19 @@
           <para>
             This option allows to set a Qt style for the application. This can
             be used to alter the style of the widgets. So call 
-            <cmd>qdmr -style=windows</cmd> if you fancy.
+            <userinput>qdmr -style=windows</userinput> if you fancy.
           </para>
           <para>
             However, this option is of real use if you want to use a dark 
             theme. By installing a dark Qt theme like kvantum-dark and starting
             qdmr by passing this theme to the style option. That is
           </para>
-          <para>
+          <screen>
             qdmr -style=kvantum-dark
-          </para>
+          </screen>
           <para>
             You may set the Qt style for all Qt applications using the 
-            <env>QT_STYLE_OVERRIDE</env> environment variable.
+            <varname>QT_STYLE_OVERRIDE</varname> environment variable.
           </para>
         </listitem>
       </varlistentry>
@@ -86,7 +87,23 @@
         <listitem>
           <para>
             This option allows for specifying a style sheet to alter the 
-            appearance of some or all widgets of qdmr. </para>
+            appearance of some or all widgets of <command>qdmr</command>. 
+          </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term><option>--loglevel=LEVEL</option></term>
+        <listitem>
+          <para>
+            This option allows for specifying the log level for messages 
+            printed to stderr. This does not affect the log level of messages
+            written to the log file. 
+          </para>
+          <para>
+            Must be one of <token>debug</token>, <token>info</token>, 
+            <token>warning</token>, <token>error</token> or 
+            <token>fatal</token>. Default is <token>info</token>.
+          </para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -95,10 +112,11 @@
   <refsect1>
     <title>Logging</title>
     <para>
-      Qdmr writes a lot of debug and error messages to <io>stderr</io>. This 
-      can be used to inspect some issues during reading/writing the codeplug 
-      to the device. There is also a log file containing these messages usually
-      at <file>~/.local/share/DM3MAT/qdmr/qdmr.log</file>.
+      <command>qdmr</command> writes a lot of debug and error messages to 
+      the log file. This can be used to inspect some issues during
+      reading/writing the a codeplug to the device. The log file 
+      containing these messages is usually found at 
+      <filename>~/.local/share/DM3MAT/qdmr/qdmr.log</filename>.
     </para>
   </refsect1>
 
@@ -112,16 +130,10 @@
       your radio.
     </para>
     <para>
-      There are some issues with the so-called dark mode under Linux. The Qt 
-      library is not able to detect that the desktop has a dark mode theme. To
-      this end, qdmr cannot react to it too. To enable a dark theme for qdmr, 
-      see the <option>-style</option> option above.
-    </para>
-    <para>
       Writing a single application supporting several radios of different 
       manufacturers is a hard task. To this end, there are plenty of bugs to be
       expected. If you stumble across one of them, consider opening an issue at
-      <xlink href="https://github.com/hmatuschek/qdmr/issues"/>.
+      <ulink url="https://github.com/hmatuschek/qdmr/issues"/>.
     </para>
   </refsect1>
 </refentry>

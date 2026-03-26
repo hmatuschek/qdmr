@@ -1,7 +1,6 @@
 #include "rd5r_codeplug.hh"
 #include "config.hh"
 #include "channel.hh"
-#include "utils.hh"
 #include "logger.hh"
 #include <QDateTime>
 
@@ -24,17 +23,16 @@ RD5RCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
 void
 RD5RCodeplug::ChannelElement::clear() {
   RadioddityCodeplug::ChannelElement::clear();
-  setSquelch(0);
+  setSquelch(Level::null());
 }
 
-unsigned
+Level
 RD5RCodeplug::ChannelElement::squelch() const {
-  return getUInt8(Offset::squelch());
+  return Level::fromValue(getUInt8(Offset::squelch()), {1,9});
 }
 void
-RD5RCodeplug::ChannelElement::setSquelch(unsigned level) {
-  level = std::min(9u, level);
-  setUInt8(Offset::squelch(), level);
+RD5RCodeplug::ChannelElement::setSquelch(Level level) {
+  setUInt8(Offset::squelch(), level.mapTo({1,9}));
 }
 
 bool
@@ -47,7 +45,7 @@ RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx, con
     if (ac->defaultSquelch())
       setSquelch(ctx.config()->settings()->squelch());
     else if (ac->squelchDisabled())
-      setSquelch(0);
+      setSquelch(Level::null());
     else
       setSquelch(ac->squelch());
   } else {

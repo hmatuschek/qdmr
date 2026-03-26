@@ -11,6 +11,9 @@ class D878UVTest : public UnitTestBase
 public:
   explicit D878UVTest(QObject *parent = nullptr);
 
+protected:
+  void encodeDecode(Config &input, Config &output);
+
 private slots:
   void initTestCase();
 
@@ -35,6 +38,8 @@ private slots:
   void testEmptyAESKey();  ///< Regression test for #711
   void testChannelDataACK(); ///< Regression test for #813
   void testSettingsDisplayVolumeChangePrompt(); ///< Regression test for #813
+  void testRadioLimits(); ///< Regression test for #816
+  void testMicGain();
 
 protected:
   Config _micGainConfig;

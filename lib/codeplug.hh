@@ -341,7 +341,7 @@ public:
 
     /** Resolves the given index for the specifies element type.
      * @returns @c nullptr if the index is not defined or the type is unknown. */
-    ConfigItem *obj(const QMetaObject *elementType, unsigned idx);
+    ConfigItem *obj(const QMetaObject *elementType, unsigned idx, bool exact=false);
     /** Returns the index for the given object.
      * @returns -1 if no index is associated with the object or its type is unknown. */
     int index(ConfigItem *obj);
@@ -351,9 +351,9 @@ public:
     /** Adds a table for the given type. */
     bool addTable(const QMetaObject *obj);
     /** Returns @c true if a table is defined for the given type. */
-    bool hasTable(const QMetaObject *obj) const;
+    bool hasTable(const QMetaObject *obj, bool exact=false) const;
     /** Deletes a table. */
-    bool remTable(const QMetaObject *obj);
+    bool remTable(const QMetaObject *obj, bool exact=false);
 
     /** Returns the object associated by the given index and type. */
     template <class T>
@@ -369,8 +369,8 @@ public:
 
     /** Returns the number of elements for the specified type. */
     template <class T>
-    unsigned int count() {
-      if (! hasTable(&T::staticMetaObject))
+    unsigned int count(bool exact=true) {
+      if (! hasTable(&T::staticMetaObject, exact))
         return 0;
       return getTable(&T::staticMetaObject).indices.size();
     }

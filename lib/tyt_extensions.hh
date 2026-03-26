@@ -2,6 +2,8 @@
 #define TYTEXTENSION_HH
 
 #include "configobject.hh"
+#include "level.hh"
+
 
 /** Represents the TyT channel extension.
  *
@@ -18,16 +20,8 @@ class TyTChannelExtension: public ConfigExtension
                                  "Including TyT MD-390, MD-UV390, MD-2017, Retevis RT8, RT3S and RT82"
                                  " as well as Baofeng DM-1701.")
 
-  /** The lone worker feature. */
-  Q_PROPERTY(bool loneWorker READ loneWorker WRITE enableLoneWorker)
   /** The auto scan feature. */
   Q_PROPERTY(bool autoScan READ autoScan WRITE enableAutoScan)
-  /** The talk around feature. */
-  Q_PROPERTY(bool talkaround READ talkaround WRITE enableTalkaround)
-  /** If @c true, data call confirmation is enabled. */
-  Q_PROPERTY(bool dataCallConfirmed READ dataCallConfirmed WRITE enableDataCallConfirmed)
-  /** If @c true, private call confirmation is enabled. */
-  Q_PROPERTY(bool privateCallConfirmed READ privateCallConfirmed WRITE enablePrivateCallConfirmed)
   /** If @c true, emergency calls are confirmed. */
   Q_PROPERTY(bool emergencyAlarmConfirmed READ emergencyAlarmConfirmed WRITE enableEmergencyAlarmConfirmed)
   /** If @c true, displays analog PTT IDs. */
@@ -41,8 +35,6 @@ class TyTChannelExtension: public ConfigExtension
   Q_PROPERTY(bool tightSquelch READ tightSquelch WRITE enableTightSquelch)
   /** The compressed UDP header feature. */
   Q_PROPERTY(bool compressedUDPHeader READ compressedUDPHeader WRITE enableCompressedUDPHeader)
-  /** The reverse-burst feature. */
-  Q_PROPERTY(bool reverseBurst READ reverseBurst WRITE enableReverseBurst)
 
   /** Holds the kill tone frequency. */
   Q_PROPERTY(KillTone killTone READ killTone WRITE setKillTone)
@@ -50,12 +42,10 @@ class TyTChannelExtension: public ConfigExtension
   Q_PROPERTY(InCallCriterion inCallCriterion READ inCallCriterion WRITE setInCallCriterion)
   /** Holds the allow-interrupt flag. */
   Q_PROPERTY(bool allowInterrupt READ allowInterrupt WRITE enableAllowInterrupt)
-  /** If @c true, enables Dual-Capacity Direct Mode (DCDM, i.e., time-slots for simplex). */
-  Q_PROPERTY(bool dcdm READ dcdm WRITE enableDCDM)
   /** If @c true, and dcdm is enabled, this radio is the leader, specifying the clock. */
   Q_PROPERTY(bool dcdmLeader READ dcdmLeader WRITE enableDCDMLeader)
   /** The squelch level for DMR channels. */
-  Q_PROPERTY(unsigned int dmrSquelch READ dmrSquelch WRITE setDMRSquelch)
+  Q_PROPERTY(Level dmrSquelch READ dmrSquelch WRITE setDMRSquelch)
   Q_CLASSINFO("dmrSquelchDescription", "Sets the squelch level for DMR channels. "
               "Only applicable for MD-UV390 and MD-2017")
 
@@ -84,26 +74,10 @@ public:
 
   ConfigItem *clone() const;
 
-  /** Returns @c true if the lone worker feature is enabled. */
-  bool loneWorker() const;
-  /** Enables/disables the lone-worker feature. */
-  void enableLoneWorker(bool enable);
   /** Returns @c true if the auto scan feature is enabled. */
   bool autoScan() const;
   /** Enables/disables the auto-scan feature. */
   void enableAutoScan(bool enable);
-  /** Returns @c true if the talk around feature is enabled. */
-  bool talkaround() const;
-  /** Enables/disables the talk-around feature. */
-  void enableTalkaround(bool enable);
-  /** Returns @c true if data call confirmation is enabled. */
-  bool dataCallConfirmed() const;
-  /** Enables/disables data-call confirmation. */
-  void enableDataCallConfirmed(bool enable);
-  /** Returns @c true if private call confirmation is enabled. */
-  bool privateCallConfirmed() const;
-  /** Enables/disables private-call confirmation. */
-  void enablePrivateCallConfirmed(bool enable);
   /** Returns @c true if emergency calls are confirmed. */
   bool emergencyAlarmConfirmed() const;
   /** Enables/disables emergency-call confirmation. */
@@ -129,10 +103,6 @@ public:
   bool compressedUDPHeader() const;
   /** Enables/disables the compressed UDP header. */
   void enableCompressedUDPHeader(bool enable);
-  /** Returns @c true if the reverse burst is enabled. */
-  bool reverseBurst() const;
-  /** Enables/disables reverse burst. */
-  void enableReverseBurst(bool enable);
 
   /** Returns the kill tone frequency. */
   KillTone killTone() const;
@@ -146,18 +116,14 @@ public:
   bool allowInterrupt() const;
   /** Enables/disables interrupt. */
   void enableAllowInterrupt(bool enable);
-  /** Returns @c true if the DCDM mode is enabled. */
-  bool dcdm() const;
-  /** Enables/disables the DCDM mode. */
-  void enableDCDM(bool enable);
   /** Returns @c true if this radio is the leader for a DCDM simplex channel. */
   bool dcdmLeader() const;
   /** Enables/disables this radio to be the leader on a DCDM simplex channel. */
   void enableDCDMLeader(bool enable);
   /** Squelch level for DMR channels. */
-  unsigned int dmrSquelch() const;
+  Level dmrSquelch() const;
   /** Sets the squelch-level for DMR channels. */
-  void setDMRSquelch(unsigned int sq);
+  void setDMRSquelch(Level sq);
 
 public:
   /*ConfigItem *allocateChild(QMetaProperty &prop, const YAML::Node &node,
@@ -165,16 +131,8 @@ public:
 
 protected:
   // Common properties
-  /** Holds the lone-worker flag. */
-  bool _loneWorker;
   /** Holds the auto-scan flag. */
   bool _autoScan;
-  /** Holds the talk around flag. */
-  bool _talkaround;
-  /** Holds the data-call confirmation flag. */
-  bool _dataCallConfirmed;
-  /** Holds the private-call confirmation flag. */
-  bool _privateCallConfirmed;
   /** Holds the emergency-call confirmation flag. */
   bool _emergencyAlarmConfirmed;
   /** Holds the display PTT ID flag. */
@@ -189,8 +147,6 @@ protected:
   bool _tightSquelch;
   /** Holds the compressed UDP header flag. */
   bool _compressedUDPHeader;
-  /** Holds the reverse burst flag. */
-  bool _reverseBurst;
 
   // MD-UV390, MD-2017 properties
   /** Holds the kill tone setting. */
@@ -199,12 +155,10 @@ protected:
   InCallCriterion _inCallCriterion;
   /** Holds the interrupt flag. */
   bool _allowInterrupt;
-  /** Holds the DCDM flag. */
-  bool _dcdm;
   /** Holds the DCDM-leader flag. */
   bool _dcdmLeader;
   /** The squelch level [0-10] for DMR channels. */
-  unsigned int _dmrSquelch;
+  Level _dmrSquelch;
 };
 
 

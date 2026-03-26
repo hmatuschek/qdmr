@@ -628,7 +628,7 @@ public:
 
   public:
     /** Some limits for entries. */
-    struct Limit {
+    struct Limit: AnytoneCodeplug::ExtendedSettingsElement::Limit {
       /// Out of range reminder count limits.
       static constexpr IntRange repRangeReminder()    { return {1, 10}; }
       /// Repeater range check interval limits.

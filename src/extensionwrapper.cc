@@ -6,6 +6,8 @@
 #include "frequency.hh"
 #include "interval.hh"
 #include <QGeoCoordinate>
+#include "level.hh"
+
 
 /* ******************************************************************************************** *
  * Implementation of ExtensionProxy
@@ -591,16 +593,26 @@ PropertyWrapper::data(const QModelIndex &index, int role) const {
                  (QMetaType::Double == prop.typeId()) || (QMetaType::QString == prop.typeId()))
                 && ((Qt::DisplayRole == role) || (Qt::EditRole==role)) ) {
       return value;
-    } else if (QString("Frequency") == prop.typeName()) {
+    } else if (QMetaType::fromType<Frequency>() == prop.metaType()) {
       if (Qt::DisplayRole == role)
         return value.value<Frequency>().format();
       else if (Qt::EditRole == role)
         return value;
-    } else if (QString("Interval") == prop.typeName()) {
+    } else if (QMetaType::fromType<Interval>() == prop.metaType()) {
       if (Qt::DisplayRole == role) {
         if (value.value<Interval>().isInfinite())
           return QChar(0x221e);
         return value.value<Interval>().format();
+      } else if (Qt::EditRole == role) {
+        return value;
+      }
+    } else if (QMetaType::fromType<Level>() == prop.metaType()) {
+      if (Qt::DisplayRole == role) {
+        if (value.value<Level>().isInvalid())
+          return tr("None");
+        if (value.value<Level>().isNull())
+          return tr("Off");
+        return value.value<Level>().value();
       } else if (Qt::EditRole == role) {
         return value;
       }

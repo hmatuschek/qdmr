@@ -105,10 +105,10 @@ public:
     /** Invalidates the scan list index. */
     virtual void clearScanListIndex();
 
-    /** Returns @c true if talkaround cannot be enabled on this channel. */
-    virtual bool preventTalkaroundEnabled() const;
-    /** Enables/disables prevention of talkaround feature on this channel. */
-    virtual void enablePreventTalkaround(bool enable);
+    /** Returns @c true if talkaround is enabled on this channel. */
+    virtual bool talkaroundEnabled() const;
+    /** Enables/disables talkaround feature on this channel. */
+    virtual void enableTalkaround(bool enable);
 
     /** Returns the admit criterion. */
     virtual Admit admitCriterion() const;
@@ -138,9 +138,9 @@ public:
     virtual void clearEmergencySystemIndex();
 
     /** Returns FM and DMR squelch level. */
-    virtual unsigned int squelchLevel() const;
+    virtual Level squelchLevel() const;
     /** Sets the FM and DMR squelch level. */
-    virtual void setSquelchLevel(unsigned int level);
+    virtual void setSquelchLevel(Level level);
 
     /** Returns @c true if the channel is RX only. */
     virtual bool rxOnlyEnabled() const;
@@ -225,7 +225,7 @@ public:
       /** Maximum name length. */
       static constexpr unsigned int nameLength() { return 16; }
       /** Maximum squelch level. */
-      static constexpr unsigned int squelchLevel() { return 15; }
+      static constexpr Range<unsigned int> squelchLevel() { return {0, 15}; }
     };
 
   protected:
@@ -1896,14 +1896,14 @@ public:
     virtual void setSTEMode(STEMode mode);
 
     /** Returns the FM mic level. */
-    virtual unsigned int fmMicLevel() const;
+    virtual Level fmMicLevel() const;
     /** Sets the FM mic level.*/
-    virtual void setFMMicLevel(unsigned int level);
+    virtual void setFMMicLevel(Level level);
 
     /** Returns the DMR mic level. */
-    virtual unsigned int dmrMicLevel() const;
+    virtual Level dmrMicLevel() const;
     /** Sets the DMR mic level.*/
-    virtual void setDMRMicLevel(unsigned int level);
+    virtual void setDMRMicLevel(Level level);
 
     /** Decodes the general settings. */
     virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1933,6 +1933,8 @@ public:
       }
       /** Valid VOX sensitivity levels. */
       static constexpr Range<unsigned int> vox() { return {1,5}; }
+      /** Valid mic gain settings. */
+      static constexpr Range<unsigned int> micGain() { return {0,4}; }
     };
 
   protected:

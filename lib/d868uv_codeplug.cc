@@ -170,9 +170,10 @@ D868UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
   if (ch->is<DMRChannel>()) {
     DMRChannel *dch = ch->as<DMRChannel>();
+    dch->extended()->enableSMS(sms());
+    dch->extended()->enableDataConfirm(dataACK());
+
     if (AnytoneDMRChannelExtension *ext = dch->anytoneChannelExtension()) {
-      ext->enableSMS(sms());
-      ext->enableDataACK(dataACK());
       ext->enableThroughMode(throughMode());
     }
   }
@@ -226,6 +227,9 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       enableRXAPRS(false);
     }
 
+    enableSMS(dc->extended()->sms());
+    enableDataACK(dc->extended()->dataConfirm());
+
     clearDMREncryptionKeyIndex();
     bool hasStrongEncryption = ctx.config()->settings()->anytoneExtension() &&
         (AnytoneDMRSettingsExtension::EncryptionType::AES ==
@@ -242,8 +246,6 @@ D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
 
     // Handle extension
     if (AnytoneDMRChannelExtension *ext = dc->anytoneChannelExtension()) {
-      enableSMS(ext->sms());
-      enableDataACK(ext->dataACK());
       enableThroughMode(ext->throughMode());
     }
   }
@@ -413,14 +415,13 @@ D868UVCodeplug::GeneralSettingsElement::setVFOScanType(AnytoneSettingsExtension:
   setUInt8(Offset::vfoScanType(), (unsigned)type);
 }
 
-unsigned
+Level
 D868UVCodeplug::GeneralSettingsElement::dmrMicGain() const {
-  return (((unsigned)getUInt8(Offset::dmrMicGain())+1)*10)/4;
+  return Level::fromValue(getUInt8(Offset::dmrMicGain()), Limit::micGain());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setDMRMicGain(unsigned gain) {
-  gain = std::max(1U, std::min(10U, gain));
-  setUInt8(Offset::dmrMicGain(), (gain*4)/10);
+D868UVCodeplug::GeneralSettingsElement::setDMRMicGain(Level gain) {
+  setUInt8(Offset::dmrMicGain(), gain.mapTo(Limit::micGain()));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
@@ -1623,12 +1624,12 @@ D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode channels
-  for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     ChannelElement ch(data(Offset::channelBanks() + bank * Offset::betweenChannelBanks()
                            + idx * ChannelElement::size()));
-    if (! ch.fromChannelObj(ctx.config()->channelList()->channel(i), ctx))
+    if (! ch.fromChannelObj(ctx.get<Channel>(i), ctx))
       return false;
   }
   return true;

@@ -1,7 +1,3 @@
-/** @defgroup ogd77 Open GD-77 Firmware
- * Implements a radio running the Open MD-UV380 firmware.
- * @ingroup dsc */
-
 #ifndef OPENUV380_HH
 #define OPENUV380_HH
 

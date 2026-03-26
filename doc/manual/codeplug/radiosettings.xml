@@ -138,8 +138,8 @@
   <varlistentry>
     <term><token>systems</token></term>
     <listitem>
-      <para>Specifies the GNSSs to use in terms of a list of <term>GPS</term>, 
-        <term>Glonass</term>, <term>Galileo</term>, <term>Beidou</term>. </para>
+      <para>Specifies the GNSSs to use in terms of a list of <token>GPS</token>, 
+        <token>Glonass</token>, <token>Galileo</token>, <token>Beidou</token>. </para>
     </listitem>
   </varlistentry>
   <varlistentry>

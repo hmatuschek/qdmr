@@ -22,6 +22,11 @@ Channel::Channel(QObject *parent)
     _openGD77ChannelExtension(nullptr),
     _tytChannelExtension(nullptr)
 {
+  Context::setTag(staticMetaObject.className(), "timeout",
+                  "!default", QVariant::fromValue(Interval::null()));
+  Context::setTag(staticMetaObject.className(), "vox",
+                  "!default", QVariant::fromValue(Level::invalid()));
+
   // Link scan list modification event (e.g., scan list gets deleted).
   connect(&_scanlist, SIGNAL(modified()), this, SLOT(onReferenceModified()));
 }
@@ -298,13 +303,6 @@ Channel::populate(YAML::Node &node, const Context &context, const ErrorStack &er
     node["power"] = metaEnum.valueToKey((unsigned)power());
   }
 
-  if (defaultTimeout()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["timeout"] = def;
-  } else {
-    node["timeout"] = timeout();
-  }
-
   return true;
 }
 
@@ -329,18 +327,6 @@ Channel::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStac
     setPower((Channel::Power)meta.keyToValue(ch["power"].as<std::string>().c_str()));
   }
 
-  if ((! ch["timeout"]) || ("!default" == ch["timeout"].Tag())) {
-    setDefaultTimeout();
-  } else if (ch["timeout"] && ch["timeout"].IsScalar()) {
-    setTimeout(ch["timeout"].as<Interval>());
-  }
-
-  if ((! ch["vox"]) || ("!default" == ch["vox"].Tag())) {
-    setVOXDefault();
-  } else if (ch["vox"] && ch["vox"].IsScalar()) {
-    setVOX(ch["vox"].as<Level>());
-  }
-
   return ConfigObject::parse(ch, ctx, err);
 }
 
@@ -363,16 +349,48 @@ Channel::link(const YAML::Node &node, const ConfigItem::Context &ctx, const Erro
  * Implementation of AnalogChannel
  * ********************************************************************************************* */
 AnalogChannel::AnalogChannel(QObject *parent)
-  : Channel(parent)
+  : Channel(parent), _squelch(Level::invalid())
 {
-  // pass...
+  Context::setTag(staticMetaObject.className(), "squelch",
+                  "!default", QVariant::fromValue(Level::invalid()));
 }
 
 AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
-  : Channel(other, parent)
+  : Channel(other, parent), _squelch(Level::invalid())
 {
-  // pass...
+  Context::setTag(staticMetaObject.className(), "squelch",
+                  "!default", QVariant::fromValue(Level::invalid()));
 }
+
+bool
+AnalogChannel::defaultSquelch() const {
+  return _squelch.isInvalid();
+}
+bool
+AnalogChannel::squelchDisabled() const {
+  return _squelch.isNull();
+}
+Level
+AnalogChannel::squelch() const {
+  return _squelch;
+}
+bool
+AnalogChannel::setSquelch(Level level) {
+  if (_squelch == level)
+    return true;
+  _squelch = level;
+  emit modified(this);
+  return true;
+}
+void
+AnalogChannel::disableSquelch() {
+  setSquelch(Level::null());
+}
+void
+AnalogChannel::setSquelchDefault() {
+  setSquelch(Level::invalid());
+}
+
 
 
 
@@ -381,12 +399,13 @@ AnalogChannel::AnalogChannel(const AnalogChannel &other, QObject *parent)
  * ********************************************************************************************* */
 FMChannel::FMChannel(QObject *parent)
   : AnalogChannel(parent),
-    _admit(Admit::Always), _squelch(std::numeric_limits<unsigned>::max()),
-    _rxTone(), _txTone(), _bw(Bandwidth::Narrow),
-    _aprsSystem(), _anytoneExtension(nullptr)
+    _admit(Admit::Always), _rxTone(), _txTone(), _bw(Bandwidth::Narrow),
+    _aprsSystem(), _extended(new FMChannelExtension(this)), _anytoneExtension(nullptr)
 {
   // Link APRS system reference
-  connect(&_aprsSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(&_aprsSystem, &FMAPRSSystemReference::modified, this, &FMChannel::onReferenceModified);
+  // Link extended settings
+  connect(_extended, &FMChannelExtension::modified, this, &FMChannel::modified);
 }
 
 bool
@@ -431,33 +450,6 @@ void
 FMChannel::setAdmit(Admit admit) {
   _admit = admit;
   emit modified(this);
-}
-
-bool
-FMChannel::defaultSquelch() const {
-  return std::numeric_limits<unsigned>::max()==squelch();
-}
-bool
-FMChannel::squelchDisabled() const {
-  return 0==squelch();
-}
-unsigned
-FMChannel::squelch() const {
-  return _squelch;
-}
-bool
-FMChannel::setSquelch(unsigned val) {
-  _squelch = val;
-  emit modified(this);
-  return true;
-}
-void
-FMChannel::disableSquelch() {
-  setSquelch(0);
-}
-void
-FMChannel::setSquelchDefault() {
-  setSquelch(std::numeric_limits<unsigned>::max());
 }
 
 SelectiveCall
@@ -512,6 +504,13 @@ FMChannel::setAPRS(FMAPRSSystem *sys) {
   _aprsSystem.set(sys);
 }
 
+
+FMChannelExtension *
+FMChannel::extended() const {
+  return _extended;
+}
+
+
 AnytoneFMChannelExtension *
 FMChannel::anytoneChannelExtension() const {
   return _anytoneExtension;
@@ -541,21 +540,6 @@ FMChannel::serialize(const Context &context, const ErrorStack &err) {
 }
 
 bool
-FMChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
-  if (! AnalogChannel::populate(node, context, err))
-    return false;
-
-  if (defaultSquelch()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["squelch"] = def;
-  } else {
-    node["squelch"] = squelch();
-  }
-
-  return true;
-}
-
-bool
 FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   if (! node)
     return false;
@@ -568,12 +552,6 @@ FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
 
   YAML::Node ch = node.begin()->second;
 
-  if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
-    setSquelchDefault();
-  } else if (ch["squelch"].IsDefined() && ch["squelch"].IsScalar()) {
-    setSquelch(ch["squelch"].as<unsigned>());
-  }
-
   return AnalogChannel::parse(node, ctx, err);
 }
 
@@ -583,7 +561,7 @@ FMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
  * Implementation of AMChannel
  * ********************************************************************************************* */
 AMChannel::AMChannel(QObject *parent)
-  : AnalogChannel(parent), _squelch(std::numeric_limits<unsigned>::max())
+  : AnalogChannel(parent)
 {
   // pass...
 }
@@ -613,39 +591,6 @@ AMChannel::clear() {
   setSquelchDefault();
 }
 
-
-bool
-AMChannel::defaultSquelch() const {
-  return std::numeric_limits<unsigned>::max()==squelch();
-}
-
-bool
-AMChannel::squelchDisabled() const {
-  return 0==squelch();
-}
-
-unsigned
-AMChannel::squelch() const {
-  return _squelch;
-}
-
-bool
-AMChannel::setSquelch(unsigned val) {
-  _squelch = val;
-  emit modified(this);
-  return true;
-}
-
-void
-AMChannel::disableSquelch() {
-  setSquelch(0);
-}
-
-void
-AMChannel::setSquelchDefault() {
-  setSquelch(std::numeric_limits<unsigned>::max());
-}
-
 YAML::Node
 AMChannel::serialize(const Context &context, const ErrorStack &err) {
   YAML::Node node = AnalogChannel::serialize(context, err);
@@ -655,21 +600,6 @@ AMChannel::serialize(const Context &context, const ErrorStack &err) {
   YAML::Node type;
   type["am"] = node;
   return type;
-}
-
-bool
-AMChannel::populate(YAML::Node &node, const Context &context, const ErrorStack &err) {
-  if (! AnalogChannel::populate(node, context, err))
-    return false;
-
-  if (defaultSquelch()) {
-    YAML::Node def = YAML::Node(YAML::NodeType::Scalar); def.SetTag("!default");
-    node["squelch"] = def;
-  } else {
-    node["squelch"] = squelch();
-  }
-
-  return true;
 }
 
 bool
@@ -684,12 +614,6 @@ AMChannel::parse(const YAML::Node &node, Context &ctx, const ErrorStack &err) {
   }
 
   YAML::Node ch = node.begin()->second;
-
-  if ((!ch["squelch"]) || ("!default" == ch["squelch"].Tag())) {
-    setSquelchDefault();
-  } else if (ch["squelch"].IsDefined() && ch["squelch"].IsScalar()) {
-    setSquelch(ch["squelch"].as<unsigned>());
-  }
 
   return AnalogChannel::parse(node, ctx, err);
 }
@@ -719,13 +643,14 @@ DMRChannel::DMRChannel(QObject *parent)
   : DigitalChannel(parent), _admit(Admit::Always),
     _colorCode(1), _timeSlot(TimeSlot::TS1),
     _rxGroup(), _txContact(), _posSystem(), _roaming(), _radioId(),
+    _extended(new DMRChannelExtension(this)),
     _commercialExtension(nullptr), _anytoneExtension(nullptr)
 {
   // Register default tags
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "roaming", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", DefaultRoamingZone::get());
-  if (! ConfigItem::Context::hasTag(staticMetaObject.className(), "radioId", "!default"))
-    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", DefaultRadioID::get());
+  if (! ConfigItem::Context::tagIsSet(staticMetaObject.className(), "roaming", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "roaming", "!default", QVariant::fromValue(DefaultRoamingZone::get()));
+  if (! ConfigItem::Context::tagIsSet(staticMetaObject.className(), "radioId", "!default"))
+    ConfigItem::Context::setTag(staticMetaObject.className(), "radioId", "!default", QVariant::fromValue(DefaultRadioID::get()));
 
   // Set default DMR Id
   _radioId.set(DefaultRadioID::get());
@@ -736,6 +661,7 @@ DMRChannel::DMRChannel(QObject *parent)
   connect(&_posSystem, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_roaming, SIGNAL(modified()), this, SLOT(onReferenceModified()));
   connect(&_radioId, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+  connect(_extended, &DMRChannelExtension::modified, this, &DMRChannel::modified);
 }
 
 void
@@ -911,6 +837,13 @@ DMRChannel::setRadioId(DMRRadioID *id) {
   emit modified(this);
   return true;
 }
+
+
+DMRChannelExtension *
+DMRChannel::extended() const {
+  return _extended;
+}
+
 
 CommercialChannelExtension *
 DMRChannel::commercialExtension() const {

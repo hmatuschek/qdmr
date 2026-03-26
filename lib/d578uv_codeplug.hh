@@ -283,8 +283,8 @@ public:
     AnytoneSettingsExtension::VFOScanType vfoScanType() const override;
     void setVFOScanType(AnytoneSettingsExtension::VFOScanType type) override;
 
-    unsigned int dmrMicGain() const override;
-    void setDMRMicGain(unsigned int gain) override;
+    Level dmrMicGain() const override;
+    void setDMRMicGain(Level gain) override;
 
     bool vfoModeA() const override;
     void enableVFOModeA(bool enable) override;
@@ -1110,9 +1110,9 @@ public:
     virtual void setDateFormat(AnytoneDisplaySettingsExtension::DateFormat format);
 
     /** Returns the FM Mic gain [1,10]. */
-    virtual unsigned int fmMicGain() const;
+    virtual Level fmMicGain() const;
     /** Sets the analog mic gain [1,10]. */
-    virtual void setFMMicGain(unsigned int gain);
+    virtual void setFMMicGain(Level gain);
 
     /** Returns the short-press function for SK1 of the BT handset. */
     virtual AnytoneKeySettingsExtension::KeyFunction btSK1ShortPressFunction() const;
@@ -1243,9 +1243,10 @@ public:
 
   public:
     /** Some limits for the settings. */
-    struct Limit {
-      static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }    ///< Maximum delay in minutes.
-      static constexpr unsigned int maxWeatherChannelIndex()    { return 9; }    ///< Maximum weather channel index.
+    struct Limit: AnytoneCodeplug::ExtendedSettingsElement::Limit {
+      static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }     ///< Maximum delay in minutes.
+      static constexpr unsigned int maxWeatherChannelIndex()    { return 9; }     ///< Maximum weather channel index.
+      static constexpr Range<unsigned int> micGain()            { return {1,5}; } ///< Valid range for mic gain settings.
     };
 
   protected:
@@ -1378,6 +1379,11 @@ public:
     /** Sets the name of the channel. */
     virtual void setName(const QString &name);
 
+    /** Encodes the given AM channel. */
+    virtual bool encode(AMChannel *ch, Context &ctx, const ErrorStack &err=ErrorStack());
+    /** Decodes the given AM channel. */
+    virtual AMChannel *decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+
   public:
     /** Some limits of the channel. */
     struct Limit {
@@ -1418,27 +1424,37 @@ public:
   /** Empty constructor. */
   explicit D578UVCodeplug(QObject *parent = nullptr);
 
+  Config *preprocess(Config *config, const ErrorStack &err) const override;
+
 protected:
-  bool allocateBitmaps();
+  bool allocateBitmaps() override;
+  void setBitmaps(Context &ctx) override;
+  void allocateForDecoding() override;
+  void allocateForEncoding() override;
 
-  void allocateUpdated();
+  void allocateHotKeySettings() override;
 
-  void allocateHotKeySettings();
+  bool encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool createElements(Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
-  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
+  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
-  void allocateContacts();
-  bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Allocate Air band channels. */
+  virtual bool allocateAirBandChannels();
+  /** Encode all defined air band channels. */
+  virtual bool encodeAirBandChannels(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  /** Decode all air band channels. */
+  virtual bool createAirBandChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  void allocateGeneralSettings();
-  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
-  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack());
+  void allocateContacts() override;
+  bool encodeContacts(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
-  /** Allocates the air-band channels und VFO settings. */
-  virtual void allocateAirBand();
+  void allocateGeneralSettings() override;
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
 public:
   /** Some limits for the codeplug. */

@@ -1075,9 +1075,9 @@ public:
     virtual void setDateFormat(AnytoneDisplaySettingsExtension::DateFormat format);
 
     /** Returns the FM Mic gain [1,10]. */
-    virtual unsigned int fmMicGain() const;
+    virtual Level fmMicGain() const;
     /** Sets the analog mic gain [1,10]. */
-    virtual void setFMMicGain(unsigned int gain);
+    virtual void setFMMicGain(Level gain);
 
     /** Returns @c true if the GPS roaming is enabled. */
     virtual bool gpsRoaming() const;
@@ -1102,8 +1102,9 @@ public:
 
   public:
     /** Some limits for the settings. */
-    struct Limit {
+    struct Limit: AnytoneCodeplug::ExtendedSettingsElement::Limit {
       static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }    ///< Maximum delay in minutes.
+      static constexpr Range<unsigned int> micGain() { return {0,4}; }
     };
 
   protected:

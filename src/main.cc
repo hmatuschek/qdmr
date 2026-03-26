@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   parser.addHelpOption();
   parser.addVersionOption();
   parser.addPositionalArgument("codeplug", QCoreApplication::translate("main", "Codeplug file to load."));
-  parser.addOption({"log-level", QCoreApplication::translate("main", "Specifies applications log-level to stdout. Must be one of `debug`, `info`, `warning`, `error` or `fatal`."), "loglevel", "info"});
+  parser.addOption({"loglevel", QCoreApplication::translate("main", "Specifies applications log-level to stdout. Must be one of `debug`, `info`, `warning`, `error` or `fatal`."), "loglevel", "info"});
   parser.parse(app.arguments());
 
   // Handle args (if there are some)

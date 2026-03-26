@@ -418,14 +418,14 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
       if (fm->squelchDisabled())
         return tr("Open");
       else
-        return fm->squelch();
+        return fm->squelch().value();
     } else if (AMChannel *am = channel->as<AMChannel>()) {
       if (am->defaultSquelch())
         return tr("[Default]");
       if (am->squelchDisabled())
         return tr("Open");
       else
-        return am->squelch();
+        return am->squelch().value();
     }
     break;
   case 18:
