@@ -18,12 +18,14 @@ ConfigCloneVisitor::ConfigCloneVisitor(QHash<ConfigObject *, ConfigObject *> &ma
 
 bool
 ConfigCloneVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err) {
-  if (prop.isEnumType() || (QString("bool") == prop.typeName())
-      || (QString("int") == prop.typeName()) || (QString("uint") == prop.typeName())
-      || (QString("double") == prop.typeName()) || (QString("QString") == prop.typeName())
-      || (QString("Frequency") == prop.typeName()) || (QString("Interval") == prop.typeName())
-      || (QString("Level") == prop.typeName()) || (QString("SelectiveCall") == prop.typeName())
-      || (QString("QGeoCoordinate") == prop.typeName())) {
+  if (prop.isEnumType() || (QMetaType::Bool == prop.typeId())
+      || (QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())
+      || (QMetaType::Double == prop.typeId()) || (QMetaType::QString == prop.typeId())
+      || (QMetaType::fromType<Frequency>() == prop.metaType())
+      || (QMetaType::fromType<Interval>() == prop.metaType())
+      || (QMetaType::fromType<Level>() == prop.metaType())
+      || (QMetaType::fromType<SelectiveCall>() == prop.metaType())
+      || (QMetaType::fromType<QGeoCoordinate>() == prop.metaType())) {
     if ((! prop.isReadable()) && (!prop.isWritable())) {
       logDebug() << "Skip property " << prop.name()
                  << " of item " << item->metaObject()->className() << ": Not readable or writable.";
