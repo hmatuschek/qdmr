@@ -53,61 +53,61 @@ Visitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const Erro
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("bool") == prop.typeName()) {
+  } else if (QMetaType::Bool == prop.typeId()) {
     if (! this->processBool(item, prop, err)) {
       errMsg(err) << "While processing boolean '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("int") == prop.typeName()) {
+  } else if (QMetaType::Int == prop.typeId()) {
     if (! this->processInt(item, prop, err)) {
       errMsg(err) << "While processing integer '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("uint") == prop.typeName()) {
+  } else if (QMetaType::UInt == prop.typeId()) {
     if (! this->processUInt(item, prop, err)) {
       errMsg(err) << "While processing unsigned integer '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("double") == prop.typeName()) {
+  } else if (QMetaType::Double == prop.typeId()) {
     if (! this->processDouble(item, prop, err)) {
       errMsg(err) << "While processing double '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("QString") == prop.typeName()) {
+  } else if (QMetaType::QString == prop.typeId()) {
     if (! this->processString(item, prop, err)) {
       errMsg(err) << "While processing string '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("Frequency") == prop.typeName()) {
+  } else if (QMetaType::fromType<Frequency>() == prop.metaType()) {
     if (! this->processFrequency(item, prop, err)) {
       errMsg(err) << "While processing frequency '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("Interval") == prop.typeName()) {
+  } else if (QMetaType::fromType<Interval>() == prop.metaType()) {
     if (! this->processInterval(item, prop, err)) {
       errMsg(err) << "While processing interval '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("Level") == prop.typeName()) {
+  } else if (QMetaType::fromType<Level>() == prop.metaType()) {
     if (! this->processLevel(item, prop, err)) {
       errMsg(err) << "While processing level '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("SelectiveCall") == prop.typeName()) {
+  } else if (QMetaType::fromType<SelectiveCall>() == prop.metaType()) {
     if (! this->processSelectiveCall(item, prop, err)) {
       errMsg(err) << "While processing selective call '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";
       return false;
     }
-  } else if (QString("QGeoCoordinate") == prop.typeName()) {
+  } else if (QMetaType::fromType<QGeoCoordinate>() == prop.metaType()) {
     if (! this->processGeoCoordinate(item, prop, err)) {
       errMsg(err) << "While processing geo coordinate '" << prop.name() << "' of '"
                   << item->metaObject()->className() << "'.";

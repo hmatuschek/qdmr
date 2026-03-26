@@ -188,15 +188,14 @@ ConfigItem::copy(const ConfigItem &other) {
     }
 
     // true if the property is a basic type
-    bool isBasicType = ( prop.isEnumType() || prop.isFlagType() ||
-                         (QMetaType::Bool==prop.typeId()) ||
+    bool isBasicType = ( prop.isEnumType() || prop.isFlagType() || (QMetaType::Bool==prop.typeId()) ||
                          (QMetaType::Int==prop.typeId()) || (QMetaType::UInt==prop.typeId()) ||
                          (QMetaType::Double==prop.typeId()) || (QMetaType::QString==prop.typeId()) ||
-                         (QString("Frequency")==prop.typeName()) ||
-                         (QString("Interval")==prop.typeName()) ||
-                         (QString("Level")==prop.typeName()) ||
-                         (QString("SelectiveCall")==prop.typeName()) ||
-                         (QString("QGeoCoordinate")==prop.typeName()));
+                         (QMetaType::fromType<Frequency>()==prop.metaType()) ||
+                         (QMetaType::fromType<Interval>()==prop.metaType()) ||
+                         (QMetaType::fromType<Level>()==prop.metaType()) ||
+                         (QMetaType::fromType<SelectiveCall>()==prop.metaType()) ||
+                         (QMetaType::fromType<QGeoCoordinate>()==prop.metaType()));
 
     // If a basic type -> simply copy value
     if (isBasicType && prop.isWritable() && (prop.typeId()==oprop.typeId())) {
@@ -309,8 +308,9 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
     }
 
-    if (QString("Frequency") == prop.typeName()) {
-      Frequency a = prop.read(this).value<Frequency>(), b = oprop.read(&other).value<Frequency>();
+    if (QMetaType::fromType<Frequency>() == prop.metaType()) {
+      Frequency a = prop.read(this).value<Frequency>(),
+        b = oprop.read(&other).value<Frequency>();
       if (a<b)
         return -1;
       if (b<a)
@@ -318,7 +318,7 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
     }
 
-    if (QString("Interval") == prop.typeName()) {
+    if (QMetaType::fromType<Interval>() == prop.metaType()) {
       Interval a = prop.read(this).value<Interval>(), b = oprop.read(&other).value<Interval>();
       if (a<b)
         return -1;
@@ -327,7 +327,7 @@ ConfigItem::compare(const ConfigItem &other) const {
       continue;
     }
 
-    if (QString("Level") == prop.typeName()) {
+    if (QMetaType::fromType<Level>() == prop.metaType()) {
       Level a = prop.read(this).value<Level>(), b = oprop.read(&other).value<Level>();
       if (a<b)
         return -1;
@@ -470,25 +470,25 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
         continue;
       }
       node[prop.name()] = key;
-    } else if (QString("bool") == prop.typeName()) {
+    } else if (QMetaType::Bool == prop.typeId()) {
       node[prop.name()] = this->property(prop.name()).toBool();
-    } else if (QString("int") == prop.typeName()) {
+    } else if (QMetaType::Int == prop.typeId()) {
       node[prop.name()] = this->property(prop.name()).toInt();
-    } else if (QString("uint") == prop.typeName()) {
+    } else if (QMetaType::UInt == prop.typeId()) {
       node[prop.name()] = this->property(prop.name()).toUInt();
-    } else if (QString("double") == prop.typeName()) {
+    } else if (QMetaType::Double == prop.typeId()) {
       node[prop.name()] = this->property(prop.name()).toDouble();
-    } else if (QString("QString") == prop.typeName()) {
+    } else if (QMetaType::QString == prop.typeId()) {
       node[prop.name()] = this->property(prop.name()).toString().toStdString();
-    } else if (QString("Frequency") == prop.typeName()) {
+    } else if (QMetaType::fromType<Frequency>() == prop.metaType()) {
       node[prop.name()] = this->property(prop.name()).value<Frequency>();
-    } else if (QString("Interval") == prop.typeName()) {
+    } else if (QMetaType::fromType<Interval>() == prop.metaType()) {
       node[prop.name()] = this->property(prop.name()).value<Interval>();
-    } else if (QString("Level") == prop.typeName()) {
+    } else if (QMetaType::fromType<Level>() == prop.metaType()) {
       node[prop.name()] = this->property(prop.name()).value<Level>();
-    } else if (QString("SelectiveCall") == prop.typeName()) {
+    } else if (QMetaType::fromType<SelectiveCall>() == prop.metaType()) {
       node[prop.name()] = this->property(prop.name()).value<SelectiveCall>();
-    } else if (QString("QGeoCoordinate") == prop.typeName()) {
+    } else if (QMetaType::fromType<QGeoCoordinate>() == prop.metaType()) {
       node[prop.name()] = this->property(prop.name()).value<QGeoCoordinate>();
     } else if (ConfigObjectReference *ref = prop.read(this).value<ConfigObjectReference *>()) {
       ConfigObject *obj = ref->as<ConfigObject>();
@@ -647,7 +647,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       }
       // finally set property
       prop.write(this, value);
-    } else if (QString("bool") == prop.typeName()) {
+    } else if (QMetaType::Bool == prop.typeId()) {
       // If property is not set -> skip
       if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
@@ -659,7 +659,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, node[prop.name()].as<bool>());
-    } else if (QString("int") == prop.typeName()) {
+    } else if (QMetaType::Int == prop.typeId()) {
       // If property is not set -> skip
       if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
@@ -671,7 +671,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, node[prop.name()].as<int>());
-    } else if (QString("uint") == prop.typeName()) {
+    } else if (QMetaType::UInt == prop.typeId()) {
       // If property is not set -> skip
       if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
@@ -683,7 +683,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, node[prop.name()].as<unsigned>());
-    } else if (QString("double") == prop.typeName()) {
+    } else if (QMetaType::Double == prop.typeId()) {
       // If property is not set -> skip
       if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
@@ -695,7 +695,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, node[prop.name()].as<double>());
-    } else if (QString("QString") == prop.typeName()) {
+    } else if (QMetaType::QString == prop.typeId()) {
       // If property is not set -> skip
       if ( (!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
@@ -707,7 +707,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QString::fromStdString(node[prop.name()].as<std::string>()));
-    } else if (QString("Frequency") == prop.typeName()) {
+    } else if (QMetaType::fromType<Frequency>() == prop.metaType()) {
       // If property is not set -> skip
       if ((! node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
@@ -720,7 +720,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       }
       Frequency f = node[prop.name()].as<Frequency>();
       prop.write(this, QVariant::fromValue(f));
-    } else if (QString("Interval") == prop.typeName()) {
+    } else if (QMetaType::fromType<Interval>() == prop.metaType()) {
       // If property is not set -> skip
       if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
@@ -732,7 +732,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QVariant::fromValue(node[prop.name()].as<Interval>()));
-    } else if (QString("Level") == prop.typeName()) {
+    } else if (QMetaType::fromType<Level>() == prop.metaType()) {
       // If property is not set -> skip
       if ((!node[prop.name()]) || node[prop.name()].IsNull() || (!prop.isWritable()))
         continue;
@@ -744,7 +744,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QVariant::fromValue(node[prop.name()].as<Level>()));
-    } else if (QString("SelectiveCall") == prop.typeName()) {
+    } else if (QMetaType::fromType<SelectiveCall>() == prop.metaType()) {
       // If property is not set -> skip
       if ((! node[prop.name()]) || (node[prop.name()].IsNull()) || (!prop.isWritable())) {
         prop.write(this, QVariant::fromValue(SelectiveCall()));
@@ -758,7 +758,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
         return false;
       }
       prop.write(this, QVariant::fromValue(node[prop.name()].as<SelectiveCall>()));
-    } else if (QString("QGeoCoordinate") == prop.typeName()) {
+    } else if (QMetaType::fromType<QGeoCoordinate>() == prop.metaType()) {
       // If property is not set -> skip
       if ((! node[prop.name()]) || (node[prop.name()].IsNull()) || (!prop.isWritable())) {
         prop.write(this, QVariant::fromValue(QGeoCoordinate()));
