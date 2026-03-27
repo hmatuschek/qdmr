@@ -25,6 +25,7 @@ void
 TransponderFrequencyEditor::populate(unsigned int satId, bool uplink, Transponder::Mode mode,
                                      const TransponderDatabase &transponder) {
   clear();
+  addItem(tr("None"), QVariant::fromValue(Frequency()));
   for (const Transponder &tp: transponder) {
     if (tp.satellite() != satId)
       continue;
