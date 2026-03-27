@@ -18,7 +18,7 @@ D878UV2Codeplug::D878UV2Codeplug(const QString &label, QObject *parent)
 }
 
 D878UV2Codeplug::D878UV2Codeplug(QObject *parent)
-  : D878UVCodeplug("AnyTone AT-D868UVII Codeplug", parent)
+  : D878UVCodeplug("AnyTone AT-D878UVII Codeplug", parent)
 {
   // pass...
 }
