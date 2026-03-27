@@ -5,11 +5,27 @@
 /* ********************************************************************************************* *
  * Implementation of TransponderFrequencyEditor
  * ********************************************************************************************* */
+TransponderFrequencyEditor::TransponderFrequencyEditor(QWidget *parent)
+  : QComboBox(parent)
+{
+  setEditable(true);
+}
+
+
 TransponderFrequencyEditor::TransponderFrequencyEditor(unsigned int satId, bool uplink, Transponder::Mode mode,
                                                        const TransponderDatabase &transponder, QWidget *parent)
   : QComboBox(parent)
 {
   setEditable(true);
+  populate(satId, uplink, mode, transponder);
+}
+
+
+void
+TransponderFrequencyEditor::populate(unsigned int satId, bool uplink, Transponder::Mode mode,
+                                     const TransponderDatabase &transponder) {
+  clear();
+  addItem(tr("None"), QVariant::fromValue(Frequency()));
   for (const Transponder &tp: transponder) {
     if (tp.satellite() != satId)
       continue;
@@ -24,6 +40,7 @@ TransponderFrequencyEditor::TransponderFrequencyEditor(unsigned int satId, bool 
             QVariant::fromValue(f));
   }
 }
+
 
 void
 TransponderFrequencyEditor::setFrequency(const Frequency &current) {

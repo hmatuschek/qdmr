@@ -125,6 +125,8 @@ public:
   unsigned int count() const;
   /** Returns the i-th satellite. */
   const Satellite &getAt(unsigned int idx) const;
+  /** Returns the i-th satellite. */
+  bool setAt(const Satellite &sat, unsigned int idx);
   /** Appends a satellite. */
   void add(const Satellite &sat);
   /** Removes one or more satellites. */
