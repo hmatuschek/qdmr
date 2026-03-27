@@ -13,9 +13,14 @@ class TransponderFrequencyEditor: public QComboBox
   Q_OBJECT
 
 public:
-  explicit TransponderFrequencyEditor(
+  explicit TransponderFrequencyEditor(QWidget *parent=nullptr);
+
+  TransponderFrequencyEditor(
       unsigned int satId, bool uplink, Transponder::Mode mode,
       const TransponderDatabase &transponder, QWidget *parent=nullptr);
+
+  void populate(unsigned int satId, bool uplink, Transponder::Mode mode,
+                const TransponderDatabase &transponder);
 
   void setFrequency(const Frequency &current);
   Frequency frequency() const;

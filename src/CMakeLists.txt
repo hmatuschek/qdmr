@@ -61,6 +61,7 @@ qt6_add_executable(qdmr WIN32
   mainwindow.cc mainwindow.hh mainwindow.ui
   flageditdialog.hh flageditdialog.cc flageditdialog.ui
   ${qdmr_RCC_SOURCES}
+  satellitetransponderdialog.hh satellitetransponderdialog.cc satellitetransponderdialog.ui
 )
 
 #

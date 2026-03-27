@@ -258,6 +258,15 @@ SatelliteDatabase::getAt(unsigned int idx) const {
   return _satellites[idx];
 }
 
+bool
+SatelliteDatabase::setAt(const Satellite &sat, unsigned int idx) {
+  if (idx >= count())
+    return false;
+  _satellites[idx] = sat;
+  emit dataChanged(index(idx, 0), index(idx,columnCount()));
+  return true;
+}
+
 void
 SatelliteDatabase::add(const Satellite &sat) {
   if (! sat.isValid())
