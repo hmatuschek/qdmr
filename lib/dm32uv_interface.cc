@@ -255,7 +255,7 @@ DM32UVInterface::WriteRequest::WriteRequest(uint32_t address, const QByteArray &
   _address[0] = ((address >>  0) & 0xff);
   _address[1] = ((address >>  8) & 0xff);
   _address[2] = ((address >> 16) & 0xff);
-  uint16_t len = std::min(4096LL, payload.length());
+  uint16_t len = std::min((qsizetype)4096, payload.length());
   _length = qToLittleEndian(len);
   memcpy(_payload, payload.constData(), len);
 }

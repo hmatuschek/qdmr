@@ -10,6 +10,7 @@ SatelliteSelectionDialog::SatelliteSelectionDialog(OrbitalElementsDatabase *db, 
   : QDialog(parent), ui(new Ui::SatelliteSelectionDialog), _database(db)
 {
   ui->setupUi(this);
+  setWindowIcon(QIcon::fromTheme("edit-satellites"));
   ui->satellites->setModel(_database);
   ui->satellites->hideColumn(2);
 
