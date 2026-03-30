@@ -88,12 +88,13 @@ OpenGD77Codeplug::linkAPRSSettings(Context &ctx, const ErrorStack &err) {
 
 bool
 OpenGD77Codeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags);
   // Encode boot melody if set
   if ((nullptr != ctx.config()->settings()->openGD77Extension())
       && (! ctx.config()->settings()->openGD77Extension()->bootMelody()->isEmpty())) {
-    AdditionalSettingsElement(data(Offset::additionalSettings(), ImageIndex::additionalSettings()))
-        .bootMelody().encode(ctx, ctx.config()->settings()->openGD77Extension()->bootMelody(), err);
+    AdditionalSettingsElement opt(data(Offset::additionalSettings(), ImageIndex::additionalSettings()));
+    if (! flags.updateCodeplug() && ! opt.isValid())
+      opt.clear();
+    opt.bootMelody().encode(ctx, ctx.config()->settings()->openGD77Extension()->bootMelody(), err);
   }
   // Encode other boot settings
   return BootSettingsElement(data(Offset::bootSettings(), ImageIndex::bootSettings()))

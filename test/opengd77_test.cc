@@ -31,13 +31,14 @@ OpenGD77Test::encodeDecode(Config &config, Config &decoded, const ErrorStack &er
   OpenGD77Codeplug codeplug;
   codeplug.clear();
 
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   Config *intermediate = codeplug.preprocess(&config, err);
   if (nullptr == intermediate) {
     errMsg(err) << "Cannot encode codeplug for OpenGD77.";
     return false;
   }
 
-  if (! codeplug.encode(intermediate, Codeplug::Flags(), err)) {
+  if (! codeplug.encode(intermediate, flags, err)) {
     errMsg(err) << "Cannot encode codeplug for OpenGD77.";
     return false;
   }
