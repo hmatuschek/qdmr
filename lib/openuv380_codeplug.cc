@@ -90,12 +90,28 @@ OpenUV380Codeplug::linkAPRSSettings(Context &ctx, const ErrorStack &err) {
 bool
 OpenUV380Codeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
+  // Encode boot melody if set
+  if ((nullptr != ctx.config()->settings()->openGD77Extension())
+      && (! ctx.config()->settings()->openGD77Extension()->bootMelody()->isEmpty())) {
+    AdditionalSettingsElement opt(data(Offset::additionalSettings(), ImageIndex::additionalSettings()));
+    if (! flags.updateCodeplug() && ! opt.isValid())
+      opt.clear();
+    opt.bootMelody().encode(ctx, ctx.config()->settings()->openGD77Extension()->bootMelody(), err);
+  }
+  // Encode other boot settings
   return BootSettingsElement(data(Offset::bootSettings(), ImageIndex::bootSettings()))
       .encode(ctx, err);
 }
 
 bool
 OpenUV380Codeplug::decodeBootSettings(Context &ctx, const ErrorStack &err) {
+  // Check if boot melody is encoded
+  AdditionalSettingsElement opt(data(Offset::additionalSettings(), ImageIndex::additionalSettings()));
+  if (opt.hasSettings(AdditionalSettingsElement::BootMelody)) {
+    auto ext = new OpenGD77SettingsExtension();
+    opt.bootMelody().decode(ctx, ext->bootMelody(), err);
+    ctx.config()->settings()->setOpenGD77Extension(ext);
+  }
   return BootSettingsElement(data(Offset::bootSettings(), ImageIndex::bootSettings()))
       .decode(ctx, err);
 }
