@@ -158,7 +158,7 @@ OpenGD77ContactExtension::setTimeSlotOverride(TimeSlotOverride ts) {
  * Implementation of OpenGD77SettingsExtension
  * ******************************************************************************************** */
 OpenGD77SettingsExtension::OpenGD77SettingsExtension(QObject *parent)
-  : ConfigExtension(parent), _bootMelody(new Melody())
+  : ConfigExtension(parent), _bootMelody(new Melody(100, this))
 {
   // pass...
 }

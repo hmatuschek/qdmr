@@ -2497,7 +2497,8 @@ OpenGD77BaseCodeplug::NoteElement::clear() {
 
 bool
 OpenGD77BaseCodeplug::NoteElement::isValid() const {
-  return 0 != getUInt8(Offset::pitch()) && 0 != getUInt8(Offset::duration());
+  return (0 != getUInt8(Offset::pitch()) || 0 != getUInt8(Offset::duration())) &&
+         0xff != getUInt8(Offset::pitch()) && 0xff != getUInt8(Offset::duration());
 }
 
 bool
@@ -2582,7 +2583,7 @@ OpenGD77BaseCodeplug::BootMelodyElement::encode(Context &ctx, const Melody *melo
 
 bool
 OpenGD77BaseCodeplug::BootMelodyElement::decode(Context &ctx, Melody *melody, const ErrorStack &err) const {
-  Q_UNUSED(ctx);
+  Q_UNUSED(ctx); Q_UNUSED(err);
   QVector<QPair<double, unsigned int>> notes;
   for (unsigned int i=0; i<Limit::notes(); i++) {
     NoteElement note(_data + Offset::notes() + i*Offset::betweenNotes());

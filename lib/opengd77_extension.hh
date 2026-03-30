@@ -169,7 +169,7 @@ class OpenGD77SettingsExtension: public ConfigExtension
   Q_CLASSINFO("description", "Some settings specific to OpenGD77 radios.")
 
   /** The boot melody. */
-  Q_PROPERTY(Melody * bootMelody READ bootMelody)
+  Q_PROPERTY(Melody* bootMelody READ bootMelody)
 
 public:
   /** Constructor. */
