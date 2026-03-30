@@ -36,6 +36,11 @@ Melody::copy(const ConfigItem &other) {
   return true;
 }
 
+bool
+Melody::isEmpty() const {
+  return 0 == _melody.count();
+}
+
 Melody::iterator
 Melody::begin() {
   return _melody.begin();
@@ -183,8 +188,8 @@ Melody::Note::fromLilypond(const QString &note, Duration currentDuration) {
     else return false;
 
     if (0 == note_match.capturedLength(2)) octave = 0;
-    else if ('\'' == note_match.captured(2).at(0)) octave = note_match.capturedLength(3);
-    else if (','  == note_match.captured(2).at(0)) octave = -note_match.capturedLength(3);
+    else if ('\'' == note_match.captured(2).at(0)) octave = note_match.capturedLength(2);
+    else if (','  == note_match.captured(2).at(0)) octave = -note_match.capturedLength(2);
     else return false;
 
     if (0 == note_match.capturedLength(3)) duration = currentDuration;

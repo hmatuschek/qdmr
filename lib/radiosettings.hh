@@ -44,6 +44,8 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(RadiodditySettingsExtension * radioddity READ radioddityExtension WRITE setRadioddityExtension)
   /** Settings for AnyTone devices. */
   Q_PROPERTY(AnytoneSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
+  /** Settings for OpenGD77 devices. */
+  Q_PROPERTY(OpenGD77SettingsExtension *openGD77 READ openGD77Extension WRITE setOpenGD77Extension)
 
 public:
   /** Default constructor. */
@@ -130,6 +132,11 @@ public:
   /** Sets the AnyTone device specific radio settings. */
   void setAnytoneExtension(AnytoneSettingsExtension *ext);
 
+  /** Returns the OpenGD77 device specific radio settings. */
+  OpenGD77SettingsExtension *openGD77Extension() const;
+  /** Sets the OpenGD77 device specific radio settings. */
+  void setOpenGD77Extension(OpenGD77SettingsExtension *ext);
+
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
@@ -168,6 +175,8 @@ protected:
   RadiodditySettingsExtension *_radioddityExtension;
   /** Device specific settings extension for AnyTone devices. */
   AnytoneSettingsExtension *_anytoneExtension;
+  /** Device specific settings for OpenGD77 devices. */
+  OpenGD77SettingsExtension *_openGD77;
 };
 
 #endif // RADIOCONFIG_HH

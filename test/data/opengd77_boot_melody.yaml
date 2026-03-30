@@ -1,0 +1,14 @@
+---
+# Minimal settings +boot tone
+
+settings:
+  defaultID: id1
+  openGD77:
+    bootMelody:
+      bpm: 100
+      melody: c4 e g c e g c e g c e g c4 d e g c1
+
+radioIDs:
+  - dmr: {id: id1, name: DM3MAT, number: 2621370}
+
+...
