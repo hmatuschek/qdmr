@@ -269,6 +269,7 @@ public:
       static constexpr Bit aliasTimeSlot1() { return { 0x030, 0}; }
       static constexpr Bit timeSlot() { return {0x0031, 6}; }
       static constexpr Bit bandwidth() { return {0x0033, 1}; }
+      static constexpr Bit enableMonitor() { return {0x0033, 3}; }
       static constexpr Bit rxOnly() { return {0x0033, 2}; }
       static constexpr Bit skipScan() { return {0x0033, 4}; }
       static constexpr Bit skipZoneScan() { return {0x0033, 5}; }
@@ -602,6 +603,7 @@ public:
       static constexpr unsigned int comment() { return 0x001f; }
       static constexpr unsigned int fmFrequency() { return 0x0037; }
       static constexpr Bit positionPrecision() { return { 0x003d, 4}; }
+      static constexpr Bit transmitQSY() { return { 0x003d, 2}; }
       static constexpr Bit useFixedPosition() { return { 0x003d, 1}; }
       static constexpr Bit baudRate() { return { 0x003d, 0}; }
       static constexpr unsigned int unknownBytes() { return 0x003e; }
