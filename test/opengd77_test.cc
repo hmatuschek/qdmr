@@ -303,11 +303,11 @@ OpenGD77Test::testBootMelody() {
   uint8_t note[2];
   OpenGD77BaseCodeplug::NoteElement elm(note);
   elm.setPause(); QCOMPARE(note[0], 0u);
-  elm.setFrequency(110); QCOMPARE(note[0],0u);
-  elm.setFrequency(440); QCOMPARE(note[0],24u);
-  note[0] = 12; QCOMPARE(elm.frequency(), 220);
-  note[0] = 15; QCOMPARE(elm.frequency(), 261.6);
-  note[0] = 16; QCOMPARE(elm.frequency(), 277.2);
+  elm.setFrequency(110); QCOMPARE(note[0],1u);
+  elm.setFrequency(440); QCOMPARE(note[0],25u);
+  note[0] = 13; QCOMPARE(elm.frequency(), 220);
+  note[0] = 16; QCOMPARE(elm.frequency(), 261.62);
+  note[0] = 17; QCOMPARE(elm.frequency(), 277.18);
   ErrorStack err;
   Config config, decoded;
 
