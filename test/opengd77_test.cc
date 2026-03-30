@@ -296,5 +296,26 @@ OpenGD77Test::testChannelTransmitTimeout() {
   QVERIFY(decoded.channelList()->channel(1)->timeoutDisabled());
 }
 
+
+void
+OpenGD77Test::testBootMelody() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/opengd77_boot_melody.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  QVERIFY(config.settings()->openGD77Extension());
+  QCOMPARE(config.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.settings()->openGD77Extension());
+  QCOMPARE(decoded.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
+}
+
 QTEST_GUILESS_MAIN(OpenGD77Test)
 

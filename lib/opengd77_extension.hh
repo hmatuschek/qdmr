@@ -8,6 +8,7 @@
 
 #include <QGeoCoordinate>
 #include "configobject.hh"
+#include "melody.hh"
 
 
 /** Implements the channel extensions for the OpenGD77 radios.
@@ -157,6 +158,31 @@ public:
 protected:
   /** Holds the time slot override. */
   TimeSlotOverride _timeSlotOverride;
+};
+
+
+/** Implements the global OpenGD77 settings extension. */
+class OpenGD77SettingsExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("description", "Some settings specific to OpenGD77 radios.")
+
+  /** The boot melody. */
+  Q_PROPERTY(Melody * bootMelody READ bootMelody)
+
+public:
+  /** Constructor. */
+  Q_INVOKABLE explicit OpenGD77SettingsExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const override;
+
+  /** Returns the boot melody. */
+  Melody *bootMelody() const;
+
+protected:
+  /** The boot melody. */
+  Melody *_bootMelody;
 };
 
 

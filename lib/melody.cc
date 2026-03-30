@@ -36,6 +36,11 @@ Melody::copy(const ConfigItem &other) {
   return true;
 }
 
+bool
+Melody::isEmpty() const {
+  return 0 == _melody.count();
+}
+
 Melody::iterator
 Melody::begin() {
   return _melody.begin();

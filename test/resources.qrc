@@ -24,5 +24,6 @@
         <file>data/anytone_channel_data_ack.yaml</file>
         <file>data/anytone_settings_display.yaml</file>
         <file>data/anytone_settings_roaming.yaml</file>
+        <file>data/opengd77_boot_melody.yaml</file>
     </qresource>
 </RCC>

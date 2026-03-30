@@ -2450,7 +2450,7 @@ OpenGD77BaseCodeplug::SatelliteBankElement::SatelliteBankElement(uint8_t *ptr)
 void
 OpenGD77BaseCodeplug::SatelliteBankElement::clear() {
   memset(_data, 0, size());
-  setUInt32_le(Offset::blockId(), 3);
+  setUInt32_le(Offset::blockId(), magic());
   setUInt32_le(Offset::segmentSize(), size()-8);
 }
 
@@ -2476,6 +2476,118 @@ OpenGD77BaseCodeplug::SatelliteBankElement::encode(SatelliteDatabase *db, const 
     }
   }
 
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::NoteElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::NoteElement::NoteElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+OpenGD77BaseCodeplug::NoteElement::clear() {
+  memset(_data, 0, size());
+}
+
+bool
+OpenGD77BaseCodeplug::NoteElement::isValid() const {
+  return 0 != getUInt8(Offset::pitch()) && 0 != getUInt8(Offset::duration());
+}
+
+bool
+OpenGD77BaseCodeplug::NoteElement::isPause() const {
+  return 0 == getUInt8(Offset::pitch());
+}
+
+double
+OpenGD77BaseCodeplug::NoteElement::frequency() const {
+  return std::min((uint8_t)44, getUInt8(Offset::pitch()));
+}
+
+void
+OpenGD77BaseCodeplug::NoteElement::setFrequency(double pitch) {
+  auto it = std::lower_bound(std::begin(_lut), std::end(_lut), pitch);
+  setUInt8(Offset::pitch(), (it == std::end(_lut)) ? 44 : (1+it-std::begin(_lut)));
+}
+
+void
+OpenGD77BaseCodeplug::NoteElement::setPause() {
+  setUInt8(Offset::pitch(), 0);
+}
+
+
+unsigned int
+OpenGD77BaseCodeplug::NoteElement::duration() const {
+  return 100 * (unsigned int)getUInt8(Offset::duration());
+}
+
+void
+OpenGD77BaseCodeplug::NoteElement::setDuration(unsigned int ms) {
+  ms = Limit::Range<unsigned int>{100,25500}.limit(ms);
+  setUInt8(Offset::duration(), ms/100);
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of OpenGD77BaseCodeplug::BootMelodyElement
+ * ********************************************************************************************* */
+OpenGD77BaseCodeplug::BootMelodyElement::BootMelodyElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+void
+OpenGD77BaseCodeplug::BootMelodyElement::clear() {
+  memset(_data, 0, size());
+  setUInt32_le(Offset::blockId(), magic());
+  setUInt32_le(Offset::segmentSize(), size()-8);
+}
+
+
+bool
+OpenGD77BaseCodeplug::BootMelodyElement::encode(Context &ctx, const Melody *melody, const ErrorStack &err) {
+  Q_UNUSED(err); Q_UNUSED(ctx);
+
+  clear();
+  auto notes = melody->toTones();
+  unsigned int numNotes = std::min(Limit::notes(), (unsigned int)notes.size());
+  for (unsigned int i=0; i<numNotes; i++) {
+    NoteElement note(_data + Offset::notes() + i*Offset::betweenNotes());
+    if (0 == notes[i].first)
+      note.setPause();
+    else
+      note.setFrequency(notes[i].first);
+    note.setDuration(notes[i].second);
+  }
+
+  return true;
+}
+
+
+bool
+OpenGD77BaseCodeplug::BootMelodyElement::decode(Context &ctx, Melody *melody, const ErrorStack &err) const {
+  Q_UNUSED(ctx);
+  QVector<QPair<double, unsigned int>> notes;
+  for (unsigned int i=0; i<Limit::notes(); i++) {
+    NoteElement note(_data + Offset::notes() + i*Offset::betweenNotes());
+    if (! note.isValid())
+      break;
+    notes.append({note.frequency(), note.duration()});
+  }
+
+  if (notes.isEmpty())
+    return false;
+
+  melody->infer(notes);
   return true;
 }
 
@@ -2544,12 +2656,37 @@ OpenGD77BaseCodeplug::AdditionalSettingsElement::satellites() const {
   for (unsigned int offset = Offset::blocks(); offset < size(); ) {
     uint32_t magic = getUInt32_le(offset),
         content_size = getUInt32_le(offset+4);
-    if ((0xffffffff == magic) || (magic == (uint32_t)Settings::SatelliteOrbitals))
+    if (0xffffffff == magic) {
+      SatelliteBankElement(_data + offset).clear();
       return SatelliteBankElement(_data + offset);
+    } else if (magic == (uint32_t)Settings::SatelliteOrbitals) {
+      return SatelliteBankElement(_data + offset);
+    }
     offset += 8 + content_size;
   }
 
   return SatelliteBankElement(nullptr);
+}
+
+
+OpenGD77BaseCodeplug::BootMelodyElement
+OpenGD77BaseCodeplug::AdditionalSettingsElement::bootMelody() const {
+  if (! isValid())
+    return BootMelodyElement(nullptr);
+
+  for (unsigned int offset = Offset::blocks(); offset < size(); ) {
+    uint32_t magic = getUInt32_le(offset),
+        content_size = getUInt32_le(offset+4);
+    if (0xffffffff == magic) {
+      BootMelodyElement(_data + offset).clear();
+      return BootMelodyElement(_data + offset);
+    } if (magic == (uint32_t)Settings::BootMelody) {
+      return BootMelodyElement(_data + offset);
+    }
+    offset += 8 + content_size;
+  }
+
+  return BootMelodyElement(nullptr);
 }
 
 

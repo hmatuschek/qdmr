@@ -13,11 +13,11 @@ OpenGD77Codeplug::OpenGD77Codeplug(QObject *parent)
 {
   // Delete allocated image by GD77 codeplug
   addImage("OpenGD77 Codeplug EEPROM");
-  image(EEPROM).addElement(0x00080, 0x05fe0);
+  image(EEPROM).addElement(Offset::settings(), 0x05fe0);
   image(EEPROM).addElement(0x07500, 0x03b00);
 
   addImage("OpenGD77 Codeplug FLASH");
-  image(FLASH).addElement(0x00000, AdditionalSettingsElement::size());
+  image(FLASH).addElement(Offset::additionalSettings(), AdditionalSettingsElement::size());
   image(FLASH).addElement(0x7b000, 0x13e60);
 }
 
@@ -89,12 +89,26 @@ OpenGD77Codeplug::linkAPRSSettings(Context &ctx, const ErrorStack &err) {
 bool
 OpenGD77Codeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
+  // Encode boot melody if set
+  if ((nullptr != ctx.config()->settings()->openGD77Extension())
+      && (! ctx.config()->settings()->openGD77Extension()->bootMelody()->isEmpty())) {
+    AdditionalSettingsElement(data(Offset::additionalSettings(), ImageIndex::additionalSettings()))
+        .bootMelody().encode(ctx, ctx.config()->settings()->openGD77Extension()->bootMelody(), err);
+  }
+  // Encode other boot settings
   return BootSettingsElement(data(Offset::bootSettings(), ImageIndex::bootSettings()))
       .encode(ctx, err);
 }
 
 bool
 OpenGD77Codeplug::decodeBootSettings(Context &ctx, const ErrorStack &err) {
+  // Check if boot melody is encoded
+  AdditionalSettingsElement opt(data(Offset::additionalSettings(), ImageIndex::additionalSettings()));
+  if (opt.hasSettings(AdditionalSettingsElement::BootMelody)) {
+    auto ext = new OpenGD77SettingsExtension();
+    opt.bootMelody().decode(ctx, ext->bootMelody(), err);
+    ctx.config()->settings()->setOpenGD77Extension(ext);
+  }
   return BootSettingsElement(data(Offset::bootSettings(), ImageIndex::bootSettings()))
       .decode(ctx, err);
 }

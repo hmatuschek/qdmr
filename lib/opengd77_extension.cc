@@ -151,3 +151,32 @@ void
 OpenGD77ContactExtension::setTimeSlotOverride(TimeSlotOverride ts) {
   _timeSlotOverride = ts;
 }
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77SettingsExtension
+ * ******************************************************************************************** */
+OpenGD77SettingsExtension::OpenGD77SettingsExtension(QObject *parent)
+  : ConfigExtension(parent), _bootMelody(new Melody())
+{
+  // pass...
+}
+
+ConfigItem *
+OpenGD77SettingsExtension::clone() const {
+  auto ex = new OpenGD77SettingsExtension();
+  if (! ex->copy(*this)) {
+    ex->deleteLater();
+    return nullptr;
+  }
+  return ex;
+}
+
+
+Melody *
+OpenGD77SettingsExtension::bootMelody() const {
+  return _bootMelody;
+}
+
+
