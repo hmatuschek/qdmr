@@ -2507,13 +2507,13 @@ OpenGD77BaseCodeplug::NoteElement::isPause() const {
 
 double
 OpenGD77BaseCodeplug::NoteElement::frequency() const {
-  return std::min((uint8_t)44, getUInt8(Offset::pitch()));
+  return _lut[std::min((uint8_t)44, getUInt8(Offset::pitch()))];
 }
 
 void
 OpenGD77BaseCodeplug::NoteElement::setFrequency(double pitch) {
   auto it = std::lower_bound(std::begin(_lut), std::end(_lut), pitch);
-  setUInt8(Offset::pitch(), (it == std::end(_lut)) ? 44 : (1+it-std::begin(_lut)));
+  setUInt8(Offset::pitch(), (it == std::end(_lut)) ? 44 : (it-std::begin(_lut)));
 }
 
 void
