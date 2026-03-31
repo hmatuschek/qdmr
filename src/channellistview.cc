@@ -46,37 +46,50 @@ ChannelListView::~ChannelListView() {
 void
 ChannelListView::onAddFMChannel() {
   FMChannelDialog dialog(_config, parentWidget());
-  if (QDialog::Accepted != dialog.exec())
+  auto newCh = new FMChannel();
+  dialog.setChannel(newCh);
+  if (QDialog::Accepted != dialog.exec()) {
+    delete newCh;
     return;
+  }
 
   int row=-1;
   if (ui->channelTableView->hasSelection())
     row = ui->channelTableView->selection().second+1;
-  _config->channelList()->add(dialog.channel(), row);
+  _config->channelList()->add(newCh, row);
 }
 
 void
 ChannelListView::onAddAMChannel() {
   AMChannelDialog dialog(_config, parentWidget());
-  if (QDialog::Accepted != dialog.exec())
+  auto newCh = new AMChannel();
+  dialog.setChannel(newCh);
+
+  if (QDialog::Accepted != dialog.exec()) {
+    delete newCh;
     return;
+  }
 
   int row=-1;
   if (ui->channelTableView->hasSelection())
     row = ui->channelTableView->selection().second+1;
-  _config->channelList()->add(dialog.channel(), row);
+  _config->channelList()->add(newCh, row);
 }
 
 void
 ChannelListView::onAddDMRChannel() {
   DMRChannelDialog dialog(_config, parentWidget());
-  if (QDialog::Accepted != dialog.exec())
+  auto newCh = new DMRChannel();
+  dialog.setChannel(newCh);
+  if (QDialog::Accepted != dialog.exec()) {
+    delete newCh;
     return;
+  }
 
   int row=-1;
   if (ui->channelTableView->hasSelection())
     row = ui->channelTableView->selection().second+1;
-  _config->channelList()->add(dialog.channel(), row);
+  _config->channelList()->add(newCh, row);
 }
 
 void
@@ -100,41 +113,38 @@ ChannelListView::onCloneChannel() {
     // clone channel
     FMChannel *clone = channel->clone()->as<FMChannel>();
     // open editor
-    FMChannelDialog dialog(_config, clone);
+    FMChannelDialog dialog(_config);
+    dialog.setChannel(clone);
     if (QDialog::Accepted != dialog.exec()) {
       // if rejected -> destroy clone
       clone->deleteLater();
       return;
     }
-    // update channel
-    dialog.channel();
     // add to list (below selected one)
     _config->channelList()->add(clone, row+1);
   } else if (channel->is<AMChannel>()) {
     // clone channel
     auto clone = channel->clone()->as<AMChannel>();
     // open editor
-    AMChannelDialog dialog(_config, clone);
+    AMChannelDialog dialog(_config);
+    dialog.setChannel(clone);
     if (QDialog::Accepted != dialog.exec()) {
       // if rejected -> destroy clone
       clone->deleteLater();
       return;
     }
-    // update channel
-    dialog.channel();
     // add to list (below selected one)
     _config->channelList()->add(clone, row+1);
   } else if (channel->is<DMRChannel>()) {
     // clone channel
     DMRChannel *clone = channel->clone()->as<DMRChannel>();
     // open editor
-    DMRChannelDialog dialog(_config, clone);
+    DMRChannelDialog dialog(_config);
+    dialog.setChannel(clone);
     if (QDialog::Accepted != dialog.exec()) {
       clone->deleteLater();
       return;
     }
-    // update channel
-    dialog.channel();
     // add to list (below selected one)
     _config->channelList()->add(clone, row+1);
   }
@@ -179,20 +189,20 @@ ChannelListView::onEditChannel(unsigned row) {
   if (! channel)
     return;
   if (channel->is<FMChannel>()) {
-    FMChannelDialog dialog(_config, channel->as<FMChannel>());
+    FMChannelDialog dialog(_config);
+    dialog.setChannel(channel->as<FMChannel>());
     if (QDialog::Accepted != dialog.exec())
       return;
-    dialog.channel();
   } else if (channel->is<DMRChannel>()) {
-    DMRChannelDialog dialog(_config, channel->as<DMRChannel>());
+    DMRChannelDialog dialog(_config);
+    dialog.setChannel(channel->as<DMRChannel>());
     if (QDialog::Accepted != dialog.exec())
       return;
-    dialog.channel();
   } else if (channel->is<AMChannel>()) {
-    AMChannelDialog dialog(_config, channel->as<AMChannel>());
+    AMChannelDialog dialog(_config);
+    dialog.setChannel(channel->as<AMChannel>());
     if (QDialog::Accepted != dialog.exec())
       return;
-    dialog.channel();
   }
 }
 

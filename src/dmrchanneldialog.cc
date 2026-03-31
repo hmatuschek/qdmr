@@ -1,223 +1,94 @@
 #include "dmrchanneldialog.hh"
 #include "application.hh"
 #include <QCompleter>
+#include <QSpinBox>
 #include "rxgrouplistdialog.hh"
 #include "repeatercompleter.hh"
 #include "repeaterdatabase.hh"
-#include "extensionwrapper.hh"
-#include "propertydelegate.hh"
 #include "settings.hh"
-#include "utils.hh"
-#include "logger.hh"
+#include "idselect.hh"
+#include "admitselect.hh"
+#include "timeslotselect.hh"
+#include "dmrcontactdialog.hh"
+#include "aprsselect.hh"
+#include "roamingzonedialog.hh"
+#include "ui_channeldialog.h"
+
 
 
 /* ********************************************************************************************* *
  * Implementation of DMRChannelDialog
  * ********************************************************************************************* */
 DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
-  : QDialog(parent), _config(config), _myChannel(new DMRChannel(this)), _channel(nullptr)
+  : ChannelDialog(config, parent), _channel(), _dmrId(nullptr), _admit(nullptr),
+  _colorcode(nullptr), _timeSlot(nullptr), _groupList(nullptr), _contact(nullptr),
+  _aprs(nullptr), _roam(nullptr)
 {
-  construct();
-}
-
-DMRChannelDialog::DMRChannelDialog(Config *config, DMRChannel *channel, QWidget *parent)
-  : QDialog(parent), _config(config), _myChannel(nullptr), _channel(channel)
-{
-  if (_channel) {
-    _myChannel = _channel->clone()->as<DMRChannel>();
-    _myChannel->setParent(parent);
-  }
-  construct();
-}
-
-void
-DMRChannelDialog::construct() {
-  setupUi(this);
   Settings settings;
-
   if (settings.hideChannelNote()) {
-    hintLabel->setVisible(false);
+    ui->hintLabel->setVisible(false);
     layout()->invalidate();
     adjustSize();
   }
+  connect(ui->hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
 
   Application *app = qobject_cast<Application *>(qApp);
   DMRRepeaterFilter *filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
   QCompleter *completer = new RepeaterCompleter(2, app->repeater(), this);
   completer->setModel(filter);
-  channelName->setCompleter(completer);
+  ui->channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
           this, SLOT(onRepeaterSelected(const QModelIndex &)));
 
-  powerValue->setItemData(0, unsigned(Channel::Power::Max));
-  powerValue->setItemData(1, unsigned(Channel::Power::High));
-  powerValue->setItemData(2, unsigned(Channel::Power::Mid));
-  powerValue->setItemData(3, unsigned(Channel::Power::Low));
-  powerValue->setItemData(4, unsigned(Channel::Power::Min));
-  powerDefault->setChecked(true); powerValue->setCurrentIndex(1); powerValue->setEnabled(false);
-  totDefault->setChecked(true); totValue->setValue(0); totValue->setEnabled(false);
-  scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)(nullptr)));
-  scanList->setCurrentIndex(0);
-  for (int i=0; i<_config->scanlists()->count(); i++) {
-    scanList->addItem(_config->scanlists()->scanlist(i)->name(),
-                      QVariant::fromValue(_config->scanlists()->scanlist(i)));
-    if (_myChannel && (_myChannel->scanList() == _config->scanlists()->scanlist(i)) )
-      scanList->setCurrentIndex(i+1);
-  }
-  txAdmit->setItemData(0, unsigned(DMRChannel::Admit::Always));
-  txAdmit->setItemData(1, unsigned(DMRChannel::Admit::Free));
-  txAdmit->setItemData(2, unsigned(DMRChannel::Admit::ColorCode));
-  timeSlot->setItemData(0, unsigned(DMRChannel::TimeSlot::TS1));
-  timeSlot->setItemData(1, unsigned(DMRChannel::TimeSlot::TS2));
-  populateRXGroupListBox(rxGroupList, _config->rxGroupLists(),
-                         (nullptr != _myChannel ? _myChannel->groupList() : nullptr));
-  txContact->addItem(tr("[None]"), QVariant::fromValue(nullptr));
-  if (_myChannel && (nullptr == _myChannel->contact()))
-    txContact->setCurrentIndex(0);
-  for (int i=0,c=1; i<_config->contacts()->count(); i++) {
-    if (! _config->contacts()->contact(i)->is<DMRContact>())
-      continue;
-    txContact->addItem(_config->contacts()->contact(i)->name(),
-                       QVariant::fromValue(_config->contacts()->contact(i)));
-    if (_myChannel && (_myChannel->contact() == _config->contacts()->contact(i)) )
-      txContact->setCurrentIndex(i+1);
-  }
-  gpsSystem->addItem(tr("[None]"), QVariant::fromValue((DMRAPRSSystem *)nullptr));
-  for (int i=0; i<_config->posSystems()->count(); i++) {
-    PositionReportingSystem *sys = _config->posSystems()->system(i);
-    gpsSystem->addItem(sys->name(), QVariant::fromValue(sys));
-    if (_myChannel && (_myChannel->aprs() == sys))
-      gpsSystem->setCurrentIndex(i+1);
-  }
-  roaming->addItem(tr("[None]"), QVariant::fromValue((RoamingZone *)nullptr));
-  roaming->addItem(tr("[Default]"), QVariant::fromValue(DefaultRoamingZone::get()));
-  if (_myChannel && (_myChannel->roaming() == DefaultRoamingZone::get()))
-    roaming->setCurrentIndex(1);
-  for (int i=0; i<_config->roamingZones()->count(); i++) {
-    RoamingZone *zone = _config->roamingZones()->zone(i);
-    roaming->addItem(zone->name(), QVariant::fromValue(zone));
-    if (_myChannel && (_myChannel->roaming() == zone))
-      roaming->setCurrentIndex(i+2);
-  }
-  dmrID->addItem(tr("[Default]"), QVariant::fromValue(DefaultRadioID::get()));
-  dmrID->setCurrentIndex(0);
-  for (int i=0; i<_config->radioIDs()->count(); i++) {
-    if (! _config->radioIDs()->get(i)->is<DMRRadioID>())
-      continue;
-    auto id = _config->radioIDs()->get(i)->as<DMRRadioID>();
-    dmrID->addItem(id->name(), QVariant::fromValue(id));
-    if (_myChannel && (id == _myChannel->radioId())) {
-      dmrID->setCurrentIndex(i+1);
-    }
-  }
-  voxDefault->setChecked(true); voxValue->setValue(0); voxValue->setEnabled(false);
-
-  channelName->setText(_myChannel->name());
-  rxFrequency->setText(_myChannel->rxFrequency().format(Frequency::Unit::MHz));
-  txFrequency->setText(_myChannel->txFrequency().format(Frequency::Unit::MHz));
-
-  offsetComboBox->addItem(QIcon::fromTheme("symbol-none"), "");
-  offsetComboBox->setItemData(0, tr("No offset"), Qt::ToolTipRole);
-  offsetComboBox->addItem(QIcon::fromTheme("symbol-plus"), "");
-  offsetComboBox->setItemData(1, tr("Positive offset"), Qt::ToolTipRole);
-  offsetComboBox->addItem(QIcon::fromTheme("symbol-minus"), "");
-  offsetComboBox->setItemData(2, tr("Negative offset"), Qt::ToolTipRole);
-
-  updateOffsetFrequency();
-
-
-  if (! _myChannel->defaultPower()) {
-    powerDefault->setChecked(false); powerValue->setEnabled(true);
-    switch (_myChannel->power()) {
-    case Channel::Power::Max: powerValue->setCurrentIndex(0); break;
-    case Channel::Power::High: powerValue->setCurrentIndex(1); break;
-    case Channel::Power::Mid: powerValue->setCurrentIndex(2); break;
-    case Channel::Power::Low: powerValue->setCurrentIndex(3); break;
-    case Channel::Power::Min: powerValue->setCurrentIndex(4); break;
-    }
-  }
-  if (_myChannel->timeoutDisabled()) {
-    totDefault->setChecked(false); totValue->setEnabled(true);
-    totValue->setValue(0);
-  } else if (! _myChannel->defaultTimeout()) {
-    totDefault->setChecked(false); totValue->setEnabled(true);
-    totValue->setValue(_channel->timeout().seconds());
-  }
-  rxOnly->setChecked(_myChannel->rxOnly());
-  switch (_myChannel->admit()) {
-  case DMRChannel::Admit::Always: txAdmit->setCurrentIndex(0); break;
-  case DMRChannel::Admit::Free: txAdmit->setCurrentIndex(1); break;
-  case DMRChannel::Admit::ColorCode: txAdmit->setCurrentIndex(2); break;
-  }
-  colorCode->setValue(_myChannel->colorCode());
-  if (DMRChannel::TimeSlot::TS1 == _myChannel->timeSlot())
-    timeSlot->setCurrentIndex(0);
-  else if (DMRChannel::TimeSlot::TS2 == _myChannel->timeSlot())
-    timeSlot->setCurrentIndex(1);
-  if (! _myChannel->defaultVOX()) {
-    voxDefault->setChecked(false); voxValue->setEnabled(true);
-    voxValue->setValue(_channel->vox().value());
-  }
-
-  extensionView->setObjectName("digitalChannelExtension");
-  extensionView->setObject(_myChannel, _config);
-
-  if (! settings.showExtensions())
-    tabWidget->tabBar()->hide();
-
-  connect(powerDefault, SIGNAL(toggled(bool)), this, SLOT(onPowerDefaultToggled(bool)));
-  connect(totDefault, SIGNAL(toggled(bool)), this, SLOT(onTimeoutDefaultToggled(bool)));
-  connect(voxDefault, SIGNAL(toggled(bool)), this, SLOT(onVOXDefaultToggled(bool)));
-  connect(hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
-
-  connect(txFrequency, &QLineEdit::editingFinished, this, &DMRChannelDialog::onTxFrequencyEdited);
-  connect(rxFrequency, &QLineEdit::editingFinished, this, &DMRChannelDialog::onRxFrequencyEdited);
-  connect(offsetLineEdit, &QLineEdit::editingFinished, this, &DMRChannelDialog::onOffsetFrequencyEdited);
-  connect(offsetComboBox, &QComboBox::currentIndexChanged, this, &DMRChannelDialog::onOffsetCurrentIndexChanged);
+  ui->rightForm->addRow(tr("Radio Id"),
+                        _dmrId = new DMRIdSelect(config));
+  ui->rightForm->addRow(tr("Tx Admit"),
+                        _admit = new DMRAdmitSelect());
+  ui->rightForm->addRow(tr("Color-code"),
+                        _colorcode = new QSpinBox());
+  _colorcode->setRange(0,15);
+  ui->rightForm->addRow(tr("Time-slot"),
+                        _timeSlot = new TimeslotSelect());
+  ui->rightForm->addRow(tr("Group list"),
+                        _groupList = new RXGroupListBox(config->rxGroupLists()));
+  ui->rightForm->addRow(tr("Tx Contact"),
+                        _contact = new DMRContactSelect(config));
+  ui->rightForm->addRow(tr("APRS"),
+                        _aprs = new APRSSelect(config));
+  ui->rightForm->addRow(tr("Roaming zone"),
+                        _roam = new RoamingZoneSelect(config));
 }
 
-DMRChannel *
-DMRChannelDialog::channel()
+
+void
+DMRChannelDialog::setChannel(DMRChannel *ch) {
+  ChannelDialog::setChannel(ch);
+  _channel = ch;
+
+  _dmrId->setRadioId(_channel->radioId());
+  _admit->setAdmit(_channel->admit());
+  _colorcode->setValue(_channel->colorCode());
+  _timeSlot->setSlot(_channel->timeSlot());
+  _groupList->setGroupList(_channel->groupList());
+  _contact->setContact(_channel->contact());
+  _aprs->setAPRSSystem(_channel->aprs());
+  _roam->setRoamingZone(_channel->roaming());
+}
+
+void
+DMRChannelDialog::accept()
 {
-  _myChannel->setRadioId(dmrID->currentData().value<DMRRadioID*>());
-  _myChannel->setName(channelName->text());
-  _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
-  _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
-  if (powerDefault->isChecked())
-    _myChannel->setDefaultPower();
-  else
-    _myChannel->setPower(Channel::Power(powerValue->currentData().toUInt()));
-  if (totDefault->isChecked())
-    _myChannel->setDefaultTimeout();
-  else if (0 == totValue->value())
-    _myChannel->disableTimeout();
-  else
-    _myChannel->setTimeout(Interval::fromSeconds(totValue->value()));
-  _myChannel->setRXOnly(rxOnly->isChecked());
-  _myChannel->setScanList(scanList->currentData().value<ScanList *>());
-  _myChannel->setAdmit(DMRChannel::Admit(txAdmit->currentData().toUInt()));
-  _myChannel->setColorCode(colorCode->value());
-  _myChannel->setTimeSlot(DMRChannel::TimeSlot(timeSlot->currentData().toUInt()));
-  _myChannel->setGroupList(rxGroupList->currentData().value<RXGroupList *>());
-  _myChannel->setContact(txContact->currentData().value<DMRContact *>());
-  _myChannel->setAPRS(gpsSystem->currentData().value<PositionReportingSystem *>());
-  _myChannel->setRoaming(roaming->currentData().value<RoamingZone *>());
-  if (voxDefault->isChecked())
-    _myChannel->setVOXDefault();
-  else
-    _myChannel->setVOX(Level::fromValue(voxValue->value()));
+  _channel->setRadioId(_dmrId->radioId());
+  _channel->setAdmit(_admit->admit());
+  _channel->setColorCode(_colorcode->value());
+  _channel->setTimeSlot(_timeSlot->slot());
+  _channel->setGroupList(_groupList->groupList());
+  _channel->setContact(_contact->contact());
+  _channel->setAPRS(_aprs->aprsSystem());
+  _channel->setRoaming(_roam->roamingZone());
 
-  DMRChannel *channel = _myChannel;
-  if (nullptr == _channel) {
-    _myChannel->setParent(nullptr);
-    _myChannel = nullptr;
-  } else {
-    _channel->copy(*_myChannel);
-    channel = _channel;
-  }
-
-  return channel;
+  ChannelDialog::accept();
 }
 
 void
@@ -225,129 +96,23 @@ DMRChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   Application *app = qobject_cast<Application *>(qApp);
 
   QModelIndex src = qobject_cast<QAbstractProxyModel*>(
-        channelName->completer()->completionModel())->mapToSource(index);
+        ui->channelName->completer()->completionModel())->mapToSource(index);
   src = qobject_cast<QAbstractProxyModel*>(
-        channelName->completer()->model())->mapToSource(src);
+        ui->channelName->completer()->model())->mapToSource(src);
   Frequency rx = app->repeater()->get(src.row()).rxFrequency();
   Frequency tx = app->repeater()->get(src.row()).txFrequency();
-  colorCode->setValue(app->repeater()->get(src.row()).colorCode());
-  rxFrequency->setText(rx.format());
-  txFrequency->setText(tx.format());
-
-  _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
-  _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
+  _colorcode->setValue(app->repeater()->get(src.row()).colorCode());
+  ui->rxFrequency->setText(rx.format());
+  ui->txFrequency->setText(tx.format());
   updateOffsetFrequency();
-}
-
-void
-DMRChannelDialog::onPowerDefaultToggled(bool checked) {
-  powerValue->setEnabled(!checked);
-}
-
-void
-DMRChannelDialog::onTimeoutDefaultToggled(bool checked) {
-  totValue->setEnabled(!checked);
-}
-
-void
-DMRChannelDialog::onVOXDefaultToggled(bool checked) {
-  voxValue->setEnabled(! checked);
 }
 
 void
 DMRChannelDialog::onHideChannelHint() {
   Settings settings;
   settings.setHideChannelNote(true);
-  hintLabel->setVisible(false);
+  ui->hintLabel->setVisible(false);
   layout()->invalidate();
   adjustSize();
 }
 
-void
-DMRChannelDialog::onTxFrequencyEdited() {
-  _myChannel->setTXFrequency(Frequency::fromString(txFrequency->text()));
-  txFrequency->setText(_myChannel->txFrequency().format());
-  updateOffsetFrequency();
-}
-
-void
-DMRChannelDialog::onRxFrequencyEdited() {
-  _myChannel->setRXFrequency(Frequency::fromString(rxFrequency->text()));
-  rxFrequency->setText(_myChannel->rxFrequency().format());
-
-  if (_myChannel->txFrequency().isZero()) {
-    // If no previous txFrequency set, match rx frequency.
-    _myChannel->setTXFrequency(Frequency::fromString(rxFrequency->text()));
-    txFrequency->setText(_myChannel->txFrequency().format());
-  }
-
-  updateOffsetFrequency();
-}
-
-void
-DMRChannelDialog::onOffsetFrequencyEdited() {
-  Frequency txFreq = _myChannel->rxFrequency();
-  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
-
-  switch (offsetComboBox->currentIndex()) {
-  case 0: txFreq = _myChannel->rxFrequency(); break;
-  case 1: txFreq = _myChannel->rxFrequency() + offsetFrequency; break;
-  case 2: txFreq = _myChannel->rxFrequency() + offsetFrequency.invert(); break;
-  }
-
-  _myChannel->setTXFrequency(txFreq);
-  txFrequency->setText(txFreq.format());
-  offsetLineEdit->setText(offsetFrequency.format());
-}
-
-void
-DMRChannelDialog::onOffsetCurrentIndexChanged(int index) {
-  Frequency txFreq = _myChannel->rxFrequency();
-  FrequencyOffset offsetFrequency = FrequencyOffset::fromString(offsetLineEdit->text()).abs();
-
-  switch (index) {
-  case 0:
-    offsetLineEdit->setEnabled(false);
-    txFreq = _myChannel->rxFrequency();
-  break;
-  case 1:
-    offsetLineEdit->setEnabled(true);
-    txFreq = _myChannel->rxFrequency() + offsetFrequency;
-  break;
-  case 2:
-    offsetLineEdit->setEnabled(true);
-    txFreq = _myChannel->rxFrequency() + offsetFrequency.invert();
-  break;
-  }
-
-  _myChannel->setTXFrequency(txFreq);
-  txFrequency->setText(txFreq.format());
-}
-
-
-void
-DMRChannelDialog::updateOffsetFrequency() {
-  FrequencyOffset offsetFrequency = _myChannel->offsetFrequency();
-  // Show absolute value
-  offsetLineEdit->setText(offsetFrequency.abs().format());
-  // Use combo box to indicate direction
-  updateComboBox();
-}
-
-void
-DMRChannelDialog::updateComboBox() {
-  switch (_myChannel->offsetShift()) {
-  case Channel::OffsetShift::None:
-    offsetComboBox->setCurrentIndex(0);
-    offsetLineEdit->setEnabled(false);
-  break;
-  case Channel::OffsetShift::Positive:
-    offsetComboBox->setCurrentIndex(1);
-    offsetLineEdit->setEnabled(true);
-  break;
-  case Channel::OffsetShift::Negative:
-    offsetComboBox->setCurrentIndex(2);
-    offsetLineEdit->setEnabled(true);
-  break;
-  }
-}

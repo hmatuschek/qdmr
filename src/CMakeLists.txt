@@ -9,8 +9,10 @@ qt6_add_executable(qdmr WIN32
   dtmfcontactdialog.cc dtmfcontactdialog.hh dtmfcontactdialog.ui
   m17contactdialog.cc m17contactdialog.hh m17contactdialog.ui
   rxgrouplistdialog.cc rxgrouplistdialog.hh rxgrouplistdialog.ui
-  fmchanneldialog.cc fmchanneldialog.hh fmchanneldialog.ui
-  amchanneldialog.hh amchanneldialog.cc amchanneldialog.ui
+  channeldialog.hh channeldialog.cc channeldialog.ui
+  squelchedit.hh squelchedit.cc squelchedit.ui
+  fmchanneldialog.cc fmchanneldialog.hh
+  amchanneldialog.hh amchanneldialog.cc
   dmrchanneldialog.cc dmrchanneldialog.hh dmrchanneldialog.ui
   m17channeldialog.cc m17channeldialog.hh m17channeldialog.ui
   channelvalidator.cc channelvalidator.hh
@@ -63,6 +65,11 @@ qt6_add_executable(qdmr WIN32
   flageditdialog.hh flageditdialog.cc flageditdialog.ui
   ${qdmr_RCC_SOURCES}
   satellitetransponderdialog.hh satellitetransponderdialog.cc satellitetransponderdialog.ui
+  admitselect.hh admitselect.cc
+  bandwidthselect.hh bandwidthselect.cc
+  aprsselect.hh aprsselect.cc
+  idselect.hh idselect.cc
+  timeslotselect.hh timeslotselect.cc
 )
 
 #

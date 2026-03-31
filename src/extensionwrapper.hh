@@ -5,6 +5,7 @@
 #include <QAbstractItemModel>
 #include <QIdentityProxyModel>
 #include <QMetaProperty>
+#include <QPointer>
 
 
 class ExtensionProxy: public QIdentityProxyModel
@@ -38,7 +39,10 @@ class PropertyWrapper: public QAbstractItemModel
   Q_OBJECT
 
 public:
-  PropertyWrapper(ConfigItem *obj, QObject *parent=nullptr);
+  PropertyWrapper(ConfigItem *obj, bool direct, QObject *parent=nullptr);
+
+  // Applies all changes to the original config item.
+  bool applyTo(ConfigItem *obj) const;
 
   ConfigItem *root() const;
   ConfigItem *item(const QModelIndex &item) const;
@@ -76,6 +80,7 @@ protected slots:
 
 protected:
   ConfigItem *_object;
+  QPointer<ConfigItem> _original;
 };
 
 #endif // EXTENSIONWRAPPER_HH

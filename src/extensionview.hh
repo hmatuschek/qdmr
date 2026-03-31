@@ -21,7 +21,8 @@ public:
   ~ExtensionView();
 
 public slots:
-  void setObject(ConfigItem *obj, Config *context);
+  void setObject(ConfigItem *obj, Config *context, bool direct=false);
+  bool applyTo(ConfigItem *obj) const;
 
 protected slots:
   void onSelectionChanged(const QItemSelection &current, const QItemSelection &last);

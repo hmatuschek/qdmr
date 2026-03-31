@@ -921,7 +921,7 @@ M17Channel::clear() {
   setMode(Mode::Voice);
   setAccessNumber(0);
   setContact(nullptr);
-  enableGPS(false);
+  enableAPRS(false);
   setEncryptionMode(EncryptionMode::None);
 }
 
@@ -994,12 +994,12 @@ M17Channel::setContact(M17Contact *c) {
 }
 
 bool
-M17Channel::gpsEnabled() const {
+M17Channel::aprsEnabled() const {
   return _gpsEnabled;
 }
 
 void
-M17Channel::enableGPS(bool enabled) {
+M17Channel::enableAPRS(bool enabled) {
   if (_gpsEnabled == enabled)
     return;
   _gpsEnabled = enabled;

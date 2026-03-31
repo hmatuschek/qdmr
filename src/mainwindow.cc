@@ -136,9 +136,9 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   // Wire-up "Roaming Zone List" view
   _roamingZoneList = new RoamingZoneListView(config);
   ui->tabs->addTab(_roamingZoneList, tr("Roaming Zones"));
-  // Wire-up "extension view"
+  // Wire-up "extension view" for direct editing
   _extensionView = new ExtensionView();
-  _extensionView->setObject(config, config);
+  _extensionView->setObject(config, config, true);
   ui->tabs->addTab(_extensionView, tr("Extensions"));
 
   if (! settings.showCommercialFeatures()) {
