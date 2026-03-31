@@ -149,8 +149,8 @@ PropertyWrapper::PropertyWrapper(ConfigItem *obj, bool direct, QObject *parent)
     _object = obj;
   } else if (obj) {
     // If indirect -> copy
-    _object = qobject_cast<ConfigItem*>(obj->metaObject()->newInstance((QObject *)this));
-    _object->copy(*obj);
+    _object = obj->clone();
+    _object->setParent(this);
   }
   if (_object) {
     connect(_object, SIGNAL(beginClear()), this, SLOT(onItemClearing()));
