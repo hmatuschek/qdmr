@@ -1,52 +1,29 @@
 #ifndef AMCHANNELDIALOG_HH
 #define AMCHANNELDIALOG_HH
 
-#include <QDialog>
+#include "channeldialog.hh"
 
-namespace Ui {
-class AMChannelDialog;
-}
 class Config;
 class AMChannel;
+class ChannelSquelchEdit;
 
 
-class AMChannelDialog : public QDialog
+class AMChannelDialog : public ChannelDialog
 {
   Q_OBJECT
 
 public:
   AMChannelDialog(Config *config, QWidget *parent=nullptr);
-  AMChannelDialog(Config *config, AMChannel *channel, QWidget *parent=nullptr);
-  ~AMChannelDialog();
 
-  AMChannel *channel();
+  void setChannel(AMChannel *am);
 
-protected:
-  void construct();
-
-protected slots:
-  void onPowerDefaultToggled(bool checked);
-  void onTimeoutDefaultToggled(bool checked);
-  void onSquelchDefaultToggled(bool checked);
-  void onVOXDefaultToggled(bool checked);
-
-private slots:
-  void onRxFrequencyEdited();
-  void onTxFrequencyEdited();
-  void onOffsetFrequencyEdited();
-  void onOffsetDirectionChanged(int index);
-  void updateOffsetFrequency();
-
-private:
-  void updateComboBox();
+public slots:
+  void accept() override;
 
 protected:
   Config *_config;
-  AMChannel *_myChannel;
-  AMChannel *_channel;
-
-private:
-  Ui::AMChannelDialog *ui;
+  QPointer<AMChannel> _channel;
+  ChannelSquelchEdit *_squelch;
 };
 
 #endif // AMCHANNELDIALOG_HH

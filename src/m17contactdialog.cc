@@ -2,10 +2,13 @@
 #include "ui_m17contactdialog.h"
 #include "contact.hh"
 #include "settings.hh"
+#include "config.hh"
 #include <QRegularExpressionValidator>
 
 
-
+/* ******************************************************************************************* *
+ * M17 contact dialog
+ * ******************************************************************************************* */
 M17ContactDialog::M17ContactDialog(Config *config, QWidget *parent) :
   QDialog(parent), ui(new Ui::M17ContactDialog), _config(config), _contact(nullptr),
   _myContact(new M17Contact(this))
@@ -81,3 +84,38 @@ void
 M17ContactDialog::onBroadcastToggled(bool enable) {
   ui->call->setEnabled(! enable);
 }
+
+
+
+/* ******************************************************************************************* *
+ * M17 contact selection
+ * ******************************************************************************************* */
+M17ContactSelect::M17ContactSelect(Config *config, QWidget *parent)
+  : QComboBox(parent)
+{
+  addItem(tr("[None]"), QVariant::fromValue<M17Contact *>(nullptr));
+  for (int i=0; i<config->contacts()->count(); i++) {
+    if (! config->contacts()->contact(i)->is<M17Contact>())
+      continue;
+    auto contact = config->contacts()->contact(i)->as<M17Contact>();
+    addItem(contact->name(), QVariant::fromValue(contact));
+  }
+}
+
+
+void
+M17ContactSelect::setContact(M17Contact *contact) {
+  for (int i=0; i<count(); i++) {
+    if (itemData(i).value<M17Contact*>()==contact) {
+      setCurrentIndex(i);
+      break;
+    }
+  }
+}
+
+
+M17Contact *
+M17ContactSelect::contact() const {
+  return currentData().value<M17Contact*>();
+}
+

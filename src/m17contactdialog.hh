@@ -2,6 +2,7 @@
 #define M17CONTACTDIALOG_HH
 
 #include <QDialog>
+#include <QComboBox>
 
 class M17Contact;
 class Config;
@@ -9,6 +10,7 @@ class Config;
 namespace Ui {
   class M17ContactDialog;
 }
+
 
 class M17ContactDialog : public QDialog
 {
@@ -33,6 +35,19 @@ private:
   Config *_config;
   M17Contact *_contact;
   M17Contact *_myContact;
+};
+
+
+
+class M17ContactSelect: public QComboBox
+{
+  Q_OBJECT
+
+public:
+  M17ContactSelect(Config *config, QWidget *parent=nullptr);
+
+  void setContact(M17Contact *contact);
+  M17Contact *contact() const;
 };
 
 #endif // M17CONTACTDIALOG_HH

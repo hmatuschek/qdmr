@@ -34,12 +34,19 @@ ExtensionView::~ExtensionView()
 }
 
 void
-ExtensionView::setObject(ConfigItem *obj, Config *context) {
+ExtensionView::setObject(ConfigItem *obj, Config *context, bool direct) {
   if (nullptr != _model)
     _model->deleteLater();
-  _model = new PropertyWrapper(obj, this);
+  _model = new PropertyWrapper(obj, direct, this);
   _proxy.setSourceModel(_model);
   _editor.setConfig(context);
+}
+
+bool
+ExtensionView::applyTo(ConfigItem *obj) const {
+  if (_model)
+    return _model->applyTo(obj);
+  return false;
 }
 
 void

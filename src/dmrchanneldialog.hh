@@ -1,45 +1,45 @@
 #ifndef DMRCHANNELDIALOG_H
 #define DMRCHANNELDIALOG_H
 
-#include <QDialog>
-#include "config.hh"
+#include "channeldialog.hh"
 
-#include "ui_dmrchanneldialog.h"
+class DMRChannel;
+class DMRIdSelect;
+class DMRAdmitSelect;
+class QSpinBox;
+class TimeslotSelect;
+class RXGroupListBox;
+class DMRContactSelect;
+class APRSSelect;
+class RoamingZoneSelect;
 
-class DMRChannelDialog: public QDialog, private Ui::DigitalChannelDialog
+
+class DMRChannelDialog: public ChannelDialog
 {
   Q_OBJECT
 
 public:
   DMRChannelDialog(Config *config, QWidget *parent=nullptr);
-  DMRChannelDialog(Config *config, DMRChannel *channel, QWidget *parent=nullptr);
 
-  DMRChannel *channel();
+  void setChannel(DMRChannel *ch);
+
+public slots:
+  void accept() override;
 
 protected slots:
   void onRepeaterSelected(const QModelIndex &index);
-  void onPowerDefaultToggled(bool checked);
-  void onTimeoutDefaultToggled(bool checked);
-  void onVOXDefaultToggled(bool checked);
   void onHideChannelHint();
 
-private slots:
-  void onRxFrequencyEdited();
-  void onTxFrequencyEdited();
-  void onOffsetFrequencyEdited();
-  void onOffsetCurrentIndexChanged(int index);
-  void updateOffsetFrequency();
-
 protected:
-  void construct();
-
-private:
-  void updateComboBox();
-
-protected:
-  Config *_config;
-  DMRChannel *_myChannel;
-  DMRChannel *_channel;
+  QPointer<DMRChannel> _channel;
+  DMRIdSelect *_dmrId;
+  DMRAdmitSelect *_admit;
+  QSpinBox *_colorcode;
+  TimeslotSelect *_timeSlot;
+  RXGroupListBox *_groupList;
+  DMRContactSelect *_contact;
+  APRSSelect *_aprs;
+  RoamingZoneSelect *_roam;
 };
 
 #endif // DMRCHANNELDIALOG_H

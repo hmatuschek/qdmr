@@ -1,46 +1,39 @@
 #ifndef FMCHANNELDIALOG_H
 #define FMCHANNELDIALOG_H
 
-#include <QDialog>
+#include "channeldialog.hh"
 #include "config.hh"
 
-#include "ui_fmchanneldialog.h"
+class ChannelSquelchEdit;
+class FMAdmitSelect;
+class SelectiveCallBox;
+class BandwidthSelect;
+class FMAPRSSelect;
 
-class FMChannelDialog: public QDialog, private Ui::AnalogChannelDialog
+
+class FMChannelDialog: public ChannelDialog
 {
   Q_OBJECT
 
 public:
   FMChannelDialog(Config *config, QWidget *parent=nullptr);
-  FMChannelDialog(Config *config, FMChannel *channel, QWidget *parent=nullptr);
 
-  FMChannel *channel();
+  void setChannel(FMChannel *fm);
 
-protected:
-  void construct();
+public slots:
+  void accept() override;
 
 protected slots:
   void onRepeaterSelected(const QModelIndex &index);
-  void onPowerDefaultToggled(bool checked);
-  void onTimeoutDefaultToggled(bool checked);
-  void onSquelchDefaultToggled(bool checked);
-  void onVOXDefaultToggled(bool checked);
   void onHideChannelHint();
 
-private slots:
-  void onRxFrequencyEdited();
-  void onTxFrequencyEdited();
-  void onOffsetFrequencyEdited();
-  void onOffsetDirectionChanged(int index);
-  void updateOffsetFrequency();
-
-private:
-  void updateComboBox();
-
 protected:
-  Config *_config;
-  FMChannel *_myChannel;
-  FMChannel *_channel;
+  QPointer<FMChannel> _channel;
+  ChannelSquelchEdit *_squelch;
+  FMAdmitSelect   *_admit;
+  SelectiveCallBox *_rxTone, *_txTone;
+  BandwidthSelect *_bandwidth;
+  FMAPRSSelect *_aprs;
 };
 
 

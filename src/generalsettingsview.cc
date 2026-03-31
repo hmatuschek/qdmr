@@ -39,7 +39,8 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   ui->voxValue->setValue(_config->settings()->vox().value());
 
   ui->extensionView->setObjectName("radioSettingsExtension");
-  ui->extensionView->setObject(_config->settings(), _config);
+  // Set object for direct editing
+  ui->extensionView->setObject(_config->settings(), _config, true);
 
   connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
   connect(ui->dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
