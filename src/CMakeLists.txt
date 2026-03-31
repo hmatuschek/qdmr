@@ -13,8 +13,8 @@ qt6_add_executable(qdmr WIN32
   squelchedit.hh squelchedit.cc squelchedit.ui
   fmchanneldialog.cc fmchanneldialog.hh
   amchanneldialog.hh amchanneldialog.cc
-  dmrchanneldialog.cc dmrchanneldialog.hh dmrchanneldialog.ui
-  m17channeldialog.cc m17channeldialog.hh m17channeldialog.ui
+  dmrchanneldialog.cc dmrchanneldialog.hh
+  m17channeldialog.cc m17channeldialog.hh
   channelvalidator.cc channelvalidator.hh
   channelcombobox.cc channelcombobox.hh
   channelselectiondialog.cc channelselectiondialog.hh
