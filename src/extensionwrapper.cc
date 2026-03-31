@@ -142,28 +142,15 @@ ExtensionProxy::mapFromSource(const QModelIndex &sourceIndex) const {
 /* ******************************************************************************************** *
  * Implementation of PropertyWrapper
  * ******************************************************************************************** */
-PropertyWrapper::PropertyWrapper(ConfigItem *obj, bool direct, QObject *parent)
-  : QAbstractItemModel(parent), _object(nullptr)
+PropertyWrapper::PropertyWrapper(ConfigItem *obj, QObject *parent)
+  : QAbstractItemModel(parent), _object(obj)
 {
-  if (obj && direct) {
-    _object = obj;
-  } else if (obj) {
-    // If indirect -> copy
-    _object = obj->clone();
-    _object->setParent(this);
-  }
   if (_object) {
     connect(_object, SIGNAL(beginClear()), this, SLOT(onItemClearing()));
     connect(_object, SIGNAL(endClear()), this, SLOT(onItemCleared()));
   }
 }
 
-bool
-PropertyWrapper::applyTo(ConfigItem *obj) const {
-  if (nullptr == _object)
-    return false;
-  return obj->copy(*_object);
-}
 
 ConfigItem *
 PropertyWrapper::root() const {

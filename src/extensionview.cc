@@ -34,20 +34,14 @@ ExtensionView::~ExtensionView()
 }
 
 void
-ExtensionView::setObject(ConfigItem *obj, Config *context, bool direct) {
+ExtensionView::setObject(ConfigItem *obj, Config *context) {
   if (nullptr != _model)
     _model->deleteLater();
-  _model = new PropertyWrapper(obj, direct, this);
+  _model = new PropertyWrapper(obj, this);
   _proxy.setSourceModel(_model);
   _editor.setConfig(context);
 }
 
-bool
-ExtensionView::applyTo(ConfigItem *obj) const {
-  if (_model)
-    return _model->applyTo(obj);
-  return false;
-}
 
 void
 ExtensionView::onSelectionChanged(const QItemSelection &current, const QItemSelection &last) {

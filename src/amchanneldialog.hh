@@ -21,8 +21,8 @@ public slots:
   void accept() override;
 
 protected:
-  Config *_config;
-  QPointer<AMChannel> _channel;
+  AMChannel *_clone;
+  QPointer<AMChannel> _orig;
   ChannelSquelchEdit *_squelch;
 };
 

@@ -186,8 +186,6 @@ APRSSystemDialog::aprsSystem() {
     _myAPRS->setPeriod(Interval::fromSeconds(ui->updatePeriod->value()));
   _myAPRS->setMessage(ui->message->text().simplified());
 
-  ui->extensionView->applyTo(_myAPRS);
-
   FMAPRSSystem *system = _myAPRS;
   if (_aprs) {
     _aprs->copy(*_myAPRS);

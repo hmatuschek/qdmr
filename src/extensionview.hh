@@ -18,11 +18,10 @@ class ExtensionView : public QWidget
 
 public:
   explicit ExtensionView(QWidget *parent = nullptr);
-  ~ExtensionView();
+  ~ExtensionView() override;
 
 public slots:
-  void setObject(ConfigItem *obj, Config *context, bool direct=false);
-  bool applyTo(ConfigItem *obj) const;
+  void setObject(ConfigItem *obj, Config *context);
 
 protected slots:
   void onSelectionChanged(const QItemSelection &current, const QItemSelection &last);

@@ -12,6 +12,8 @@
 #include <QMessageBox>
 #include <QMenu>
 
+#include "m17channeldialog.hh"
+
 ChannelListView::ChannelListView(Config *config, QWidget *parent)
   : QWidget(parent), ui(new Ui::ChannelListView), _config(config)
 {
@@ -201,6 +203,11 @@ ChannelListView::onEditChannel(unsigned row) {
   } else if (channel->is<AMChannel>()) {
     AMChannelDialog dialog(_config);
     dialog.setChannel(channel->as<AMChannel>());
+    if (QDialog::Accepted != dialog.exec())
+      return;
+  } else if (channel->is<M17Channel>()) {
+    M17ChannelDialog dialog(_config);
+    dialog.setChannel(channel->as<M17Channel>());
     if (QDialog::Accepted != dialog.exec())
       return;
   }

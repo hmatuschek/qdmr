@@ -20,22 +20,14 @@
  * Implementation of DMRChannelDialog
  * ********************************************************************************************* */
 DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
-  : ChannelDialog(config, parent), _channel(), _dmrId(nullptr), _admit(nullptr),
+  : ChannelDialog(config, parent), _clone(nullptr), _orig(), _dmrId(nullptr), _admit(nullptr),
   _colorcode(nullptr), _timeSlot(nullptr), _groupList(nullptr), _contact(nullptr),
   _aprs(nullptr), _roam(nullptr)
 {
-  Settings settings;
-  if (settings.hideChannelNote()) {
-    ui->hintLabel->setVisible(false);
-    layout()->invalidate();
-    adjustSize();
-  }
-  connect(ui->hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));
-
-  Application *app = qobject_cast<Application *>(qApp);
-  DMRRepeaterFilter *filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
+  auto app = qobject_cast<Application *>(qApp);
+  auto filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  QCompleter *completer = new RepeaterCompleter(2, app->repeater(), this);
+  auto completer = new RepeaterCompleter(2, app->repeater(), this);
   completer->setModel(filter);
   ui->channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),
@@ -63,33 +55,49 @@ DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
 
 void
 DMRChannelDialog::setChannel(DMRChannel *ch) {
-  ChannelDialog::setChannel(ch);
-  _channel = ch;
+  if (_clone) {
+    delete _clone;
+    _clone = nullptr;
+  }
 
-  _dmrId->setRadioId(_channel->radioId());
-  _admit->setAdmit(_channel->admit());
-  _colorcode->setValue(_channel->colorCode());
-  _timeSlot->setSlot(_channel->timeSlot());
-  _groupList->setGroupList(_channel->groupList());
-  _contact->setContact(_channel->contact());
-  _aprs->setAPRSSystem(_channel->aprs());
-  _roam->setRoamingZone(_channel->roaming());
+  _orig = ch;
+  if (_orig.isNull())
+    return;
+
+  _clone = _orig->clone()->as<DMRChannel>();
+  _clone->setParent(this);
+
+  ChannelDialog::setChannel(_clone);
+
+
+  _dmrId->setRadioId(_clone->radioId());
+  _admit->setAdmit(_clone->admit());
+  _colorcode->setValue(_clone->colorCode());
+  _timeSlot->setSlot(_clone->timeSlot());
+  _groupList->setGroupList(_clone->groupList());
+  _contact->setContact(_clone->contact());
+  _aprs->setAPRSSystem(_clone->aprs());
+  _roam->setRoamingZone(_clone->roaming());
 }
+
 
 void
 DMRChannelDialog::accept()
 {
-  _channel->setRadioId(_dmrId->radioId());
-  _channel->setAdmit(_admit->admit());
-  _channel->setColorCode(_colorcode->value());
-  _channel->setTimeSlot(_timeSlot->slot());
-  _channel->setGroupList(_groupList->groupList());
-  _channel->setContact(_contact->contact());
-  _channel->setAPRS(_aprs->aprsSystem());
-  _channel->setRoaming(_roam->roamingZone());
+  _clone->setRadioId(_dmrId->radioId());
+  _clone->setAdmit(_admit->admit());
+  _clone->setColorCode(_colorcode->value());
+  _clone->setTimeSlot(_timeSlot->slot());
+  _clone->setGroupList(_groupList->groupList());
+  _clone->setContact(_contact->contact());
+  _clone->setAPRS(_aprs->aprsSystem());
+  _clone->setRoaming(_roam->roamingZone());
 
   ChannelDialog::accept();
+
+  _orig->copy(*_clone);
 }
+
 
 void
 DMRChannelDialog::onRepeaterSelected(const QModelIndex &index) {
@@ -105,14 +113,5 @@ DMRChannelDialog::onRepeaterSelected(const QModelIndex &index) {
   ui->rxFrequency->setText(rx.format());
   ui->txFrequency->setText(tx.format());
   updateOffsetFrequency();
-}
-
-void
-DMRChannelDialog::onHideChannelHint() {
-  Settings settings;
-  settings.setHideChannelNote(true);
-  ui->hintLabel->setVisible(false);
-  layout()->invalidate();
-  adjustSize();
 }
 

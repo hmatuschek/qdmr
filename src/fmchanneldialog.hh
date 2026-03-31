@@ -25,10 +25,10 @@ public slots:
 
 protected slots:
   void onRepeaterSelected(const QModelIndex &index);
-  void onHideChannelHint();
 
 protected:
-  QPointer<FMChannel> _channel;
+  FMChannel *_clone;
+  QPointer<FMChannel> _orig;
   ChannelSquelchEdit *_squelch;
   FMAdmitSelect   *_admit;
   SelectiveCallBox *_rxTone, *_txTone;

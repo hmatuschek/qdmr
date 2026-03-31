@@ -39,10 +39,7 @@ class PropertyWrapper: public QAbstractItemModel
   Q_OBJECT
 
 public:
-  PropertyWrapper(ConfigItem *obj, bool direct, QObject *parent=nullptr);
-
-  // Applies all changes to the original config item.
-  bool applyTo(ConfigItem *obj) const;
+  PropertyWrapper(ConfigItem *obj, QObject *parent=nullptr);
 
   ConfigItem *root() const;
   ConfigItem *item(const QModelIndex &item) const;

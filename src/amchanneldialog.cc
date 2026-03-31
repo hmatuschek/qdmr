@@ -6,21 +6,36 @@
 
 
 AMChannelDialog::AMChannelDialog(Config *config, QWidget *parent)
-  : ChannelDialog(config, parent), _channel(nullptr), _squelch(nullptr)
+  : ChannelDialog(config, parent), _clone(nullptr), _orig(nullptr), _squelch(nullptr)
 {
-  ui->rightForm->addRow(tr("Squelch"),  _squelch = new ChannelSquelchEdit(_config->settings()->squelch()));
+  ui->rightForm->addRow(tr("Squelch"),
+    _squelch = new ChannelSquelchEdit(_config->settings()->squelch()));
 }
 
 void
 AMChannelDialog::setChannel(AMChannel *am) {
-  ChannelDialog::setChannel(am);
-  _channel = am;
+  if (_clone) {
+    delete _clone;
+    _clone = nullptr;
+  }
 
+  _orig = am;
+  if (_orig.isNull())
+    return;
+
+  _clone = _orig->clone()->as<AMChannel>();
+  _clone->setParent(this);
+  ChannelDialog::setChannel(_clone);
+
+  _squelch->setChannel(_clone);
 }
 
 void
 AMChannelDialog::accept() {
   _squelch->accept();
+
   ChannelDialog::accept();
+
+  _orig->copy(*_clone);
 }
 

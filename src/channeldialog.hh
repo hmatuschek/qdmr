@@ -17,12 +17,12 @@ class ChannelDialog : public QDialog
 
 public:
   ChannelDialog(Config *config, QWidget *parent=nullptr);
-  ~ChannelDialog();
+  ~ChannelDialog() override;
 
   void setChannel(Channel *mychannel);
 
 public slots:
-  virtual void accept() override;
+  void accept() override;
 
 protected slots:
   void updateOffsetFrequency();
@@ -32,6 +32,7 @@ private slots:
   void onTxFrequencyEdited();
   void onOffsetFrequencyEdited();
   void onOffsetDirectionChanged(int index);
+  void onHideChannelHint();
 
 private:
   void updateComboBox();
