@@ -28,10 +28,10 @@ public slots:
 
 protected slots:
   void onRepeaterSelected(const QModelIndex &index);
-  void onHideChannelHint();
 
 protected:
-  QPointer<DMRChannel> _channel;
+  DMRChannel *_clone;
+  QPointer<DMRChannel> _orig;
   DMRIdSelect *_dmrId;
   DMRAdmitSelect *_admit;
   QSpinBox *_colorcode;

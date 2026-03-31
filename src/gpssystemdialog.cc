@@ -77,7 +77,6 @@ GPSSystemDialog::gpsSystem() {
     _myGPSSystem->setRevertChannel(revChannel->currentData().value<DMRChannel*>());
 
   DMRAPRSSystem *sys = _myGPSSystem;
-  extensionView->applyTo(_myGPSSystem);
   if (_gpsSystem) {
     _gpsSystem->copy(*_myGPSSystem);
     sys = _gpsSystem;

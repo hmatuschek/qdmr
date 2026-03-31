@@ -55,6 +55,7 @@ endif()
 
 if (${BUILD_TESTS})
   find_package(Qt6 REQUIRED COMPONENTS Test)
+  enable_testing(true)
 endif(${BUILD_TESTS})
 
 IF (UNIX AND APPLE)

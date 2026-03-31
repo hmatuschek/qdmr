@@ -13,16 +13,28 @@ ChannelDialog::ChannelDialog(Config *config, QWidget *parent)
   ui->setupUi(this);
   Settings settings;
 
+  if (settings.hideChannelNote()) {
+    ui->hintLabel->setVisible(false);
+    layout()->invalidate();
+    adjustSize();
+  }
+  connect(ui->hintLabel, &QLabel::linkActivated,
+    this, &ChannelDialog::onHideChannelHint);
+
   ui->offsetComboBox->addItem(QIcon::fromTheme("symbol-none"), "");
   ui->offsetComboBox->setItemData(0, tr("No offset"), Qt::ToolTipRole);
   ui->offsetComboBox->addItem(QIcon::fromTheme("symbol-plus"), "");
   ui->offsetComboBox->setItemData(1, tr("Positive offset"), Qt::ToolTipRole);
   ui->offsetComboBox->addItem(QIcon::fromTheme("symbol-minus"), "");
   ui->offsetComboBox->setItemData(2, tr("Negative offset"), Qt::ToolTipRole);
-  connect(ui->txFrequency, &QLineEdit::editingFinished, this, &ChannelDialog::onTxFrequencyEdited);
-  connect(ui->rxFrequency, &QLineEdit::editingFinished, this, &ChannelDialog::onRxFrequencyEdited);
-  connect(ui->offsetLineEdit, &QLineEdit::editingFinished, this, &ChannelDialog::onOffsetFrequencyEdited);
-  connect(ui->offsetComboBox, &QComboBox::currentIndexChanged, this, &ChannelDialog::onOffsetDirectionChanged);
+  connect(ui->txFrequency, &QLineEdit::editingFinished,
+    this, &ChannelDialog::onTxFrequencyEdited);
+  connect(ui->rxFrequency, &QLineEdit::editingFinished,
+    this, &ChannelDialog::onRxFrequencyEdited);
+  connect(ui->offsetLineEdit, &QLineEdit::editingFinished,
+    this, &ChannelDialog::onOffsetFrequencyEdited);
+  connect(ui->offsetComboBox, &QComboBox::currentIndexChanged,
+    this, &ChannelDialog::onOffsetDirectionChanged);
 
   ui->powerValue->setItemData(0, unsigned(Channel::Power::Max));
   ui->powerValue->setItemData(1, unsigned(Channel::Power::High));
@@ -35,7 +47,7 @@ ChannelDialog::ChannelDialog(Config *config, QWidget *parent)
   ui->totDefault->setChecked(true); ui->totValue->setValue(0); ui->totValue->setEnabled(false);
   connect(ui->totDefault, &QCheckBox::toggled, [this](bool checked) { this->ui->totValue->setEnabled(! checked); });
 
-  ui->scanList->addItem(tr("[None]"), QVariant::fromValue((ScanList *)nullptr));
+  ui->scanList->addItem(tr("[None]"), QVariant::fromValue<ScanList *>(nullptr));
   for (int i=0; i<_config->scanlists()->count(); i++) {
     auto lst = _config->scanlists()->scanlist(i);
     ui->scanList->addItem(lst->name(), QVariant::fromValue(lst));
@@ -103,7 +115,7 @@ ChannelDialog::accept() {
   if (_channel.isNull())
     return;
 
-  _channel->setName(ui->channelName->text());
+  _channel->setName(ui->channelName->text().simplified());
   _channel->setRXFrequency(Frequency::fromString(ui->rxFrequency->text()));
   _channel->setTXFrequency(Frequency::fromString(ui->txFrequency->text()));
   if (ui->powerDefault->isChecked()) {
@@ -121,8 +133,6 @@ ChannelDialog::accept() {
     _channel->setVOXDefault();
   else
     _channel->setVOX(Level::fromValue(ui->voxValue->value()));
-
-  ui->extensionView->applyTo(_channel);
 
   QDialog::accept();
 }
@@ -208,4 +218,14 @@ ChannelDialog::updateComboBox() {
     ui->offsetComboBox->setCurrentIndex(2);
     ui->offsetLineEdit->setEnabled(true);
   }
+}
+
+
+void
+ChannelDialog::onHideChannelHint() {
+  Settings settings;
+  settings.setHideChannelNote(true);
+  ui->hintLabel->setVisible(false);
+  layout()->invalidate();
+  adjustSize();
 }

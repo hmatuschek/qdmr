@@ -17,21 +17,13 @@
  * Implementation of FMChannelDialog
  * ********************************************************************************************* */
 FMChannelDialog::FMChannelDialog(Config *config, QWidget *parent)
-  : ChannelDialog(config, parent), _channel(nullptr), _squelch(nullptr), _admit(nullptr),
+  : ChannelDialog(config, parent), _clone(nullptr), _orig(nullptr), _squelch(nullptr), _admit(nullptr),
   _rxTone(nullptr), _txTone(nullptr), _bandwidth(nullptr), _aprs(nullptr)
 {
-  /*Settings settings;
-  if (settings.hideChannelNote()) {
-    ui->hintLabel->setVisible(false);
-    layout()->invalidate();
-    adjustSize();
-  }
-  connect(ui->hintLabel, SIGNAL(linkActivated(QString)), this, SLOT(onHideChannelHint()));*/
-
-  Application *app = qobject_cast<Application *>(qApp);
-  FMRepeaterFilter *filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
+  auto app = qobject_cast<Application *>(qApp);
+  auto filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  QCompleter *completer = new RepeaterCompleter(2, app->repeater(), this);
+  auto completer = new RepeaterCompleter(2, app->repeater(), this);
   completer->setModel(filter);
   ui->channelName->setCompleter(completer);
   connect(completer, QOverload<const QModelIndex &>::of(&QCompleter::activated),
@@ -54,33 +46,43 @@ FMChannelDialog::FMChannelDialog(Config *config, QWidget *parent)
 
 void
 FMChannelDialog::setChannel(FMChannel *channel) {
-  ChannelDialog::setChannel(channel);
-  _channel = channel;
+  if (_clone) {
+    delete _clone;
+    _clone = nullptr;
+  }
 
-  _squelch->setChannel(_channel);
-  _admit->setAdmit(_channel->admit());
-  _rxTone->setSelectiveCall(_channel->rxTone());
-  _txTone->setSelectiveCall(_channel->txTone());
-  _bandwidth->setBandwidth(_channel->bandwidth());
-  _aprs->setAPRSSystem(_channel->aprs());
+  _orig = channel;
+  if (_orig.isNull()) return;
+  _clone = _orig->clone()->as<FMChannel>();
+  _clone->setParent(this);
+  ChannelDialog::setChannel(_clone);
+
+  _squelch->setChannel(_clone);
+  _admit->setAdmit(_clone->admit());
+  _rxTone->setSelectiveCall(_clone->rxTone());
+  _txTone->setSelectiveCall(_clone->txTone());
+  _bandwidth->setBandwidth(_clone->bandwidth());
+  _aprs->setAPRSSystem(_clone->aprs());
 }
 
 void
 FMChannelDialog::accept()
 {
   _squelch->accept();
-  _channel->setAdmit(_admit->admit());
-  _channel->setRXTone(_rxTone->selectiveCall());
-  _channel->setTXTone(_txTone->selectiveCall());
-  _channel->setBandwidth(_bandwidth->bandwidth());
-  _channel->setAPRS(_aprs->aprsSystem());
+  _clone->setAdmit(_admit->admit());
+  _clone->setRXTone(_rxTone->selectiveCall());
+  _clone->setTXTone(_txTone->selectiveCall());
+  _clone->setBandwidth(_bandwidth->bandwidth());
+  _clone->setAPRS(_aprs->aprsSystem());
 
   ChannelDialog::accept();
+
+  _orig->copy(*_clone);
 }
 
 void
 FMChannelDialog::onRepeaterSelected(const QModelIndex &index) {
-  Application *app = qobject_cast<Application *>(qApp);
+  auto app = qobject_cast<Application *>(qApp);
 
   QModelIndex src = qobject_cast<QAbstractProxyModel*>(
         ui->channelName->completer()->completionModel())->mapToSource(index);
@@ -96,12 +98,4 @@ FMChannelDialog::onRepeaterSelected(const QModelIndex &index) {
 }
 
 
-void
-FMChannelDialog::onHideChannelHint() {
-  /*Settings settings;
-  settings.setHideChannelNote(true);
-  hintLabel->setVisible(false);
-  layout()->invalidate();
-  adjustSize();*/
-}
 
