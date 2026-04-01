@@ -55,7 +55,7 @@ ZoneDialog::construct() {
 
 void
 ZoneDialog::onAddChannelA() {
-  MultiChannelSelectionDialog dia(_config->channelList());
+  MultiChannelSelectionDialog dia(_config->channelList(), false, false, _myZone->A());
   if (QDialog::Accepted != dia.exec())
     return;
 
@@ -86,7 +86,7 @@ ZoneDialog::onRemChannelA() {
 
 void
 ZoneDialog::onAddChannelB() {
-  MultiChannelSelectionDialog dia(_config->channelList());
+  MultiChannelSelectionDialog dia(_config->channelList(), false, false, _myZone->B());
   if (QDialog::Accepted != dia.exec())
     return;
 

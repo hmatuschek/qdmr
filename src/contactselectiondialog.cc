@@ -10,7 +10,8 @@
 /* ********************************************************************************************* *
  * Implementation of MultiGroupCallSelectionDialog
  * ********************************************************************************************* */
-MultiGroupCallSelectionDialog::MultiGroupCallSelectionDialog(ContactList *contacts, bool showPrivateCalls, QWidget *parent)
+MultiGroupCallSelectionDialog::MultiGroupCallSelectionDialog(
+  ContactList *contacts, bool showPrivateCalls, DMRContactRefList *exclude, QWidget *parent)
   : QDialog(parent)
 {
   _contacts = new QListWidget();
@@ -21,8 +22,10 @@ MultiGroupCallSelectionDialog::MultiGroupCallSelectionDialog(ContactList *contac
     Contact *contact = contacts->contact(i);
     if (! contact->is<DMRContact>())
       continue;
-    DMRContact *digi = contact->as<DMRContact>();
-    QListWidgetItem *item = new QListWidgetItem(digi->name());
+    if (exclude && exclude->has(contact))
+      continue;
+    auto digi = contact->as<DMRContact>();
+    auto item = new QListWidgetItem(digi->name());
     item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
     item->setData(Qt::UserRole, QVariant::fromValue(digi));
     item->setCheckState(Qt::Unchecked);

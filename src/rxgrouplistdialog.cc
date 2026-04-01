@@ -64,13 +64,13 @@ RXGroupListDialog::construct() {
 
 void
 RXGroupListDialog::onAddGroup() {
-  MultiGroupCallSelectionDialog dialog(_config->contacts(), false);
+  MultiGroupCallSelectionDialog dialog(_config->contacts(), false, _myGroupList->contacts());
   if (QDialog::Accepted != dialog.exec())
     return;
 
   QList<DMRContact *> contacts = dialog.contacts();
   foreach (DMRContact *contact, contacts) {
-    if (0 <= _myGroupList->contacts()->indexOf(contact))
+    if (_myGroupList->contacts()->has(contact))
       continue;
     _myGroupList->addContact(contact);
   }

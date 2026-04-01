@@ -65,7 +65,7 @@ RoamingZoneDialog::onAddDMRChannel() {
 
 void
 RoamingZoneDialog::onAddRoamingChannel() {
-  MultiRoamingChannelSelectionDialog dia(_config);
+  MultiRoamingChannelSelectionDialog dia(_config, _myZone->channels());
   if (QDialog::Accepted != dia.exec())
     return;
 
