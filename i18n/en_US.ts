@@ -653,7 +653,7 @@
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Channel ...</source>
-        <translation>Add Channel ...</translation>
+        <translation>Add Channel …</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
@@ -955,12 +955,12 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="17"/>
         <source>Merging codeplugs ...</source>
-        <translation>Merging codeplugs ...</translation>
+        <translation>Merging codeplugs …</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="32"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, …) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="48"/>
@@ -2173,7 +2173,7 @@
     <message>
         <location filename="../src/flageditdialog.ui" line="14"/>
         <source>Select Flags</source>
-        <translation type="unfinished"></translation>
+        <translation>Select Flags</translation>
     </message>
 </context>
 <context>
@@ -2630,7 +2630,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="318"/>
         <source>Export to CHIRP ...</source>
-        <translation>Export to CHIRP ...</translation>
+        <translation>Export to CHIRP …</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="321"/>
@@ -2640,7 +2640,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="326"/>
         <source>Import ...</source>
-        <translation>Import ...</translation>
+        <translation>Import …</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="329"/>
@@ -2660,7 +2660,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="345"/>
         <source>Edit Satellites ...</source>
-        <translation>Edit Satellites ...</translation>
+        <translation>Edit Satellites …</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="348"/>
@@ -2934,12 +2934,12 @@
     <message>
         <location filename="../src/propertydelegate.cc" line="74"/>
         <source>None</source>
-        <translation type="unfinished">None</translation>
+        <translation>None</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="75"/>
         <source>Off</source>
-        <translation type="unfinished">Off</translation>
+        <translation>Off</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="112"/>
@@ -2992,12 +2992,12 @@
     <message>
         <location filename="../src/extensionwrapper.cc" line="612"/>
         <source>None</source>
-        <translation type="unfinished">None</translation>
+        <translation>None</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="614"/>
         <source>Off</source>
-        <translation type="unfinished">Off</translation>
+        <translation>Off</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="625"/>
@@ -3537,51 +3537,51 @@
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="14"/>
         <source>Edit Satellite Transponder</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit Satellite Transponder</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="26"/>
         <source>FM Voice Transponder</source>
-        <translation type="unfinished"></translation>
+        <translation>FM Voice Transponder</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="32"/>
         <location filename="../src/satellitetransponderdialog.ui" line="105"/>
         <source>Uplink Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Uplink Frequency</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="42"/>
         <location filename="../src/satellitetransponderdialog.ui" line="121"/>
         <source>Uplink Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Uplink Tone</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="58"/>
         <location filename="../src/satellitetransponderdialog.ui" line="143"/>
         <source>Downlink Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Downlink Frequency</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="68"/>
         <location filename="../src/satellitetransponderdialog.ui" line="159"/>
         <source>Downlink Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Downlink Tone</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="93"/>
         <source>APRS Transponder</source>
-        <translation type="unfinished"></translation>
+        <translation>APRS Transponder</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="184"/>
         <source>Beacon</source>
-        <translation type="unfinished"></translation>
+        <translation>Beacon</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="196"/>
         <source>Beacon Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Beacon Frequency</translation>
     </message>
 </context>
 <context>
@@ -3970,7 +3970,7 @@
     <message>
         <location filename="../src/transponderfrequencydelegate.cc" line="28"/>
         <source>None</source>
-        <translation type="unfinished">None</translation>
+        <translation>None</translation>
     </message>
 </context>
 <context>
