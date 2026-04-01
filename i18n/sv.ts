@@ -944,7 +944,7 @@
 <context>
     <name>ChannelSelectionDialog</name>
     <message>
-        <location filename="../src/channelselectiondialog.cc" line="23"/>
+        <location filename="../src/channelselectiondialog.cc" line="24"/>
         <source>Select a channel:</source>
         <translation>Välj kanal:</translation>
     </message>
@@ -2772,12 +2772,12 @@
 <context>
     <name>MultiChannelSelectionDialog</name>
     <message>
-        <location filename="../src/channelselectiondialog.cc" line="43"/>
+        <location filename="../src/channelselectiondialog.cc" line="46"/>
         <source>[Selected]</source>
         <translation>[Vald]</translation>
     </message>
     <message>
-        <location filename="../src/channelselectiondialog.cc" line="64"/>
+        <location filename="../src/channelselectiondialog.cc" line="69"/>
         <source>Select a channel:</source>
         <translation>Välj kanal:</translation>
     </message>
@@ -2785,12 +2785,12 @@
 <context>
     <name>MultiGroupCallSelectionDialog</name>
     <message>
-        <location filename="../src/contactselectiondialog.cc" line="17"/>
+        <location filename="../src/contactselectiondialog.cc" line="18"/>
         <source>Show private calls</source>
         <translation>Visa privata samtal</translation>
     </message>
     <message>
-        <location filename="../src/contactselectiondialog.cc" line="39"/>
+        <location filename="../src/contactselectiondialog.cc" line="42"/>
         <source>Select a group call:</source>
         <translation>Välj ett gruppsamtal:</translation>
     </message>
@@ -3515,12 +3515,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/satellitedatabasedialog.ui" line="45"/>
+        <location filename="../src/satellitedatabasedialog.ui" line="48"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/satellitedatabasedialog.ui" line="52"/>
+        <location filename="../src/satellitedatabasedialog.ui" line="55"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3531,6 +3531,58 @@
         <location filename="../src/satelliteselectiondialog.ui" line="20"/>
         <location filename="../src/satelliteselectiondialog.ui" line="26"/>
         <source>Select a satellite</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SatelliteTransponderDialog</name>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="14"/>
+        <source>Edit Satellite Transponder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="26"/>
+        <source>FM Voice Transponder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="32"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="105"/>
+        <source>Uplink Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="42"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="121"/>
+        <source>Uplink Tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="58"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="143"/>
+        <source>Downlink Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="68"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="159"/>
+        <source>Downlink Tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="93"/>
+        <source>APRS Transponder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="184"/>
+        <source>Beacon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="196"/>
+        <source>Beacon Frequency</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3914,6 +3966,14 @@
         <location filename="../src/settingsdialog.ui" line="445"/>
         <source>Show device extensions</source>
         <translation>Visa enhetstillägg</translation>
+    </message>
+</context>
+<context>
+    <name>TransponderFrequencyEditor</name>
+    <message>
+        <location filename="../src/transponderfrequencydelegate.cc" line="28"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
