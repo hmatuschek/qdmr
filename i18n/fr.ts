@@ -955,12 +955,12 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="17"/>
         <source>Merging codeplugs ...</source>
-        <translation>Fusion de codeplugs ...</translation>
+        <translation type="unfinished">Fusion de codeplugs ...</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="32"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Stratégies de résolution de conflits:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Si des objets importés (canaux, contacts, ...) existent déjà, sélectionner comment ces conflits sont à résoudre pour les éléments et les ensembles.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Stratégies de résolution de conflits:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Si des objets importés (canaux, contacts, ...) existent déjà, sélectionner comment ces conflits sont à résoudre pour les éléments et les ensembles.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="48"/>
@@ -2630,7 +2630,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="318"/>
         <source>Export to CHIRP ...</source>
-        <translation>Export vers CHIRP ...</translation>
+        <translation type="unfinished">Export vers CHIRP ...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="321"/>
@@ -2640,7 +2640,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="326"/>
         <source>Import ...</source>
-        <translation>Import ...</translation>
+        <translation type="unfinished">Import ...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="329"/>
@@ -2660,7 +2660,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="345"/>
         <source>Edit Satellites ...</source>
-        <translation>Modifier les satellites ...</translation>
+        <translation type="unfinished">Modifier les satellites ...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="348"/>
