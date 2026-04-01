@@ -165,8 +165,6 @@ APRSSystemDialog::construct() {
 
   ui->extensionView->setObjectName("aprsSystemExtension");
   ui->extensionView->setObject(_myAPRS, _config);
-  if (! settings.showExtensions())
-    ui->tabWidget->tabBar()->hide();
 }
 
 FMAPRSSystem *

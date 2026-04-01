@@ -101,8 +101,6 @@ DMRContactDialog::construct() {
 
   ui->extensionView->setObjectName("dmrContactExtension");
   ui->extensionView->setObject(_myContact, _config);
-  if (! settings.showExtensions())
-    ui->tabWidget->tabBar()->hide();
 
   connect(ui->typeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged(int)));
   connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));

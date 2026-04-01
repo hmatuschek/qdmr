@@ -38,8 +38,6 @@ RoamingZoneDialog::construct() {
 
   extensionView->setObjectName("roamingZoneExtension");
   extensionView->setObject(_myZone, _config);
-  if (! settings.showExtensions())
-    tabWidget->tabBar()->hide();
 
   connect(addRoam, SIGNAL(clicked(bool)), this, SLOT(onAddRoamingChannel()));
   connect(addDMR, SIGNAL(clicked(bool)), this, SLOT(onAddDMRChannel()));
