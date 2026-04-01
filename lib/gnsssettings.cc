@@ -3,7 +3,8 @@
 
 
 GNSSSettings::GNSSSettings(QObject *parent)
-  : ConfigExtension{parent}, _fixedPosition(), _systems(System::GPS), _units(Units::Metric)
+  : ConfigExtension{parent}, _fixedPositionEnabled(false), _fixedPosition(),
+    _systems(System::GPS), _units(Units::Metric)
 {
   // pass...
 }
