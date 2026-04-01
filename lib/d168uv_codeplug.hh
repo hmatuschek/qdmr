@@ -23,6 +23,33 @@ class D168UVCodeplug : public D878UVCodeplug
 {
   Q_OBJECT
 
+public:
+  /** Represents the general config of the radio within the D168UV binary codeplug.
+   * This covers the CPS version 1.07. */
+  class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
+  {
+  protected:
+    /** Device specific time zones. */
+    struct TimeZone {
+    public:
+      /** Encodes time zone. */
+      static uint8_t encode(const QTimeZone& zone);
+      /** Decodes time zone. */
+      static QTimeZone decode(uint8_t code);
+
+    protected:
+      /** Vector of possible time-zones. */
+      static QVector<QTimeZone> _timeZones;
+    };
+
+  public:
+    /** Constructor. */
+    GeneralSettingsElement(uint8_t *ptr);
+
+    QTimeZone gpsTimeZone() const override;
+    void setGPSTimeZone(const QTimeZone &zone) override;
+  };
+
 protected:
   /** Hidden constructor. */
   explicit D168UVCodeplug(const QString &label, QObject *parent = nullptr);
@@ -30,6 +57,11 @@ protected:
 public:
   /** Empty constructor. */
   explicit D168UVCodeplug(QObject *parent = nullptr);
+
+protected:
+  bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
+  bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
 
 protected:
   /** Internal used offsets within the codeplug. */

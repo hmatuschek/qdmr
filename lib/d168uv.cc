@@ -5,9 +5,6 @@
 #include "d168uv_codeplug.hh"
 #include "d878uv2_callsigndb.hh"
 
-#define RBSIZE 16
-#define WBSIZE 16
-
 
 D168UV::D168UV(AnytoneInterface *device, QObject *parent)
   : AnytoneRadio("Anytone AT-D168UV", device, parent), _limits(nullptr)
