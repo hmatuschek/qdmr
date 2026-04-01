@@ -6,22 +6,25 @@
 #include <QVBoxLayout>
 
 MultiRoamingChannelSelectionDialog::MultiRoamingChannelSelectionDialog(
-    Config *config, QWidget *parent)
+    Config *config, RoamingChannelRefList *exclude, QWidget *parent)
   : QDialog(parent), _channels(nullptr)
 {
   setWindowTitle(tr("Select roaming channels"));
   _channels = new QListWidget();
   for (int i=0; i<config->roamingChannels()->count(); i++) {
-    QListWidgetItem *item = new QListWidgetItem(config->roamingChannels()->channel(i)->name());
+    auto channel = config->roamingChannels()->channel(i);
+    if (exclude && exclude->has(channel))
+      continue;
+    auto item = new QListWidgetItem(channel->name());
     item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
-    item->setData(Qt::UserRole, QVariant::fromValue(config->roamingChannels()->channel(i)));
+    item->setData(Qt::UserRole, QVariant::fromValue(channel));
     item->setCheckState(Qt::Unchecked);
     _channels->addItem(item);
   }
 
-  QDialogButtonBox *box = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
+  auto box = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel);
 
-  QVBoxLayout *layout = new QVBoxLayout();
+  auto layout = new QVBoxLayout();
   layout->addWidget(_channels);
   layout->addWidget(box);
   setLayout(layout);

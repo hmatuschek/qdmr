@@ -1,5 +1,6 @@
 #include "extensionwrapper.hh"
 #include <QMetaProperty>
+#include <QMetaObject>
 #include "logger.hh"
 #include "configreference.hh"
 #include "configobjecttypeselectiondialog.hh"
@@ -149,6 +150,7 @@ PropertyWrapper::PropertyWrapper(ConfigItem *obj, QObject *parent)
     connect(_object, SIGNAL(endClear()), this, SLOT(onItemCleared()));
   }
 }
+
 
 ConfigItem *
 PropertyWrapper::root() const {

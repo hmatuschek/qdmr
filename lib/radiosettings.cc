@@ -8,7 +8,8 @@ RadioSettings::RadioSettings(QObject *parent)
     _squelch(Level::fromValue(1)), _power(Channel::Power::High), _vox(Level::null()),
     _transmitTimeOut(Interval::infinity()), _defaultId(new DMRRadioIDReference(this)),
     _gnss(new GNSSSettings(this)), _dmr(new DMRSettings(this)),
-    _tytExtension(nullptr), _radioddityExtension(nullptr), _anytoneExtension(nullptr)
+    _tytExtension(nullptr), _radioddityExtension(nullptr), _anytoneExtension(nullptr),
+    _openGD77(nullptr)
 {
   connect(_gnss, &GNSSSettings::modified, this, &RadioSettings::modified);
   connect(_dmr, &DMRSettings::modified, this, &RadioSettings::modified);
@@ -246,6 +247,26 @@ RadioSettings::setAnytoneExtension(AnytoneSettingsExtension *ext) {
   if (_anytoneExtension) {
     _anytoneExtension->setParent(this);
     connect(_anytoneExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+  }
+  emit modified(this);
+}
+
+
+OpenGD77SettingsExtension *
+RadioSettings::openGD77Extension() const {
+  return _openGD77;
+}
+
+void
+RadioSettings::setOpenGD77Extension(OpenGD77SettingsExtension *ext) {
+  if (_openGD77) {
+    disconnect(_openGD77, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+    _openGD77->deleteLater();
+  }
+  _openGD77 = ext;
+  if (_openGD77) {
+    _openGD77->setParent(this);
+    connect(_openGD77, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
   }
   emit modified(this);
 }

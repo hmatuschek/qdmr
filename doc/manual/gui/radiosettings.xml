@@ -24,29 +24,6 @@
 </screenshot>
 
 <para>
-  The general configuration of your radio is the simplest step: You only need to  enter your
-  DMR ID and your radio name. The latter is usually just your call sign. If you do not have a DMR
-  ID yet, you can request one at 
-  <link xlink:href="https://register.ham-digital.org/">ham-digital.org</link>.
-</para>
-
-<note>
-  <para>
-    You will always need only <emphasis>one</emphasis> DMR ID, even if you have several radios. The
-    DMR network is able to handle multiple endpoints with the same ID. Never request more than one 
-    ID, they are a limited resource.
-  </para>
-</note>
-
-<para>
-  In the rare case, where you actually need more than one DMR ID, for example if you the same 
-  radio from HAM as well as commercial applications, you may add your additional DMR IDs using
-  the <guilabel>Radio IDs</guilabel> tab. This tab is usually hidden and can be accessed by 
-  enabling <guibutton>Show commercial features</guibutton> in the application settings (see 
-  <xref linkend="guiSettingsDialog"/> below).
-</para>
-
-<para>
   Within the <guilabel>Boot Settings</guilabel>, the <guilabel>Intro Line 1</guilabel> &amp; 
   <guilabel>2</guilabel> specify the text that some radios show on startup. You may enter any text
   here. Some radios show an image during boot. For those radios, these settings have no effect.

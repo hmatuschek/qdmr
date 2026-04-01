@@ -59,20 +59,18 @@ RXGroupListDialog::construct() {
 
   extensionView->setObjectName("groupListExtension");
   extensionView->setObject(_myGroupList, _config);
-  if (! settings.showExtensions())
-    tabWidget->tabBar()->hide();
 }
 
 
 void
 RXGroupListDialog::onAddGroup() {
-  MultiGroupCallSelectionDialog dialog(_config->contacts(), false);
+  MultiGroupCallSelectionDialog dialog(_config->contacts(), false, _myGroupList->contacts());
   if (QDialog::Accepted != dialog.exec())
     return;
 
   QList<DMRContact *> contacts = dialog.contacts();
   foreach (DMRContact *contact, contacts) {
-    if (0 <= _myGroupList->contacts()->indexOf(contact))
+    if (_myGroupList->contacts()->has(contact))
       continue;
     _myGroupList->addContact(contact);
   }
@@ -105,6 +103,23 @@ RXGroupListBox::RXGroupListBox(RXGroupLists *groups, QWidget *parent)
 {
   populateRXGroupListBox(this, groups);
 }
+
+
+void
+RXGroupListBox::setGroupList(RXGroupList *lst) {
+  for (int i=0; i<count(); i++) {
+    if (itemData(i).value<RXGroupList*>() == lst) {
+      setCurrentIndex(i);
+      break;
+    }
+  }
+}
+
+RXGroupList *
+RXGroupListBox::groupList() const {
+  return currentData().value<RXGroupList *>();
+}
+
 
 void
 populateRXGroupListBox(QComboBox *box, RXGroupLists *groups, RXGroupList *list) {

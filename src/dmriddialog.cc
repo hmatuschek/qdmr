@@ -29,9 +29,6 @@ DMRIDDialog::construct() {
   ui->dmrID->setText(QString::number(_myID->number()));
   ui->dmrID->setValidator(new QIntValidator(1, 16777215));
 
-  if (! settings.showCommercialFeatures())
-    ui->tabWidget->tabBar()->hide();
-
   ui->extensionView->setObjectName("dmrRadioIdExtension");
   ui->extensionView->setObject(_myID, _config);
 }

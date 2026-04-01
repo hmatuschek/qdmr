@@ -267,6 +267,19 @@ D878UVCodeplug::ChannelElement::clearDMREncryptionKeyIndex() {
 
 
 bool
+D878UVCodeplug::ChannelElement::adaptiveTDMA() const {
+  // Removed feature
+  return false;
+}
+
+void
+D878UVCodeplug::ChannelElement::enableAdaptiveTDMA(bool enable) {
+  Q_UNUSED(enable);
+  // removed feature.
+}
+
+
+bool
 D878UVCodeplug::ChannelElement::hasAESEncryptionKeyIndex() const {
   return 0 != getUInt8(Offset::aesKeyIndex());
 }

@@ -1,33 +1,46 @@
 #ifndef M17CHANNELDIALOG_HH
 #define M17CHANNELDIALOG_HH
 
-#include <QDialog>
+#include "channeldialog.hh"
+#include "channel.hh"
+#include <QComboBox>
+#include <QSpinBox>
+#include <QCheckBox>
+
 class Config;
-class M17Channel;
+class M17ContactSelect;
 
-namespace Ui {
-  class M17ChannelDialog;
-}
 
-class M17ChannelDialog : public QDialog
+class M17ChannelModeSelect: public QComboBox
+{
+Q_OBJECT
+
+public:
+  explicit M17ChannelModeSelect(QWidget *parent=nullptr);
+
+  void setMode(M17Channel::Mode mode);
+  M17Channel::Mode mode() const;
+};
+
+
+class M17ChannelDialog : public ChannelDialog
 {
   Q_OBJECT
 
 public:
   M17ChannelDialog(Config *config, QWidget *parent = nullptr);
-  M17ChannelDialog(Config *config, M17Channel *channel, QWidget *parent = nullptr);
-  ~M17ChannelDialog();
 
-  M17Channel *channel();
+  void setChannel(M17Channel *ch);
 
-protected:
-  void construct();
+public slots:
+  void accept() override;
 
 private:
-  Ui::M17ChannelDialog *ui;
-  Config *_config;
-  M17Channel *_channel;
-  M17Channel *_myChannel;
+  QPointer<M17Channel> _channel;
+  M17ChannelModeSelect *_mode;
+  QSpinBox *_access;
+  M17ContactSelect *_contact;
+  QCheckBox *_aprs;
 };
 
 #endif // M17CHANNELDIALOG_HH

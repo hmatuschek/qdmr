@@ -569,7 +569,7 @@ class M17Channel: public DigitalChannel
   /** The encryption mode. */
   Q_PROPERTY(EncryptionMode encryptionMode READ encryptionMode WRITE setEncryptionMode)
   /** If enabled, positioning data is send along with voice and data. */
-  Q_PROPERTY(bool gpsEnabled READ gpsEnabled WRITE enableGPS)
+  Q_PROPERTY(bool aprs READ aprsEnabled WRITE enableAPRS)
 
 public:
   /** Possible channel modes. */
@@ -614,10 +614,10 @@ public:
   /** (Re-) Sets the default TX contact for this channel. */
   bool setContact(M17Contact *c);
 
-  /** Returns @c true if GPS is enabled. */
-  bool gpsEnabled() const;
-  /** Enables/disables GPS. */
-  void enableGPS(bool enabled);
+  /** Returns @c true if APRS is enabled. */
+  bool aprsEnabled() const;
+  /** Enables/disables APRS. */
+  void enableAPRS(bool enabled);
 
   /** Returns the encryption mode of the channel. */
   EncryptionMode encryptionMode() const;

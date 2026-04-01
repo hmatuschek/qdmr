@@ -43,9 +43,6 @@ ZoneDialog::construct() {
 
   extensionView->setObjectName("zoneExtension");
   extensionView->setObject(_myZone, _config);
-  if (! settings.showExtensions()) {
-    tabWidget->tabBar()->hide();
-  }
 
   connect(addChannelA, SIGNAL(clicked()), this, SLOT(onAddChannelA()));
   connect(remChannelA, SIGNAL(clicked()), this, SLOT(onRemChannelA()));
@@ -58,7 +55,7 @@ ZoneDialog::construct() {
 
 void
 ZoneDialog::onAddChannelA() {
-  MultiChannelSelectionDialog dia(_config->channelList());
+  MultiChannelSelectionDialog dia(_config->channelList(), false, false, _myZone->A());
   if (QDialog::Accepted != dia.exec())
     return;
 
@@ -89,7 +86,7 @@ ZoneDialog::onRemChannelA() {
 
 void
 ZoneDialog::onAddChannelB() {
-  MultiChannelSelectionDialog dia(_config->channelList());
+  MultiChannelSelectionDialog dia(_config->channelList(), false, false, _myZone->B());
   if (QDialog::Accepted != dia.exec())
     return;
 

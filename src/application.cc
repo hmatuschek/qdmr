@@ -820,8 +820,6 @@ Application::showSettings() {
     if (_source)
       _source->startUpdates();
   }
-
-  _mainWindow->applySettings();
 }
 
 

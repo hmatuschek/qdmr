@@ -155,6 +155,7 @@ void
 ConfigTest::testGNSSSettings() {
   Config config; config.readYAML(":/data/config_test.yaml");
   config.settings()->gnss()->setFixedPositionLocator("JO62jl45");
+  config.settings()->gnss()->enableFixedPosition(true);
   config.settings()->gnss()->setSystems(GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
 
   qDebug() << "Before" << config.settings()->gnss()->fixedPositionLocator();

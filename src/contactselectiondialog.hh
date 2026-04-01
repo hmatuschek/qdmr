@@ -8,6 +8,7 @@ class DMRContact;
 class ContactList;
 class QListWidget;
 class QLabel;
+class DMRContactRefList;
 
 
 class MultiGroupCallSelectionDialog: public QDialog
@@ -15,7 +16,8 @@ class MultiGroupCallSelectionDialog: public QDialog
   Q_OBJECT
 
 public:
-  explicit MultiGroupCallSelectionDialog(ContactList *contacts, bool showPrivateCalls=false, QWidget *parent=nullptr);
+  explicit MultiGroupCallSelectionDialog(ContactList *contacts, bool showPrivateCalls=false,
+    DMRContactRefList *exclude=nullptr, QWidget *parent=nullptr);
 
   QList<DMRContact *> contacts();
 
