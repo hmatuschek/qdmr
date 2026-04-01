@@ -7,6 +7,7 @@ class Channel;
 class ChannelList;
 class ChannelComboBox;
 class QListWidget;
+class ChannelRefList;
 
 class ChannelSelectionDialog: public QDialog
 {
@@ -28,7 +29,8 @@ class MultiChannelSelectionDialog: public QDialog
 
 public:
   MultiChannelSelectionDialog(ChannelList *lst, bool includeSelectedChannel=false,
-                              bool digitalOnly=false, QWidget *parent=nullptr);
+                              bool digitalOnly=false, ChannelRefList *exclude=nullptr,
+                              QWidget *parent=nullptr);
 
   QList<Channel *> channel() const;
 

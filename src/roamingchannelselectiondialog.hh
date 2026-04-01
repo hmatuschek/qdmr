@@ -8,13 +8,15 @@
 class Config;
 class RoamingChannel;
 class QListWidget;
+class RoamingChannelRefList;
+
 
 class MultiRoamingChannelSelectionDialog : public QDialog
 {
   Q_OBJECT
 
 public:
-  MultiRoamingChannelSelectionDialog(Config *config, QWidget *parent=nullptr);
+  MultiRoamingChannelSelectionDialog(Config *config, RoamingChannelRefList *exclude=nullptr, QWidget *parent=nullptr);
 
   QList<RoamingChannel *> channels() const;
 
