@@ -1,6 +1,7 @@
 #include "channelselectiondialog.hh"
 #include "channel.hh"
 #include "channelcombobox.hh"
+#include "configreference.hh"
 
 #include <QDialogButtonBox>
 #include <QLabel>
@@ -35,7 +36,9 @@ ChannelSelectionDialog::channel() const {
 /* ********************************************************************************************* *
  * Implementation of MultiChannelSelectionDialog
  * ********************************************************************************************* */
-MultiChannelSelectionDialog::MultiChannelSelectionDialog(ChannelList *lst, bool includeSelectedChannel, bool digitalOnly, QWidget *parent)
+MultiChannelSelectionDialog::MultiChannelSelectionDialog(
+  ChannelList *lst, bool includeSelectedChannel, bool digitalOnly, ChannelRefList *exclude,
+  QWidget *parent)
   : QDialog(parent)
 {
   _channel = new QListWidget();
@@ -48,7 +51,9 @@ MultiChannelSelectionDialog::MultiChannelSelectionDialog(ChannelList *lst, bool 
   }
   for (int i=0; i<lst->count(); i++) {
     Channel *channel = lst->channel(i);
-    if (digitalOnly && channel->is<FMChannel>())
+    if (digitalOnly && channel->is<AnalogChannel>())
+      continue;
+    if (exclude && exclude->has(channel))
       continue;
     QListWidgetItem *item = new QListWidgetItem(channel->name());
     item->setFlags(Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);

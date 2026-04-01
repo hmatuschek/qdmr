@@ -19,6 +19,7 @@ public:
   ~SatelliteDatabaseDialog();
 
 private slots:
+  void onEditTransponder(const QModelIndex &idx);
   void onAddSatellite();
   void onDeleteSatellite();
 
