@@ -4,7 +4,6 @@
 #include <QDateTime>
 
 #include "d878uv_codeplug.hh"
-#include "signaling.hh"
 
 class Channel;
 class DMRContact;
@@ -14,7 +13,7 @@ class ScanList;
 class DMRAPRSSystem;
 
 
-/** Represents the device specific binary codeplug for Anytone AT-D878UVII radios.
+/** Represents the device specific binary codeplug for AnyTone AT-D878UVII radios.
  *
  * This class only implements the difference to the AT-D878UV codeplug. In fact there is only a
  * difference in the address of the contact ID<->Index map.
