@@ -8,10 +8,6 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
 {
   ui->setupUi(this);
 
-  if (_config->settings()->defaultId()) {
-    ui->dmrID->setText(QString::number(_config->settings()->defaultId()->number()));
-    ui->radioName->setText(_config->settings()->defaultId()->name());
-  }
   ui->introLine1->setText(_config->settings()->introLine1());
   ui->introLine2->setText(_config->settings()->introLine2());
   ui->mic->setValue(_config->settings()->micLevel().value());
@@ -43,8 +39,6 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   ui->extensionView->setObject(_config->settings(), _config);
 
   connect(_config, SIGNAL(modified(ConfigItem*)), this, SLOT(onConfigModified()));
-  connect(ui->dmrID, SIGNAL(editingFinished()), this, SLOT(onDMRIDChanged()));
-  connect(ui->radioName, SIGNAL(editingFinished()), this, SLOT(onNameChanged()));
   connect(ui->introLine1, SIGNAL(editingFinished()), this, SLOT(onIntroLine1Edited()));
   connect(ui->introLine2, SIGNAL(editingFinished()), this, SLOT(onIntroLine2Edited()));
   connect(ui->mic, SIGNAL(valueChanged(int)), this, SLOT(onMicLevelChanged()));
@@ -60,24 +54,7 @@ GeneralSettingsView::~GeneralSettingsView() {
 }
 
 void
-GeneralSettingsView::hideDMRID(bool hidden) {
-  ui->dmrIDBox->setHidden(hidden);
-}
-
-void
-GeneralSettingsView::hideExtensions(bool hidden) {
-  ui->extensionBox->setHidden(hidden);
-}
-
-void
 GeneralSettingsView::onConfigModified() {
-  if (_config->settings()->defaultId()) {
-    ui->dmrID->setText(QString::number(_config->settings()->defaultId()->number()));
-    ui->radioName->setText(_config->settings()->defaultId()->name());
-  } else {
-    ui->dmrID->setText("0");
-    ui->radioName->setText("");
-  }
   ui->introLine1->setText(_config->settings()->introLine1());
   ui->introLine2->setText(_config->settings()->introLine2());
   ui->mic->setValue(_config->settings()->micLevel().value());
@@ -95,32 +72,6 @@ GeneralSettingsView::onConfigModified() {
   else
     ui->totValue->setValue(_config->settings()->tot().seconds());
   ui->voxValue->setValue(_config->settings()->vox().value());
-}
-
-void
-GeneralSettingsView::onDMRIDChanged() {
-  if (0 == _config->radioIDs()->count()) {
-    _config->radioIDs()->addId("", ui->dmrID->text().toUInt());
-    _config->settings()->setDefaultId(_config->radioIDs()->get(0)->as<DMRRadioID>());
-  } else if (nullptr == _config->settings()->defaultId()) {
-    _config->settings()->setDefaultId(_config->radioIDs()->get(0)->as<DMRRadioID>());
-    _config->settings()->defaultId()->setNumber(ui->dmrID->text().toUInt());
-  } else {
-    _config->settings()->defaultId()->setNumber(ui->dmrID->text().toUInt());
-  }
-}
-
-void
-GeneralSettingsView::onNameChanged() {
-  if (0 == _config->radioIDs()->count()) {
-    _config->radioIDs()->addId(ui->radioName->text().simplified(), 0);
-    _config->settings()->setDefaultId(_config->radioIDs()->get(0)->as<DMRRadioID>());
-  } else if (nullptr == _config->settings()->defaultId()) {
-    _config->settings()->setDefaultId(_config->radioIDs()->get(0)->as<DMRRadioID>());
-    _config->settings()->defaultId()->setName(ui->radioName->text().simplified());
-  } else {
-    _config->settings()->defaultId()->setName(ui->radioName->text().simplified());
-  }
 }
 
 void

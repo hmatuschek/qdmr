@@ -79,12 +79,6 @@ public:
   bool ignoreFrequencyLimits() const;
   void setIgnoreFrequencyLimits(bool ignore);
 
-  bool showCommercialFeatures() const;
-  void setShowCommercialFeatures(bool show);
-
-  bool showExtensions() const;
-  void setShowExtensions(bool show);
-
   bool hideChannelNote() const;
   void setHideChannelNote(bool hide);
 

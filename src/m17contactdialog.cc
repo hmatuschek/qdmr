@@ -51,8 +51,6 @@ M17ContactDialog::construct() {
 
   ui->extensionView->setObjectName("m17ContactExtension");
   ui->extensionView->setObject(_myContact, _config);
-  if (! settings.showExtensions())
-    ui->tabWidget->tabBar()->hide();
 
   connect(ui->broadcast, SIGNAL(toggled(bool)), this, SLOT(onBroadcastToggled(bool)));
   connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));

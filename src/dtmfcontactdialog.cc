@@ -40,8 +40,6 @@ DTMFContactDialog::construct() {
 
   ui->extensionView->setObjectName("dtmfContactExtension");
   ui->extensionView->setObject(_myContact, _config);
-  if (! settings.showExtensions())
-    ui->tabWidget->tabBar()->hide();
 }
 
 DTMFContact *
