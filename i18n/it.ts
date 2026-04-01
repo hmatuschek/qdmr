@@ -653,7 +653,7 @@
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Channel ...</source>
-        <translation>Aggiungi canale...</translation>
+        <translation type="unfinished">Aggiungi canale...</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
@@ -955,12 +955,12 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="17"/>
         <source>Merging codeplugs ...</source>
-        <translation>Unione dei codeplug...</translation>
+        <translation type="unfinished">Unione dei codeplug...</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="32"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Strategie di risoluzione dei conflitti:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;se alcuni degli oggetti importati (canali, contatti, …) esistono già, seleziona come risolvere questi conflitti per singoli elementi e insiemi.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Strategie di risoluzione dei conflitti:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;se alcuni degli oggetti importati (canali, contatti, …) esistono già, seleziona come risolvere questi conflitti per singoli elementi e insiemi.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="48"/>
@@ -2630,7 +2630,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="318"/>
         <source>Export to CHIRP ...</source>
-        <translation>Esporta in CHIRP...</translation>
+        <translation type="unfinished">Esporta in CHIRP...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="321"/>
@@ -2640,7 +2640,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="326"/>
         <source>Import ...</source>
-        <translation>Importa...</translation>
+        <translation type="unfinished">Importa...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="329"/>
@@ -2660,7 +2660,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="345"/>
         <source>Edit Satellites ...</source>
-        <translation>Modifica i satelliti...</translation>
+        <translation type="unfinished">Modifica i satelliti...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="348"/>
