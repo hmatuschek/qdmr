@@ -3242,7 +3242,7 @@ DM32UVCodeplug::GeneralSettingsElement::setSTEMode(STEMode mode) {
 
 Level
 DM32UVCodeplug::GeneralSettingsElement::fmMicLevel() const {
-  return Level::fromValue(getUInt8(Offset::fmMicLevel())+ 1, Limit::micGain());
+  return Level::fromValue(getUInt8(Offset::fmMicLevel()), Limit::micGain());
 }
 
 void
