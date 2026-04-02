@@ -492,10 +492,6 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
       dmr->setRadioId(ctx.get<DMRRadioID>(dmrIdIndex()));
 
     if (dmrAPRSEnabled() && ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
-      if (! ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
-        errMsg(err) << "Unknown GPS system index " << dmrAPRSChannelIndex() << ".";
-        return false;
-      }
       dmr->setAPRS(ctx.get<DMRAPRSSystem>(dmrAPRSChannelIndex()));
     }
   }    
