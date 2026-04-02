@@ -3294,6 +3294,11 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
   Q_UNUSED(err);
   setBootMessage1(ctx.config()->settings()->introLine1());
   setBootMessage2(ctx.config()->settings()->introLine2());
+  if (ctx.config()->settings()->introLine1().isEmpty() &&
+      ctx.config()->settings()->introLine2().isEmpty())
+    setBootDisplay(BootDisplay::Image);
+  else
+    setBootDisplay(BootDisplay::Message);
   enableVoicePrompt(ctx.config()->settings()->speech());
   if (ctx.config()->settings()->voxDisabled())
     setVOXLevel(Level::null());
