@@ -293,11 +293,11 @@ D868UVETest::testRegressionDefaultChannel() {
           .arg(err.format()).toStdString().c_str());
   }
   config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
-  config.settings()->anytoneExtension()->bootSettings()->zoneA()->set(config.zones()->zone(0));
-  config.settings()->anytoneExtension()->bootSettings()->channelA()->set(config.zones()->zone(0)->A()->get(0));
-  config.settings()->anytoneExtension()->bootSettings()->zoneB()->set(config.zones()->zone(1));
-  config.settings()->anytoneExtension()->bootSettings()->channelB()->set(config.zones()->zone(1)->A()->get(0));
-  config.settings()->anytoneExtension()->bootSettings()->enableDefaultChannel(true);
+  config.settings()->boot()->zoneA()->set(config.zones()->zone(0));
+  config.settings()->boot()->channelA()->set(config.zones()->zone(0)->A()->get(0));
+  config.settings()->boot()->zoneB()->set(config.zones()->zone(1));
+  config.settings()->boot()->channelB()->set(config.zones()->zone(1)->A()->get(0));
+  config.settings()->boot()->enableDefaultChannel(true);
 
   D868UVCodeplug codeplug;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
@@ -313,14 +313,14 @@ D868UVETest::testRegressionDefaultChannel() {
   }
 
   QVERIFY(decoded.settings()->anytoneExtension());
-  QVERIFY(decoded.settings()->anytoneExtension()->bootSettings()->defaultChannelEnabled());
-  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->zoneA()->as<Zone>(),
+  QVERIFY(decoded.settings()->boot()->defaultChannelEnabled());
+  QCOMPARE(decoded.settings()->boot()->zoneA()->as<Zone>(),
            decoded.zones()->zone(0));
-  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->channelA()->as<Channel>()->name(),
+  QCOMPARE(decoded.settings()->boot()->channelA()->as<Channel>()->name(),
            decoded.zones()->zone(0)->A()->get(0)->name());
-  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->zoneB()->as<Zone>(),
+  QCOMPARE(decoded.settings()->boot()->zoneB()->as<Zone>(),
            decoded.zones()->zone(1));
-  QCOMPARE(decoded.settings()->anytoneExtension()->bootSettings()->channelB()->as<Channel>()->name(),
+  QCOMPARE(decoded.settings()->boot()->channelB()->as<Channel>()->name(),
            decoded.zones()->zone(1)->A()->get(0)->name());
 }
 

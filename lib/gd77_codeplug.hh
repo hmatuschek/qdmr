@@ -319,12 +319,11 @@ public:
   bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
-  void clearBootSettings();
   void clearMenuSettings();
 
-  void clearBootText();
-  bool encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
-  bool decodeBootText(Context &ctx, const ErrorStack &err=ErrorStack());
+  void clearBootSettings();
+  bool encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  bool decodeBootSettings(Context &ctx, const ErrorStack &err=ErrorStack());
 
   void clearVFOSettings();
 

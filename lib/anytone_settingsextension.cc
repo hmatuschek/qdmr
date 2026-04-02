@@ -775,11 +775,9 @@ AnytoneSettingsExtension::setFan(FanControl ctrl) {
  * Implementation of AnytoneBootSettingsExtension
  * ********************************************************************************************* */
 AnytoneBootSettingsExtension::AnytoneBootSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _bootDisplay(BootDisplay::Default), _bootPasswordEnabled(false),
-    _defaultChannel(false), _zoneA(new ZoneReference(this)), _channelA(new ChannelReference(this)),
-    _zoneB(new ZoneReference(this)), _channelB(new ChannelReference(this)),
+  : ConfigItem(parent),
     _priorityZoneA(new ZoneReference(this)), _priorityZoneB(new ZoneReference(this)),
-    _gpsCheck(false), _reset(true)
+    _gpsCheck(false)
 {
   // pass...
 }
@@ -794,70 +792,6 @@ AnytoneBootSettingsExtension::clone() const {
   return ext;
 }
 
-AnytoneBootSettingsExtension::BootDisplay
-AnytoneBootSettingsExtension::bootDisplay() const {
-  return _bootDisplay;
-}
-void
-AnytoneBootSettingsExtension::setBootDisplay(BootDisplay mode) {
-  if (_bootDisplay == mode)
-    return;
-  _bootDisplay = mode;
-  emit modified(this);
-}
-
-bool
-AnytoneBootSettingsExtension::bootPasswordEnabled() const {
-  return _bootPasswordEnabled;
-}
-void
-AnytoneBootSettingsExtension::enableBootPassword(bool enable) {
-  if (_bootPasswordEnabled == enable)
-    return;
-  _bootPasswordEnabled = enable;
-  emit modified(this);
-}
-
-const QString &
-AnytoneBootSettingsExtension::bootPassword() const {
-  return _bootPassword;
-}
-void
-AnytoneBootSettingsExtension::setBootPassword(const QString &pass) {
-  if (_bootPassword == pass)
-    return;
-  _bootPassword = pass;
-  emit modified(this);
-}
-
-bool
-AnytoneBootSettingsExtension::defaultChannelEnabled() const {
-  return _defaultChannel;
-}
-void
-AnytoneBootSettingsExtension::enableDefaultChannel(bool enable) {
-  if (_defaultChannel == enable)
-    return;
-  _defaultChannel = enable;
-  emit modified(this);
-}
-
-ZoneReference *
-AnytoneBootSettingsExtension::zoneA() const {
-  return _zoneA;
-}
-ChannelReference *
-AnytoneBootSettingsExtension::channelA() const {
-  return _channelA;
-}
-ZoneReference *
-AnytoneBootSettingsExtension::zoneB() const {
-  return _zoneB;
-}
-ChannelReference *
-AnytoneBootSettingsExtension::channelB() const {
-  return _channelB;
-}
 
 ZoneReference *
 AnytoneBootSettingsExtension::priorityZoneA() const {
@@ -877,18 +811,6 @@ AnytoneBootSettingsExtension::enableGPSCheck(bool enable) {
   if (_gpsCheck == enable)
     return;
   _gpsCheck = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneBootSettingsExtension::resetEnabled() const {
-  return _reset;
-}
-void
-AnytoneBootSettingsExtension::enableReset(bool enable) {
-  if (_reset == enable)
-    return;
-  _reset = enable;
   emit modified(this);
 }
 

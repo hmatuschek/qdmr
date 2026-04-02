@@ -4,6 +4,7 @@
 #include "configobject.hh"
 #include "channel.hh"
 
+#include "bootsettings.hh"
 #include "gnsssettings.hh"
 #include "dmrsettings.hh"
 #include "radioddity_extensions.hh"
@@ -34,6 +35,8 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(Interval tot READ tot WRITE setTOT SCRIPTABLE false)
   /** The default DMR radio ID. */
   Q_PROPERTY(DMRRadioIDReference *defaultID READ defaultIdRef)
+  /** Common boot settings. */
+  Q_PROPERTY(BootSettings* boot READ boot);
   /** The GNSS settings. */
   Q_PROPERTY(GNSSSettings *gnss READ gnss);
   /** The common DMR settings. */
@@ -112,6 +115,8 @@ public:
   /** Sets the default DMR ID. */
   void setDefaultId(DMRRadioID *id);
 
+  /** Returns the boot settings. */
+  BootSettings *boot() const;
   /** Returns the GNSS settings. */
   GNSSSettings *gnss() const;
   /** Returns the DMR settings. */
@@ -165,6 +170,8 @@ protected:
   Interval _transmitTimeOut;
   /** Reference to the default DMR radio ID. */
   DMRRadioIDReference *_defaultId;
+  /** The boot settings. */
+  BootSettings *_boot;
   /** The GNSS settings. */
   GNSSSettings *_gnss;
   /** The DMR settings. */

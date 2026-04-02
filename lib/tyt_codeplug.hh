@@ -7,6 +7,7 @@
 #include "signaling.hh"
 #include "channel.hh"
 #include "contact.hh"
+#include "bootsettings.hh"
 #include "tyt_extensions.hh"
 
 class DMRContact;
@@ -585,10 +586,10 @@ public:
     /** Enables/disables talk permit tone for analog channels. */
     virtual void enableTalkPermitToneAnalog(bool enable);
 
-    /** Returns @c true, if intro picture is enabled. */
-    virtual bool introPicture() const;
-    /** Enables/disables the intro picture. */
-    virtual void enableIntroPicture(bool enable);
+    /** Returns boot display mode. */
+    virtual BootSettings::BootDisplay bootDisplay() const;
+    /** Sets boot display mode. */
+    virtual void setBootDisplay(BootSettings::BootDisplay mode);
 
     /** Returns the default DMR ID of the radio. */
     virtual uint32_t dmrId() const;
@@ -698,6 +699,14 @@ public:
     struct Limit: Element::Limit {
       // Valid VOX sensitivity range.
       static constexpr Range<unsigned int> vox() { return {1,10}; }
+    };
+
+  protected:
+    /** Internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Bit bootImageEnabled() { return {0x0042,4}; }
+      /// @endcond
     };
   };
 
