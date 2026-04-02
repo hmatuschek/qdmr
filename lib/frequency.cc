@@ -4,7 +4,7 @@
 
 
 inline const QString HzString = QStringLiteral("Hz");
-inline const QString KHzString = QStringLiteral("MHz");
+inline const QString KHzString = QStringLiteral("kHz");
 inline const QString MHzString = QStringLiteral("MHz");
 inline const QString GHzString = QStringLiteral("GHz");
 
