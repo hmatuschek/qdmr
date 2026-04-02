@@ -590,7 +590,7 @@ DM32UVCodeplug::ChannelElement::decodeSelectiveCall(uint16_t code) {
   code &= 0x3fff;
 
   if (0 == type) {
-    return SelectiveCall(double((code>>4)&0xf)*10 + double((code>>4)&0xf)*1 + double(code & 0xf)/10);
+    return SelectiveCall(double((code>>8)&0xf)*10 + double((code>>4)&0xf)*1 + double(code & 0xf)/10);
   } else if ((1 == type) || (2 == type)) {
     return SelectiveCall(code, 2 == type);
   }
@@ -2512,8 +2512,9 @@ DM32UVCodeplug::GeneralSettingsElement::setBacklightDuration(Interval duration) 
     setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T4min);
   } else if (duration.minutes() <= 5) {
     setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T5min);
+  } else {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::Infinity);
   }
-  setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::Infinity);
 }
 
 
@@ -3417,7 +3418,7 @@ DM32UVCodeplug::APRSSettingsElement::setFixedLocation(const QGeoCoordinate &coor
 
 void
 DM32UVCodeplug::APRSSettingsElement::enableFixedLocation(bool enable) {
-  setUInt8(Offset::enableFixedLocation(), enable ? 0x01 : 0x02);
+  setUInt8(Offset::enableFixedLocation(), enable ? 0x01 : 0x00);
 }
 
 
@@ -3565,9 +3566,6 @@ DM32UVCodeplug::APRSSettingsElement::encode(Context &ctx, const ErrorStack &err)
     setFixedLocation(ctx.config()->settings()->gnss()->fixedPosition());
     enableFixedLocation(ctx.config()->settings()->gnss()->fixedPositionEnabled());
   }
-
-  ctx.config()->settings()->gnss()->setFixedPosition(fixedLocation());
-  ctx.config()->settings()->gnss()->enableFixedPosition(fixedLocationEnabled());
 
   if (0 == ctx.count<DMRAPRSSystem>()) {
     setDestinationId(0);
