@@ -785,14 +785,15 @@ TyTSettingsExtension::TyTSettingsExtension(QObject *parent)
   : ConfigExtension(parent), _monitorType(MonitorType::Open), _allLEDsDisabled(false),
     _talkPermitToneDigital(false), _talkPermitToneAnalog(false), _passwdAndLock(false),
     _channelFreeIndicationTone(true), _allTonesDisabled(false), _powerSaveMode(true),
-    _wakeupPreamble(true), _bootPicture(true), _channelModeA(true), _channelModeB(true),
+    _wakeupPreamble(true), _channelModeA(true), _channelModeB(true),
     _channelMode(true), _txPreambleDuration(600), _groupCallHangTime(3000),
     _privateCallHangTime(3000), _lowBatteryWarnInterval(120), _callAlertToneContinuous(false),
     _callAlertToneDuration(0), _loneWorkerResponseTime(1), _loneWorkerReminderTime(10),
     _digitalScanHangTime(1000), _analogScanHangTime(1000), _backlightAlwaysOn(false),
     _backlightDuration(10), _keypadLockManual(true), _keypadLockTime(5*0xff),
-    _powerOnPasswordEnabled(false), _powerOnPassword(0), _radioProgPasswordEnabled(false),
-    _radioProgPassword(0), _pcProgPassword(""), _privateCallMatch(true), _groupCallMatch(true),
+    _pcProgPasswordEnabled(false), _pcProgPassword(),
+    _radioProgPasswordEnabled(false), _radioProgPassword(0),
+    _privateCallMatch(true), _groupCallMatch(true),
     _channelHangTime(3000)
 {
   // pass...
@@ -914,18 +915,6 @@ TyTSettingsExtension::enableWakeupPreamble(bool enable) {
   if (_wakeupPreamble == enable)
     return;
   _wakeupPreamble = enable;
-  emit modified(this);
-}
-
-bool
-TyTSettingsExtension::bootPicture() const {
-  return _bootPicture;
-}
-void
-TyTSettingsExtension::enableBootPicture(bool enable) {
-  if (_bootPicture == enable)
-    return;
-  _bootPicture = enable;
   emit modified(this);
 }
 
@@ -1090,29 +1079,6 @@ TyTSettingsExtension::setKeypadLockTime(unsigned sec) {
   if (_keypadLockTime == sec)
     return;
   _keypadLockTime = sec;
-  emit modified(this);
-}
-
-bool
-TyTSettingsExtension::powerOnPasswordEnabled() const {
-  return _powerOnPasswordEnabled;
-}
-void
-TyTSettingsExtension::enablePowerOnPassword(bool enable) {
-  if (_powerOnPasswordEnabled == enable)
-    return;
-  _powerOnPasswordEnabled = enable;
-  emit modified(this);
-}
-unsigned
-TyTSettingsExtension::powerOnPassword() const {
-  return _powerOnPassword;
-}
-void
-TyTSettingsExtension::setPowerOnPassword(unsigned passwd) {
-  if (_powerOnPassword == passwd)
-    return;
-  _powerOnPassword = passwd;
   emit modified(this);
 }
 

@@ -362,14 +362,28 @@ GD73Codeplug::SettingsElement::setLoneWorkerRemindPeriod(const Interval &interva
   setUInt16_le(Offset::loneWorkerReminderPeriod(), intv.seconds());
 }
 
-GD73Codeplug::SettingsElement::BootDisplayMode
+
+BootSettings::BootDisplay
 GD73Codeplug::SettingsElement::bootDisplayMode() const {
-  return (BootDisplayMode)getUInt8(Offset::bootDisplayMode());
+  switch ((BootDisplayMode)getUInt8(Offset::bootDisplayMode())) {
+    case BootDisplayMode::Off: return BootSettings::BootDisplay::Logo;
+    case BootDisplayMode::Text: return BootSettings::BootDisplay::Text;
+    case BootDisplayMode::Both:
+    case BootDisplayMode::Image: return BootSettings::BootDisplay::Image;
+  }
+  return BootSettings::BootDisplay::Logo;
 }
+
 void
-GD73Codeplug::SettingsElement::setBootDisplayMode(BootDisplayMode mode) {
-  setUInt8(Offset::bootDisplayMode(), (unsigned int)mode);
+GD73Codeplug::SettingsElement::setBootDisplayMode(BootSettings::BootDisplay mode) {
+  switch (mode) {
+  case BootSettings::BootDisplay::Logo: setUInt8(Offset::bootDisplayMode(), (unsigned int)BootDisplayMode::Off); break;
+  case BootSettings::BootDisplay::Text: setUInt8(Offset::bootDisplayMode(), (unsigned int)BootDisplayMode::Text); break;
+  case BootSettings::BootDisplay::Image: setUInt8(Offset::bootDisplayMode(), (unsigned int)BootDisplayMode::Image); break;
+  }
 }
+
+
 QString
 GD73Codeplug::SettingsElement::bootTextLine1() const {
   return readUnicode(Offset::bootTextLine1(), Limit::bootTextLine(), 0x0000);
@@ -489,6 +503,10 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   else
     ctx.config()->settings()->setTOT(tot());
 
+  ctx.config()->settings()->boot()->setBootDisplay(bootDisplayMode());
+  ctx.config()->settings()->boot()->enableBootPassword(readLockEnabled());
+  ctx.config()->settings()->boot()->setBootPassword(readLockPin());
+
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
   if (nullptr == ext)
@@ -518,23 +536,6 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ext->tone()->enableLowBatteryWarn(lowBatteryToneEnabled());
   ext->tone()->setLowBatteryWarnVolume(lowBatteryToneVolume());
 
-  switch (bootDisplayMode()) {
-  case BootDisplayMode::Off:
-    ext->boot()->setDisplay(RadioddityBootSettingsExtension::DisplayMode::None);
-    break;
-  case BootDisplayMode::Text:
-    ext->boot()->setDisplay(RadioddityBootSettingsExtension::DisplayMode::Text);
-    break;
-  case BootDisplayMode::Image:
-  case BootDisplayMode::Both:
-    ext->boot()->setDisplay(RadioddityBootSettingsExtension::DisplayMode::Image);
-    break;
-  }
-
-  if (readLockEnabled())
-    ext->boot()->setBootPassword(readLockPin());
-  else
-    ext->boot()->setBootPassword("");
   if (writeLockEnabled())
     ext->boot()->setProgPassword(writeLockPin());
   else
@@ -572,6 +573,10 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setUInt8(0x003c, 0x01);
   setUInt8(0x003e, 0x01);
 
+  setBootDisplayMode(ctx.config()->settings()->boot()->bootDisplay());
+  enableReadLock(ctx.config()->settings()->boot()->bootPasswordEnabled());
+  setReadLockPin(ctx.config()->settings()->boot()->bootPassword());
+
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
   if (nullptr == ext)
@@ -601,23 +606,8 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   enableLowBatteryTone(ext->tone()->lowBatteryWarn());
   setLowBatteryToneVolume(ext->tone()->lowBatteryWarnVolume());
 
-  switch(ext->boot()->display()) {
-  case RadioddityBootSettingsExtension::DisplayMode::None:
-    setBootDisplayMode(BootDisplayMode::Off); break;
-  case RadioddityBootSettingsExtension::DisplayMode::Text:
-    setBootDisplayMode(BootDisplayMode::Text); break;
-  case RadioddityBootSettingsExtension::DisplayMode::Image:
-    setBootDisplayMode(BootDisplayMode::Image); break;
-  }
-
-  if (! ext->boot()->bootPassword().isEmpty()) {
-    setReadLockPin(ext->boot()->bootPassword());
-    enableReadLock(true);
-  } else {
-    enableReadLock(false);
-  }
   if (! ext->boot()->progPassword().isEmpty()) {
-    setWriteLockPin(ext->boot()->bootPassword());
+    setWriteLockPin(ext->boot()->progPassword());
     enableWriteLock(true);
   } else {
     enableWriteLock(false);

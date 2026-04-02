@@ -1237,7 +1237,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   enableTalkPermitToneAnalog(false);
 
   setBit(0x42,0, 0); setBit(0x41,1, 1); setBit(0x42,2, 0); setBit(0x42,3, 1);
-  enableIntroPicture(true);
+  setBootDisplay(BootSettings::BootDisplay::Logo);
   setBit(0x42,5, 1); setBit(0x42,6, 1); setBit(0x42,7, 1);
 
   setUInt8(0x43, 0xff);
@@ -1370,14 +1370,23 @@ TyTCodeplug::GeneralSettingsElement::enableTalkPermitToneAnalog(bool enable) {
   setBit(0x41,7, enable);
 }
 
-bool
-TyTCodeplug::GeneralSettingsElement::introPicture() const {
-  return getBit(0x42,4);
+
+BootSettings::BootDisplay
+TyTCodeplug::GeneralSettingsElement::bootDisplay() const {
+  return getBit(Offset::bootImageEnabled())
+    ? BootSettings::BootDisplay::Logo
+    : BootSettings::BootDisplay::Text;
 }
+
 void
-TyTCodeplug::GeneralSettingsElement::enableIntroPicture(bool enable) {
-  setBit(0x42,4, enable);
+TyTCodeplug::GeneralSettingsElement::setBootDisplay(BootSettings::BootDisplay mode) {
+  switch (mode) {
+  case BootSettings::BootDisplay::Text: setBit(Offset::bootImageEnabled(), false); break;
+  case BootSettings::BootDisplay::Logo:
+  case BootSettings::BootDisplay::Image: setBit(Offset::bootImageEnabled(), true); break;
+  }
 }
+
 
 uint32_t
 TyTCodeplug::GeneralSettingsElement::dmrId() const {
@@ -1592,6 +1601,12 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   setIntroLine2(config->settings()->introLine2());
   setVOXSesitivity(config->settings()->vox());
 
+  setBootDisplay(config->settings()->boot()->bootDisplay());
+  if (! config->settings()->boot()->bootPasswordEnabled())
+    setPowerOnPassword(0);
+  else
+    setPowerOnPassword(config->settings()->boot()->bootPassword().toUInt());
+
   setPrivateCallHangTime(config->settings()->dmr()->privateCallHangTime());
   setGroupCallHangTime(config->settings()->dmr()->groupCallHangTime());
   setTXPreambleDuration(config->settings()->dmr()->preamble());
@@ -1606,7 +1621,6 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
     disableAllTones(ex->allTonesDisabled());
     setSaveModeRX(ex->powerSaveMode());
     setSavePreamble(ex->wakeupPreamble());
-    enableIntroPicture(ex->bootPicture());
     setLowBatteryInterval(ex->lowBatteryWarnInterval());
     if (ex->callAlertToneContinuous())
       setCallAlertToneContinuous();
@@ -1624,10 +1638,6 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
       keypadLockTimeSetManual();
     else
       setKeypadLockTime(ex->keypadLockTime());
-    if (! ex->powerOnPasswordEnabled())
-      setPowerOnPassword(0);
-    else
-      setPowerOnPassword(ex->powerOnPassword());
     if (! ex->radioProgPasswordEnabled())
       radioProgPasswordDisable();
     else
@@ -1652,6 +1662,10 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   config->settings()->setIntroLine2(introLine2());
   config->settings()->setVOX(voxSesitivity());
 
+  config->settings()->boot()->setBootDisplay(bootDisplay());
+  config->settings()->boot()->enableBootPassword(0 != powerOnPassword());
+  config->settings()->boot()->setBootPassword(QString::number(powerOnPassword()));
+
   config->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
   config->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
   config->settings()->dmr()->setPreamble(txPreambleDuration());
@@ -1669,7 +1683,6 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   ex->disableAllTones(allTonesDisabled());
   ex->enablePowerSaveMode(saveModeRX());
   ex->enableWakeupPreamble(savePreamble());
-  ex->enableBootPicture(introPicture());
   ex->setLowBatteryWarnInterval(lowBatteryInterval());
   ex->enableCallAlertToneContinuous(callAlertToneIsContinuous());
   if (! callAlertToneIsContinuous())

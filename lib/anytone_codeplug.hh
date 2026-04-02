@@ -5,6 +5,7 @@
 #include <QGeoCoordinate>
 #include "channel.hh"
 #include "contact.hh"
+#include "bootsettings.hh"
 #include "anytone_settingsextension.hh"
 
 
@@ -889,6 +890,10 @@ public:
     enum class AutoShutdown {
       Off = 0, After10min = 1, After30min  = 2, After60min  = 3, After120min = 4,
     };
+    /** Possible encoding of boot display settings. */
+    enum class BootDisplay {
+      Default = 0, CustomText = 1, CustomImage = 2
+    };
 
   protected:
     /** Hidden constructor. */
@@ -916,9 +921,9 @@ public:
     /** Sets the auto-shutdown delay in minutes. */
     virtual void setAutoShutdownDelay(Interval min);
     /** Returns the boot display mode. */
-    virtual AnytoneBootSettingsExtension::BootDisplay bootDisplay() const;
+    virtual BootSettings::BootDisplay bootDisplay() const;
     /** Sets the boot display mode. */
-    virtual void setBootDisplay(AnytoneBootSettingsExtension::BootDisplay mode);
+    virtual void setBootDisplay(BootSettings::BootDisplay mode);
     /** Returns @c true if boot password is enabled. */
     virtual bool bootPassword() const;
     /** Enables/disables boot password. */

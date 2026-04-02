@@ -2248,14 +2248,27 @@ DM32UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
 }
 
 
-DM32UVCodeplug::GeneralSettingsElement::BootDisplay
+BootSettings::BootDisplay
 DM32UVCodeplug::GeneralSettingsElement::bootDisplay() const {
-  return (BootDisplay) getUInt8(Offset::bootDisplay());
+  switch ((BootDisplay) getUInt8(Offset::bootDisplay())) {
+  case BootDisplay::Message: return BootSettings::BootDisplay::Text;
+  case BootDisplay::Image: return BootSettings::BootDisplay::Image;
+  default: break;
+  }
+  return BootSettings::BootDisplay::Logo;
 }
 
 void
-DM32UVCodeplug::GeneralSettingsElement::setBootDisplay(BootDisplay dis) {
-  setUInt8(Offset::bootDisplay(), (unsigned int)dis);
+DM32UVCodeplug::GeneralSettingsElement::setBootDisplay(BootSettings::BootDisplay dis) {
+  switch (dis) {
+  case BootSettings::BootDisplay::Text:
+    setUInt8(Offset::bootDisplay(), (unsigned int)BootDisplay::Message);
+    break;
+  case BootSettings::BootDisplay::Logo:
+  case BootSettings::BootDisplay::Image:
+    setUInt8(Offset::bootDisplay(), (unsigned int)BootDisplay::Image);
+    break;
+  }
 }
 
 
@@ -3272,8 +3285,12 @@ bool
 DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
+  // Boot settings
+  ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
   ctx.config()->settings()->setIntroLine1(bootMessage1());
   ctx.config()->settings()->setIntroLine2(bootMessage2());
+  ctx.config()->settings()->boot()->enableReset(mcuResetEnabled());
+
   ctx.config()->settings()->enableSpeech(voicePromptEnabled());
   ctx.config()->settings()->setVOX(voxLevel());
   if (transmitTimeout().isInfinite())
@@ -3299,8 +3316,13 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
 bool
 DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+
+  // boot settings
+  setBootDisplay(ctx.config()->settings()->boot()->bootDisplay());
   setBootMessage1(ctx.config()->settings()->introLine1());
   setBootMessage2(ctx.config()->settings()->introLine2());
+  enableMCUReset(ctx.config()->settings()->boot()->resetEnabled());
+
   enableVoicePrompt(ctx.config()->settings()->speech());
   if (ctx.config()->settings()->voxDisabled())
     setVOXLevel(Level::null());
@@ -3643,6 +3665,32 @@ DM32UVCodeplug::PasswordSettingsElement::setReadPassword(const QString &value) {
 void
 DM32UVCodeplug::PasswordSettingsElement::clearReadPassword() {
   setUInt8(Offset::enableReadPassword(), 0);
+}
+
+
+bool
+DM32UVCodeplug::PasswordSettingsElement::encode(Context &ctx, ErrorStack err) {
+  if (ctx.config()->settings()->boot()->bootPasswordEnabled()) {
+    if (ctx.config()->settings()->boot()->bootPassword().length() > Limit::passwordLength()) {
+      errMsg(err) << "Cannot encode boot password: password is too long.";
+      clearBootPassword();
+      return false;
+    }
+    setBootPassword(ctx.config()->settings()->boot()->bootPassword());
+  } else {
+    clearBootPassword();
+  }
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::PasswordSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  ctx.config()->settings()->boot()->enableBootPassword(bootPasswordEnabled());
+  if (bootPasswordEnabled())
+    ctx.config()->settings()->boot()->setBootPassword(bootPassword());
+  return true;
 }
 
 
@@ -4040,6 +4088,11 @@ DM32UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! PasswordSettingsElement(data(Offset::passwordSettings())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode password settings.";
+    return false;
+  }
+
   if (! APRSSettingsElement(data(Offset::aprsSettings())).decode(ctx, err)) {
     errMsg(err) << "Cannot decode APRS settings.";
     return false;
@@ -4150,6 +4203,10 @@ DM32UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
   }
   if (! APRSSettingsElement(data(Offset::aprsSettings())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode APRS settings.";
+    return false;
+  }
+  if (! PasswordSettingsElement(data(Offset::passwordSettings())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode password settings.";
     return false;
   }
 

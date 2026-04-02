@@ -2074,10 +2074,13 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
 
+  enableBootReset(ctx.config()->settings()->boot()->resetEnabled());
+
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
   setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
+
   setPreWaveDelay(ctx.config()->settings()->dmr()->preamble());
   setSMSFormat(ctx.config()->smsExtension()->format());
 
@@ -2097,7 +2100,6 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! ext->roamingSettings()->defaultZone()->isNull())
     setDefaultRoamingZoneIndex(ctx.index(ext->roamingSettings()->defaultZone()->as<RoamingZone>()));
   enableBootGPSCheck(ext->bootSettings()->gpsCheckEnabled());
-  enableBootReset(ext->bootSettings()->resetEnabled());
 
   // Encode key settings
   enableKnobLock(ext->keySettings()->knobLockEnabled());
@@ -2176,6 +2178,8 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   ctx.config()->settings()->setTOT(transmitTimeout());
 
+  ctx.config()->settings()->boot()->enableReset(this->bootReset());
+
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
                                    GNSSSettings::Units::Metric);
@@ -2197,7 +2201,6 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Decode boot settings
   ext->bootSettings()->enableGPSCheck(this->bootGPSCheck());
-  ext->bootSettings()->enableReset(this->bootReset());
 
   // Decode key settings
   ext->keySettings()->enableKnobLock(this->knobLock());

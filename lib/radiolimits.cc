@@ -266,6 +266,19 @@ RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop,
 
 
 /* ********************************************************************************************* *
+ * Implementation of RadioLimitPin
+ * ********************************************************************************************* */
+RadioLimitPin::RadioLimitPin(int length, RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitStringRegEx("", severity, parent)
+{
+  if (length <= 0)
+    _pattern = QRegularExpression("^[0-9]+");
+  else
+    _pattern = QRegularExpression(QString("[0-9]{0,%1}").arg(length));
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of RadioLimitStringIgnored
  * ********************************************************************************************* */
 RadioLimitStringIgnored::RadioLimitStringIgnored(RadioLimitIssue::Severity severity, QObject *parent)
