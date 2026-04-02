@@ -568,7 +568,7 @@ RadioLimitLevel::verify(const ConfigItem *item, const QMetaProperty &prop, Radio
     return _severity <= RadioLimitIssue::Warning;
   }
 
-  if (_range.contains(value.value())) {
+  if (!_range.contains(value.value())) {
     auto &msg = context.newMessage(_severity);
     msg << "Value of property " << prop.name() << " " << value.value() << " exceeds range [" << _range.lower << ", " << _range.upper << "].";
     return _severity <= RadioLimitIssue::Warning;
