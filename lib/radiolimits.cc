@@ -7,7 +7,7 @@
 // Utility function to check string content for ASCII encoding
 inline bool qstring_is_ascii(const QString &text) {
   foreach (QChar c, text) {
-    if ((c.unicode() < 0x1f) && (0x7f != c.unicode()))
+    if ((c.unicode() < 0x20) || (c.unicode() > 0x7e))
       return false;
   }
   return true;
@@ -1043,7 +1043,7 @@ RadioLimits::RadioLimits(bool betaWarning, QObject *parent)
 }
 
 RadioLimits::RadioLimits(const std::initializer_list<std::pair<QString, RadioLimitElement *> > &list, QObject *parent)
-  : RadioLimitItem(list, parent),
+  : RadioLimitItem(list, parent), _betaWarning(false),
     _hasCallSignDB(false), _callSignDBImplemented(false), _numCallSignDBEntries(0),
     _hasSatelliteConfig(false), _satelliteConfigImplemented(false), _numSatellites(0)
 {
