@@ -39,7 +39,7 @@ class BootSettings: public ConfigExtension
   Q_PROPERTY(ChannelReference* channelB READ channelB)
 
   /** Allows a factory reset during boot. Sometimes needed to enter FW programming mode. */
-  Q_PROPERTY(bool allowFactoryReset READ resetEnabled WRITE setResetEnabled)
+  Q_PROPERTY(bool allowFactoryReset READ resetEnabled WRITE enableReset)
 
 public:
   /** What to display during boot. */
