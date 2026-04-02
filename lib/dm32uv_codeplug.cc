@@ -3686,9 +3686,11 @@ DM32UVCodeplug::PasswordSettingsElement::encode(Context &ctx, ErrorStack err) {
 
 bool
 DM32UVCodeplug::PasswordSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
   ctx.config()->settings()->boot()->enableBootPassword(bootPasswordEnabled());
   if (bootPasswordEnabled())
     ctx.config()->settings()->boot()->setBootPassword(bootPassword());
+  return true;
 }
 
 

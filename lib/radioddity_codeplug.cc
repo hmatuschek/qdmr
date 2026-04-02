@@ -2544,15 +2544,22 @@ RadioddityCodeplug::BootSettingsElement::bootPassword() const {
 
 bool
 RadioddityCodeplug::BootSettingsElement::setBootPassword(const QString &passwd) {
+  if (passwd.isEmpty()) {
+    enableBootPassword(false);
+    return true;
+  }
   static QRegularExpression valid(R"(^[0-9]{0,8}$)");
-  if (! valid.match(passwd).hasMatch())
+  if (! valid.match(passwd).hasMatch()) {
     return false;
+  }
   setBCD8_be(Offset::bootPassword(), passwd.toUInt());
+  return true;
 }
 
 
 bool
 RadioddityCodeplug::BootSettingsElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
   setBootDisplay(ctx.config()->settings()->boot()->bootDisplay());
   enableBootPassword(ctx.config()->settings()->boot()->bootPasswordEnabled());
   setBootPassword(ctx.config()->settings()->boot()->bootPassword());
@@ -2561,8 +2568,9 @@ RadioddityCodeplug::BootSettingsElement::encode(Context &ctx, const ErrorStack &
 
 bool
 RadioddityCodeplug::BootSettingsElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err);
   ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
-  ctx.config()->settings()->boot()->enableBootPassword(bootPasswordEnabled());
+  ctx.config()->settings()->boot()->enableBootPassword(bootPasswordEnabled() && (!bootPassword().isEmpty()));
   ctx.config()->settings()->boot()->setBootPassword(bootPassword());
   return true;
 }
