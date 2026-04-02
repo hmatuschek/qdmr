@@ -26,6 +26,16 @@
   squelch: 1
   vox: 0
   power: High
+  boot:
+    display: Logo
+    enablePassword: false
+    password: 00000815
+    defaultChannel: true
+    zoneA: zone1
+    channelA: ch1
+    zoneB: zone1
+    channelB: ch2
+    allowFactoryReset: true
   gnss:
     fixedLocationEnabled: false
     fixedLocation: JO62jl45
@@ -116,6 +126,50 @@
     </listitem>
   </varlistentry>
 </variablelist>
+
+
+<section>
+<info><title>Boot settings</title></info>
+
+<para>
+Some settings relevant for the boot process.
+</para>
+
+<variablelist>
+  <varlistentry>
+    <term><token>display</token></term>
+    <listitem>
+      <para>Specifies what is shown during the boot process. This must be one of <token>Logo</token>,
+        <token>Image</token> or <token>text</token>. Where <token>Logo</token> is usually the manufacturer logo and the
+        default</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>passwordEnabled</token>, <token>password</token></term>
+    <listitem>
+      <para>Enables and specifies the boot password. This is usually a 8-digit number that must be entered into the
+        radio to boot it.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>defaultChannel</token>, <token>zoneA</token>, <token>channelA</token>, <token>zoneB</token>,
+      <token>channelB</token></term>
+    <listitem>
+      <para>Enables and specifies the channels and zones that are selected after boot. If disabled, usually the last
+        used channels/zones are selected. If specified, the channel must be member of the zone. To select a
+        zone/channel assign the corresponding zone/channel id.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>allowFactoryReset</token></term>
+    <listitem>
+      <para>If <token>true</token>, allows to factory reset the device during reboot. This can be used to clear an
+        incompatible codeplug after the firmware has been updated. Sometime, this must be enabled to enter the firmware
+        programming mode.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
 
 
 <section>
