@@ -2,6 +2,7 @@
 #include "channel.hh"
 #include "radioid.hh"
 #include "contact.hh"
+#include "d878uv2_codeplug.hh"
 #include "rxgrouplist.hh"
 #include "zone.hh"
 #include "scanlist.hh"
@@ -34,7 +35,10 @@ D878UV2Limits::D878UV2Limits(const std::initializer_list<std::pair<Frequency, Fr
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
         { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
-        { "tot", new RadioLimitInterval() }
+        { "tot", new RadioLimitInterval() },
+        { "boot", new RadioLimitItem {
+            {"passwordEnabled", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+            {"password", new RadioLimitPin(D878UV2Codeplug::BootSettingsElement::Limit::passwordLength(), RadioLimitIssue::Critical) } } }
       });
 
   /* Define limits for radio IDs. */

@@ -241,6 +241,22 @@ protected:
 };
 
 
+/** Verifies string values containing only numbers.
+ * @ingroup limits */
+class RadioLimitPin: public RadioLimitStringRegEx
+{
+  Q_OBJECT
+
+public:  /** Constructor.
+   * @param length Specifies the maximum length of the pin. If -1, length is not limited.
+   * @param severity Specifies the severity of the issue.
+   * @param parent Specifies the QObject parent. */
+  RadioLimitPin(int length = -1,
+                RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                QObject *parent=nullptr);
+};
+
+
 /** Notifies the user that a string gets ignored.
  * This is usually the case, when named elements are referenced within the codeplug by index.
  * @ingroup limits */

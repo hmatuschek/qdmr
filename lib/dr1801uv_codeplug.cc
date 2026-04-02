@@ -1467,7 +1467,7 @@ DR1801UVCodeplug::SettingsElement::enableCampanding(bool enable) {
 }
 
 DR1801UVCodeplug::SettingsElement::TuningMode
-DR1801UVCodeplug::SettingsElement::tunigModeUp() const {
+DR1801UVCodeplug::SettingsElement::tuningModeUp() const {
   return (TuningMode) getUInt8(Offset::tuningModeUp());
 }
 void
@@ -1475,7 +1475,7 @@ DR1801UVCodeplug::SettingsElement::setTuningModeUp(TuningMode mode) {
   setUInt8(Offset::tuningModeUp(), (uint8_t)mode);
 }
 DR1801UVCodeplug::SettingsElement::TuningMode
-DR1801UVCodeplug::SettingsElement::tunigModeDown() const {
+DR1801UVCodeplug::SettingsElement::tuningModeDown() const {
   return (TuningMode) getUInt8(Offset::tunigModeDown());
 }
 void
@@ -1510,14 +1510,25 @@ DR1801UVCodeplug::SettingsElement::setScanMode(ScanMode mode) {
   setUInt8(Offset::scanMode(), (uint8_t)mode);
 }
 
-DR1801UVCodeplug::SettingsElement::BootScreen
+
+BootSettings::BootDisplay
 DR1801UVCodeplug::SettingsElement::bootScreen() const {
-  return (BootScreen) getUInt8(Offset::bootScreen());
+  switch ((BootScreen) getUInt8(Offset::bootScreen())) {
+  case BootScreen::Text: return BootSettings::BootDisplay::Text;
+  case BootScreen::Picture: return BootSettings::BootDisplay::Image;
+  }
+  return BootSettings::BootDisplay::Logo;
 }
+
 void
-DR1801UVCodeplug::SettingsElement::setBootScreen(BootScreen mode) {
-  setUInt8(Offset::bootScreen(), (uint8_t) mode);
+DR1801UVCodeplug::SettingsElement::setBootScreen(BootSettings::BootDisplay mode) {
+  switch (mode) {
+  case BootSettings::BootDisplay::Text: setUInt8(Offset::bootScreen(), (uint8_t)BootScreen::Text); break;
+  case BootSettings::BootDisplay::Logo:
+  case BootSettings::BootDisplay::Image: setUInt8(Offset::bootScreen(), (uint8_t)BootScreen::Picture); break;
+  }
 }
+
 
 QString
 DR1801UVCodeplug::SettingsElement::bootLine1() const {
@@ -1607,7 +1618,7 @@ DR1801UVCodeplug::SettingsElement::clearProgPassword() {
 }
 
 bool
-DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack &err) {
+DR1801UVCodeplug::SettingsElement::decode(Config *config, const ErrorStack &err) {
   Q_UNUSED(err);
 
   // Store radio ID
@@ -1617,15 +1628,18 @@ DR1801UVCodeplug::SettingsElement::updateConfig(Config *config, const ErrorStack
   // Handle VOX settings.
   config->settings()->setVOX(voxSensitivity());
 
-  // Handle intro lines
+  // Handle boot settings
+  config->settings()->boot()->setBootDisplay(bootScreen());
   config->settings()->setIntroLine1(bootLine1());
   config->settings()->setIntroLine2(bootLine2());
+  config->settings()->boot()->enableBootPassword(bootPasswordEnabled());
+  config->settings()->boot()->setBootPassword(bootPassword());
 
   return true;
 }
 
 bool
-DR1801UVCodeplug::SettingsElement::fromConfig(Config *config, const ErrorStack &err) {
+DR1801UVCodeplug::SettingsElement::encode(Config *config, const ErrorStack &err) {
   // Store radio ID
   DMRRadioID *id = config->settings()->defaultId();
   if (nullptr == id) {
@@ -1636,8 +1650,15 @@ DR1801UVCodeplug::SettingsElement::fromConfig(Config *config, const ErrorStack &
   setDMRID(id->number());
 
   setVOXSensitivity(config->settings()->vox());
+
+  // Encode boot settings
+  setBootScreen(config->settings()->boot()->bootDisplay());
   setBootLine1(config->settings()->introLine1());
   setBootLine2(config->settings()->introLine2());
+  if (config->settings()->boot()->bootPasswordEnabled())
+    setBootPassword(config->settings()->boot()->bootPassword());
+  else
+    clearBootPassword();
 
   return true;
 }
@@ -3392,7 +3413,7 @@ DR1801UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  if (! SettingsElement(data(Offset::settings())).updateConfig(ctx.config(), err)) {
+  if (! SettingsElement(data(Offset::settings())).decode(ctx.config(), err)) {
     errMsg(err) << "Cannot decode settings element.";
     return false;
   }
@@ -3448,7 +3469,7 @@ DR1801UVCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
 
 bool
 DR1801UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
-  if (! SettingsElement(data(Offset::settings())).fromConfig(ctx.config(), err)) {
+  if (! SettingsElement(data(Offset::settings())).encode(ctx.config(), err)) {
     errMsg(err) << "Cannot encode settings element.";
     return false;
   }

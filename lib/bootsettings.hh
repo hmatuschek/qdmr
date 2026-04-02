@@ -16,11 +16,11 @@ class BootSettings: public ConfigExtension
   Q_OBJECT
 
   /** The boot display setting. */
-  Q_PROPERTY(BootDisplay bootDisplay READ bootDisplay WRITE setBootDisplay)
+  Q_PROPERTY(BootDisplay display READ bootDisplay WRITE setBootDisplay)
   /** If @c true, the boot password is enabled. */
-  Q_PROPERTY(bool bootPasswordEnabled READ bootPasswordEnabled WRITE enableBootPassword)
+  Q_PROPERTY(bool passwordEnabled READ bootPasswordEnabled WRITE enableBootPassword)
   /** Holds the boot password. */
-  Q_PROPERTY(QString bootPassword READ bootPassword WRITE setBootPassword)
+  Q_PROPERTY(QString password READ bootPassword WRITE setBootPassword)
 
   Q_CLASSINFO("defaultChannelDescription", "If enabled, the default channels are selected at boot.")
   /** If enabled, the default channels are selected at boot. */

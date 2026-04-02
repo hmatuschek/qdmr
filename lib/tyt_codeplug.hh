@@ -699,6 +699,7 @@ public:
     struct Limit: Element::Limit {
       // Valid VOX sensitivity range.
       static constexpr Range<unsigned int> vox() { return {1,10}; }
+      static constexpr unsigned bootPasswordLength() { return 8; }
     };
 
   protected:

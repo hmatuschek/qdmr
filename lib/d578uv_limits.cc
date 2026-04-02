@@ -1,7 +1,12 @@
 #include "d578uv_limits.hh"
+
+#include "anytone_codeplug.hh"
+#include "d578uv_codeplug.hh"
 #include "channel.hh"
 #include "radioid.hh"
 #include "contact.hh"
+#include "d578uv_codeplug.hh"
+#include "d578uv_codeplug.hh"
 #include "rxgrouplist.hh"
 #include "zone.hh"
 #include "scanlist.hh"
@@ -34,7 +39,10 @@ D578UVLimits::D578UVLimits(const std::initializer_list<std::pair<Frequency, Freq
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
         { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
-        { "tot", new RadioLimitInterval() }
+        { "tot", new RadioLimitInterval() },
+        { "boot", new RadioLimitItem {
+            {"passwordEnabled", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+            {"password", new RadioLimitPin(D578UVCodeplug::BootSettingsElement::Limit::passwordLength(), RadioLimitIssue::Critical) } } }
       });
 
   /* Define limits for radio IDs. */
