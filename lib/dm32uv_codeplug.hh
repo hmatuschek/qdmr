@@ -282,7 +282,7 @@ public:
   {
   public:
     /** Constructor. */
-    ChannelBankElement(uint8_t *ptr);
+    explicit ChannelBankElement(uint8_t *ptr);
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0010; }
@@ -293,12 +293,22 @@ public:
     virtual void setChannelCount(unsigned int n);
 
   public:
+    /** Returns the block index for the given channel index. */
+    static unsigned int channelBank(unsigned int index);
+    /** Returns the channel index within the block for the given channel index. */
+    static unsigned int indexInBank(unsigned int index);
+    /** Computes the number of channel banks required to encode the given number of channels. */
+    static unsigned int bankCount(unsigned int channelCount);
+
+  public:
     /** Some limits. */
     struct Limit: Element::Limit {
       /** Maximum number of channels. */
       static constexpr unsigned int channels() { return 4000; }
+      /** Maximum number of channels in block 0. */
+      static constexpr unsigned int channelsInBlock0() { return 84; }
       /** Maximum number of channels per block. */
-      static constexpr unsigned int channelsPerBlock() { return 84; }
+      static constexpr unsigned int channelsPerBlock() { return 85; }
     };
 
     /** Some internal offsets. */
@@ -322,7 +332,7 @@ public:
   {
   public:
     /** Constructor. */
-    ChannelExtensionElement(uint8_t *ptr);
+    explicit ChannelExtensionElement(uint8_t *ptr);
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0002; }
