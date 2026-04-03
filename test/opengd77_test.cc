@@ -1,4 +1,5 @@
 #include "opengd77_test.hh"
+#include "opengd77_limits.hh"
 #include "config.hh"
 #include "opengd77_codeplug.hh"
 #include "errorstack.hh"
@@ -309,13 +310,14 @@ OpenGD77Test::testConfigVerification() {
   }
 
   RadioLimitContext ctx;
-  if (! OpenGD77Limits().verifyConfig(&config, ctx)) {
-    QStringList messages;
-    for (int i=0; i<ctx.count(); i++) {
-      messages.append(ctx.message(i).format());
-    }
+  OpenGD77Limits().verifyConfig(&config, ctx);
+
+  QStringList messages;
+  for (int i=0; i<ctx.count(); i++)
+    messages.append(ctx.message(i).format());
+
+  if (RadioLimitIssue::Severity::Warning <= ctx.maxSeverity())
     QFAIL(messages.join("; ").toLatin1().constData());
-  }
 }
 
 
@@ -346,6 +348,7 @@ OpenGD77Test::testBootMelody() {
   QVERIFY(decoded.settings()->openGD77Extension());
   QCOMPARE(decoded.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
 }
+
 
 QTEST_GUILESS_MAIN(OpenGD77Test)
 
