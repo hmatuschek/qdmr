@@ -105,7 +105,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
                }},
-              {"aprs", new RadioLimitObjRef(FMAPRSSystem::staticMetaObject, false)},
+              {"aprs", new RadioLimitObjRef(FMAPRSSystem::staticMetaObject)},
               /// @todo handle OpenGD77 extension
               {"openGD77", new RadioLimitIgnored()},
               {"tyt", new RadioLimitIgnored()}
@@ -130,10 +130,10 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
               {"timeSlot", new RadioLimitEnum {
                  unsigned(DMRChannel::TimeSlot::TS1),
                  unsigned(DMRChannel::TimeSlot::TS2) } },
-              {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
+              {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject)},
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
-              {"contact", new RadioLimitObjRef(DMRContact::staticMetaObject, true)},
-              {"aprs", new RadioLimitObjRef(FMAPRSSystem::staticMetaObject, false)},
+              {"contact", new RadioLimitObjRef(DMRContact::staticMetaObject)},
+              {"aprs", new RadioLimitObjRef(FMAPRSSystem::staticMetaObject)},
               {"roaming", new RadioLimitObjRefIgnored(DefaultRoamingZone::get())},
               /// @todo handle OpenGD77 extension
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
