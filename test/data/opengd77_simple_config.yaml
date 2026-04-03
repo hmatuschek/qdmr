@@ -1,0 +1,13 @@
+version: 0.14.0
+radioIDs:
+  - dmr: {id: id1, name: DM3MAT, number: 2621370}
+
+contacts:
+  - dmr: {id: cont1, name: Local, ring: false, type: GroupCall, number: 9}
+
+channels:
+  - fm:
+      id: ch1
+      name: "Test Channel"
+      rxFrequency: 144.8 MHz 
+      txFrequency: 144.8 MHz

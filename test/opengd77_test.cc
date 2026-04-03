@@ -1,4 +1,5 @@
 #include "opengd77_test.hh"
+#include "opengd77_limits.hh"
 #include "config.hh"
 #include "opengd77_codeplug.hh"
 #include "errorstack.hh"
@@ -299,6 +300,28 @@ OpenGD77Test::testChannelTransmitTimeout() {
 
 
 void
+OpenGD77Test::testConfigVerification() {
+  ErrorStack err;
+  Config config;
+
+  if (! config.readYAML(":/data/opengd77_simple_config.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  RadioLimitContext ctx;
+  OpenGD77Limits().verifyConfig(&config, ctx);
+
+  QStringList messages;
+  for (int i=0; i<ctx.count(); i++)
+    messages.append(ctx.message(i).format());
+
+  if (RadioLimitIssue::Severity::Warning <= ctx.maxSeverity())
+    QFAIL(messages.join("; ").toLatin1().constData());
+}
+
+
+void
 OpenGD77Test::testBootMelody() {
   uint8_t note[2];
   OpenGD77BaseCodeplug::NoteElement elm(note);
@@ -325,6 +348,7 @@ OpenGD77Test::testBootMelody() {
   QVERIFY(decoded.settings()->openGD77Extension());
   QCOMPARE(decoded.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
 }
+
 
 QTEST_GUILESS_MAIN(OpenGD77Test)
 
