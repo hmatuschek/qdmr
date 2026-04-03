@@ -118,6 +118,71 @@ DM32UVTest::testAMChannelReencoding() {
 }
 
 
+void
+DM32UVTest::testChannelBankEncoding() {
+  static const uint32_t bank0=0x12000, bank1 = 0x13000, bank2 = 0x14000;
+  Config config;
+
+  config.radioIDs()->add(new DMRRadioID("test", 123456));
+  // Add 84 channels to fill bank 0
+  for (int i=0; i<84; i++) {
+    auto ch = new FMChannel();
+    ch->setName(QString("Channel %1").arg(i));
+    ch->setRXFrequency(Frequency::fromMHz(144.0));
+    ch->setTXFrequency(Frequency::fromMHz(144.0));
+    config.channelList()->add(ch);
+  }
+
+  {
+    DM32UVCodeplug codeplug; ErrorStack err;
+    if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+      QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+              .arg(err.format()).toStdString().c_str());
+    }
+    QVERIFY(codeplug.isAllocated(bank0));
+    QVERIFY(!codeplug.isAllocated(bank1));
+    QVERIFY(!codeplug.isAllocated(bank2));
+  }
+
+  // Add another 85 channel to fill bank 1
+  for (int i=0; i<85; i++) {
+    auto ch = new FMChannel();
+    ch->setName(QString("Channel %1").arg(i));
+    ch->setRXFrequency(Frequency::fromMHz(144.0));
+    ch->setTXFrequency(Frequency::fromMHz(144.0));
+    config.channelList()->add(ch);
+  }
+
+  {
+    DM32UVCodeplug codeplug; ErrorStack err;
+    if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+      QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+              .arg(err.format()).toStdString().c_str());
+    }
+    QVERIFY(codeplug.isAllocated(bank0));
+    QVERIFY(codeplug.isAllocated(bank1));
+    QVERIFY(!codeplug.isAllocated(bank2));
+  }
+
+  // Add yet another channel to allocate bank 2
+  auto ch = new FMChannel();
+  ch->setName(QString("Channel %1").arg(config.channelList()->count()));
+  ch->setRXFrequency(Frequency::fromMHz(144.0));
+  ch->setTXFrequency(Frequency::fromMHz(144.0));
+  config.channelList()->add(ch);
+
+  {
+    DM32UVCodeplug codeplug; ErrorStack err;
+    if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+      QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+              .arg(err.format()).toStdString().c_str());
+    }
+    QVERIFY(codeplug.isAllocated(bank0));
+    QVERIFY(codeplug.isAllocated(bank1));
+    QVERIFY(codeplug.isAllocated(bank2));
+  }
+}
+
 
 QTEST_GUILESS_MAIN(DM32UVTest)
 
