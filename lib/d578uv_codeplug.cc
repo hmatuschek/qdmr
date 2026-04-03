@@ -501,7 +501,7 @@ D578UVCodeplug::GeneralSettingsElement::TimeZone::_timeZones = {
   QTimeZone(-10800), QTimeZone(- 7200), QTimeZone(- 3600), QTimeZone(     0), QTimeZone(  3600),
   QTimeZone(  7200), QTimeZone( 10800), QTimeZone( 12600), QTimeZone( 14400), QTimeZone( 16200),
   QTimeZone( 18000), QTimeZone( 19800), QTimeZone( 20700), QTimeZone( 21600), QTimeZone( 25200),
-  QTimeZone( 28600), QTimeZone( 30600), QTimeZone( 32400), QTimeZone( 36000), QTimeZone( 39600),
+  QTimeZone( 28800), QTimeZone( 30600), QTimeZone( 32400), QTimeZone( 36000), QTimeZone( 39600),
   QTimeZone( 43200), QTimeZone( 46800) };
 
 QTimeZone

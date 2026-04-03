@@ -499,7 +499,7 @@ AnytoneCodeplug::ChannelElement::dtmfIDIndex() const {
 }
 void
 AnytoneCodeplug::ChannelElement::setDTMFIDIndex(unsigned idx) {
-  setUInt8(Offset::fiveToneIDIndex(), idx);
+  setUInt8(Offset::dtmfIDIndex(), idx);
 }
 
 unsigned
@@ -1142,7 +1142,7 @@ AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Cont
   for (uint8_t i=0; i<Limit::members(); i++) {
     // Skip non-private-call entries
     while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
-      logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
+      logWarn() << "Contact '" << lst->contact(j)->name() << "' in group list '" << lst->name()
                 << "' is not a group call. Skip entry.";
       j++;
     }
@@ -1402,7 +1402,7 @@ AnytoneCodeplug::ScanListElement::fromScanListObj(ScanList *lst, Context &ctx) {
     setMemberIndex(i, ctx.index(lst->channel(i)));
   }
 
-  return false;
+  return true;
 }
 
 
@@ -2026,7 +2026,7 @@ AnytoneCodeplug::ZoneChannelListElement::clear() {
 
 bool
 AnytoneCodeplug::ZoneChannelListElement::hasChannelA(unsigned n) const {
-  return 0xffff == channelIndexA(n);
+  return 0xffff != channelIndexA(n);
 }
 unsigned
 AnytoneCodeplug::ZoneChannelListElement::channelIndexA(unsigned n) const {
@@ -2043,7 +2043,7 @@ AnytoneCodeplug::ZoneChannelListElement::clearChannelIndexA(unsigned n) {
 
 bool
 AnytoneCodeplug::ZoneChannelListElement::hasChannelB(unsigned n) const {
-  return 0xffff == channelIndexB(n);
+  return 0xffff != channelIndexB(n);
 }
 unsigned
 AnytoneCodeplug::ZoneChannelListElement::channelIndexB(unsigned n) const {
