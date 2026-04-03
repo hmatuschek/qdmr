@@ -682,7 +682,7 @@ D878UVCodeplug::RoamingChannelElement::setTXFrequency(unsigned hz) {
 
 bool
 D878UVCodeplug::RoamingChannelElement::hasColorCode() const {
-  return ColorCodeValue::Disabled == getUInt8(Offset::colorCode());
+  return ColorCodeValue::Disabled != getUInt8(Offset::colorCode());
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::colorCode() const {
@@ -809,7 +809,7 @@ void
 D878UVCodeplug::RoamingZoneElement::clearMember(unsigned n) {
   if (n >= Limit::numMembers())
     return;
-  setMember(Offset::members() + n*Offset::betweenMembers(), 0xff);
+  setMember(n, 0xff);
 }
 
 QString
