@@ -5,6 +5,7 @@
 #include <QTest>
 #include <QtEndian>
 #include "logger.hh"
+#include "opengd77_limits.hh"
 
 
 OpenGD77Test::OpenGD77Test(QObject *parent)
@@ -294,6 +295,27 @@ OpenGD77Test::testChannelTransmitTimeout() {
   QVERIFY(! decoded.channelList()->channel(0)->timeoutDisabled());
   QCOMPARE(decoded.channelList()->channel(0)->timeout(), Interval::fromSeconds(60));
   QVERIFY(decoded.channelList()->channel(1)->timeoutDisabled());
+}
+
+
+void
+OpenGD77Test::testConfigVerification() {
+  ErrorStack err;
+  Config config;
+
+  if (! config.readYAML(":/data/opengd77_simple_config.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  RadioLimitContext ctx;
+  if (! OpenGD77Limits().verifyConfig(&config, ctx)) {
+    QStringList messages;
+    for (int i=0; i<ctx.count(); i++) {
+      messages.append(ctx.message(i).format());
+    }
+    QFAIL(messages.join("; ").toLatin1().constData());
+  }
 }
 
 QTEST_GUILESS_MAIN(OpenGD77Test)
