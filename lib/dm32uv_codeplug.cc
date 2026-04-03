@@ -491,11 +491,7 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
     else
       dmr->setRadioId(ctx.get<DMRRadioID>(dmrIdIndex()));
 
-    if (dmrAPRSEnabled()) {
-      if (! ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
-        errMsg(err) << "Unknown GPS system index " << dmrAPRSChannelIndex() << ".";
-        return false;
-      }
+    if (dmrAPRSEnabled() && ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
       dmr->setAPRS(ctx.get<DMRAPRSSystem>(dmrAPRSChannelIndex()));
     }
   }    
@@ -558,6 +554,12 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     enableLoneWorker(dmr->extended()->loneWorker());
     enablePrivateCallACK(dmr->extended()->privateCallConfirm());
     enableDataACK(dmr->extended()->dataConfirm());
+    if (!dmr->aprsRef()->isNull() && dmr->aprsRef()->is<DMRAPRSSystem>()) {
+      enableDMRAPRS(true);
+      setDMRAPRSChannelIndex(ctx.index(dmr->aprsRef()->as<DMRAPRSSystem>()));
+    } else {
+      enableDMRAPRS(false);
+    }
   } else if (channel->is<FMChannel>()) {
     auto fm = channel->as<FMChannel>();
     setBandwidth(fm->bandwidth());
@@ -3242,7 +3244,7 @@ DM32UVCodeplug::GeneralSettingsElement::setSTEMode(STEMode mode) {
 
 Level
 DM32UVCodeplug::GeneralSettingsElement::fmMicLevel() const {
-  return Level::fromValue(getUInt8(Offset::fmMicLevel())+ 1, Limit::micGain());
+  return Level::fromValue(getUInt8(Offset::fmMicLevel()), Limit::micGain());
 }
 
 void
