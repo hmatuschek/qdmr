@@ -634,6 +634,31 @@ DM32UVCodeplug::ChannelBankElement::setChannelCount(unsigned int n) {
 }
 
 
+unsigned int
+DM32UVCodeplug::ChannelBankElement::channelBank(unsigned int index) {
+  if (index < Limit::channelsInBlock0())
+    return 0;
+  index -= Limit::channelsInBlock0();
+  return 1 + index/Limit::channelsPerBlock();
+}
+
+unsigned int
+DM32UVCodeplug::ChannelBankElement::indexInBank(unsigned int index) {
+  if (index < Limit::channelsInBlock0())
+    return index;
+  index -= Limit::channelsInBlock0();
+  return index % Limit::channelsPerBlock();
+}
+
+unsigned int
+DM32UVCodeplug::ChannelBankElement::bankCount(unsigned int channelCount) {
+  if (channelCount <= Limit::channelsInBlock0())
+    return 1;
+  channelCount -= Limit::channelsInBlock0();
+  return 1 + channelCount / Limit::channelsPerBlock() +
+    ((0 != channelCount % Limit::channelsPerBlock()) ? 1 : 0);
+}
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::ChannelExtensionElement
@@ -4148,8 +4173,8 @@ bool
 DM32UVCodeplug::decodeChannels(Context &ctx, const ErrorStack &err) {
   ChannelBankElement bank(data(Offset::channelBanks()));
   for (unsigned int i=0; i<bank.channelCount(); i++) {
-    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
-    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+    auto blockNumber = ChannelBankElement::channelBank(i);
+    auto indexInBlock = ChannelBankElement::indexInBank(i);
     uint32_t addr = Offset::channelBanks()
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
@@ -4186,8 +4211,8 @@ bool
 DM32UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   ChannelBankElement bank(data(Offset::channelBanks()));
   for (unsigned int i=0; i<bank.channelCount(); i++) {
-    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
-    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+    unsigned int blockNumber  = ChannelBankElement::channelBank(i);
+    unsigned int indexInBlock = ChannelBankElement::indexInBank(i);
     uint32_t addr = Offset::channelBanks()
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
@@ -4222,9 +4247,7 @@ bool
 DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
   // Allocate blocks
   auto numBlocks = Limit::channelBanks().limit(
-    ctx.count<Channel>()/ChannelBankElement::Limit::channelsPerBlock()
-    + ((0 != ctx.count<Channel>() % ChannelBankElement::Limit::channelsPerBlock()) ? 1 : 0));
-
+    ChannelBankElement::bankCount(ctx.count<Channel>()));
   for (unsigned int b=0; b<numBlocks; b++) {
     unsigned int addr = Offset::channelBanks() + b*Limit::blockSize();
     if (! isAllocated(addr))
@@ -4233,10 +4256,10 @@ DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
 
   // Encode channels
   ChannelBankElement bank(data(Offset::channelBanks()));
-  bank.setChannelCount(ctx.count<Channel>());
-  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
-    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
-    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+  bank.setChannelCount(std::min(ctx.count<Channel>(), ChannelBankElement::Limit::channels()));
+  for (unsigned int i=0; i<bank.channelCount(); i++) {
+    unsigned int blockNumber  = ChannelBankElement::channelBank(i);
+    unsigned int indexInBlock = ChannelBankElement::indexInBank(i);
     uint32_t addr = Offset::channelBanks()
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
