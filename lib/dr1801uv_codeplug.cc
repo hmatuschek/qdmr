@@ -1953,6 +1953,7 @@ DR1801UVCodeplug::ScanListElement::encode(ScanList *obj, Context &ctx, const Err
   }
 
   unsigned int n = std::min(Limit::memberCount(), (unsigned int)obj->count());
+  setEntryCount(n);
   for (unsigned int i=0; i<n; i++) {
     setEntryIndex(i, ctx.index(obj->channel(i)));
   }
@@ -2191,7 +2192,7 @@ DR1801UVCodeplug::VFOBankElement::nameA() const {
 }
 void
 DR1801UVCodeplug::VFOBankElement::setNameA(const QString &name) {
-  writeASCII(Offset::nameB(), name, Limit::nameLength(), 0x00);
+  writeASCII(Offset::nameA(), name, Limit::nameLength(), 0x00);
 }
 
 QString
@@ -2390,7 +2391,7 @@ void
 DR1801UVCodeplug::DTMFSettingsElement::setRadioID(const QString &id) {
   setUInt8(Offset::radioIDLength(),
            std::min(Limit::radioIDLength(), (unsigned int)id.length()));
-  writeASCII(Offset::radioIDLength(), id, Limit::radioIDLength(), 0x00);
+  writeASCII(Offset::radioID(), id, Limit::radioIDLength(), 0x00);
 }
 
 QString
@@ -2665,8 +2666,8 @@ DR1801UVCodeplug::DTMFIDElement::number() const {
 
 void
 DR1801UVCodeplug::DTMFIDElement::setNumber(const QString &number) {
-  QString lnumber = number.toLower();
-  QRegularExpression re("[0-9a-d*#]+");
+  QString lnumber = number.toUpper();
+  QRegularExpression re("[0-9A-D*#]+");
   if (! re.match(lnumber).isValid())
     return;
   setNumberLength(std::min(Limit::numberLength(), (unsigned int)lnumber.length()));
