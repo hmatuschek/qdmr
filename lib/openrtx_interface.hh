@@ -2,16 +2,26 @@
 #define OPENRTXINTERFACE_HH
 
 #include "radiointerface.hh"
-#include "dfu_libusb.hh"
+#include "packetstream.hh"
+#include "usbserial.hh"
+#include "xmodem.hh"
 
 /** Implements the communication interface to radios running the OpenRTX firmware.
  *
+ * The protocol is called rtxlink and is documented at https://openrtx.org/#/rtxlink. The protocol
+ * has several layers. The lowest is a serial interface either as a VCOM (UBS CDC-ACM) or a proper
+ * hardware UART. Ontop of that, there is SLIP. Followed by a simple framing layer, that determines
+ * the higher-level protocol.
  * @ingroup ortx */
-class OpenRTXInterface : public DFUDevice, public RadioInterface
+class OpenRTXInterface : public QObject, public RadioInterface
 {
   Q_OBJECT
 
 public:
+  /** Constructor.
+   * @param descr The USB device descriptor. Used to identify a specific USB device.
+   * @param err The stack of error messages.
+   * @param parent The QObject parent. */
   explicit OpenRTXInterface(const USBDeviceDescriptor &descr, const ErrorStack &err=ErrorStack(), QObject *parent = nullptr);
 
   bool isOpen() const;
@@ -29,7 +39,16 @@ public:
 
   bool reboot(const ErrorStack &err=ErrorStack());
 
+public:
+  /** Returns some information about this interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces connected AnyTone radios. */
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
 
+protected:
+  /** OpenRTX link interface. This is the protocol dispatcher for all implemented data transfer
+   * protocols. */
+  OpenRTXLink *_rtxLink;
 };
 
 #endif // OPENRTXINTERFACE_HH

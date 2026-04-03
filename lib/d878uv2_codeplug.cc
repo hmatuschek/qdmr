@@ -56,7 +56,7 @@ D878UV2Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorSta
 
   QVector<DMRContact*> contacts;
   // Encode contacts and also collect id<->index map
-  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
     uint32_t bank_addr = Offset::contactBanks() + (i/Limit::contactsPerBank())*Offset::betweenContactBanks();
     uint32_t addr = bank_addr + (i%Limit::contactsPerBank())*ContactElement::size();
     ContactElement con(data(addr));

@@ -39,6 +39,7 @@ private slots:
   void testChannelTransmitTimeout();
   /** Regression test for #856. */
   void testConfigVerification();
+  void testBootMelody();
 
 protected:
   static bool encodeDecode(Config &config, Config &decoded, const ErrorStack &err=ErrorStack());

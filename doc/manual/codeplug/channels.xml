@@ -10,10 +10,11 @@
 
 <para>
   The <token>channels</token> list contains all channels defined within the codeplug. Usually, 
-  DMR radios support at least two different channel types. Digital channels (DMR) and analog 
-  channels (FM). To distinguish these two types, each entry of the channel list contains a 
-  map with a single entry. The key specifies the type (either <token>digital</token> or 
-  <token>analog</token>) while the value contains the actual channel definition.
+  DMR radios support at least two different channel types. DMR channels and analog 
+  FM channels. Some radios (e.g., running OpenRTX) also support M17 channels. To distinguish 
+  these three types, each entry of the channel list contains a 
+  map with a single entry. The key specifies the type (either <token>dmr</token>,
+  <token>fm</token> or <token>m17</token>) while the value contains the actual channel definition.
 </para>
 
 <para>
@@ -23,7 +24,7 @@
 <example pgwide="1">
   <title>Channel definition</title>
   <programlisting><![CDATA[channels:
-  - digital:
+  - dmr:
       id: ch5
       name: BB DB0LDS TS2
       rxFrequency: 439.5625
@@ -40,7 +41,7 @@
       contact: cont7
       radioID: !default
       roaming: !default
-  - analog:
+  - fm:
       id: ch76
       name: DB0LDS
       rxFrequency: 439.5625
@@ -58,8 +59,8 @@
 </example>
 
 <para>
-  The first channel is a digital (DMR) channel. Its ID is <emphasis>ch5</emphasis> and its name 
-  <emphasis>BB DB0LDS TS2</emphasis>. The second channel is an analog channel (FM) with ID <emphasis>ch76</emphasis> 
+  The first channel is a DMR channel. Its ID is <emphasis>ch5</emphasis> and its name 
+  <emphasis>BB DB0LDS TS2</emphasis>. The second channel is an analog FM channel with ID <emphasis>ch76</emphasis> 
   and name <emphasis>DB0LDS</emphasis>. Please note, that there are some common attributes like 
   <token>rxFrequency</token>, <token>txFrequency</token>, <token>power</token>, <token>timeout</token>,
   <token>rxOnly</token>, <token>vox</token> and <token>scanList</token> but also type-specific settings like 
@@ -159,15 +160,15 @@
 
 <section>
 <info>
-  <title>Digital channel attributes</title>
+  <title>DMR channel attributes</title>
 </info>
 
 <para>
-  The following attributes apply only to digital (DMR) channels.
+  The following attributes apply only to DMR channels.
 </para>
 
 <variablelist>
-  <title>Digital channel fields</title>
+  <title>DMR channel fields</title>
   <varlistentry>
     <term><token>admit</token></term>
     <listitem>
@@ -245,16 +246,74 @@
 
 
 <section>
+  <info>
+    <title>M17 channel attributes</title>
+  </info>
+  
+  <para>
+    The following attributes apply only to M17 digital channels.
+  </para>
+  
+  <variablelist>
+    <title>M17 channel fields</title>
+    <varlistentry>
+      <term><token>mode</token></term>
+      <listitem>
+        <para>
+          Specifies the channel mode. That is, one of <token>Voice</token>, <token>Data</token> and
+          <token>VoiceAndData</token>.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>accessNumber</token></term>
+      <listitem>
+        <para>
+          Specifies the channel access number. Similar to the color code of DMR channels, this must
+          match the repeater access number. A value between 0-15.
+        </para>
+      </listitem>
+    </varlistentry>
+    <varlistentry>
+      <term><token>contact</token></term>
+      <listitem>
+        <para>
+          Specifies the M17 transmit contact. This must be a reference to a M17 contact.  
+        </para>
+      </listitem>
+    </varlistentry>
+  </variablelist>
+  <varlistentry>
+    <term><token>gpsEnabled</token></term>
+    <listitem>
+      <para>
+        Specifies wether position information is send along with voice and data.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>encryptionMode</token></term>
+    <listitem>
+      <para>
+        Specifies the encryption mode. That is, one of <token>None</token>, 
+        <token>Scrambled</token> and <token>AES256</token>.
+      </para>
+    </listitem>
+  </varlistentry>
+</section>  
+
+
+<section>
 <info>
-  <title>Analog channel attributes</title>
+  <title>FM channel attributes</title>
 </info>
 
 <para>
-  The following attributes apply only to analog (FM) channels.
+  The following attributes apply only to FM channels.
 </para>
 
 <variablelist>
-  <title>Analog channel fields</title>
+  <title>FM channel fields</title>
   <varlistentry>
     <term><token>admit</token></term>
     <listitem>

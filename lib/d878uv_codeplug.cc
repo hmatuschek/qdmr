@@ -267,6 +267,19 @@ D878UVCodeplug::ChannelElement::clearDMREncryptionKeyIndex() {
 
 
 bool
+D878UVCodeplug::ChannelElement::adaptiveTDMA() const {
+  // Removed feature
+  return false;
+}
+
+void
+D878UVCodeplug::ChannelElement::enableAdaptiveTDMA(bool enable) {
+  Q_UNUSED(enable);
+  // removed feature.
+}
+
+
+bool
 D878UVCodeplug::ChannelElement::hasAESEncryptionKeyIndex() const {
   return 0 != getUInt8(Offset::aesKeyIndex());
 }
@@ -669,7 +682,7 @@ D878UVCodeplug::RoamingChannelElement::setTXFrequency(unsigned hz) {
 
 bool
 D878UVCodeplug::RoamingChannelElement::hasColorCode() const {
-  return ColorCodeValue::Disabled == getUInt8(Offset::colorCode());
+  return ColorCodeValue::Disabled != getUInt8(Offset::colorCode());
 }
 unsigned
 D878UVCodeplug::RoamingChannelElement::colorCode() const {
@@ -796,7 +809,7 @@ void
 D878UVCodeplug::RoamingZoneElement::clearMember(unsigned n) {
   if (n >= Limit::numMembers())
     return;
-  setMember(Offset::members() + n*Offset::betweenMembers(), 0xff);
+  setMember(n, 0xff);
 }
 
 QString
@@ -984,15 +997,20 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
  * ******************************************************************************************** */
 QVector<QTimeZone>
 D878UVCodeplug::GeneralSettingsElement::TimeZone::_timeZones = {
-  QTimeZone(-43200), QTimeZone(-39600), QTimeZone(-36000), QTimeZone(-32400),
-  QTimeZone(-28800), QTimeZone(-25200), QTimeZone(-21600), QTimeZone(-18000),
-  QTimeZone(-14400), QTimeZone(-12600), QTimeZone(-10800), QTimeZone(- 7200),
-  QTimeZone(- 3600), QTimeZone(     0), QTimeZone(  3600), QTimeZone(  7200),
-  QTimeZone( 10800), QTimeZone( 12600), QTimeZone(-28800), QTimeZone( 14400),
-  QTimeZone( 16200), QTimeZone( 18000), QTimeZone( 19800), QTimeZone( 20700),
-  QTimeZone( 21600), QTimeZone( 25200), QTimeZone( 28600), QTimeZone( 30600),
-  QTimeZone( 32400), QTimeZone( 36000), QTimeZone( 39600), QTimeZone( 43200),
-  QTimeZone( 46800) };
+  QTimeZone(-43200), QTimeZone(-41400), QTimeZone(-39600), QTimeZone(-37800),
+  QTimeZone(-36000), QTimeZone(-34200), QTimeZone(-32400), QTimeZone(-30600),
+  QTimeZone(-28800), QTimeZone(-27000), QTimeZone(-25200), QTimeZone(-23400),
+  QTimeZone(-21600), QTimeZone(-19800), QTimeZone(-18000), QTimeZone(-16200),
+  QTimeZone(-14400), QTimeZone(-12600), QTimeZone(-10800), QTimeZone( -9000),
+  QTimeZone( -7200), QTimeZone( -5400), QTimeZone( -3600), QTimeZone( -1800),
+  QTimeZone(     0), QTimeZone(  1800), QTimeZone(  3600), QTimeZone(  5400),
+  QTimeZone(  7200), QTimeZone(  9000), QTimeZone( 10800), QTimeZone( 12600),
+  QTimeZone( 14400), QTimeZone( 16200), QTimeZone( 18000), QTimeZone( 19800),
+  QTimeZone( 21600), QTimeZone( 23400), QTimeZone( 25200), QTimeZone( 27000),
+  QTimeZone( 28800), QTimeZone( 30600), QTimeZone( 32400), QTimeZone( 34200),
+  QTimeZone( 36000), QTimeZone( 37800), QTimeZone( 39600), QTimeZone( 41400),
+  QTimeZone( 43200), QTimeZone( 45000), QTimeZone( 46800)
+};
 
 QTimeZone
 D878UVCodeplug::GeneralSettingsElement::TimeZone::decode(uint8_t code) {
@@ -2056,10 +2074,13 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
 
+  enableBootReset(ctx.config()->settings()->boot()->resetEnabled());
+
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
   setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
+
   setPreWaveDelay(ctx.config()->settings()->dmr()->preamble());
   setSMSFormat(ctx.config()->smsExtension()->format());
 
@@ -2079,7 +2100,6 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! ext->roamingSettings()->defaultZone()->isNull())
     setDefaultRoamingZoneIndex(ctx.index(ext->roamingSettings()->defaultZone()->as<RoamingZone>()));
   enableBootGPSCheck(ext->bootSettings()->gpsCheckEnabled());
-  enableBootReset(ext->bootSettings()->resetEnabled());
 
   // Encode key settings
   enableKnobLock(ext->keySettings()->knobLockEnabled());
@@ -2158,6 +2178,8 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   ctx.config()->settings()->setTOT(transmitTimeout());
 
+  ctx.config()->settings()->boot()->enableReset(this->bootReset());
+
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
                                    GNSSSettings::Units::Metric);
@@ -2179,7 +2201,6 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
   // Decode boot settings
   ext->bootSettings()->enableGPSCheck(this->bootGPSCheck());
-  ext->bootSettings()->enableReset(this->bootReset());
 
   // Decode key settings
   ext->keySettings()->enableKnobLock(this->knobLock());
@@ -3522,7 +3543,13 @@ D878UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, DMRAPRSSystem *s
     sys->setRevertChannel(ctx.get<Channel>(dmrChannelIndex(idx))->as<DMRChannel>());
 
   // Search for a matching contact in contacts
-  DMRContact *cont = ctx.config()->contacts()->findDigitalContact(dmrDestination(idx));
+  DMRContact *cont = nullptr;
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
+    if (ctx.get<DMRContact>(i)->number() == dmrDestination(idx)) {
+      cont = ctx.get<DMRContact>(i);
+      break;
+    }
+  }
   // If no matching contact is found, create one
   if (nullptr == cont) {
     cont = new DMRContact(dmrCallType(idx), tr("GPS #%1 Contact").arg(idx+1),

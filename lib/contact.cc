@@ -2,6 +2,8 @@
 #include "config.hh"
 #include "utils.hh"
 #include "logger.hh"
+#include "opengd77_extension.hh"
+#include <QRegularExpression>
 
 
 /* ********************************************************************************************* *
@@ -253,6 +255,77 @@ DMRContact::setAnytoneExtension(AnytoneContactExtension *ext) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of M17Contact
+ * ********************************************************************************************* */
+M17Contact::M17Contact(QObject *parent)
+  : DigitalContact(parent), _isBroadcast(false), _call()
+{
+  // pass...
+}
+
+M17Contact::M17Contact(const QString &name, bool ring, const QString &call, QObject *parent)
+  : DigitalContact(name, ring, parent), _isBroadcast(false), _call()
+{
+  _call = normalizeCall(call);
+}
+
+ConfigItem *
+M17Contact::clone() const {
+  M17Contact *c = new M17Contact();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+void
+M17Contact::clear() {
+  DigitalContact::clear();
+  _isBroadcast = false;
+  _call.clear();
+}
+
+const QString &
+M17Contact::call() const {
+  return _call;
+}
+
+void
+M17Contact::setCall(const QString &call) {
+  _call = normalizeCall(call);
+}
+
+bool
+M17Contact::isBroadcast() const {
+  return _isBroadcast;
+}
+
+void
+M17Contact::setBroadcast(bool enable) {
+  _isBroadcast = enable;
+}
+
+YAML::Node
+M17Contact::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = DigitalContact::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  node.SetStyle(YAML::EmitterStyle::Flow);
+  YAML::Node type; type["m17"] = node;
+  return type;
+}
+
+QString
+M17Contact::normalizeCall(const QString call) {
+  QString tmp = call.toUpper();
+  tmp.remove(QRegularExpression("[^A-Z0-9/\\.\\-]"));
+  return tmp.mid(0, 9);
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of ContactList
  * ********************************************************************************************* */
 ContactList::ContactList(QObject *parent)
@@ -268,25 +341,6 @@ ContactList::add(ConfigObject *obj, int row, bool unique) {
   return ConfigObjectList::add(obj, row, unique);
 }
 
-int
-ContactList::digitalCount() const {
-  int c=0;
-  for (int i=0; i<_items.size(); i++)
-    if (_items.at(i)->is<DMRContact>())
-      c++;
-  return c;
-}
-
-int
-ContactList::dtmfCount() const {
-  int c=0;
-  for (int i=0; i<_items.size(); i++)
-    if (_items.at(i)->is<DTMFContact>())
-      c++;
-  return c;
-}
-
-
 Contact *
 ContactList::contact(int idx) const {
   if ((0>idx) || (idx >= count()))
@@ -294,42 +348,6 @@ ContactList::contact(int idx) const {
   return _items[idx]->as<Contact>();
 }
 
-DMRContact *
-ContactList::digitalContact(int idx) const {
-  for (int i=0; i<_items.size(); i++) {
-    if (_items.at(i)->is<DMRContact>()) {
-      if (0 == idx)
-        return _items.at(i)->as<DMRContact>();
-      else
-        idx--;
-    }
-  }
-  return nullptr;
-}
-
-DMRContact *
-ContactList::findDigitalContact(unsigned number) const {
-  for (int i=0; i<_items.size(); i++) {
-    if (! _items.at(i)->is<DMRContact>())
-      continue;
-    if (_items.at(i)->as<DMRContact>()->number() == number)
-      return _items.at(i)->as<DMRContact>();
-  }
-  return nullptr;
-}
-
-DTMFContact *
-ContactList::dtmfContact(int idx) const {
-  for (int i=0; i<_items.size(); i++) {
-    if (_items.at(i)->is<DTMFContact>()) {
-      if (0 == idx)
-        return _items.at(i)->as<DTMFContact>();
-      else
-        idx--;
-    }
-  }
-  return nullptr;
-}
 
 ConfigItem *
 ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
@@ -347,6 +365,8 @@ ContactList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
   if ("dmr" == type) {
     return new DMRContact();
+  } else if ("m17" == type) {
+    return new M17Contact();
   } else if ("dtmf" == type) {
     return new DTMFContact();
   }

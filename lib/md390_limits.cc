@@ -35,7 +35,10 @@ MD390Limits::MD390Limits(const std::initializer_list<std::pair<Frequency,Frequen
             unsigned(Channel::Power::High) } },
         { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
-        { "tot", new RadioLimitInterval() }
+        { "tot", new RadioLimitInterval() },
+        { "boot", new RadioLimitItem {
+          {"passwordEnabled", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+          {"password", new RadioLimitPin(MD390Codeplug::GeneralSettingsElement::Limit::bootPasswordLength(), RadioLimitIssue::Critical) } } }
         /// @todo check default radio ID.
       } );
 

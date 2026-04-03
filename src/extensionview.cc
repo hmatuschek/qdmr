@@ -42,6 +42,7 @@ ExtensionView::setObject(ConfigItem *obj, Config *context) {
   _editor.setConfig(context);
 }
 
+
 void
 ExtensionView::onSelectionChanged(const QItemSelection &current, const QItemSelection &last) {
   Q_UNUSED(last)

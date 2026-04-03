@@ -43,9 +43,6 @@ ZoneDialog::construct() {
 
   extensionView->setObjectName("zoneExtension");
   extensionView->setObject(_myZone, _config);
-  if (! settings.showExtensions()) {
-    tabWidget->tabBar()->hide();
-  }
 
   connect(addChannelA, SIGNAL(clicked()), this, SLOT(onAddChannelA()));
   connect(remChannelA, SIGNAL(clicked()), this, SLOT(onRemChannelA()));

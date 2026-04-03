@@ -11,7 +11,7 @@
 
 <para>
   The application settings dialog controls the behavior of <application>qdmr</application>.
-  The dialog is divided into 3 sections, accessible via the tabs on the top.
+  The dialog is divided into 2 sections, accessible via the tabs on the top.
 </para>
 
 
@@ -151,38 +151,5 @@
 </para>
 </section>
 
-<section>
-<info>
-  <title>Extension settings</title>
-</info>
-
-<para>
-  The last tab collects settings, controlling several extended settings for the devices.
-</para>
-
-<screenshot>
-  <mediaobject>
-    <imageobject><imagedata fileref="fig/qdmr-settings-extensions.png" width="5cm" align="center"/></imageobject>
-    <textobject>Screen shot of the application settings dialog for extensions.</textobject>
-  </mediaobject>
-  <title>The settings dialog: Extensions</title>
-</screenshot>
-
-<para>
-  DMR originated as a standard for commercial radios. Consequently, there are many features that 
-  are not relevant or even illegal for ham-radio use (e.g., encryption). However, some operators 
-  use their handhelds for both ham-radio and commercial applications. Consequently, 
-  <application>qdmr</application> cannot ignore commercial features. It can, however, hide them.
-  Enabling the <guilabel>Show commercial features</guilabel> options will show these features.
-</para>
-
-<para>
-  Starting with <application>qdmr</application> version 0.9.0, there are some 
-  device specific settings, allowing to configure features only present in one device and not 
-  represented in the general code plug. These are called <emphasis>extensions</emphasis> and are 
-  usually hidden. To show these device specific extension, select <guilabel>Show device 
-  extensions</guilabel>.
-</para>
-</section>
 </section>
   

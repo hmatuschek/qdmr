@@ -5,6 +5,7 @@
 #include <QAbstractItemModel>
 #include <QIdentityProxyModel>
 #include <QMetaProperty>
+#include <QPointer>
 
 
 class ExtensionProxy: public QIdentityProxyModel
@@ -76,6 +77,7 @@ protected slots:
 
 protected:
   ConfigItem *_object;
+  QPointer<ConfigItem> _original;
 };
 
 #endif // EXTENSIONWRAPPER_HH

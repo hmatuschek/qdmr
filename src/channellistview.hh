@@ -21,6 +21,7 @@ public:
 protected slots:
   void onAddFMChannel();
   void onAddAMChannel();
+  //void onAddM17Channel();
   void onAddDMRChannel();
   void onCloneChannel();
   void onRemChannel();

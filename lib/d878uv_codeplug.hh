@@ -219,6 +219,9 @@ public:
     /** Clears the DMR encryption key index. */
     void clearDMREncryptionKeyIndex() override;
 
+    bool adaptiveTDMA() const override;
+    void enableAdaptiveTDMA(bool enable) override;
+
     /** Constructs a Channel object from this element. */
     Channel *toChannelObj(Context &ctx) const override;
     /** Links a previously created channel object. */
@@ -245,13 +248,15 @@ public:
       static constexpr Bit advancedEncryptionType()        { return {0x003b, 5}; }
       static constexpr unsigned int fmAPRSFrequencyIndex() { return 0x003c; }
       static constexpr unsigned int arc4KeyIndex()         { return 0x003d; }
+      // Removed
+      static constexpr Bit adaptiveTDMA()                  { return {0, 0}; }
       /// @endcond
     };
   };
 
 
-  /** Starting from AT-D878UV, all AnyTone devices encode an channel settings extension element
-   * at an offset 0x2000 to the original channel. Also the size of the extension element is
+  /** Starting from AT-D878UV, all AnyTone devices encode a channel settings extension element
+   * at an offset 0x2000 to the original channel. Also, the size of the extension element is
    * identical to the channel element itself. This is weird. Anyway. This class encodes/decodes
    * these settings.
    *

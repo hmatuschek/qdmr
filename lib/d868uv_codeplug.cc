@@ -1431,7 +1431,7 @@ D868UVCodeplug::setBitmaps(Context& ctx)
 
   // Mark valid contacts (clear bit)
   ContactBitmapElement contact_bitmap(data(Offset::contactBitmap()));
-  unsigned int num_contacts = std::min(Limit::numContacts(), ctx.count<DMRContact>());
+  unsigned int num_contacts = std::min(Limit::numContacts(), ctx.count<DigitalContact>());
   contact_bitmap.clear(); contact_bitmap.enableFirst(num_contacts);
 
   // Mark valid analog contacts (clear bytes)
@@ -1715,7 +1715,7 @@ D868UVCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
 
   QVector<DMRContact*> contacts;
   // Encode contacts and also collect id<->index map
-  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
     uint32_t bank_addr = Offset::contactBanks() + (i/Limit::contactsPerBank())*Offset::betweenContactBanks();
     uint32_t addr = bank_addr + (i%Limit::contactsPerBank())*ContactElement::size();
     ContactElement con(data(addr));

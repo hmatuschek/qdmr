@@ -592,7 +592,7 @@ DM32UVCodeplug::ChannelElement::decodeSelectiveCall(uint16_t code) {
   code &= 0x3fff;
 
   if (0 == type) {
-    return SelectiveCall(double((code>>4)&0xf)*10 + double((code>>4)&0xf)*1 + double(code & 0xf)/10);
+    return SelectiveCall(double((code>>8)&0xf)*10 + double((code>>4)&0xf)*1 + double(code & 0xf)/10);
   } else if ((1 == type) || (2 == type)) {
     return SelectiveCall(code, 2 == type);
   }
@@ -633,6 +633,31 @@ DM32UVCodeplug::ChannelBankElement::setChannelCount(unsigned int n) {
   setUInt16_le(Offset::channelCount(), n);
 }
 
+
+unsigned int
+DM32UVCodeplug::ChannelBankElement::channelBank(unsigned int index) {
+  if (index < Limit::channelsInBlock0())
+    return 0;
+  index -= Limit::channelsInBlock0();
+  return 1 + index/Limit::channelsPerBlock();
+}
+
+unsigned int
+DM32UVCodeplug::ChannelBankElement::indexInBank(unsigned int index) {
+  if (index < Limit::channelsInBlock0())
+    return index;
+  index -= Limit::channelsInBlock0();
+  return index % Limit::channelsPerBlock();
+}
+
+unsigned int
+DM32UVCodeplug::ChannelBankElement::bankCount(unsigned int channelCount) {
+  if (channelCount <= Limit::channelsInBlock0())
+    return 1;
+  channelCount -= Limit::channelsInBlock0();
+  return 1 + channelCount / Limit::channelsPerBlock() +
+    ((0 != channelCount % Limit::channelsPerBlock()) ? 1 : 0);
+}
 
 
 /* ******************************************************************************************** *
@@ -941,10 +966,11 @@ bool
 DM32UVCodeplug::ContactIndexElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  setContactCount(ctx.count<DMRContact>());
+  setContactCount(ctx.count<DigitalContact>());
   unsigned int privatCallCount = 0, groupCallCount = 0;
 
-  QVector<unsigned int> indices; indices.reserve(contactCount());
+  unsigned int cc = contactCount();
+  QVector<unsigned int> indices; indices.reserve(cc);
   for (unsigned int idx=0; idx<contactCount(); idx++) {
     if (DMRContact::Type::PrivateCall == ctx.get<DMRContact>(idx)->type())
       privatCallCount++;
@@ -957,7 +983,7 @@ DM32UVCodeplug::ContactIndexElement::encode(Context &ctx, const ErrorStack &err)
 
   setPrivateCallCount(privatCallCount);
   setGroupCallCount(groupCallCount);
-  bitmap().enableFirst(ctx.count<DMRContact>());
+  bitmap().enableFirst(ctx.count<DigitalContact>());
 
   // Sort indices w.r.t. associated DMR id:
   std::sort(indices.begin(), indices.end(), [&ctx](unsigned ia, unsigned ib)->bool {
@@ -1034,7 +1060,13 @@ DM32UVCodeplug::GroupListElement::link(RXGroupList *gl, Context &ctx, const Erro
   for (unsigned int i=0; i<Limit::contacts(); i++) {
     if (! validId(i))
       continue;
-    auto contact = ctx.config()->contacts()->findDigitalContact(id(i));
+    DMRContact* contact = nullptr;
+    for (unsigned int j=0; j<ctx.count<DigitalContact>(); j++) {
+      if (id(i) == ctx.get<DMRContact>(j)->number()) {
+        contact = ctx.get<DMRContact>(j);
+        break;
+      }
+    }
     if (nullptr == contact) {
       contact = new DMRContact(DMRContact::GroupCall, "Group Call", id(i));
       ctx.config()->contacts()->add(contact);
@@ -2243,14 +2275,27 @@ DM32UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
 }
 
 
-DM32UVCodeplug::GeneralSettingsElement::BootDisplay
+BootSettings::BootDisplay
 DM32UVCodeplug::GeneralSettingsElement::bootDisplay() const {
-  return (BootDisplay) getUInt8(Offset::bootDisplay());
+  switch ((BootDisplay) getUInt8(Offset::bootDisplay())) {
+  case BootDisplay::Message: return BootSettings::BootDisplay::Text;
+  case BootDisplay::Image: return BootSettings::BootDisplay::Image;
+  default: break;
+  }
+  return BootSettings::BootDisplay::Logo;
 }
 
 void
-DM32UVCodeplug::GeneralSettingsElement::setBootDisplay(BootDisplay dis) {
-  setUInt8(Offset::bootDisplay(), (unsigned int)dis);
+DM32UVCodeplug::GeneralSettingsElement::setBootDisplay(BootSettings::BootDisplay dis) {
+  switch (dis) {
+  case BootSettings::BootDisplay::Text:
+    setUInt8(Offset::bootDisplay(), (unsigned int)BootDisplay::Message);
+    break;
+  case BootSettings::BootDisplay::Logo:
+  case BootSettings::BootDisplay::Image:
+    setUInt8(Offset::bootDisplay(), (unsigned int)BootDisplay::Image);
+    break;
+  }
 }
 
 
@@ -2494,8 +2539,9 @@ DM32UVCodeplug::GeneralSettingsElement::setBacklightDuration(Interval duration) 
     setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T4min);
   } else if (duration.minutes() <= 5) {
     setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::T5min);
+  } else {
+    setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::Infinity);
   }
-  setUInt8(Offset::backlightDuration(), (unsigned int)BacklightDuration::Infinity);
 }
 
 
@@ -3267,8 +3313,12 @@ bool
 DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
+  // Boot settings
+  ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
   ctx.config()->settings()->setIntroLine1(bootMessage1());
   ctx.config()->settings()->setIntroLine2(bootMessage2());
+  ctx.config()->settings()->boot()->enableReset(mcuResetEnabled());
+
   ctx.config()->settings()->enableSpeech(voicePromptEnabled());
   ctx.config()->settings()->setVOX(voxLevel());
   if (transmitTimeout().isInfinite())
@@ -3294,8 +3344,13 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
 bool
 DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+
+  // boot settings
+  setBootDisplay(ctx.config()->settings()->boot()->bootDisplay());
   setBootMessage1(ctx.config()->settings()->introLine1());
   setBootMessage2(ctx.config()->settings()->introLine2());
+  enableMCUReset(ctx.config()->settings()->boot()->resetEnabled());
+
   enableVoicePrompt(ctx.config()->settings()->speech());
   if (ctx.config()->settings()->voxDisabled())
     setVOXLevel(Level::null());
@@ -3383,13 +3438,14 @@ DM32UVCodeplug::APRSSettingsElement::setFixedLocation(const QGeoCoordinate &coor
   QString latString, lonString;
   latString.asprintf("%02.6f%c",std::abs(coordinate.latitude()), coordinate.latitude()<0 ? 'S' : 'N');
   lonString.asprintf("%03.5f%c",std::abs(coordinate.longitude()), coordinate.longitude()<0 ? 'W' : 'E');
+  setUInt8(Offset::enableFixedLocation(), 1);
   writeASCII(Offset::fixedLocationLatitude(), latString, 10);
   writeASCII(Offset::fixedLocationLongitude(), lonString, 10);
 }
 
 void
 DM32UVCodeplug::APRSSettingsElement::enableFixedLocation(bool enable) {
-  setUInt8(Offset::enableFixedLocation(), enable ? 0x01 : 0x02);
+  setUInt8(Offset::enableFixedLocation(), enable ? 0x01 : 0x00);
 }
 
 
@@ -3497,7 +3553,13 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  auto cont = ctx.config()->contacts()->findDigitalContact(destinationId());
+  DMRContact *cont = nullptr;
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
+    if (destinationId() == ctx.get<DMRContact>(i)->number()) {
+      cont = ctx.get<DMRContact>(i);
+      break;
+    }
+  }
   if (nullptr == cont) {
     cont = new DMRContact(callType(), "DMR APRS Contact", destinationId());
     ctx.config()->contacts()->add(cont);
@@ -3531,9 +3593,6 @@ DM32UVCodeplug::APRSSettingsElement::encode(Context &ctx, const ErrorStack &err)
     setFixedLocation(ctx.config()->settings()->gnss()->fixedPosition());
     enableFixedLocation(ctx.config()->settings()->gnss()->fixedPositionEnabled());
   }
-
-  ctx.config()->settings()->gnss()->setFixedPosition(fixedLocation());
-  ctx.config()->settings()->gnss()->enableFixedPosition(fixedLocationEnabled());
 
   if (0 == ctx.count<DMRAPRSSystem>()) {
     setDestinationId(0);
@@ -3631,6 +3690,32 @@ DM32UVCodeplug::PasswordSettingsElement::setReadPassword(const QString &value) {
 void
 DM32UVCodeplug::PasswordSettingsElement::clearReadPassword() {
   setUInt8(Offset::enableReadPassword(), 0);
+}
+
+
+bool
+DM32UVCodeplug::PasswordSettingsElement::encode(Context &ctx, ErrorStack err) {
+  if (ctx.config()->settings()->boot()->bootPasswordEnabled()) {
+    if (ctx.config()->settings()->boot()->bootPassword().length() > Limit::passwordLength()) {
+      errMsg(err) << "Cannot encode boot password: password is too long.";
+      clearBootPassword();
+      return false;
+    }
+    setBootPassword(ctx.config()->settings()->boot()->bootPassword());
+  } else {
+    clearBootPassword();
+  }
+  return true;
+}
+
+
+bool
+DM32UVCodeplug::PasswordSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  ctx.config()->settings()->boot()->enableBootPassword(bootPasswordEnabled());
+  if (bootPasswordEnabled())
+    ctx.config()->settings()->boot()->setBootPassword(bootPassword());
+  return true;
 }
 
 
@@ -3832,6 +3917,14 @@ DM32UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
+  // Remove all M17 channels
+  ObjectFilterVisitor m17Filter{M17Channel::staticMetaObject};
+  if (! m17Filter.process(copy, err)) {
+    errMsg(err) << "Remove M17 channels.";
+    delete copy;
+    return nullptr;
+  }
+
   // Keep only ARC4, AES (128 and 256)
   EncryptionKeyFilterVisitor encFilter{
     EncryptionKeyFilterVisitor::Filter(ARC4EncryptionKey::staticMetaObject, 40),
@@ -4020,6 +4113,11 @@ DM32UVCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! PasswordSettingsElement(data(Offset::passwordSettings())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode password settings.";
+    return false;
+  }
+
   if (! APRSSettingsElement(data(Offset::aprsSettings())).decode(ctx, err)) {
     errMsg(err) << "Cannot decode APRS settings.";
     return false;
@@ -4132,6 +4230,10 @@ DM32UVCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
     errMsg(err) << "Cannot encode APRS settings.";
     return false;
   }
+  if (! PasswordSettingsElement(data(Offset::passwordSettings())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode password settings.";
+    return false;
+  }
 
   if (! image(0).isAllocated(Offset::extendedSettings()))
     image(0).addElement(Offset::extendedSettings(), Limit::blockSize());
@@ -4148,8 +4250,8 @@ bool
 DM32UVCodeplug::decodeChannels(Context &ctx, const ErrorStack &err) {
   ChannelBankElement bank(data(Offset::channelBanks()));
   for (unsigned int i=0; i<bank.channelCount(); i++) {
-    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
-    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+    auto blockNumber = ChannelBankElement::channelBank(i);
+    auto indexInBlock = ChannelBankElement::indexInBank(i);
     uint32_t addr = Offset::channelBanks()
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
@@ -4186,8 +4288,8 @@ bool
 DM32UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   ChannelBankElement bank(data(Offset::channelBanks()));
   for (unsigned int i=0; i<bank.channelCount(); i++) {
-    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
-    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+    unsigned int blockNumber  = ChannelBankElement::channelBank(i);
+    unsigned int indexInBlock = ChannelBankElement::indexInBank(i);
     uint32_t addr = Offset::channelBanks()
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
@@ -4222,9 +4324,7 @@ bool
 DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
   // Allocate blocks
   auto numBlocks = Limit::channelBanks().limit(
-    ctx.count<Channel>()/ChannelBankElement::Limit::channelsPerBlock()
-    + ((0 != ctx.count<Channel>() % ChannelBankElement::Limit::channelsPerBlock()) ? 1 : 0));
-
+    ChannelBankElement::bankCount(ctx.count<Channel>()));
   for (unsigned int b=0; b<numBlocks; b++) {
     unsigned int addr = Offset::channelBanks() + b*Limit::blockSize();
     if (! isAllocated(addr))
@@ -4233,10 +4333,10 @@ DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
 
   // Encode channels
   ChannelBankElement bank(data(Offset::channelBanks()));
-  bank.setChannelCount(ctx.count<Channel>());
-  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
-    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
-    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+  bank.setChannelCount(std::min(ctx.count<Channel>(), ChannelBankElement::Limit::channels()));
+  for (unsigned int i=0; i<bank.channelCount(); i++) {
+    unsigned int blockNumber  = ChannelBankElement::channelBank(i);
+    unsigned int indexInBlock = ChannelBankElement::indexInBank(i);
     uint32_t addr = Offset::channelBanks()
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
@@ -4301,10 +4401,10 @@ DM32UVCodeplug::encodeContacts(Context &ctx, const ErrorStack &err) {
   if (! isAllocated(Offset::contactIndex()))
     image(0).addElement(Offset::contactIndex(), ContactIndexElement::size());
 
-  // Allocate blocks
+    // Allocate blocks
   auto numBlocks = Limit::contactBanks().limit(
-    ctx.count<DMRContact>()/ContactBankElement::Limit::contactsPerBlock()
-    + ((0 != ctx.count<DMRContact>() % ContactBankElement::Limit::contactsPerBlock()) ? 1 : 0));
+    ctx.count<DigitalContact>()/ContactBankElement::Limit::contactsPerBlock()
+    + ((0 != ctx.count<DigitalContact>() % ContactBankElement::Limit::contactsPerBlock()) ? 1 : 0));
   for (unsigned int b=0; b<numBlocks; b++) {
     unsigned int addr = Offset::contactBanks() + b*Limit::blockSize();
     if (! isAllocated(addr))
@@ -4316,7 +4416,7 @@ DM32UVCodeplug::encodeContacts(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  for (unsigned int i=0; i<ctx.count<DMRContact>(); i++) {
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
     unsigned int blockIndex    = i / ContactBankElement::Limit::contactsPerBlock(),
       indexInBlock = i % ContactBankElement::Limit::contactsPerBlock();
     uint32_t addr = Offset::contactBanks()

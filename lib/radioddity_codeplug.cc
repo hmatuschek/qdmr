@@ -1,4 +1,7 @@
 #include "radioddity_codeplug.hh"
+
+#include <QRegularExpression>
+
 #include "utils.hh"
 #include "logger.hh"
 #include "scanlist.hh"
@@ -1805,6 +1808,7 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const Error
   }
 
   setVOXSensitivity(ctx.config()->settings()->vox());
+  enableAnimation(BootSettings::BootDisplay::Logo == ctx.config()->settings()->boot()->bootDisplay());
   setPreambleDuration(ctx.config()->settings()->dmr()->preamble());
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
   setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
@@ -1833,7 +1837,6 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const Error
     inhibitQuickKeyOverride(ext->quickKeyOverrideInhibited());
     enableTXExitTone(ext->tone()->txExitTone());
     enableTXOnActiveChannel(ext->txOnActiveChannel());
-    enableAnimation(RadioddityBootSettingsExtension::DisplayMode::Image == ext->boot()->display());
     setScanMode(ext->scanMode());
     setRepeaterEndDelay(ext->repeaterEndDelay().seconds());
     setRepeaterSTE(ext->repeaterSTE().seconds());
@@ -1859,6 +1862,8 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
     ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()->setNumber(radioID());
   }
   ctx.config()->settings()->setVOX(voxSensitivity());
+  if (animation())
+    ctx.config()->settings()->boot()->setBootDisplay(BootSettings::BootDisplay::Logo);
   ctx.config()->settings()->dmr()->setPreamble(preambleDuration());
   ctx.config()->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
   ctx.config()->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
@@ -1894,8 +1899,6 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
   ext->inhibitQuickKeyOverride(quickKeyOverrideInhibited());
   ext->tone()->enableTXExitTone(txExitTone());
   ext->enableTXOnActiveChannel(txOnActiveChannel());
-  ext->boot()->setDisplay(animation() ? RadioddityBootSettingsExtension::DisplayMode::Image:
-                                            RadioddityBootSettingsExtension::DisplayMode::Text);
   ext->setScanMode(scanMode());
   ext->setRepeaterEndDelay(Interval::fromSeconds(repeaterEndDelay()));
   ext->setRepeaterSTE(Interval::fromSeconds(repeaterSTE()));
@@ -2501,39 +2504,78 @@ RadioddityCodeplug::BootSettingsElement::~BootSettingsElement() {
 
 void
 RadioddityCodeplug::BootSettingsElement::clear() {
-  enableBootText(true);
+  setBootDisplay(BootSettings::BootDisplay::Logo);
   enableBootPassword(false);
   setBCD8_be(0x0002, 0);
   setUInt8(0x0007, 0);
   memset(_data+0x0008, 0, 24);
 }
 
-bool
-RadioddityCodeplug::BootSettingsElement::bootText() const {
-  return (1 == getUInt8(0x0000));
+
+BootSettings::BootDisplay
+RadioddityCodeplug::BootSettingsElement::bootDisplay() const {
+  return (1 == getUInt8(Offset::bootText()))
+    ? BootSettings::BootDisplay::Text
+    : BootSettings::BootDisplay::Logo;
 }
+
 void
-RadioddityCodeplug::BootSettingsElement::enableBootText(bool enable) {
-  setUInt8(0x0000, (enable ? 1 :0));
+RadioddityCodeplug::BootSettingsElement::setBootDisplay(BootSettings::BootDisplay mode) {
+  switch (mode) {
+    case BootSettings::BootDisplay::Text: setUInt8(Offset::bootText(), 1); break;
+    default: setUInt8(Offset::bootText(), 0); break;
+  }
 }
 
 bool
 RadioddityCodeplug::BootSettingsElement::bootPasswordEnabled() const {
-  return (1 == getUInt8(0x0001));
+  return (1 == getUInt8(Offset::bootPasswordEnable()));
 }
 void
 RadioddityCodeplug::BootSettingsElement::enableBootPassword(bool enable) {
-  setUInt8(0x0001, (enable ? 1 : 0));
+  setUInt8(Offset::bootPasswordEnable(), (enable ? 1 : 0));
 }
 
-unsigned
+
+QString
 RadioddityCodeplug::BootSettingsElement::bootPassword() const {
-  return getBCD8_be(0x0002);
+  return QString::number(getBCD8_be(Offset::bootPassword()));
 }
-void
-RadioddityCodeplug::BootSettingsElement::setBootPassword(unsigned passwd) {
-  setBCD8_be(0x0002, passwd);
+
+bool
+RadioddityCodeplug::BootSettingsElement::setBootPassword(const QString &passwd) {
+  if (passwd.isEmpty()) {
+    enableBootPassword(false);
+    return true;
+  }
+  static QRegularExpression valid(R"(^[0-9]{0,8}$)");
+  if (! valid.match(passwd).hasMatch()) {
+    return false;
+  }
+  setBCD8_be(Offset::bootPassword(), passwd.toUInt());
+  return true;
 }
+
+
+bool
+RadioddityCodeplug::BootSettingsElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  setBootDisplay(ctx.config()->settings()->boot()->bootDisplay());
+  enableBootPassword(ctx.config()->settings()->boot()->bootPasswordEnabled());
+  setBootPassword(ctx.config()->settings()->boot()->bootPassword());
+  return true;
+}
+
+bool
+RadioddityCodeplug::BootSettingsElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err);
+  ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
+  ctx.config()->settings()->boot()->enableBootPassword(bootPasswordEnabled() && (!bootPassword().isEmpty()));
+  ctx.config()->settings()->boot()->setBootPassword(bootPassword());
+  return true;
+}
+
+
 
 /* ********************************************************************************************* *
  * Implementation of RadioddityCodeplug::BootTextElement
@@ -2832,7 +2874,7 @@ RadioddityCodeplug::clear() {
   // clear menu settings
   clearMenuSettings();
   // clear boot text
-  clearBootText();
+  clearBootSettings();
   // clear VFO settings
   clearVFOSettings();
   // clear zones
@@ -2858,10 +2900,15 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DMRContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d+1); d++;
-    } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a+1); a++;
+    Contact *contact = config->contacts()->contact(i);
+    if (contact->is<DMRContact>()) {
+      ctx.add(contact->as<DMRContact>(), d+1); d++;
+    } else if (contact->is<DTMFContact>()) {
+      ctx.add(contact->as<DTMFContact>(), a+1); a++;
+    } else {
+      logInfo() << "Cannot index contact '" << contact->name()
+                << "'. Contact type '" << contact->metaObject()->className()
+                << "' not supported by or implemented for Radioddity devices.";
     }
   }
 
@@ -2870,8 +2917,16 @@ RadioddityCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) c
     ctx.add(config->rxGroupLists()->list(i), i+1);
 
   // Map channels
-  for (int i=0; i<config->channelList()->count(); i++)
-    ctx.add(config->channelList()->channel(i), i+1);
+  for (int i=0, c=1; i<config->channelList()->count(); i++) {
+    Channel *channel = config->channelList()->channel(i);
+    if (channel->is<FMChannel>() || channel->is<DMRChannel>()) {
+      ctx.add(channel, c); c++;
+    } else {
+      logInfo() << "Cannot index channel '" << channel->name()
+                << "'. Channel type '" << channel->metaObject()->className()
+                << "' not supported by or implemented for Radioddity devices.";
+    }
+  }
 
   // Map zones
   for (int i=0; i<config->zones()->count(); i++)
@@ -2905,10 +2960,10 @@ RadioddityCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
-  // Remove all AM channels
-  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  // Remove all AM & M17 channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject, M17Channel::staticMetaObject};
   if (! amFilter.process(intermediate, err)) {
-    errMsg(err) << "Remove AM channels.";
+    errMsg(err) << "Remove AM & M17 channels.";
     delete intermediate;
     return nullptr;
   }
@@ -2976,7 +3031,7 @@ RadioddityCodeplug::encodeElements(const Flags &flags, Context &ctx, const Error
     return false;
   }
 
-  if (! this->encodeBootText(flags, ctx, err)) {
+  if (! this->encodeBootSettings(flags, ctx, err)) {
     errMsg(err) << "Cannot encode boot text.";
     return false;
   }
@@ -3064,7 +3119,7 @@ RadioddityCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  if (! this->decodeBootText(ctx, err)) {
+  if (! this->decodeBootSettings(ctx, err)) {
     errMsg(err) << "Cannot decode boot text.";
     return false;
   }
