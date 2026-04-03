@@ -34,7 +34,10 @@ UV390Limits::UV390Limits(QObject *parent)
             unsigned(Channel::Power::High) } },
         { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
-        { "tot", new RadioLimitInterval() }
+        { "tot", new RadioLimitInterval() },
+        { "boot", new RadioLimitItem {
+          {"passwordEnabled", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+          {"password", new RadioLimitPin(UV390Codeplug::GeneralSettingsElement::Limit::bootPasswordLength(), RadioLimitIssue::Critical) } } }
         /// @todo check default radio ID.
       } );
 

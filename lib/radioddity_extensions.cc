@@ -326,7 +326,7 @@ RadioddityToneSettingsExtension::setFMMicGain(Level gain) {
  * Implementation of RadioddityBootSettingsExtension
  * ********************************************************************************************* */
 RadioddityBootSettingsExtension::RadioddityBootSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _displayMode(DisplayMode::Text), _bootPasswd(), _progPasswd()
+  : ConfigItem(parent), _progPasswd()
 {
   // pass...
 }
@@ -339,31 +339,6 @@ RadioddityBootSettingsExtension::clone() const {
     return nullptr;
   }
   return ext;
-}
-
-RadioddityBootSettingsExtension::DisplayMode
-RadioddityBootSettingsExtension::display() const {
-  return _displayMode;
-}
-void
-RadioddityBootSettingsExtension::setDisplay(DisplayMode mode) {
-  if (_displayMode == mode)
-    return;
-  _displayMode = mode;
-  emit modified(this);
-}
-
-
-const QString &
-RadioddityBootSettingsExtension::bootPassword() const {
-  return _bootPasswd;
-}
-void
-RadioddityBootSettingsExtension::setBootPassword(const QString &pwd) {
-  if (_bootPasswd == pwd)
-    return;
-  _bootPasswd = pwd;
-  emit modified(this);
 }
 
 const QString &

@@ -418,10 +418,6 @@ RD5RCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
-void
-RD5RCodeplug::clearBootSettings() {
-  BootSettingsElement(data(Offset::bootSettings())).clear();
-}
 
 void
 RD5RCodeplug::clearMenuSettings() {
@@ -429,19 +425,22 @@ RD5RCodeplug::clearMenuSettings() {
 }
 
 void
-RD5RCodeplug::clearBootText() {
+RD5RCodeplug::clearBootSettings() {
+  BootSettingsElement(data(Offset::bootSettings())).clear();
   BootTextElement(data(Offset::bootText())).clear();
 }
 
 bool
-RD5RCodeplug::encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err) {
+RD5RCodeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
+  BootSettingsElement(data(Offset::bootSettings())).encode(ctx, err);
   BootTextElement(data(Offset::bootText())).fromConfig(ctx, err);
   return true;
 }
 
 bool
-RD5RCodeplug::decodeBootText(Context &ctx, const ErrorStack &err) {
+RD5RCodeplug::decodeBootSettings(Context &ctx, const ErrorStack &err) {
+  BootSettingsElement(data(Offset::bootSettings())).decode(ctx, err);
   BootTextElement(data(Offset::bootText())).updateConfig(ctx, err);
   return true;
 }

@@ -95,7 +95,7 @@ public:
   static inline FrequencyOffset fromHz(qint64 Hz)   { return FrequencyOffset(Hz); }             ///< Unit conversion.
   static inline FrequencyOffset fromkHz(double kHz) { return FrequencyOffset(kHz*1e3); }      ///< Unit conversion.
   static inline FrequencyOffset fromMHz(double MHz) { return FrequencyOffset(MHz*1e6); }      ///< Unit conversion.
-  static inline FrequencyOffset fromGHz(double GHz) { return FrequencyOffset(GHz*1e6); }      ///< Unit conversion.
+  static inline FrequencyOffset fromGHz(double GHz) { return FrequencyOffset(GHz*1e9); }      ///< Unit conversion.
 };
 
 
@@ -153,7 +153,7 @@ public:
   static inline Frequency fromHz(quint64 Hz)  { return Frequency(Hz); }      ///< Unit conversion.
   static inline Frequency fromkHz(double kHz) { return Frequency(kHz*1e3); } ///< Unit conversion.
   static inline Frequency fromMHz(double MHz) { return Frequency(MHz*1e6); } ///< Unit conversion.
-  static inline Frequency fromGHz(double GHz) { return Frequency(GHz*1e6); } ///< Unit conversion.
+  static inline Frequency fromGHz(double GHz) { return Frequency(GHz*1e9); } ///< Unit conversion.
 
 public:
   /** Searches for the nearest frequency and returns an associated value. */

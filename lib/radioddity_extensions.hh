@@ -264,19 +264,8 @@ class RadioddityBootSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  /** The boot display mode. */
-  Q_PROPERTY(DisplayMode display READ display WRITE setDisplay)
-  /** The programming password, disabled if empty. */
-  Q_PROPERTY(QString bootPassword READ bootPassword WRITE setBootPassword)
   /** The programming password, disabled if empty. */
   Q_PROPERTY(QString progPassword READ progPassword WRITE setProgPassword)
-
-public:
-  /** Possible boot display modes. */
-  enum class DisplayMode {
-    None, Text, Image
-  };
-  Q_ENUM(DisplayMode)
 
 public:
   /** Default constructor. */
@@ -284,26 +273,12 @@ public:
 
   ConfigItem *clone() const;
 
-  /** Returns the boot display mode. */
-  DisplayMode display() const;
-  /** Sets the boot display mode. */
-  void setDisplay(DisplayMode mode);
-
-  /** Returns the boot password. */
-  const QString &bootPassword() const;
-  /** Sets the boot password. */
-  void setBootPassword(const QString &pwd);
-
   /** Returns the programming password. */
   const QString &progPassword() const;
   /** Sets the programming password. */
   void setProgPassword(const QString &pwd);
 
 protected:
-  /** The boot display mode. */
-  DisplayMode _displayMode;
-  /** Holds the boot password, disabled if empty. */
-  QString _bootPasswd;
   /** Holds the programming password, disabled if empty. */
   QString _progPasswd;
 };

@@ -10,6 +10,7 @@
 #include "frequency.hh"
 #include "ranges.hh"
 #include "roamingchannel.hh"
+#include "bootsettings.hh"
 #include "smsextension.hh"
 #include "gnsssettings.hh"
 #include "dmrsettings.hh"
@@ -281,7 +282,7 @@ public:
   {
   public:
     /** Constructor. */
-    ChannelBankElement(uint8_t *ptr);
+    explicit ChannelBankElement(uint8_t *ptr);
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0010; }
@@ -292,12 +293,22 @@ public:
     virtual void setChannelCount(unsigned int n);
 
   public:
+    /** Returns the block index for the given channel index. */
+    static unsigned int channelBank(unsigned int index);
+    /** Returns the channel index within the block for the given channel index. */
+    static unsigned int indexInBank(unsigned int index);
+    /** Computes the number of channel banks required to encode the given number of channels. */
+    static unsigned int bankCount(unsigned int channelCount);
+
+  public:
     /** Some limits. */
     struct Limit: Element::Limit {
       /** Maximum number of channels. */
       static constexpr unsigned int channels() { return 4000; }
+      /** Maximum number of channels in block 0. */
+      static constexpr unsigned int channelsInBlock0() { return 84; }
       /** Maximum number of channels per block. */
-      static constexpr unsigned int channelsPerBlock() { return 84; }
+      static constexpr unsigned int channelsPerBlock() { return 85; }
     };
 
     /** Some internal offsets. */
@@ -321,7 +332,7 @@ public:
   {
   public:
     /** Constructor. */
-    ChannelExtensionElement(uint8_t *ptr);
+    explicit ChannelExtensionElement(uint8_t *ptr);
 
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0002; }
@@ -1511,9 +1522,9 @@ public:
     static constexpr unsigned int size() { return 0x0100; }
 
     /** Returns the boot display setting. */
-    virtual BootDisplay bootDisplay() const;
+    virtual BootSettings::BootDisplay bootDisplay() const;
     /** Sets the boot display. */
-    virtual void setBootDisplay(BootDisplay dis);
+    virtual void setBootDisplay(BootSettings::BootDisplay dis);
 
     /** Returns the first boot message line. */
     virtual QString bootMessage1() const;
@@ -1528,6 +1539,7 @@ public:
     virtual bool mcuResetEnabled() const;
     /** Enables MCU reset. */
     virtual void enableMCUReset(bool enable);
+
     /** Returns the auto-power-off delay. */
     virtual Interval autoPowerOffDelay() const;
     /** Sets the auto-power-off delay. */
@@ -2157,6 +2169,11 @@ public:
     /** Clears the read password. */
     virtual void clearReadPassword();
 
+    /** Encode password settings from given config. */
+    virtual bool encode(Context &ctx, ErrorStack err=ErrorStack());
+    /** Decode password settings and update config. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack());
+
   public:
     /** Some limits for the element. */
     struct Limit: Element::Limit
@@ -2410,6 +2427,7 @@ protected:
     /// @cond DO_NOT_DOCUMENT
     static constexpr unsigned int generalSettings()       { return 0x00004000; }
     static constexpr unsigned int aprsSettings()          { return 0x00004300; }
+    static constexpr unsigned int passwordSettings()      { return 0x00004400; }
     static constexpr unsigned int contactIndex()          { return 0x0000b000; }
     static constexpr unsigned int groupListBank()         { return 0x0000f000; }
     static constexpr unsigned int extendedSettings()      { return 0x00010000; }

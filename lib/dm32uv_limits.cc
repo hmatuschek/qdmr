@@ -27,14 +27,17 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
           -1, DM32UVCodeplug::GeneralSettingsElement::Limit::bootMessageLength(), RadioLimitString::ASCII) },
         { "introLine2", new RadioLimitString(
           -1, DM32UVCodeplug::GeneralSettingsElement::Limit::bootMessageLength(), RadioLimitString::ASCII) },
-        { "micLevel", new RadioLimitLevel({1, 10}, false) },
+        { "micLevel", new RadioLimitLevel({1, 5}, false) },
         { "speech", new RadioLimitIgnoredBool() },
         { "power", new RadioLimitEnum {
             unsigned(Channel::Power::Low),
             unsigned(Channel::Power::High) } },
         { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
-        { "tot", new RadioLimitInterval() }
+        { "tot", new RadioLimitInterval() },
+        { "boot", new RadioLimitItem {
+            {"passwordEnabled", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+            {"password", new RadioLimitPin(DM32UVCodeplug::PasswordSettingsElement::Limit::passwordLength(), RadioLimitIssue::Critical) } } }
         /// @todo check default radio ID.
       } );
 

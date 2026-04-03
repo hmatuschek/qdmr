@@ -4,6 +4,7 @@
 #include "channel.hh"
 #include "codeplug.hh"
 #include "contact.hh"
+#include "bootsettings.hh"
 
 class Zone;
 
@@ -897,9 +898,9 @@ public:
     /** Enables/disables message tone. */
     virtual void enableMessageTone(bool enable);
 
-    /** Returns the ring tone. */
+    /** Returns the ringtone. */
     virtual RingTone ringTone() const;
-    /** Sets the ring tone. */
+    /** Sets the ringtone. */
     virtual void setRingTone(RingTone tone);
 
     /** Returns the radio name. */
@@ -923,11 +924,11 @@ public:
     virtual void enableCampanding(bool enable);
 
     /** Returns the tuning mode up-direction. */
-    virtual TuningMode tunigModeUp() const;
+    virtual TuningMode tuningModeUp() const;
     /** Sets the tuning mode up-direction. */
     virtual void setTuningModeUp(TuningMode mode);
     /** Returns the tuning mode down-direction. */
-    virtual TuningMode tunigModeDown() const;
+    virtual TuningMode tuningModeDown() const;
     /** Sets the tuning mode down-direction. */
     virtual void setTuningModeDown(TuningMode mode);
 
@@ -947,9 +948,9 @@ public:
     virtual void setScanMode(ScanMode mode);
 
     /** Returns the boot-screen mode. */
-    virtual BootScreen bootScreen() const;
+    virtual BootSettings::BootDisplay bootScreen() const;
     /** Sets the boot-screen mode. */
-    virtual void setBootScreen(BootScreen mode);
+    virtual void setBootScreen(BootSettings::BootDisplay mode);
 
     /** Returns the boot-screen line 1. */
     virtual QString bootLine1() const;
@@ -993,9 +994,9 @@ public:
     virtual void clearProgPassword();
 
     /** Updates configuration. */
-    virtual bool updateConfig(Config *config, const ErrorStack &err=ErrorStack());
+    virtual bool decode(Config *config, const ErrorStack &err=ErrorStack());
     /** Encode from config. */
-    virtual bool fromConfig(Config *config, const ErrorStack &err=ErrorStack());
+    virtual bool encode(Config *config, const ErrorStack &err=ErrorStack());
 
   protected:
     /** Some offsets within the element. */

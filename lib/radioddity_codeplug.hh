@@ -7,6 +7,7 @@
 #include "contact.hh"
 #include "radioddity_extensions.hh"
 #include "ranges.hh"
+#include "bootsettings.hh"
 
 
 class DMRContact;
@@ -1478,20 +1479,43 @@ public:
     /** Resets the settings. */
     void clear();
 
-    /** Returns @c true if the text is shown on boot, other wise an image is shown. */
-    virtual bool bootText() const;
-    /** Enables/disables boot text. */
-    virtual void enableBootText(bool enable);
+    /** Returns the boot display mode. */
+    virtual BootSettings::BootDisplay bootDisplay() const;
+    /** Sets the boot display mode. */
+    virtual void setBootDisplay(BootSettings::BootDisplay mode);
 
     /** Returns @c true if the boot password is enabled. */
     virtual bool bootPasswordEnabled() const;
     /** Enables/disables the boot password. */
     virtual void enableBootPassword(bool enable);
     /** Returns the boot password (6 digit). */
-    virtual unsigned bootPassword() const;
+    virtual QString bootPassword() const;
     /** Sets the boot password (6 digit). */
-    virtual void setBootPassword(unsigned passwd);
+    virtual bool setBootPassword(const QString &passwd);
+
+    /** Decodes boot settings and updates config. */
+    virtual bool decode(Context &ctx, const ErrorStack &err=ErrorStack()) const;
+    /** Encodes boot settings from config. */
+    virtual bool encode(Context &ctx, const ErrorStack &err=ErrorStack());
+
+  public:
+    /** Some limits for the settings. */
+    struct Limit: Element::Limit {
+      // Maximum password length.
+      static constexpr unsigned passwordLength() { return 8; }
+    };
+
+  protected:
+    /** Internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int bootText() { return 0x0000; }
+      static constexpr unsigned int bootPasswordEnable() { return 0x0001; }
+      static constexpr unsigned int bootPassword() { return 0x0002; }
+      /// @endcond
+    };
   };
+
 
   /** Implements the base class of boot messages for all Radioddity codeplugs.
    *
@@ -1739,18 +1763,15 @@ public:
   /** Links all channels. */
   virtual bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
-  /** Clear boot settings. */
-  virtual void clearBootSettings() = 0;
-
   /** Clears menu settings. */
   virtual void clearMenuSettings() = 0;
 
   /** Clears boot text. */
-  virtual void clearBootText() = 0;
+  virtual void clearBootSettings() = 0;
   /** Encodes boot text. */
-  virtual bool encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
   /** Updates the given configuration from the boot text settings. */
-  virtual bool decodeBootText(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool decodeBootSettings(Context &ctx, const ErrorStack &err=ErrorStack()) = 0;
 
   /** Clears the VFO settings. */
   virtual void clearVFOSettings() = 0;

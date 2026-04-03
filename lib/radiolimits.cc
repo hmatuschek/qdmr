@@ -7,7 +7,7 @@
 // Utility function to check string content for ASCII encoding
 inline bool qstring_is_ascii(const QString &text) {
   foreach (QChar c, text) {
-    if ((c.unicode() < 0x1f) && (0x7f != c.unicode()))
+    if ((c.unicode() < 0x20) || (c.unicode() > 0x7e))
       return false;
   }
   return true;
@@ -262,6 +262,19 @@ RadioLimitStringRegEx::verify(const ConfigItem *item, const QMetaProperty &prop,
   }
 
   return success;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitPin
+ * ********************************************************************************************* */
+RadioLimitPin::RadioLimitPin(int length, RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitStringRegEx("", severity, parent)
+{
+  if (length <= 0)
+    _pattern = QRegularExpression("^[0-9]+");
+  else
+    _pattern = QRegularExpression(QString("[0-9]{0,%1}").arg(length));
 }
 
 
@@ -568,7 +581,7 @@ RadioLimitLevel::verify(const ConfigItem *item, const QMetaProperty &prop, Radio
     return _severity <= RadioLimitIssue::Warning;
   }
 
-  if (_range.contains(value.value())) {
+  if (!_range.contains(value.value())) {
     auto &msg = context.newMessage(_severity);
     msg << "Value of property " << prop.name() << " " << value.value() << " exceeds range [" << _range.lower << ", " << _range.upper << "].";
     return _severity <= RadioLimitIssue::Warning;
@@ -1030,7 +1043,7 @@ RadioLimits::RadioLimits(bool betaWarning, QObject *parent)
 }
 
 RadioLimits::RadioLimits(const std::initializer_list<std::pair<QString, RadioLimitElement *> > &list, QObject *parent)
-  : RadioLimitItem(list, parent),
+  : RadioLimitItem(list, parent), _betaWarning(false),
     _hasCallSignDB(false), _callSignDBImplemented(false), _numCallSignDBEntries(0),
     _hasSatelliteConfig(false), _satelliteConfigImplemented(false), _numSatellites(0)
 {

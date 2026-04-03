@@ -446,29 +446,28 @@ GD77Codeplug::linkChannels(Context &ctx, const ErrorStack &err) {
 }
 
 void
-GD77Codeplug::clearBootSettings() {
-  BootSettingsElement(data(Offset::bootSettings())).clear();
-}
-
-void
 GD77Codeplug::clearMenuSettings() {
   MenuSettingsElement(data(Offset::menuSettings())).clear();
 }
 
+
 void
-GD77Codeplug::clearBootText() {
+GD77Codeplug::clearBootSettings() {
+  BootSettingsElement(data(Offset::bootSettings())).clear();
   BootTextElement(data(Offset::bootText())).clear();
 }
 
 bool
-GD77Codeplug::encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err) {
+GD77Codeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
+  BootSettingsElement(data(Offset::bootSettings())).encode(ctx, err);
   BootTextElement(data(Offset::bootText())).fromConfig(ctx, err);
   return true;
 }
 
 bool
-GD77Codeplug::decodeBootText(Context &ctx, const ErrorStack &err) {
+GD77Codeplug::decodeBootSettings(Context &ctx, const ErrorStack &err) {
+  BootSettingsElement(data(Offset::bootSettings())).decode(ctx, err);
   BootTextElement(data(Offset::bootText())).updateConfig(ctx, err);
   return true;
 }

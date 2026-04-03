@@ -37,6 +37,8 @@ private slots:
   void testDTMFContacts();
   /** Regression test for #697. */
   void testChannelTransmitTimeout();
+  /** Regression test for #856. */
+  void testConfigVerification();
   void testBootMelody();
 
 protected:
