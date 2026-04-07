@@ -40,6 +40,8 @@ private slots:
   /** Regression test for #856. */
   void testConfigVerification();
   void testBootMelody();
+  /** Regression tests for #878. */
+  void testBootMelodyPauses();
 
 protected:
   static bool encodeDecode(Config &config, Config &decoded, const ErrorStack &err=ErrorStack());

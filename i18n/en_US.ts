@@ -653,7 +653,7 @@
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Channel ...</source>
-        <translation>Add Channel ...</translation>
+        <translation>Add Channel …</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
@@ -945,7 +945,7 @@
 <context>
     <name>ChannelSelectionDialog</name>
     <message>
-        <location filename="../src/channelselectiondialog.cc" line="23"/>
+        <location filename="../src/channelselectiondialog.cc" line="24"/>
         <source>Select a channel:</source>
         <translation>Select a channel:</translation>
     </message>
@@ -955,12 +955,12 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="17"/>
         <source>Merging codeplugs ...</source>
-        <translation>Merging codeplugs ...</translation>
+        <translation>Merging codeplugs …</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="32"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, …) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="48"/>
@@ -2169,6 +2169,14 @@
     </message>
 </context>
 <context>
+    <name>FlagEditDialog</name>
+    <message>
+        <location filename="../src/flageditdialog.ui" line="14"/>
+        <source>Select Flags</source>
+        <translation>Select Flags</translation>
+    </message>
+</context>
+<context>
     <name>GPSSystemDialog</name>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="8"/>
@@ -2622,7 +2630,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="318"/>
         <source>Export to CHIRP ...</source>
-        <translation>Export to CHIRP ...</translation>
+        <translation>Export to CHIRP …</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="321"/>
@@ -2632,7 +2640,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="326"/>
         <source>Import ...</source>
-        <translation>Import ...</translation>
+        <translation>Import …</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="329"/>
@@ -2652,7 +2660,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="345"/>
         <source>Edit Satellites ...</source>
-        <translation>Edit Satellites ...</translation>
+        <translation>Edit Satellites …</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="348"/>
@@ -2765,12 +2773,12 @@
 <context>
     <name>MultiChannelSelectionDialog</name>
     <message>
-        <location filename="../src/channelselectiondialog.cc" line="43"/>
+        <location filename="../src/channelselectiondialog.cc" line="46"/>
         <source>[Selected]</source>
         <translation>[Selected]</translation>
     </message>
     <message>
-        <location filename="../src/channelselectiondialog.cc" line="64"/>
+        <location filename="../src/channelselectiondialog.cc" line="69"/>
         <source>Select a channel:</source>
         <translation>Select a channel:</translation>
     </message>
@@ -2778,12 +2786,12 @@
 <context>
     <name>MultiGroupCallSelectionDialog</name>
     <message>
-        <location filename="../src/contactselectiondialog.cc" line="17"/>
+        <location filename="../src/contactselectiondialog.cc" line="18"/>
         <source>Show private calls</source>
         <translation>Show private calls</translation>
     </message>
     <message>
-        <location filename="../src/contactselectiondialog.cc" line="39"/>
+        <location filename="../src/contactselectiondialog.cc" line="42"/>
         <source>Select a group call:</source>
         <translation>Select a group call:</translation>
     </message>
@@ -2924,17 +2932,27 @@
 <context>
     <name>PropertyDelegate</name>
     <message>
-        <location filename="../src/propertydelegate.cc" line="96"/>
+        <location filename="../src/propertydelegate.cc" line="74"/>
+        <source>None</source>
+        <translation>None</translation>
+    </message>
+    <message>
+        <location filename="../src/propertydelegate.cc" line="75"/>
+        <source>Off</source>
+        <translation>Off</translation>
+    </message>
+    <message>
+        <location filename="../src/propertydelegate.cc" line="112"/>
         <source>False</source>
         <translation>False</translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="97"/>
+        <location filename="../src/propertydelegate.cc" line="113"/>
         <source>True</source>
         <translation>True</translation>
     </message>
     <message>
-        <location filename="../src/propertydelegate.cc" line="120"/>
+        <location filename="../src/propertydelegate.cc" line="142"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
@@ -2942,48 +2960,59 @@
 <context>
     <name>PropertyWrapper</name>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="348"/>
+        <location filename="../src/extensionwrapper.cc" line="350"/>
         <source>new element</source>
         <translation>new element</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="524"/>
+        <location filename="../src/extensionwrapper.cc" line="526"/>
         <source>Property</source>
         <translation>Property</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="525"/>
+        <location filename="../src/extensionwrapper.cc" line="527"/>
         <source>Value</source>
         <translation>Value</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="526"/>
+        <location filename="../src/extensionwrapper.cc" line="528"/>
         <source>Description</source>
         <translation>Description</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="582"/>
+        <location filename="../src/extensionwrapper.cc" line="590"/>
         <source>true</source>
         <translation>true</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="583"/>
+        <location filename="../src/extensionwrapper.cc" line="591"/>
         <source>false</source>
         <translation>false</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="605"/>
-        <location filename="../src/extensionwrapper.cc" line="613"/>
+        <location filename="../src/extensionwrapper.cc" line="612"/>
+        <source>None</source>
+        <translation>None</translation>
+    </message>
+    <message>
+        <location filename="../src/extensionwrapper.cc" line="614"/>
+        <source>Off</source>
+        <translation>Off</translation>
+    </message>
+    <message>
+        <location filename="../src/extensionwrapper.cc" line="625"/>
+        <location filename="../src/extensionwrapper.cc" line="633"/>
+        <location filename="../src/extensionwrapper.cc" line="641"/>
         <source>[None]</source>
         <translation>[None]</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="615"/>
+        <location filename="../src/extensionwrapper.cc" line="643"/>
         <source>Instance of %1</source>
         <translation>Instance of &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="620"/>
+        <location filename="../src/extensionwrapper.cc" line="648"/>
         <source>List of %1 instances</source>
         <translation>List of %1 instances</translation>
     </message>
@@ -3484,12 +3513,12 @@
         <translation>Edit satellite database</translation>
     </message>
     <message>
-        <location filename="../src/satellitedatabasedialog.ui" line="45"/>
+        <location filename="../src/satellitedatabasedialog.ui" line="48"/>
         <source>Add</source>
         <translation>Add</translation>
     </message>
     <message>
-        <location filename="../src/satellitedatabasedialog.ui" line="52"/>
+        <location filename="../src/satellitedatabasedialog.ui" line="55"/>
         <source>Delete</source>
         <translation>Delete</translation>
     </message>
@@ -3501,6 +3530,58 @@
         <location filename="../src/satelliteselectiondialog.ui" line="26"/>
         <source>Select a satellite</source>
         <translation>Select a satellite</translation>
+    </message>
+</context>
+<context>
+    <name>SatelliteTransponderDialog</name>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="14"/>
+        <source>Edit Satellite Transponder</source>
+        <translation>Edit Satellite Transponder</translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="26"/>
+        <source>FM Voice Transponder</source>
+        <translation>FM Voice Transponder</translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="32"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="105"/>
+        <source>Uplink Frequency</source>
+        <translation>Uplink Frequency</translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="42"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="121"/>
+        <source>Uplink Tone</source>
+        <translation>Uplink Tone</translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="58"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="143"/>
+        <source>Downlink Frequency</source>
+        <translation>Downlink Frequency</translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="68"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="159"/>
+        <source>Downlink Tone</source>
+        <translation>Downlink Tone</translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="93"/>
+        <source>APRS Transponder</source>
+        <translation>APRS Transponder</translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="184"/>
+        <source>Beacon</source>
+        <translation>Beacon</translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="196"/>
+        <source>Beacon Frequency</source>
+        <translation>Beacon Frequency</translation>
     </message>
 </context>
 <context>
@@ -3882,6 +3963,14 @@
         <location filename="../src/settingsdialog.ui" line="445"/>
         <source>Show device extensions</source>
         <translation>Show device extensions</translation>
+    </message>
+</context>
+<context>
+    <name>TransponderFrequencyEditor</name>
+    <message>
+        <location filename="../src/transponderfrequencydelegate.cc" line="28"/>
+        <source>None</source>
+        <translation>None</translation>
     </message>
 </context>
 <context>
