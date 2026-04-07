@@ -491,11 +491,7 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
     else
       dmr->setRadioId(ctx.get<DMRRadioID>(dmrIdIndex()));
 
-    if (dmrAPRSEnabled()) {
-      if (! ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
-        errMsg(err) << "Unknown GPS system index " << dmrAPRSChannelIndex() << ".";
-        return false;
-      }
+    if (dmrAPRSEnabled() && ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
       dmr->setAPRS(ctx.get<DMRAPRSSystem>(dmrAPRSChannelIndex()));
     }
   }    
@@ -558,6 +554,12 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     enableLoneWorker(dmr->extended()->loneWorker());
     enablePrivateCallACK(dmr->extended()->privateCallConfirm());
     enableDataACK(dmr->extended()->dataConfirm());
+    if (!dmr->aprsRef()->isNull() && dmr->aprsRef()->is<DMRAPRSSystem>()) {
+      enableDMRAPRS(true);
+      setDMRAPRSChannelIndex(ctx.index(dmr->aprsRef()->as<DMRAPRSSystem>()));
+    } else {
+      enableDMRAPRS(false);
+    }
   } else if (channel->is<FMChannel>()) {
     auto fm = channel->as<FMChannel>();
     setBandwidth(fm->bandwidth());
@@ -631,6 +633,31 @@ DM32UVCodeplug::ChannelBankElement::setChannelCount(unsigned int n) {
   setUInt16_le(Offset::channelCount(), n);
 }
 
+
+unsigned int
+DM32UVCodeplug::ChannelBankElement::channelBank(unsigned int index) {
+  if (index < Limit::channelsInBlock0())
+    return 0;
+  index -= Limit::channelsInBlock0();
+  return 1 + index/Limit::channelsPerBlock();
+}
+
+unsigned int
+DM32UVCodeplug::ChannelBankElement::indexInBank(unsigned int index) {
+  if (index < Limit::channelsInBlock0())
+    return index;
+  index -= Limit::channelsInBlock0();
+  return index % Limit::channelsPerBlock();
+}
+
+unsigned int
+DM32UVCodeplug::ChannelBankElement::bankCount(unsigned int channelCount) {
+  if (channelCount <= Limit::channelsInBlock0())
+    return 1;
+  channelCount -= Limit::channelsInBlock0();
+  return 1 + channelCount / Limit::channelsPerBlock() +
+    ((0 != channelCount % Limit::channelsPerBlock()) ? 1 : 0);
+}
 
 
 /* ******************************************************************************************** *
@@ -3242,7 +3269,7 @@ DM32UVCodeplug::GeneralSettingsElement::setSTEMode(STEMode mode) {
 
 Level
 DM32UVCodeplug::GeneralSettingsElement::fmMicLevel() const {
-  return Level::fromValue(getUInt8(Offset::fmMicLevel())+ 1, Limit::micGain());
+  return Level::fromValue(getUInt8(Offset::fmMicLevel()), Limit::micGain());
 }
 
 void
@@ -4146,8 +4173,8 @@ bool
 DM32UVCodeplug::decodeChannels(Context &ctx, const ErrorStack &err) {
   ChannelBankElement bank(data(Offset::channelBanks()));
   for (unsigned int i=0; i<bank.channelCount(); i++) {
-    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
-    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+    auto blockNumber = ChannelBankElement::channelBank(i);
+    auto indexInBlock = ChannelBankElement::indexInBank(i);
     uint32_t addr = Offset::channelBanks()
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
@@ -4184,8 +4211,8 @@ bool
 DM32UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   ChannelBankElement bank(data(Offset::channelBanks()));
   for (unsigned int i=0; i<bank.channelCount(); i++) {
-    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
-    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+    unsigned int blockNumber  = ChannelBankElement::channelBank(i);
+    unsigned int indexInBlock = ChannelBankElement::indexInBank(i);
     uint32_t addr = Offset::channelBanks()
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
@@ -4220,9 +4247,7 @@ bool
 DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
   // Allocate blocks
   auto numBlocks = Limit::channelBanks().limit(
-    ctx.count<Channel>()/ChannelBankElement::Limit::channelsPerBlock()
-    + ((0 != ctx.count<Channel>() % ChannelBankElement::Limit::channelsPerBlock()) ? 1 : 0));
-
+    ChannelBankElement::bankCount(ctx.count<Channel>()));
   for (unsigned int b=0; b<numBlocks; b++) {
     unsigned int addr = Offset::channelBanks() + b*Limit::blockSize();
     if (! isAllocated(addr))
@@ -4231,10 +4256,10 @@ DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
 
   // Encode channels
   ChannelBankElement bank(data(Offset::channelBanks()));
-  bank.setChannelCount(ctx.count<Channel>());
-  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
-    unsigned int blockNumber  = i / ChannelBankElement::Limit::channelsPerBlock();
-    unsigned int indexInBlock = i % ChannelBankElement::Limit::channelsPerBlock();
+  bank.setChannelCount(std::min(ctx.count<Channel>(), ChannelBankElement::Limit::channels()));
+  for (unsigned int i=0; i<bank.channelCount(); i++) {
+    unsigned int blockNumber  = ChannelBankElement::channelBank(i);
+    unsigned int indexInBlock = ChannelBankElement::indexInBank(i);
     uint32_t addr = Offset::channelBanks()
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())

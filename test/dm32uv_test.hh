@@ -17,6 +17,8 @@ private slots:
   void testBasicConfigReencoding();
   void testProstProcessingOfEmptyCodeplug();
   void testAMChannelReencoding();
+  /** Regression test for #873 */
+  void testChannelBankEncoding();
 };
 
 #endif // DR1801TEST_HH
