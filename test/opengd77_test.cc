@@ -350,5 +350,26 @@ OpenGD77Test::testBootMelody() {
 }
 
 
+void
+OpenGD77Test::testBootMelodyPauses() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/opengd77_boot_melody.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  QVERIFY(config.settings()->openGD77Extension());
+  config.settings()->openGD77Extension()->bootMelody()->fromLilypond("c4 r16 c4 g4 e4 r4 c16 g16 e16 r16 c4");
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.settings()->openGD77Extension());
+  QCOMPARE(decoded.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 r16 c4 g e r c16 g e r c4");
+}
+
+
 QTEST_GUILESS_MAIN(OpenGD77Test)
 
