@@ -27,17 +27,6 @@ D578UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
 
 
 bool
-D578UVCodeplug::ChannelElement::frequenciesSwapped() const {
-  return getBit(Offset::swapRxTx());
-}
-
-void
-D578UVCodeplug::ChannelElement::enableSwapFrequencies(bool enable) {
-  setBit(Offset::swapRxTx(), enable);
-}
-
-
-bool
 D578UVCodeplug::ChannelElement::bluetoothEnabled() const {
   return getBit(Offset::bluetooth());
 }
@@ -238,16 +227,6 @@ D578UVCodeplug::ChannelElement::setARC4EncryptionKeyIndex(unsigned idx) {
 void
 D578UVCodeplug::ChannelElement::clearARC4EncryptionKeyIndex() {
   setUInt8(Offset::arc4KeyIndex(), 0);
-}
-
-
-bool
-D578UVCodeplug::ChannelElement::ctcssPhaseReversal() const {
-  return false;
-}
-void
-D578UVCodeplug::ChannelElement::enableCTCSSPhaseReversal(bool enable) {
-  Q_UNUSED(enable);
 }
 
 

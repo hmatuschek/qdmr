@@ -75,11 +75,6 @@ public:
     /** Constructor. */
     ChannelElement(uint8_t *ptr);
 
-    /** Returns @c true, if the RX and TX frequencies (and signaling) are swapped. */
-    virtual bool frequenciesSwapped() const;
-    /** Returns @c true, if the RX and TX frequencies (and signaling) are swapped. */
-    virtual void enableSwapFrequencies(bool enable);
-
     /** Returns @c true if bluetooth hands-free is enabled. */
     virtual bool bluetoothEnabled() const;
     /** Enables/disables hands-free. */
@@ -136,11 +131,6 @@ public:
     void setARC4EncryptionKeyIndex(unsigned int index) override;
     void clearARC4EncryptionKeyIndex() override;
 
-    /// Removed from D578UV codeplug
-    bool ctcssPhaseReversal() const override;
-    /// Removed from D578UV codeplug
-    void enableCTCSSPhaseReversal(bool enable) override;
-
     Channel *toChannelObj(Context &ctx) const override;
     bool fromChannelObj(const Channel *ch, Context &ctx) override;
 
@@ -149,7 +139,6 @@ public:
     struct Offset: public D878UVCodeplug::ChannelElement::Offset
     {
       /// @cond DO_NOT_DOCUMENT
-      static constexpr Bit swapRxTx()                      { return {0x0009, 4}; }
       static constexpr Bit bluetooth()                     { return {0x0034, 2}; }
       static constexpr Bit noiseReduction()                { return {0x0034, 3}; }
       static constexpr Bit interruptPriority()             { return {0x0034, 4}; }

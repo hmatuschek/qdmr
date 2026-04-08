@@ -190,10 +190,10 @@ public:
     /** Sets the RX signaling (tone). */
     virtual void setTXTone(const SelectiveCall &code);
 
-    /** Returns @c true if the CTCSS phase reversal is enabled. */
-    virtual bool ctcssPhaseReversal() const;
-    /** Enables/disables CTCSS phase reversal. */
-    virtual void enableCTCSSPhaseReversal(bool enable);
+    /** Returns @c true if RX and TX frequencies are swapped. */
+    virtual bool rxTxSwapped() const;
+    /** Swaps RX and TX frequencies. */
+    virtual void enableSwapRxTx(bool enable);
 
     /** Returns @c true if the RX only is enabled. */
     virtual bool rxOnly() const;
@@ -362,7 +362,7 @@ public:
       static constexpr Bit repeaterMode()               { return {0x0008, 6}; }
       static constexpr Bit rxSignalingMode()            { return {0x0009, 0}; }
       static constexpr Bit txSignalingMode()            { return {0x0009, 2}; }
-      static constexpr Bit ctcssPhaseReversal()         { return {0x0009, 4}; }
+      static constexpr Bit swapRXTX()                   { return {0x0009, 4}; }
       static constexpr Bit rxOnly()                     { return {0x0009, 5}; }
       static constexpr Bit callConfirm()                { return {0x0009, 6}; }
       static constexpr Bit talkaround()                 { return {0x0009, 7}; }

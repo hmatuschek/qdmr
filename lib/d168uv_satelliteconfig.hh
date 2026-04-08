@@ -3,6 +3,8 @@
 
 #include "anytone_satelliteconfig.hh"
 
+/** Implements the satellite configuration for the AnyTone AT-D168UV.
+ * @ingroup d168uv */
 class D168UVSatelliteConfig : public AnytoneSatelliteConfig
 {
 Q_OBJECT
@@ -11,6 +13,7 @@ public:
   /** Default constructor. */
   explicit D168UVSatelliteConfig(QObject *parent = nullptr);
 
+  /** Returns the satellite element at the specified index. */
   SatelliteElement satellite(unsigned int idx);
   bool encode(SatelliteDatabase *db, const ErrorStack &err) override;
 
@@ -30,4 +33,4 @@ protected:
 };
 
 
-#endif //QDMR_D168UVSATELLITECONFIG_HH
+#endif //D168UV_SATELLITECONFIG_HH

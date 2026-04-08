@@ -285,12 +285,12 @@ AnytoneCodeplug::ChannelElement::setTXTone(const SelectiveCall &code) {
 }
 
 bool
-AnytoneCodeplug::ChannelElement::ctcssPhaseReversal() const {
-  return getBit(Offset::ctcssPhaseReversal());
+AnytoneCodeplug::ChannelElement::rxTxSwapped() const {
+  return getBit(Offset::swapRXTX());
 }
 void
-AnytoneCodeplug::ChannelElement::enableCTCSSPhaseReversal(bool enable) {
-  setBit(Offset::ctcssPhaseReversal(), enable);
+AnytoneCodeplug::ChannelElement::enableSwapRxTx(bool enable) {
+  setBit(Offset::swapRXTX(), enable);
 }
 bool
 AnytoneCodeplug::ChannelElement::rxOnly() const {
@@ -600,7 +600,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     // no per channel squelch settings
     ach->setSquelchDefault();
     ach->extended()->enableTalkaround(talkaround());
-    ach->extended()->enableReverseBurst(ctcssPhaseReversal());
 
     // Create extension
     AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension();
@@ -745,7 +744,7 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     // Apply common settings
     enableTalkaround(ac->extended()->talkaround());
     // Apply FM settings
-    enableCTCSSPhaseReversal(ac->extended()->reverseBurst());
+
     // Handle extension
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
       setCustomCTCSSFrequency(ext->customCTCSS());
