@@ -1,4 +1,5 @@
 #include "d168uv_limits.hh"
+#include "d878uv2_callsigndb.hh"
 #include "channel.hh"
 #include "radioid.hh"
 #include "contact.hh"
@@ -16,13 +17,13 @@ D168UVLimits::D168UVLimits(const std::initializer_list<std::pair<Frequency, Freq
 {
   // Define limits for call-sign DB
   _hasCallSignDB          = true;
-  _callSignDBImplemented  = false;
-  _numCallSignDBEntries   = 500000;
+  _callSignDBImplemented  = true;
+  _numCallSignDBEntries   = D878UV2CallsignDB::Limit::entries();
 
   // Define limits for satellite config
   _hasSatelliteConfig          = true;
   _satelliteConfigImplemented  = true;
-  _numSatellites               = 200;
+  _numSatellites               = 25;
 
   /* Define limits for the general settings. */
   add("settings",
