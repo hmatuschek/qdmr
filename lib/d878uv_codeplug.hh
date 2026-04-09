@@ -912,9 +912,11 @@ public:
   class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
   protected:
-    /** Encoding of possible GNSSs. */
+    /** Encoding of possible GNSSs. Could someone explain those AnyTone engineers the concept of
+     * flags? */
     enum class GNSS {
-      GPS=0, Beidou=1, Both = 2
+      GPS = 0, Beidou = 1, GPS_Beidou = 2, Glonass = 3, GPS_Glonass = 4, Beidou_Glonass = 5,
+      GPS_Beidou_Glonass = 6
     };
 
     /** Talker alias encoding. */

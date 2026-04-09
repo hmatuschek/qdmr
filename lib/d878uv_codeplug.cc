@@ -2466,26 +2466,48 @@ D878UVCodeplug::ExtendedSettingsElement::setAutoRepeaterUHF2MaxFrequency(Frequen
   setUInt32_le(Offset::autoRepeaterUHF2MaxFrequency(), hz.inHz()/10);
 }
 
+
 GNSSSettings::Systems
 D878UVCodeplug::ExtendedSettingsElement::gnss() const {
   switch ((GNSS)getUInt8(Offset::gpsMode())) {
-  case GNSS::GPS: return GNSSSettings::System::GPS;
-  case GNSS::Beidou: return GNSSSettings::System::Beidou;
-  case GNSS::Both: return GNSSSettings::System::GPS|GNSSSettings::System::Beidou;
+  case GNSS::GPS:
+    return GNSSSettings::System::GPS;
+  case GNSS::Beidou:
+    return GNSSSettings::System::Beidou;
+  case GNSS::GPS_Beidou:
+    return GNSSSettings::System::GPS | GNSSSettings::System::Beidou;
+  case GNSS::Glonass:
+    return GNSSSettings::System::Glonass;
+  case GNSS::GPS_Glonass:
+    return GNSSSettings::System::GPS | GNSSSettings::System::Glonass;
+  case GNSS::Beidou_Glonass:
+    return GNSSSettings::System::Beidou | GNSSSettings::System::Glonass;
+  case GNSS::GPS_Beidou_Glonass:
+    return GNSSSettings::System::GPS | GNSSSettings::System::Beidou | GNSSSettings::System::Glonass;
   }
   return GNSSSettings::System::GPS;
 }
+
 void
 D878UVCodeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems mode) {
   int value = 0;
-  if (mode.testFlag(GNSSSettings::System::GPS))
+  if (mode.testFlags(GNSSSettings::System::GPS))
     value = (int)GNSS::GPS;
-  if (mode.testFlag(GNSSSettings::System::Beidou))
+  if (mode.testFlags(GNSSSettings::System::Beidou))
     value = (int)GNSS::Beidou;
   if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
-    value = (int)GNSS::Both;
+    value = (int)GNSS::GPS_Beidou;
+  if (mode.testFlags(GNSSSettings::System::Glonass))
+    value = (int)GNSS::Glonass;
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Glonass))
+    value = (int)GNSS::GPS_Glonass;
+  if (mode.testFlags(GNSSSettings::System::Beidou|GNSSSettings::System::Glonass))
+    value = (int)GNSS::Beidou_Glonass;
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou|GNSSSettings::System::Glonass))
+    value = (int)GNSS::GPS_Beidou_Glonass;
   setUInt8(Offset::gpsMode(), value);
 }
+
 
 Interval
 D878UVCodeplug::ExtendedSettingsElement::steDuration() const {
