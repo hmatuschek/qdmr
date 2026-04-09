@@ -5,6 +5,57 @@
 #include <QtEndian>
 
 /* ******************************************************************************************** *
+ * Implementation of D168UVCodeplug::ChannelElement
+ * ******************************************************************************************** */
+D168UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : D878UVCodeplug::ChannelElement(ptr)
+{
+  // pass...
+}
+
+bool
+D168UVCodeplug::ChannelElement::dmrCRCDisabled() const {
+  return getBit(Offset::disableDMRCRC());
+}
+
+void
+D168UVCodeplug::ChannelElement::disableDMRCRC(bool disable) {
+  setBit(Offset::disableDMRCRC(), disable);
+}
+
+
+Channel *
+D168UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
+  auto ch = D878UVCodeplug::ChannelElement::toChannelObj(ctx);
+  if (nullptr == ch)
+    return ch;
+
+  if (ch->is<DMRChannel>()) {
+    auto ext = ch->as<DMRChannel>()->anytoneChannelExtension();
+    if (nullptr == ext)
+      ch->as<DMRChannel>()->setAnytoneChannelExtension(
+        ext = new AnytoneDMRChannelExtension());
+    ext->enableCRC(! dmrCRCDisabled());
+  }
+
+  return ch;
+}
+
+bool D168UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+  if (! D878UVCodeplug::ChannelElement::fromChannelObj(c, ctx))
+    return false;
+
+  if (c->is<DMRChannel>() && c->as<DMRChannel>()->anytoneChannelExtension()) {
+    auto ext = c->as<DMRChannel>()->anytoneChannelExtension();
+    disableDMRCRC(! ext->crcEnabled());
+  }
+
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
  * Implementation of D168UVCodeplug::GeneralSettingsElement::TimeZone
  * ******************************************************************************************** */
 QVector<QTimeZone>
@@ -68,6 +119,73 @@ D168UVCodeplug::D168UVCodeplug(QObject *parent)
   // pass...
 }
 
+bool
+D168UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(flags); Q_UNUSED(err)
+  // Encode channels
+  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+    // enable channel
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
+
+    ChannelElement ch(data(addr));
+    ch.fromChannelObj(ctx.get<Channel>(i), ctx);
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+    ext.fromChannelObj(ctx.get<Channel>(i), ctx);
+  }
+  return true;
+}
+
+bool
+D168UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+
+  // Create channels
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
+    // Check if channel is enabled:
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
+
+    if (! channel_bitmap.isEncoded(i))
+      continue;
+
+    ChannelElement ch(data(addr));
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+
+    if (Channel *obj = ch.toChannelObj(ctx)) {
+      ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+      ext.updateChannelObj(obj, ctx);
+    }
+  }
+  return true;
+}
+
+bool
+D168UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err)
+  ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
+
+  // Link channel objects
+  for (uint16_t i=0; i<Limit::numChannels(); i++) {
+    // Check if channel is enabled:
+    uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
+    uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
+        + idx*ChannelElement::size();
+    if (! channel_bitmap.isEncoded(i))
+      continue;
+    ChannelElement ch(data(addr));
+    ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
+
+    if (ctx.has<Channel>(i)) {
+      ch.linkChannelObj(ctx.get<Channel>(i), ctx);
+      ext.linkChannelObj(ctx.get<Channel>(i), ctx);
+    }
+  }
+  return true;
+}
 
 
 bool

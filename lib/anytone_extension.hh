@@ -210,6 +210,8 @@ class AnytoneDMRChannelExtension: public AnytoneChannelExtension
   Q_PROPERTY(bool adaptiveTDMA READ adaptiveTDMA WRITE enableAdaptiveTDMA)
   /** If @c true, the through mode is enabled (what ever that means). */
   Q_PROPERTY(bool throughMode READ throughMode WRITE enableThroughMode)
+  /** If @c true, the DMR CRC check is enabled (default). */
+  Q_PROPERTY(bool crc READ crcEnabled WRITE enableCRC);
 
 public:
   /** Default constructor. */
@@ -225,12 +227,18 @@ public:
   bool throughMode() const;
   /** Enables/disables the through mode. */
   void enableThroughMode(bool enable);
+  /** Returns @c true if the DMR CRC check is enabled (default). */
+  bool crcEnabled() const;
+  /** Enables DMR CRC check. */
+  void enableCRC(bool enable);
 
 protected:
   /** If @c true, the adaptive TDMA mode is enabled. */
   bool _adaptiveTDMA;
   /** If @c true the through mode is enabled. */
   bool _throughMode;
+  /** If @c true, DMR CRC check is enabled. */
+  bool _crc;
 };
 
 

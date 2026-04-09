@@ -4,6 +4,9 @@
 #include <QDateTime>
 
 #include "d878uv_codeplug.hh"
+#include "d878uv_codeplug.hh"
+#include "d878uv_codeplug.hh"
+#include "d878uv_codeplug.hh"
 
 class Channel;
 class DMRContact;
@@ -24,6 +27,33 @@ class D168UVCodeplug : public D878UVCodeplug
   Q_OBJECT
 
 public:
+  /** Impleemnts a channel for the AnyTone AT-D168UV. */
+  class ChannelElement: public D878UVCodeplug::ChannelElement
+  {
+  public:
+    /** Constructor. */
+    ChannelElement(uint8_t *ptr);
+
+    /** Returns @c true if the CRC check for DMR channels is disabled. */
+    virtual bool dmrCRCDisabled() const;
+    /** Disables DMR CRC check. */
+    virtual void disableDMRCRC(bool disable);
+
+    /** Constructs a Channel object from this element. */
+    Channel *toChannelObj(Context &ctx) const override;
+    /** Encodes the given channel object. */
+    bool fromChannelObj(const Channel *c, Context &ctx) override;
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: D878UVCodeplug::ChannelElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Bit disableDMRCRC() { return {34, 3}; }
+      /// @endcond
+    };
+  };
+
+
   /** Represents the general config of the radio within the D168UV binary codeplug.
    * This covers the CPS version 1.07. */
   class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
@@ -59,6 +89,10 @@ public:
   explicit D168UVCodeplug(QObject *parent = nullptr);
 
 protected:
+  bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) override;
+  bool createChannels(Context &ctx, const ErrorStack &err) override;
+  bool linkChannels(Context &ctx, const ErrorStack &err) override;
+
   bool encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
   bool decodeGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
   bool linkGeneralSettings(Context &ctx, const ErrorStack &err=ErrorStack()) override;
