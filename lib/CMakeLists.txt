@@ -42,7 +42,7 @@ qt_add_library(libdmrconf SHARED
   d878uv.cc d878uv_codeplug.cc d878uv_limits.cc
   d578uv.cc d578uv_codeplug.cc d578uv_limits.cc
   d878uv2.cc d878uv2_codeplug.cc d878uv2_limits.cc d878uv2_callsigndb.cc
-  d168uv.cc d168uv_codeplug.cc d168uv_limits.cc
+  d168uv.cc d168uv_codeplug.cc d168uv_limits.cc d168uv_satelliteconfig.cc
   dmr6x2uv.cc dmr6x2uv_codeplug.cc dmr6x2uv_limits.cc
   dmr6x2uv2.cc dmr6x2uv2_codeplug.cc dmr6x2uv2_limits.cc
   auctus_a6_interface.cc
@@ -84,7 +84,7 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   d878uv.hh d878uv_codeplug.hh d878uv_limits.hh
   d578uv.hh d578uv_codeplug.hh d578uv_limits.hh
   d878uv2.hh d878uv2_codeplug.hh d878uv2_limits.hh d878uv2_callsigndb.hh
-  d168uv.hh d168uv_codeplug.hh d168uv_limits.hh
+  d168uv.hh d168uv_codeplug.hh d168uv_limits.hh d168uv_satelliteconfig.hh
   dmr6x2uv.hh dmr6x2uv_codeplug.hh dmr6x2uv_limits.hh
   dmr6x2uv2.hh dmr6x2uv2_codeplug.hh dmr6x2uv2_limits.hh
   auctus_a6_interface.hh
