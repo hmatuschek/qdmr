@@ -774,7 +774,7 @@ Codeplug::Context::Context(Config *config)
 {
   // Add tables for common elements
   addTable(&DMRRadioID::staticMetaObject);
-  addTable(&DMRContact::staticMetaObject);
+  addTable(&DigitalContact::staticMetaObject);
   addTable(&DTMFContact::staticMetaObject);
   addTable(&RXGroupList::staticMetaObject);
   addTable(&Channel::staticMetaObject);
@@ -856,7 +856,7 @@ Codeplug::Context::index(ConfigItem *obj) {
 
 bool
 Codeplug::Context::add(ConfigItem *obj, unsigned idx) {
-  if (!hasTable(obj->metaObject()))
+  if (! hasTable(obj->metaObject()))
     return false;
   if (! getTable(obj->metaObject()).indices.contains(obj))
     getTable(obj->metaObject()).indices.insert(obj, idx);

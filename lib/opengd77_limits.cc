@@ -33,7 +33,10 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
         { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
-        { "tot", new RadioLimitInterval() }
+        { "tot", new RadioLimitInterval() },
+        { "boot", new RadioLimitItem {
+          {"passwordEnabled", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+          {"password", new RadioLimitIgnored(RadioLimitIssue::Silent) } } }
       });
 
   /* Define limits for radio IDs. */
@@ -102,7 +105,7 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
                  (unsigned)FMChannel::Bandwidth::Narrow,
                  (unsigned)FMChannel::Bandwidth::Wide
                }},
-              {"aprs", new RadioLimitObjRefIgnored()},
+              {"aprs", new RadioLimitObjRef(FMAPRSSystem::staticMetaObject)},
               /// @todo handle OpenGD77 extension
               {"openGD77", new RadioLimitIgnored()},
               {"tyt", new RadioLimitIgnored()}
@@ -127,10 +130,10 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
               {"timeSlot", new RadioLimitEnum {
                  unsigned(DMRChannel::TimeSlot::TS1),
                  unsigned(DMRChannel::TimeSlot::TS2) } },
-              {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject, true)},
+              {"radioID", new RadioLimitObjRef(RadioID::staticMetaObject)},
               {"groupList", new RadioLimitObjRef(RXGroupList::staticMetaObject, false)},
-              {"contact", new RadioLimitObjRef(DMRContact::staticMetaObject, true)},
-              {"aprs", new RadioLimitObjRefIgnored()},
+              {"contact", new RadioLimitObjRef(DMRContact::staticMetaObject)},
+              {"aprs", new RadioLimitObjRef(FMAPRSSystem::staticMetaObject)},
               {"roaming", new RadioLimitObjRefIgnored(DefaultRoamingZone::get())},
               /// @todo handle OpenGD77 extension
               {"openGD77", new RadioLimitIgnored(RadioLimitIssue::Hint)},
@@ -154,7 +157,11 @@ OpenGD77Limits::OpenGD77Limits(QObject *parent)
 
   /* Ignore positioning systems. */
   add("positioning", new RadioLimitList(
-        ConfigObject::staticMetaObject, -1, -1, new RadioLimitIgnored()) );
+        ConfigObject::staticMetaObject, 0, 8,
+        new RadioLimitObjects {
+          { FMAPRSSystem::staticMetaObject, new RadioLimitIgnored(RadioLimitIssue::Silent) },
+          { DMRAPRSSystem::staticMetaObject, new RadioLimitIgnored(RadioLimitIssue::Hint) }
+        }) );
 
   /* Ignore roaming zones. */
   add("roaming",

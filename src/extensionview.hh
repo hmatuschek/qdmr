@@ -18,7 +18,7 @@ class ExtensionView : public QWidget
 
 public:
   explicit ExtensionView(QWidget *parent = nullptr);
-  ~ExtensionView();
+  ~ExtensionView() override;
 
 public slots:
   void setObject(ConfigItem *obj, Config *context);

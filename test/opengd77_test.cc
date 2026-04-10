@@ -1,4 +1,5 @@
 #include "opengd77_test.hh"
+#include "opengd77_limits.hh"
 #include "config.hh"
 #include "opengd77_codeplug.hh"
 #include "errorstack.hh"
@@ -31,13 +32,14 @@ OpenGD77Test::encodeDecode(Config &config, Config &decoded, const ErrorStack &er
   OpenGD77Codeplug codeplug;
   codeplug.clear();
 
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
   Config *intermediate = codeplug.preprocess(&config, err);
   if (nullptr == intermediate) {
     errMsg(err) << "Cannot encode codeplug for OpenGD77.";
     return false;
   }
 
-  if (! codeplug.encode(intermediate, Codeplug::Flags(), err)) {
+  if (! codeplug.encode(intermediate, flags, err)) {
     errMsg(err) << "Cannot encode codeplug for OpenGD77.";
     return false;
   }
@@ -295,6 +297,79 @@ OpenGD77Test::testChannelTransmitTimeout() {
   QCOMPARE(decoded.channelList()->channel(0)->timeout(), Interval::fromSeconds(60));
   QVERIFY(decoded.channelList()->channel(1)->timeoutDisabled());
 }
+
+
+void
+OpenGD77Test::testConfigVerification() {
+  ErrorStack err;
+  Config config;
+
+  if (! config.readYAML(":/data/opengd77_simple_config.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  RadioLimitContext ctx;
+  OpenGD77Limits().verifyConfig(&config, ctx);
+
+  QStringList messages;
+  for (int i=0; i<ctx.count(); i++)
+    messages.append(ctx.message(i).format());
+
+  if (RadioLimitIssue::Severity::Warning <= ctx.maxSeverity())
+    QFAIL(messages.join("; ").toLatin1().constData());
+}
+
+
+void
+OpenGD77Test::testBootMelody() {
+  uint8_t note[2];
+  OpenGD77BaseCodeplug::NoteElement elm(note);
+  elm.setPause(); QCOMPARE(note[0], 0u);
+  elm.setFrequency(110); QCOMPARE(note[0],1u);
+  elm.setFrequency(440); QCOMPARE(note[0],25u);
+  note[0] = 13; QCOMPARE(elm.frequency(), 220);
+  note[0] = 16; QCOMPARE(elm.frequency(), 261.62);
+  note[0] = 17; QCOMPARE(elm.frequency(), 277.18);
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/opengd77_boot_melody.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  QVERIFY(config.settings()->openGD77Extension());
+  QCOMPARE(config.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.settings()->openGD77Extension());
+  QCOMPARE(decoded.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
+}
+
+
+void
+OpenGD77Test::testBootMelodyPauses() {
+  ErrorStack err;
+  Config config, decoded;
+
+  if (! config.readYAML(":/data/opengd77_boot_melody.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+          .arg(err.format()).toLocal8Bit().constData());
+  }
+
+  QVERIFY(config.settings()->openGD77Extension());
+  config.settings()->openGD77Extension()->bootMelody()->fromLilypond("c4 r16 c4 g4 e4 r4 c16 g16 e16 r16 c4");
+
+  if (! encodeDecode(config, decoded, err))
+    QFAIL(err.format().toLocal8Bit().constData());
+
+  QVERIFY(decoded.settings()->openGD77Extension());
+  QCOMPARE(decoded.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 r16 c4 g e r c16 g e r c4");
+}
+
 
 QTEST_GUILESS_MAIN(OpenGD77Test)
 

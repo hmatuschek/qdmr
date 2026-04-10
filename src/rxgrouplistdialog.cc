@@ -59,8 +59,6 @@ RXGroupListDialog::construct() {
 
   extensionView->setObjectName("groupListExtension");
   extensionView->setObject(_myGroupList, _config);
-  if (! settings.showExtensions())
-    tabWidget->tabBar()->hide();
 }
 
 
@@ -105,6 +103,23 @@ RXGroupListBox::RXGroupListBox(RXGroupLists *groups, QWidget *parent)
 {
   populateRXGroupListBox(this, groups);
 }
+
+
+void
+RXGroupListBox::setGroupList(RXGroupList *lst) {
+  for (int i=0; i<count(); i++) {
+    if (itemData(i).value<RXGroupList*>() == lst) {
+      setCurrentIndex(i);
+      break;
+    }
+  }
+}
+
+RXGroupList *
+RXGroupListBox::groupList() const {
+  return currentData().value<RXGroupList *>();
+}
+
 
 void
 populateRXGroupListBox(QComboBox *box, RXGroupLists *groups, RXGroupList *list) {

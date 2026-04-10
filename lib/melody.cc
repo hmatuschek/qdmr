@@ -36,6 +36,11 @@ Melody::copy(const ConfigItem &other) {
   return true;
 }
 
+bool
+Melody::isEmpty() const {
+  return 0 == _melody.count();
+}
+
 Melody::iterator
 Melody::begin() {
   return _melody.begin();
@@ -183,8 +188,8 @@ Melody::Note::fromLilypond(const QString &note, Duration currentDuration) {
     else return false;
 
     if (0 == note_match.capturedLength(2)) octave = 0;
-    else if ('\'' == note_match.captured(2).at(0)) octave = note_match.capturedLength(3);
-    else if (','  == note_match.captured(2).at(0)) octave = -note_match.capturedLength(3);
+    else if ('\'' == note_match.captured(2).at(0)) octave = note_match.capturedLength(2);
+    else if (','  == note_match.captured(2).at(0)) octave = -note_match.capturedLength(2);
     else return false;
 
     if (0 == note_match.capturedLength(3)) duration = currentDuration;
@@ -203,14 +208,14 @@ Melody::Note::fromLilypond(const QString &note, Duration currentDuration) {
   QRegularExpressionMatch rest_match = rest_pattern.match(note);
   if (rest_match.hasMatch()) {
     tone = Tone::Rest;
-    if (0 == note_match.capturedLength(1)) duration = currentDuration;
-    else if ("1" == note_match.captured(1)) duration = Duration::Whole;
-    else if ("2" == note_match.captured(1)) duration = Duration::Half;
-    else if ("4" == note_match.captured(1)) duration = Duration::Quarter;
-    else if ("8" == note_match.captured(1)) duration = Duration::Eighth;
-    else if ("16" == note_match.captured(1)) duration = Duration::Sixteenth;
+    if (0 == rest_match.capturedLength(1)) duration = currentDuration;
+    else if ("1" == rest_match.captured(1)) duration = Duration::Whole;
+    else if ("2" == rest_match.captured(1)) duration = Duration::Half;
+    else if ("4" == rest_match.captured(1)) duration = Duration::Quarter;
+    else if ("8" == rest_match.captured(1)) duration = Duration::Eighth;
+    else if ("16" == rest_match.captured(1)) duration = Duration::Sixteenth;
     else return false;
-    dotted = (1 == note_match.capturedLength(2));
+    dotted = (1 == rest_match.capturedLength(2));
     return true;
   }
 

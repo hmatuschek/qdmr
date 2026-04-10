@@ -7,7 +7,9 @@
 #include "zone.hh"
 #include "config.hh"
 #include "config.h"
+#include "intermediaterepresentation.hh"
 #include <QtEndian>
+
 
 QVector<unsigned int> _openrtx_ctcss_tone_table{
     670, 693, 719, 744, 770, 797, 825, 854, 885, 915, 948, 974, 1000, 1034,
@@ -781,8 +783,7 @@ OpenRTXCodeplug::ContactElement::setM17Call(const QString &call, const ErrorStac
   return true;
 }
 
-DMRContact *
-OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &err) const {
+DigitalContact *OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(ctx)
 
   if (! isValid()) {
@@ -790,28 +791,50 @@ OpenRTXCodeplug::ContactElement::toContactObj(Context &ctx, const ErrorStack &er
     return nullptr;
   }
 
-  if (Mode_DMR != mode()) {
-    errMsg(err) << "Only DMR contacts are implemented.";
-    return nullptr;
+  if (Mode_DMR == mode()) {
+    DMRContact *contact = new DMRContact();
+
+    contact->setName(name());
+    contact->setRing(dmrRing());
+    contact->setNumber(dmrId());
+    contact->setType(dmrContactType());
+
+    return contact;
+  } else if (Mode_M17 == mode()) {
+    M17Contact *contact = new M17Contact();
+
+    contact->setName(name());
+    contact->setRing(dmrRing());
+    contact->setCall(m17Call());
+
+    return contact;
   }
 
-  DMRContact *contact = new DMRContact();
-  contact->setName(name());
-  contact->setNumber(dmrId());
-  contact->setType(dmrContactType());
-  contact->setRing(dmrRing());
-
-  return contact;
+  return nullptr;
 }
 
-void
-OpenRTXCodeplug::ContactElement::fromContactObj(const DMRContact *cont, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(ctx); Q_UNUSED(err)
-  setMode(Mode_DMR);
+bool
+OpenRTXCodeplug::ContactElement::fromContactObj(const DigitalContact *cont, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+
   setName(cont->name());
-  setDMRId(cont->number());
-  setDMRContactType(cont->type());
   enableDMRRing(cont->ring());
+
+  if (cont->is<DMRContact>()) {
+    const DMRContact *dmr = cont->as<DMRContact>();
+    setMode(Mode_DMR);
+    setDMRId(dmr->number());
+    setDMRContactType(dmr->type());
+  } else if (cont->is<M17Contact>()) {
+    const M17Contact *m17 = cont->as<M17Contact>();
+    setM17Call(m17->call());
+  } else {
+    errMsg(err) << "Cannot encode contact '" << cont->name() << "': Contact type '"
+                << cont->metaObject()->className() << "' not supported by OpenRTX firmware.";
+    return false;
+  }
+
+  return true;
 }
 
 
@@ -954,15 +977,22 @@ OpenRTXCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   // All indices as 1-based. That is, the first channel gets index 1 etc.
 
   // Map DMR contacts
-  for (int i=0, d=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DMRContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d+1); d++;
+  for (int i=0, c=0; i<config->contacts()->count(); i++) {
+    Contact *contact = config->contacts()->contact(i);
+    if (contact->is<DMRContact>() || contact->is<M17Contact>()) {
+      ctx.add(contact, c+1); c++;
+    } else {
+      logInfo() << "Cannot index contact '" << contact->name()
+                << "'. Contact type '" << contact->metaObject()->className()
+                << "' not supported by or implemented for OpenRTX devices.";
     }
   }
 
   // Map channels
-  for (int i=0; i<config->channelList()->count(); i++)
-    ctx.add(config->channelList()->channel(i), i+1);
+  for (int i=0; i<config->channelList()->count(); i++) {
+    Channel *channel = config->channelList()->channel(i);
+    ctx.add(channel, i+1);
+  }
 
   // Map zones
   for (int i=0; i<config->zones()->count(); i++)
@@ -971,11 +1001,39 @@ OpenRTXCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   return true;
 }
 
+
+Config *
+OpenRTXCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *intermediate = Codeplug::preprocess(config, err);
+  if (nullptr == intermediate) {
+    errMsg(err) << "Cannot pre-process OpenRTX codeplug.";
+    return nullptr;
+  }
+
+  // Remove all AM channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  if (! amFilter.process(intermediate, err)) {
+    errMsg(err) << "Remove AM channels.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(intermediate, err)) {
+    errMsg(err) << "Cannot split zone for OpenRTX codeplug.";
+    delete intermediate;
+    return nullptr;
+  }
+
+  return intermediate;
+}
+
+
 bool
 OpenRTXCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
   // Check if default DMR id is set.
-  if (nullptr == config->settings()->defaultIdRef()) {
-    errMsg(err) << "Cannot encode TyT codeplug: No default radio ID specified.";
+  if (nullptr == config->settings()->defaultId()) {
+    errMsg(err) << "Cannot encode OpenRTX codeplug: No default radio ID specified.";
     return false;
   }
 
@@ -986,6 +1044,7 @@ OpenRTXCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &er
 
   return this->encodeElements(flags, ctx, err);
 }
+
 
 bool
 OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorStack &err) {
@@ -1013,6 +1072,7 @@ OpenRTXCodeplug::encodeElements(const Flags &flags, Context &ctx, const ErrorSta
   return true;
 }
 
+
 bool
 OpenRTXCodeplug::decode(Config *config, const ErrorStack &err) {
   // Clear config object
@@ -1023,6 +1083,24 @@ OpenRTXCodeplug::decode(Config *config, const ErrorStack &err) {
 
   return this->decodeElements(ctx, err);
 }
+
+
+bool
+OpenRTXCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process Radioddy codeplug.";
+    return false;
+  }
+
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot merg zones in decoded Radioddity codeplug.";
+    return false;
+  }
+
+  return true;
+}
+
 
 bool
 OpenRTXCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
@@ -1066,20 +1144,19 @@ OpenRTXCodeplug::offsetContact(unsigned int n) {
 
 bool
 OpenRTXCodeplug::encodeContacts(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags)
+  Q_UNUSED(config); Q_UNUSED(flags)
 
   /// @todo Limit number of contacts.
-  unsigned int numContacts = ctx.count<DMRContact>();
+  unsigned int numContacts = ctx.count<DigitalContact>();
   HeaderElement(data(0x0000)).setContactCount(numContacts);
   image(0).addElement(offsetContact(0), numContacts*ContactSize);
 
-  for (int i=0,c=0; i<config->contacts()->count(); i++) {
-    if (! config->contacts()->contact(i)->is<DMRContact>())
-      continue;
-    ContactElement contact(data(offsetContact(c)));
-    contact.fromContactObj(
-          config->contacts()->contact(i)->as<DMRContact>(), ctx, err);
-    c++;
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
+    ContactElement contact(data(offsetContact(i)));
+    if (! contact.fromContactObj(ctx.get<DigitalContact>(i+1), ctx, err)) {
+      errMsg(err) << "Cannot encode contact '" << ctx.get<DigitalContact>(i+1)->name() <<"'.";
+      return false;
+    }
   }
 
   return true;
@@ -1090,7 +1167,7 @@ OpenRTXCodeplug::createContacts(Config *config, Context &ctx, const ErrorStack &
   unsigned int numContacts = HeaderElement(data(0x0000)).contactCount();
 
   for (unsigned int i=0; i<numContacts; i++) {
-    DMRContact *contact = ContactElement(data(offsetContact(i))).toContactObj(ctx, err);
+    DigitalContact *contact = ContactElement(data(offsetContact(i))).toContactObj(ctx, err);
     if (nullptr == contact) {
       errMsg(err) << "Cannot create " << (i+1) << "-th contact.";
       return false;
@@ -1199,38 +1276,20 @@ bool
 OpenRTXCodeplug::encodeZones(Config *config, const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
 
-  // Count zones (A + B)
-  unsigned int zoneCount=0;
-  for (int i=0; i<config->zones()->count(); i++) {
-    zoneCount++;
-    // Check if B contains channels
-    if (config->zones()->zone(i)->B()->count())
-      zoneCount++;
-  }
-
   // Allocate zone offsets
-  HeaderElement(data(0x0000)).setZoneCount(zoneCount);
-  image(0).addElement(offsetZoneOffsets(), zoneCount*sizeof(uint32_t));
+  HeaderElement(data(0x0000)).setZoneCount(config->zones()->count());
+  image(0).addElement(offsetZoneOffsets(), (config->zones()->count())*sizeof(uint32_t));
   uint32_t *offsets = (uint32_t *)data(offsetZoneOffsets());
 
   // Allocate and encode zones
-  uint32_t currentOffset = offsetZoneOffsets() + zoneCount*sizeof(uint32_t);
-  for (unsigned int z=0, i=0; i<zoneCount; i++,z++) {
+  uint32_t currentOffset = offsetZoneOffsets() + (config->zones()->count())*sizeof(uint32_t);
+  for (int z=0, i=0; i<config->zones()->count(); i++,z++) {
     // Allocate & encode zone A
     unsigned int zoneSize = ZoneHeaderSize+config->zones()->zone(z)->A()->count()*sizeof(uint32_t);
     image(0).addElement(currentOffset, zoneSize);
     offsets[i] = qToLittleEndian(currentOffset);
     ZoneElement(data(currentOffset)).fromZoneObjA(config->zones()->zone(z), ctx);
     currentOffset += zoneSize;
-    // Allocate & encode zone B, if not empty
-    if (ZoneHeaderSize+config->zones()->zone(z)->B()->count()) {
-      i++;
-      unsigned int zoneSize = ZoneHeaderSize+config->zones()->zone(z)->B()->count()*sizeof(uint32_t);
-      image(0).addElement(currentOffset, zoneSize);
-      offsets[i] = qToLittleEndian(currentOffset);
-      ZoneElement(data(currentOffset)).fromZoneObjB(config->zones()->zone(z), ctx);
-      currentOffset += zoneSize;
-    }
   }
 
   return true;
@@ -1242,20 +1301,12 @@ OpenRTXCodeplug::createZones(Config *config, Context &ctx, const ErrorStack &err
   unsigned int zoneCount = numZones();
   uint32_t *zoneOffsets = (uint32_t *) data(offsetZoneOffsets());
 
-  Zone *last_zone = nullptr;
   for (unsigned int i=0; i<zoneCount; i++) {
     ZoneElement zone(data(qFromLittleEndian(zoneOffsets[i])));
     if (! zone.isValid())
       continue;
-    bool is_ext = (nullptr != last_zone) && (zone.name().endsWith(" B")) &&
-        (zone.name().startsWith(last_zone->name()));
-    Zone *obj = last_zone;
-    if (! is_ext) {
-      last_zone = obj = new Zone(zone.name());
-      if (zone.name().endsWith(" A"))
-        obj->setName(zone.name().chopped(2));
-      config->zones()->add(obj); ctx.add(obj, i+1);
-    }
+    Zone *obj = new Zone(zone.name());
+    config->zones()->add(obj); ctx.add(obj, i+1);
   }
 
   return true;
@@ -1265,34 +1316,22 @@ bool
 OpenRTXCodeplug::linkZones(Config *config, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(config); Q_UNUSED(err)
 
-  unsigned int zoneCount = numZones();
   uint32_t *zoneOffsets = (uint32_t *) data(offsetZoneOffsets());
 
-  Zone *last_zone = nullptr;
-  for (unsigned int i=0, z=0; i<zoneCount; i++, z++) {
+  for (unsigned int i=0, z=0; i<numZones(); i++, z++) {
     ZoneElement zone(data(qFromLittleEndian(zoneOffsets[i])));
     if (! zone.isValid())
       continue;
-    if (ctx.has<Zone>(i+1)) {
-      Zone *obj = last_zone = ctx.get<Zone>(i+1);
-      for (unsigned int i=0; i<zone.channelCount(); i++) {
-        if (! ctx.has<Channel>(zone.channelIndex(i))) {
-          logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
-                    << " channel not defined.";
-          continue;
-        }
-        obj->A()->add(ctx.get<Channel>(zone.channelIndex(i)));
+    if (! ctx.has<Zone>(i+1))
+      continue;
+    Zone *obj = ctx.get<Zone>(i+1);
+    for (unsigned int i=0; i<zone.channelCount(); i++) {
+      if (! ctx.has<Channel>(zone.channelIndex(i))) {
+        logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
+                  << " channel not defined.";
+        continue;
       }
-    } else {
-      Zone *obj = last_zone; last_zone = nullptr;
-      for (unsigned int i=0; i<zone.channelCount(); i++) {
-        if (! ctx.has<Channel>(zone.channelIndex(i))) {
-          logWarn() << "Cannot link channel with index " << zone.channelIndex(i)
-                    << " channel not defined.";
-          continue;
-        }
-        obj->B()->add(ctx.get<Channel>(zone.channelIndex(i)));
-      }
+      obj->A()->add(ctx.get<Channel>(zone.channelIndex(i)));
     }
   }
 

@@ -79,6 +79,9 @@ public:
   ConfigItem *clone() const;
   bool copy(const ConfigItem &other);
 
+  /** Returns @c true, if the melody has no notes (invalid). */
+  bool isEmpty() const;
+
   /** Returns an iterator pointing at the first note. */
   iterator begin();
   /** Returns an iterator pointing right after the last note. */

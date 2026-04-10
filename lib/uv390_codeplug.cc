@@ -726,7 +726,7 @@ UV390Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack
   // Encode contacts
   for (unsigned int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
-    if (i < ctx.count<DMRContact>())
+    if (i < ctx.count<DigitalContact>())
       cont.fromContactObj(ctx.get<DMRContact>(i+1));
     else
       cont.clear();
@@ -763,12 +763,12 @@ bool
 UV390Codeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   for (int i=0; i<NUM_ZONES; i++) {
-    ZoneElement zone(data(ADDR_ZONES + i*ZONE_SIZE));
+    ZoneElement elm(data(ADDR_ZONES + i*ZONE_SIZE));
     ZoneExtElement ext(data(ADDR_ZONEEXTS + i*ZONEEXT_SIZE));
-    zone.clear();
+    elm.clear();
     ext.clear();
     if (i < ctx.config()->zones()->count()) {
-      zone.fromZoneObj(ctx.config()->zones()->zone(i), ctx);
+      elm.fromZoneObj(ctx.config()->zones()->zone(i), ctx);
       if (ctx.config()->zones()->zone(i)->B()->count() || (16 < ctx.config()->zones()->zone(i)->A()->count()))
         ext.fromZoneObj(ctx.config()->zones()->zone(i), ctx);
     }

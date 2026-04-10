@@ -431,8 +431,10 @@ AnytoneSTM32Interface::identifier(const ErrorStack &err) {
     return RadioInfo();
   if ("D578UV" == _info.name) {
     return RadioInfo::byID(RadioInfo::D578UV);
-  }  else if ("D578UV2" == _info.name) {
+  } else if ("D578UV2" == _info.name) {
     return RadioInfo::byID(RadioInfo::D578UVII);
+  } else if ("D168UV" == _info.name) {
+    return RadioInfo::byID(RadioInfo::D168UV);
   }
 
 

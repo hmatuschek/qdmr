@@ -1,9 +1,11 @@
 #include "channel.hh"
 #include "contact.hh"
 #include "rxgrouplist.hh"
-#include "config.hh"
 #include "scanlist.hh"
 #include "logger.hh"
+#include "radioid.hh"
+#include "gpssystem.hh"
+#include "roamingzone.hh"
 #include <cmath>
 #include <QAbstractProxyModel>
 #include <QMetaEnum>
@@ -892,6 +894,144 @@ DMRChannel::serialize(const Context &context, const ErrorStack &err) {
 
 
 /* ********************************************************************************************* *
+ * Implementation of M17Channel
+ * ********************************************************************************************* */
+M17Channel::M17Channel(QObject *parent)
+  : DigitalChannel(parent), _mode(Mode::Voice), _accessNumber(0), _txContact(),
+    _gpsEnabled(false), _encryptionMode(EncryptionMode::None)
+{
+  // Connect signals of references
+  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+M17Channel::M17Channel(const M17Channel &other, QObject *parent)
+  : DigitalChannel(other, parent), _mode(Mode::Voice), _accessNumber(0),
+    _txContact(), _gpsEnabled(false),
+    _encryptionMode(EncryptionMode::None)
+{
+  copy(other);
+
+  // Connect signals of references
+  connect(&_txContact, SIGNAL(modified()), this, SLOT(onReferenceModified()));
+}
+
+void
+M17Channel::clear() {
+  DigitalChannel::clear();
+  setMode(Mode::Voice);
+  setAccessNumber(0);
+  setContact(nullptr);
+  enableAPRS(false);
+  setEncryptionMode(EncryptionMode::None);
+}
+
+ConfigItem *
+M17Channel::clone() const {
+  M17Channel *c = new M17Channel();
+  if (! c->copy(*this)) {
+    c->deleteLater();
+    return nullptr;
+  }
+  return c;
+}
+
+M17Channel::Mode
+M17Channel::mode() const {
+  return _mode;
+}
+
+void
+M17Channel::setMode(Mode mode) {
+  if (_mode == mode)
+    return;
+  _mode = mode;
+  emit modified(this);
+}
+
+unsigned int
+M17Channel::accessNumber() const {
+  return _accessNumber;
+}
+
+void
+M17Channel::setAccessNumber(unsigned int can) {
+  can = std::min(15u, can);
+  if (_accessNumber == can)
+    return;
+  _accessNumber = can;
+  emit modified(this);
+}
+
+const M17ContactReference *
+M17Channel::contactRef() const {
+  return &_txContact;
+}
+
+M17ContactReference *
+M17Channel::contactRef() {
+  return &_txContact;
+}
+
+void
+M17Channel::setContactRef(M17ContactReference *ref) {
+  if (nullptr == ref)
+    _txContact.clear();
+  else
+    _txContact.copy(ref);
+}
+
+M17Contact *
+M17Channel::contact() const {
+  return _txContact.as<M17Contact>();
+}
+
+bool
+M17Channel::setContact(M17Contact *c) {
+  if(! _txContact.set(c))
+    return false;
+  emit modified(this);
+  return true;
+}
+
+bool
+M17Channel::aprsEnabled() const {
+  return _gpsEnabled;
+}
+
+void
+M17Channel::enableAPRS(bool enabled) {
+  if (_gpsEnabled == enabled)
+    return;
+  _gpsEnabled = enabled;
+  emit modified(this);
+}
+
+M17Channel::EncryptionMode
+M17Channel::encryptionMode() const {
+  return _encryptionMode;
+}
+
+void
+M17Channel::setEncryptionMode(EncryptionMode mode) {
+  if (_encryptionMode == mode)
+    return;
+  _encryptionMode = mode;
+  emit modified(this);
+}
+
+YAML::Node
+M17Channel::serialize(const Context &context, const ErrorStack &err) {
+  YAML::Node node = DigitalChannel::serialize(context, err);
+  if (node.IsNull())
+    return node;
+
+  YAML::Node type;
+  type["m17"] = node;
+  return type;
+}
+
+
+/* ********************************************************************************************* *
  * Implementation of SelectedChannel
  * ********************************************************************************************* */
 SelectedChannel *SelectedChannel::_instance = nullptr;
@@ -980,6 +1120,7 @@ ChannelList::findFMChannelByTxFreq(Frequency freq) const {
 
 ConfigItem *
 ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err) {
+  static bool digitalDepricated = true, analogDeprecated = true;
   Q_UNUSED(ctx)
   if (! node)
     return nullptr;
@@ -992,9 +1133,21 @@ ChannelList::allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, con
 
   QString type = QString::fromStdString(node.begin()->first.as<std::string>());
   if (("digital" == type) || ("dmr" == type)) {
+    if (("digital" == type) && digitalDepricated) {
+      logWarn() << node.Mark().line << ":" << node.Mark().column
+                << ": Using 'digital' for DMR channels is deprecated. Please use 'dmr' instead.";
+      digitalDepricated = false;
+    }
     return new DMRChannel();
   } else if (("analog" == type) || ("fm"==type)) {
+    if (("analog" == type) && analogDeprecated) {
+      logWarn() << node.Mark().line << ":" << node.Mark().column
+                << ": Using 'analog' for FM channels is deprecated. Please use 'fm' instead.";
+      analogDeprecated = false;
+    }
     return new FMChannel();
+  } else if ("m17" == type) {
+    return new M17Channel();
   } else if ("am" == type) {
     return new AMChannel();
   }

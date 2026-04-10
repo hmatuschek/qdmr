@@ -46,7 +46,8 @@ OpenRTX::codeplug() {
 RadioInfo
 OpenRTX::defaultRadioInfo() {
   return RadioInfo(
-        RadioInfo::OpenRTX, "openrtx", "OpenRTX", {USBDeviceInfo()});
+    RadioInfo::OpenRTX, "openrtx", "OpenRTX",
+    {OpenRTXInterface::interfaceInfo()});
 }
 
 

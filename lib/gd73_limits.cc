@@ -32,7 +32,10 @@ GD73Limits::GD73Limits(QObject *parent)
         { "power", new RadioLimitEnum({unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}) },
         { "squelch", new RadioLimitIgnored(RadioLimitIssue::Silent) },
         { "vox", new RadioLimitIgnored(RadioLimitIssue::Silent) },
-        { "tot", new RadioLimitInterval() }
+        { "tot", new RadioLimitInterval() },
+        { "boot", new RadioLimitItem {
+          {"passwordEnabled", new RadioLimitIgnored(RadioLimitIssue::Silent) },
+          {"password", new RadioLimitIgnored(RadioLimitIssue::Silent) } } }
       });
 
   /* Define limits for radio IDs. */

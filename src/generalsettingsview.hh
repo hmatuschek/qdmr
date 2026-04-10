@@ -17,13 +17,8 @@ public:
   explicit GeneralSettingsView(Config *config, QWidget *parent = nullptr);
   ~GeneralSettingsView();
 
-  void hideDMRID(bool hidden);
-  void hideExtensions(bool hidden);
-
 protected slots:
   void onConfigModified();
-  void onDMRIDChanged();
-  void onNameChanged();
   void onIntroLine1Edited();
   void onIntroLine2Edited();
   void onMicLevelChanged();

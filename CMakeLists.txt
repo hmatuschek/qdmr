@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25.0)
-project(qdmr VERSION 0.14.1)
+project(qdmr VERSION 0.15.0)
 
 set(RELEASE_SUFFIX "")
 
@@ -55,6 +55,7 @@ endif()
 
 if (${BUILD_TESTS})
   find_package(Qt6 REQUIRED COMPONENTS Test)
+  enable_testing(true)
 endif(${BUILD_TESTS})
 
 IF (UNIX AND APPLE)

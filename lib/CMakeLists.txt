@@ -19,7 +19,7 @@ qt_add_library(libdmrconf SHARED
   radiosettings.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
   roamingzone.cc roamingchannel.cc callsigndb.cc talkgroupdatabase.cc radioid.cc transferflags.cc
   encryptionextension.cc commercial_extension.cc smsextension.cc gnsssettings.cc dmrsettings.cc
-  channel_extension.cc
+  channel_extension.cc bootsettings.cc packetstream.cc
   satellitedatabase.cc orbitalelementsdatabase.cc transponderdatabase.cc satelliteconfig.cc
   tyt_radio.cc tyt_interface.cc tyt_codeplug.cc tyt_callsigndb.cc tyt_extensions.cc
   md2017.cc md2017_codeplug.cc md2017_callsigndb.cc md2017_filereader.cc md2017_limits.cc
@@ -33,7 +33,7 @@ qt_add_library(libdmrconf SHARED
   opengd77base_satelliteconfig.cc opengd77_extension.cc opengd77_limits.cc
   opengd77.cc opengd77_codeplug.cc opengd77_callsigndb.cc opengd77_satelliteconfig.cc
   openuv380.cc openuv380_codeplug.cc openuv380_callsigndb.cc openuv380_satelliteconfig.cc
-  openrtx.cc openrtx_interface.cc openrtx_codeplug.cc
+  openrtx.cc openrtx_link.cc openrtx_interface.cc openrtx_codeplug.cc
   c7000device.cc
   gd73.cc gd73_interface.cc gd73_codeplug.cc gd73_filereader.cc gd73_limits.cc
   anytone_interface.cc anytone_radio.cc anytone_codeplug.cc anytone_extension.cc anytone_limits.cc
@@ -42,6 +42,7 @@ qt_add_library(libdmrconf SHARED
   d878uv.cc d878uv_codeplug.cc d878uv_limits.cc
   d578uv.cc d578uv_codeplug.cc d578uv_limits.cc
   d878uv2.cc d878uv2_codeplug.cc d878uv2_limits.cc d878uv2_callsigndb.cc
+  d168uv.cc d168uv_codeplug.cc d168uv_limits.cc d168uv_satelliteconfig.cc
   dmr6x2uv.cc dmr6x2uv_codeplug.cc dmr6x2uv_limits.cc
   dmr6x2uv2.cc dmr6x2uv2_codeplug.cc dmr6x2uv2_limits.cc
   auctus_a6_interface.cc
@@ -60,7 +61,7 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   radiosettings.hh contact.hh rxgrouplist.hh channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh
   roamingzone.hh roamingchannel.hh callsigndb.hh talkgroupdatabase.hh radioid.hh transferflags.hh
   encryptionextension.hh commercial_extension.hh smsextension.hh gnsssettings.hh dmrsettings.hh
-  channel_extension.hh
+  channel_extension.hh bootsettings.hh packetstream.hh
   satellitedatabase.hh orbitalelementsdatabase.hh transponderdatabase.hh satelliteconfig.hh
   tyt_radio.hh tyt_interface.hh tyt_codeplug.hh tyt_callsigndb.hh tyt_extensions.hh
   md2017.hh md2017_codeplug.hh md2017_callsigndb.hh md2017_filereader.hh md2017_limits.hh
@@ -74,7 +75,7 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   opengd77base_satelliteconfig.hh opengd77_extension.hh opengd77_limits.hh
   opengd77.hh opengd77_codeplug.hh opengd77_callsigndb.hh opengd77_satelliteconfig.hh
   openuv380.hh openuv380_codeplug.hh openuv380_callsigndb.hh openuv380_satelliteconfig.hh
-  openrtx.hh openrtx_interface.hh openrtx_codeplug.hh
+  openrtx.hh openrtx_link.hh openrtx_interface.hh openrtx_codeplug.hh
   c7000device.hh
   gd73.hh gd73_interface.hh gd73_codeplug.hh gd73_filereader.hh gd73_limits.hh
   anytone_interface.hh anytone_radio.hh anytone_codeplug.hh anytone_extension.hh anytone_limits.hh
@@ -83,6 +84,7 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   d878uv.hh d878uv_codeplug.hh d878uv_limits.hh
   d578uv.hh d578uv_codeplug.hh d578uv_limits.hh
   d878uv2.hh d878uv2_codeplug.hh d878uv2_limits.hh d878uv2_callsigndb.hh
+  d168uv.hh d168uv_codeplug.hh d168uv_limits.hh d168uv_satelliteconfig.hh
   dmr6x2uv.hh dmr6x2uv_codeplug.hh dmr6x2uv_limits.hh
   dmr6x2uv2.hh dmr6x2uv2_codeplug.hh dmr6x2uv2_limits.hh
   auctus_a6_interface.hh

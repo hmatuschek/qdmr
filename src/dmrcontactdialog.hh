@@ -2,6 +2,7 @@
 #define DMRCONTACTDIALOG_HH
 
 #include <QDialog>
+#include <QComboBox>
 
 namespace Ui {
   class DMRContactDialog;
@@ -40,5 +41,19 @@ private:
   Config *_config;
   Ui::DMRContactDialog *ui;
 };
+
+
+
+class DMRContactSelect: public QComboBox
+{
+  Q_OBJECT
+
+public:
+  DMRContactSelect(Config *config, QWidget *parent=nullptr);
+
+  void setContact(DMRContact *contact);
+  DMRContact *contact() const;
+};
+
 
 #endif // DMRCONTACTDIALOG_HH

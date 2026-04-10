@@ -13,8 +13,12 @@
 #include "userdatabase.hh"
 #include "talkgroupdatabase.hh"
 #include "settings.hh"
+#include "config.hh"
 
 
+/* ****************************************************************************************** *
+ * Implementation of DMRContactDialog
+ * ****************************************************************************************** */
 DMRContactDialog::DMRContactDialog(UserDatabase *users, TalkGroupDatabase *tgs, Config *context, QWidget *parent)
   : QDialog(parent), _myContact(new DMRContact(this)), _contact(nullptr),
     _user_completer(nullptr), _tg_completer(nullptr), _config(context),
@@ -97,8 +101,6 @@ DMRContactDialog::construct() {
 
   ui->extensionView->setObjectName("dmrContactExtension");
   ui->extensionView->setObject(_myContact, _config);
-  if (! settings.showExtensions())
-    ui->tabWidget->tabBar()->hide();
 
   connect(ui->typeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged(int)));
   connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
@@ -166,5 +168,38 @@ DMRContactDialog::contact()
   }
 
   return contact;
+}
+
+
+
+/* ****************************************************************************************** *
+ * Implementation of DMRContactSelect
+ * ****************************************************************************************** */
+DMRContactSelect::DMRContactSelect(Config *config, QWidget *parent)
+  : QComboBox(parent)
+{
+  addItem(tr("[None]"), QVariant::fromValue<DMRContact*>(nullptr));
+  for (int i=0; i<config->contacts()->count(); i++) {
+    if (config->contacts()->get(i)->is<DMRContact>()) {
+      auto contact = config->contacts()->get(i)->as<DMRContact>();
+      addItem(contact->name(), QVariant::fromValue(contact));
+    }
+  }
+}
+
+
+void
+DMRContactSelect::setContact(DMRContact *contact) {
+  for (int i=0; i<count(); i++) {
+    if (itemData(i).value<DMRContact*>() == contact) {
+      setCurrentIndex(i);
+      break;
+    }
+  }
+}
+
+DMRContact *
+DMRContactSelect::contact() const {
+  return currentData().value<DMRContact*>();
 }
 

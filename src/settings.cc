@@ -244,24 +244,6 @@ Settings::setIgnoreFrequencyLimits(bool ignore) {
 }
 
 bool
-Settings::showCommercialFeatures() const {
-  return value("showCommercialFeatures", false).toBool();
-}
-void
-Settings::setShowCommercialFeatures(bool show) {
-  setValue("showCommercialFeatures", show);
-}
-
-bool
-Settings::showExtensions() const {
-  return value("showExtensions", false).toBool();
-}
-void
-Settings::setShowExtensions(bool show) {
-  setValue("showExtensions", show);
-}
-
-bool
 Settings::hideChannelNote() const {
   return value("hideChannelNote", false).toBool();
 }
@@ -450,9 +432,6 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   }
   Ui::SettingsDialog::prefixes->setText(prefs_text.join(", "));
 
-  Ui::SettingsDialog::commercialFeatures->setChecked(settings.showCommercialFeatures());
-  Ui::SettingsDialog::showExtensions->setChecked(settings.showExtensions());
-
   connect(Ui::SettingsDialog::dbLimitEnable, SIGNAL(toggled(bool)), this, SLOT(onDBLimitToggled(bool)));
   connect(Ui::SettingsDialog::useUserId, SIGNAL(toggled(bool)), this, SLOT(onUseUserDMRIdToggled(bool)));
 }
@@ -537,9 +516,6 @@ SettingsDialog::accept() {
       prefs.insert(prefix);
   }
   settings.setCallSignDBPrefixes(prefs);
-
-  settings.setShowCommercialFeatures(commercialFeatures->isChecked());
-  settings.setShowExtensions(showExtensions->isChecked());
 
   QDialog::accept();
 }

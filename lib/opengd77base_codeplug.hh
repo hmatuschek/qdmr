@@ -7,6 +7,7 @@
 #include "contact.hh"
 #include "zone.hh"
 #include "satellitedatabase.hh"
+#include "melody.hh"
 
 #include <QGeoCoordinate>
 
@@ -268,6 +269,7 @@ public:
       static constexpr Bit aliasTimeSlot1() { return { 0x030, 0}; }
       static constexpr Bit timeSlot() { return {0x0031, 6}; }
       static constexpr Bit bandwidth() { return {0x0033, 1}; }
+      static constexpr Bit enableMonitor() { return {0x0033, 3}; }
       static constexpr Bit rxOnly() { return {0x0033, 2}; }
       static constexpr Bit skipScan() { return {0x0033, 4}; }
       static constexpr Bit skipZoneScan() { return {0x0033, 5}; }
@@ -601,6 +603,7 @@ public:
       static constexpr unsigned int comment() { return 0x001f; }
       static constexpr unsigned int fmFrequency() { return 0x0037; }
       static constexpr Bit positionPrecision() { return { 0x003d, 4}; }
+      static constexpr Bit transmitQSY() { return { 0x003d, 2}; }
       static constexpr Bit useFixedPosition() { return { 0x003d, 1}; }
       static constexpr Bit baudRate() { return { 0x003d, 0}; }
       static constexpr unsigned int unknownBytes() { return 0x003e; }
@@ -1293,7 +1296,9 @@ public:
     SatelliteBankElement(uint8_t *ptr);
 
     /** The size of the element. */
-    static constexpr unsigned int size() { return 0x09e0; }
+    static constexpr unsigned int size()  { return 0x09e0; }
+    /** The magic number of the element. */
+    static constexpr unsigned int magic() { return 0x0003; }
 
     void clear();
 
@@ -1321,6 +1326,87 @@ public:
     };
   };
 
+
+  class NoteElement: public Element
+  {
+  public:
+    explicit NoteElement(uint8_t *ptr);
+
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x0002; }
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** Retunrs @c true if the note is a pause. */
+    bool isPause() const;
+    /** Returns the pitch in Hz. */
+    double frequency() const;
+    /** Sets the pitch in Hz. */
+    void setFrequency(double pitch);
+    /** Set note as pause. */
+    void setPause();
+
+    /** Returns the duration in ms. */
+    unsigned int duration() const;
+    /** Sets the interval. */
+    void setDuration(unsigned int ms);
+
+  protected:
+    /** Internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int pitch()    { return 0x0000; }
+      static constexpr unsigned int duration() { return 0x0001; }
+      /// @endcond
+    };
+
+    static constexpr double _lut[] = {
+      0110.00, 0116.54, 0123.47,
+      0130.81, 0138.59, 0146.83, 0155.56, 0164.81, 0174.61, 0185.00, 0196.00, 0207.65, 0220.00, 0233.08, 0246.94,
+      0261.62, 0277.18, 0293.66, 0311.13, 0329.63, 0349.23, 0369.99, 0392.00, 0415.30, 0440.00, 0466.16, 0493.88,
+      0523.25, 0554.37, 0587.33, 0622.25, 0659.25, 0698.46, 0739.99, 0783.99, 0830.61, 0880.00, 0932.33, 0987.77,
+      1046.50, 1108.73, 1174.66, 1244.51, 1318.51, 1396.91
+    };
+  };
+
+  /** Encodes the boot melody. */
+  class BootMelodyElement: public Element
+  {
+  public:
+    /** Constructor. */
+    BootMelodyElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0208; }
+    /** The magic number of the element. */
+    static constexpr unsigned int magic() { return 0x0002; }
+
+    void clear();
+
+    /** Encodes the given melody. */
+    virtual bool encode(Context &ctx, const Melody *melody, const ErrorStack &err=ErrorStack());
+    /** Decodes the boot melody. */
+    virtual bool decode(Context &ctx, Melody *melody, const ErrorStack &err=ErrorStack()) const;
+
+  public:
+    /** Some limits for the melody config. */
+    struct Limit {
+      /** The maximum number of notes/pauses. */
+      static constexpr unsigned int notes() { return 256; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int blockId()           { return 0x0000; }
+      static constexpr unsigned int segmentSize()       { return 0x0004; }
+      static constexpr unsigned int notes()             { return 0x0008; }
+      static constexpr unsigned int betweenNotes() { return NoteElement::size(); }
+      /// @endcond
+    };
+  };
 
 
   /** Encodes some additional settings for OpenGD77 based radios. These
@@ -1360,6 +1446,8 @@ public:
     virtual bool hasSettings(Settings set) const;
     /** Returns statellite settings bank, if present. If not, a new empty setting is returned. */
     virtual SatelliteBankElement satellites() const;
+    /** Returns boot melody settings, if present. If not, a new empty setting is returned. */
+    virtual BootMelodyElement bootMelody() const;
 
   public:
     /** Some limits for the element. */
