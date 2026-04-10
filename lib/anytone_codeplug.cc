@@ -1568,6 +1568,8 @@ AnytoneCodeplug::PrimaryRadioIdElement::decode(Context &ctx, const ErrorStack &e
 
 bool
 AnytoneCodeplug::PrimaryRadioIdElement::link(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   if (! isValid()) return true;
 
   // Check if ID is already present as a DMR radio id
