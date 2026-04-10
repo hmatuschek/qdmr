@@ -113,7 +113,7 @@ public:
   explicit AnytoneSatelliteConfig(QObject *parent = nullptr);
 
   SatelliteElement satellite(unsigned int idx);
-  bool encode(SatelliteDatabase *db, const ErrorStack &err=ErrorStack());
+  bool encode(SatelliteDatabase *db, const ErrorStack &err) override;
 
 public:
   /** Some limits for the satellite config. */

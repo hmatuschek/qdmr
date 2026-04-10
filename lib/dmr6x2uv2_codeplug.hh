@@ -83,8 +83,8 @@ public:
     AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const;
     void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func);
 
-    bool fromConfig(const Flags &flags, Context &ctx);
-    bool updateConfig(Context &ctx);
+    bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err);
+    bool updateConfig(Context &ctx, const ErrorStack &err);
 
   protected:
     /** Some internal used offsets within the element. */

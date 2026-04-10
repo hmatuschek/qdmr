@@ -1193,8 +1193,8 @@ D868UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
 }
 
 bool
-D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   setGPSUpdatePeriod(Interval::fromSeconds(5));
@@ -1237,8 +1237,8 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 }
 
 bool
-D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
+D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   ctx.config()->settings()->setVOX(voxLevel());
@@ -2121,16 +2121,12 @@ D868UVCodeplug::allocateGeneralSettings() {
 
 bool
 D868UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
-  return GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx);
+  return GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx, err);
 }
 
 bool
 D868UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
-  return GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx);
+  return GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx, err);
 }
 
 bool

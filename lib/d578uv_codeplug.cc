@@ -27,17 +27,6 @@ D578UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
 
 
 bool
-D578UVCodeplug::ChannelElement::frequenciesSwapped() const {
-  return getBit(Offset::swapRxTx());
-}
-
-void
-D578UVCodeplug::ChannelElement::enableSwapFrequencies(bool enable) {
-  setBit(Offset::swapRxTx(), enable);
-}
-
-
-bool
 D578UVCodeplug::ChannelElement::bluetoothEnabled() const {
   return getBit(Offset::bluetooth());
 }
@@ -238,16 +227,6 @@ D578UVCodeplug::ChannelElement::setARC4EncryptionKeyIndex(unsigned idx) {
 void
 D578UVCodeplug::ChannelElement::clearARC4EncryptionKeyIndex() {
   setUInt8(Offset::arc4KeyIndex(), 0);
-}
-
-
-bool
-D578UVCodeplug::ChannelElement::ctcssPhaseReversal() const {
-  return false;
-}
-void
-D578UVCodeplug::ChannelElement::enableCTCSSPhaseReversal(bool enable) {
-  Q_UNUSED(enable);
 }
 
 
@@ -1878,8 +1857,8 @@ D578UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
 
 
 bool
-D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   // Set transmit timeout
@@ -1983,8 +1962,8 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 }
 
 bool
-D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
+D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
@@ -3518,7 +3497,7 @@ bool
 D578UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx);
+  GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx, err);
   DMRAPRSMessageElement(data(Offset::gpsMessages())).fromConfig(flags, ctx);
   ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx);
   return true;
@@ -3528,7 +3507,7 @@ bool
 D578UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx);
+  GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx, err);
   DMRAPRSMessageElement(data(Offset::gpsMessages())).updateConfig(ctx);
   ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx);
   return true;

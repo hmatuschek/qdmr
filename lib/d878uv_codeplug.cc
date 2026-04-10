@@ -2067,8 +2067,8 @@ D878UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
 }
 
 bool
-D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   // Set transmit timeout
@@ -2172,8 +2172,8 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 }
 
 bool
-D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
+D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
@@ -2466,26 +2466,48 @@ D878UVCodeplug::ExtendedSettingsElement::setAutoRepeaterUHF2MaxFrequency(Frequen
   setUInt32_le(Offset::autoRepeaterUHF2MaxFrequency(), hz.inHz()/10);
 }
 
+
 GNSSSettings::Systems
 D878UVCodeplug::ExtendedSettingsElement::gnss() const {
   switch ((GNSS)getUInt8(Offset::gpsMode())) {
-  case GNSS::GPS: return GNSSSettings::System::GPS;
-  case GNSS::Beidou: return GNSSSettings::System::Beidou;
-  case GNSS::Both: return GNSSSettings::System::GPS|GNSSSettings::System::Beidou;
+  case GNSS::GPS:
+    return GNSSSettings::System::GPS;
+  case GNSS::Beidou:
+    return GNSSSettings::System::Beidou;
+  case GNSS::GPS_Beidou:
+    return GNSSSettings::System::GPS | GNSSSettings::System::Beidou;
+  case GNSS::Glonass:
+    return GNSSSettings::System::Glonass;
+  case GNSS::GPS_Glonass:
+    return GNSSSettings::System::GPS | GNSSSettings::System::Glonass;
+  case GNSS::Beidou_Glonass:
+    return GNSSSettings::System::Beidou | GNSSSettings::System::Glonass;
+  case GNSS::GPS_Beidou_Glonass:
+    return GNSSSettings::System::GPS | GNSSSettings::System::Beidou | GNSSSettings::System::Glonass;
   }
   return GNSSSettings::System::GPS;
 }
+
 void
 D878UVCodeplug::ExtendedSettingsElement::setGNSS(GNSSSettings::Systems mode) {
   int value = 0;
-  if (mode.testFlag(GNSSSettings::System::GPS))
+  if (mode.testFlags(GNSSSettings::System::GPS))
     value = (int)GNSS::GPS;
-  if (mode.testFlag(GNSSSettings::System::Beidou))
+  if (mode.testFlags(GNSSSettings::System::Beidou))
     value = (int)GNSS::Beidou;
   if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou))
-    value = (int)GNSS::Both;
+    value = (int)GNSS::GPS_Beidou;
+  if (mode.testFlags(GNSSSettings::System::Glonass))
+    value = (int)GNSS::Glonass;
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Glonass))
+    value = (int)GNSS::GPS_Glonass;
+  if (mode.testFlags(GNSSSettings::System::Beidou|GNSSSettings::System::Glonass))
+    value = (int)GNSS::Beidou_Glonass;
+  if (mode.testFlags(GNSSSettings::System::GPS|GNSSSettings::System::Beidou|GNSSSettings::System::Glonass))
+    value = (int)GNSS::GPS_Beidou_Glonass;
   setUInt8(Offset::gpsMode(), value);
 }
+
 
 Interval
 D878UVCodeplug::ExtendedSettingsElement::steDuration() const {
@@ -4025,13 +4047,13 @@ D878UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
-  // Keep 16bit DMR, 128 bit AES and 256 bit AES keys.
+  // Keep 16-bit DMR, 128-bit AES and 256-bit AES keys.
   EncryptionKeyFilterVisitor filter(
         { EncryptionKeyFilterVisitor::Filter(BasicEncryptionKey::staticMetaObject, 16, 16),
           EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 128, 128),
           EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 256, 256),});
   if (! filter.process(intermediate, err)) {
-    errMsg(err) << "Cannot remove unsupported exncryption.";
+    errMsg(err) << "Cannot remove unsupported encryption.";
     delete intermediate;
     return nullptr;
   }
@@ -4226,24 +4248,25 @@ D878UVCodeplug::allocateGeneralSettings() {
   image(0).addElement(Offset::settings(), GeneralSettingsElement::size());
   image(0).addElement(Offset::dmrAPRSMessage(), DMRAPRSMessageElement::size());
   image(0).addElement(Offset::settingsExtension(), ExtendedSettingsElement::size());
-
+  image(0).addElement(Offset::primaryId(), PrimaryRadioIdElement::size());
 }
 bool
 D878UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx);
+  GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx, err);
   DMRAPRSMessageElement(data(Offset::dmrAPRSMessage())).fromConfig(flags, ctx);
-  ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx);
+  ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx, err);
+  PrimaryRadioIdElement(data(Offset::primaryId())).encode(flags, ctx, err);
   return true;
 }
 bool
 D878UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx);
+  GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx, err);
   DMRAPRSMessageElement(data(Offset::dmrAPRSMessage())).updateConfig(ctx);
-  ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx);
+  ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx, err);
   return true;
 }
 bool

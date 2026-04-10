@@ -427,12 +427,12 @@ public:
     virtual void setManualDialedPrivateCallHangTime(unsigned int dur);
 
 
-    bool fromConfig(const Flags &flags, Context &ctx) override;
-    bool updateConfig(Context &ctx) override;
+    bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) override;
+    bool updateConfig(Context &ctx, const ErrorStack &err) override;
 
   protected:
     /** Some internal used offsets within the element. */
-    struct Offset: public D868UVCodeplug::GeneralSettingsElement::Offset {
+    struct Offset: D868UVCodeplug::GeneralSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int idleChannelTone()     { return 0x0000; }
       static constexpr unsigned int transmitTimeout()     { return 0x0004; }

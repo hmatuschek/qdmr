@@ -21,7 +21,7 @@ protected:
 
 public:
   /** Encodes the given satellite db into the device specific satellite configuration. */
-  virtual bool encode(SatelliteDatabase *db, const ErrorStack &err=ErrorStack()) = 0;
+  virtual bool encode(SatelliteDatabase *db, const ErrorStack &err) = 0;
 };
 
 #endif // SATELLITECONFIG_HH
