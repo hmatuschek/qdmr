@@ -80,6 +80,33 @@ public:
     void setGPSTimeZone(const QTimeZone &zone) override;
   };
 
+  /** Represents the extended settings within the D168UV codeplug.
+   * This covers the CPS version 1.07. */
+  class ExtendedSettingsElement: public D878UVCodeplug::ExtendedSettingsElement
+  {
+  protected:
+    /** Encoding of possible talker-alias types. That is the text being sent as talker alias.*/
+    enum class TalkerAliasType {
+      RadioName = 0, CustomText = 1
+    };
+
+  public:
+    /** Constructor. */
+    ExtendedSettingsElement(uint8_t *ptr);
+
+    // Size changed
+    static constexpr unsigned int size() { return 0x100; }
+
+    bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack()) override;
+
+  protected:
+    struct Offset: D878UVCodeplug::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int talkerAliasType() { return 0x0001; }
+      /// @endcond
+    };
+  };
+
 protected:
   /** Hidden constructor. */
   explicit D168UVCodeplug(const QString &label, QObject *parent = nullptr);

@@ -1857,8 +1857,8 @@ D578UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
 
 
 bool
-D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   // Set transmit timeout
@@ -1962,8 +1962,8 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 }
 
 bool
-D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx))
+D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
@@ -3497,7 +3497,7 @@ bool
 D578UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx);
+  GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx, err);
   DMRAPRSMessageElement(data(Offset::gpsMessages())).fromConfig(flags, ctx);
   ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx);
   return true;
@@ -3507,7 +3507,7 @@ bool
 D578UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx);
+  GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx, err);
   DMRAPRSMessageElement(data(Offset::gpsMessages())).updateConfig(ctx);
   ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx);
   return true;

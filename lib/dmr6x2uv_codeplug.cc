@@ -1029,9 +1029,9 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setManualDialedPrivateCallHangTime(uns
 
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx)
+DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
-  if (! D868UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+  if (! D868UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
@@ -1110,8 +1110,8 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
-  if (! D868UVCodeplug::GeneralSettingsElement::updateConfig(ctx))
+DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   ctx.config()->settings()->gnss()->setUnits(
@@ -2518,7 +2518,7 @@ DMR6X2UVCodeplug::allocateGeneralSettings() {
 
 bool
 DMR6X2UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx, err)) {
     errMsg(err) << "Cannot encode general settings element.";
     return false;
   }
@@ -2533,7 +2533,7 @@ DMR6X2UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const 
 
 bool
 DMR6X2UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx, err)) {
     errMsg(err) << "Cannot decode general settings element.";
     return false;
   }

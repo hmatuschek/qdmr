@@ -1,13 +1,12 @@
 #ifndef ANYTONECODEPLUG_HH
 #define ANYTONECODEPLUG_HH
 
-#include "codeplug.hh"
-#include <QGeoCoordinate>
-#include "channel.hh"
-#include "contact.hh"
-#include "bootsettings.hh"
 #include "anytone_settingsextension.hh"
-
+#include "bootsettings.hh"
+#include "channel.hh"
+#include "codeplug.hh"
+#include "contact.hh"
+#include <QGeoCoordinate>
 
 class RadioSettings;
 
@@ -876,6 +875,59 @@ public:
   };
 
 
+  /** Encodes the primary radio ID setting. */
+  class PrimaryRadioIdElement: public Element
+  {
+  public:
+    /** Constructor. */
+    explicit PrimaryRadioIdElement(uint8_t *ptr);
+
+    static constexpr unsigned int size() { return 0x0020; }
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** Returns the DMR id. */
+    virtual unsigned int number() const;
+    /** Sets the DMR id. */
+    virtual void setNumber(unsigned int number);
+
+    /** Returns the primary radio name. */
+    virtual QString name() const;
+    /** Sets the primary radio name. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true if the id is enabled. That is, overrides all other DMR ids. */
+    virtual bool enabled() const;
+    /** Enables/disables primary DMR id. */
+    virtual void enable(bool enable);
+
+    /** Encodes default DMR id as primary DMR id. */
+    virtual bool encode(const Flags &flags, Context &ctx, const ErrorStack &err);
+    /** Decodes primary DMR id. Actually does nothing.
+     * The decoding is delayed to the linking stage. */
+    virtual bool decode(Context &ctx, const ErrorStack &err);
+    /** Links primary DMR id as default DMR id. */
+    virtual bool link(Context &ctx, const ErrorStack &err);
+
+  public:
+    /** Some limits for the primary DMR id. */
+    struct Limit: Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int name() { return 26; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset  {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int id() { return 0x0000; }
+      static constexpr unsigned int enabled() { return 0x0004; }
+      static constexpr unsigned int name() { return 0x0005; }
+      /// @endcond
+    };
+  };
+
   /** Represents the base class for the settings elements in all AnyTone codeplugs.
    * This class only implements those few settings, common to all devices and encoded the same way.
    * It also defines all common settings as interfaces.
@@ -1255,11 +1307,11 @@ public:
     virtual void enableKeepLastCaller(bool enable) = 0;
 
     /** Encodes the general settings. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx);
+    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err);
     /** Updates the abstract config from general settings. */
-    virtual bool updateConfig(Context &ctx);
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err);
     /** Links the general settings. */
-    virtual bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err);
 
   protected:
     /** Internal used offsets within the element. */

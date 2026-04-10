@@ -1486,6 +1486,105 @@ AnytoneCodeplug::RadioIDBitmapElement::RadioIDBitmapElement(uint8_t *ptr)
 }
 
 
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::PrimaryRadioIdElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::PrimaryRadioIdElement::PrimaryRadioIdElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::PrimaryRadioIdElement::clear() {
+  memset(_data, 0x00, size());
+}
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::isValid() const {
+  return 0 != number() && ! name().isEmpty();
+}
+
+unsigned int
+AnytoneCodeplug::PrimaryRadioIdElement::number() const {
+  return getBCD8_be(Offset::id());
+}
+
+void
+AnytoneCodeplug::PrimaryRadioIdElement::setNumber(unsigned number) {
+  setBCD8_be(Offset::id(), number);
+}
+
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::enabled() const {
+  return 0x01 == getUInt8(Offset::enabled());
+}
+
+void
+AnytoneCodeplug::PrimaryRadioIdElement::enable(bool enabled) {
+  setUInt8(Offset::enabled(), enabled ? 0x01 : 0x00);
+}
+
+
+QString
+AnytoneCodeplug::PrimaryRadioIdElement::name() const {
+  return readASCII(Offset::name(), Limit::name(), 0x00);
+}
+
+void
+AnytoneCodeplug::PrimaryRadioIdElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::name(), 0x00);
+}
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::encode(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  bool enabled = this->enabled();
+  if (! flags.updateCodeplug())
+    enabled = false;
+
+  clear();
+
+  if (nullptr == ctx.config()->settings()->defaultId())
+    return true;
+
+  auto id = ctx.config()->settings()->defaultId();
+  setName(id->name());
+  setNumber(id->number());
+  enable(enabled);
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  // pass...
+  return true;
+}
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::link(Context &ctx, const ErrorStack &err) {
+  if (! isValid()) return true;
+
+  // Check if ID is already present as a DMR radio id
+  auto id = ctx.config()->radioIDs()->find(number());
+  // If not, create one
+  if (nullptr == id) {
+    id = new DMRRadioID(name(), number());
+    ctx.config()->radioIDs()->add(id, 0);
+  }
+  // ... and set as default.
+  ctx.config()->settings()->setDefaultId(id);
+
+  return true;
+}
+
+
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
@@ -1592,7 +1691,9 @@ AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(Level level) {
 }
 
 bool
-AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   // Set microphone gain
   // For the 868UV, this setting sets both, FM and DMR mic gain.
   // For all other devices, there is an additional FM mic gain setting.
@@ -1742,7 +1843,9 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
 }
 
 bool
-AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
+AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   // get microphone gain
   ctx.config()->settings()->setMicLevel(dmrMicGain());
   // D868UV does not support speech synthesis?

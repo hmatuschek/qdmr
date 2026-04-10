@@ -105,6 +105,27 @@ D168UVCodeplug::GeneralSettingsElement::setGPSTimeZone(const QTimeZone &zone) {
 
 
 /* ******************************************************************************************** *
+ * Implementation of D168UVCodeplug::ExtendedSettingsElement
+ * ******************************************************************************************** */
+D168UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
+  : D878UVCodeplug::ExtendedSettingsElement(ptr, size())
+{
+  // pass...
+}
+
+bool
+D168UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! D878UVCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
+    return false;
+
+  setUInt8(Offset::talkerAliasType(), (uint8_t)TalkerAliasType::RadioName);
+
+  return true;
+}
+
+
+
+/* ******************************************************************************************** *
  * Implementation of D168UVCodeplug
  * ******************************************************************************************** */
 D168UVCodeplug::D168UVCodeplug(const QString &label, QObject *parent)
@@ -192,20 +213,22 @@ bool
 D168UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx);
+  GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx, err);
   DMRAPRSMessageElement(data(Offset::dmrAPRSMessage())).fromConfig(flags, ctx);
   ExtendedSettingsElement(data(Offset::settingsExtension())).fromConfig(flags, ctx);
   return true;
 }
+
 bool
 D168UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
 
-  GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx);
+  GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx, err);
   DMRAPRSMessageElement(data(Offset::dmrAPRSMessage())).updateConfig(ctx);
-  ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx);
+  ExtendedSettingsElement(data(Offset::settingsExtension())).updateConfig(ctx, err);
   return true;
 }
+
 bool
 D168UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
   if (! GeneralSettingsElement(data(Offset::settings())).linkSettings(ctx.config()->settings(), ctx, err)) {

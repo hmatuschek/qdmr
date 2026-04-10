@@ -729,8 +729,8 @@ public:
     /** Sets the bluetooth RX delay in ms. */
     virtual void setBTRXDelay(Interval delay);
 
-    bool fromConfig(const Flags &flags, Context &ctx) override;
-    bool updateConfig(Context &ctx) override;
+    bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) override;
+    bool updateConfig(Context &ctx, const ErrorStack &err) override;
     bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) override;
 
   public:

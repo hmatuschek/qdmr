@@ -418,9 +418,9 @@ public:
     bool keepLastCaller() const;
     void enableKeepLastCaller(bool enable);
 
-    bool fromConfig(const Flags &flags, Context &ctx);
-    bool updateConfig(Context &ctx);
-    bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err=ErrorStack());
+    bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err);
+    bool updateConfig(Context &ctx, const ErrorStack &err);
+    bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits for the settings. */

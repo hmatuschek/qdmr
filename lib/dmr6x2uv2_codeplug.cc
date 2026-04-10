@@ -247,9 +247,9 @@ DMR6X2UV2Codeplug::GeneralSettingsElement::setFuncKey2Long(AnytoneKeySettingsExt
 
 
 bool
-DMR6X2UV2Codeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx)
+DMR6X2UV2Codeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
-  if (! DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+  if (! DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   // apply DMR-6X2UV Pro specific settings.
@@ -261,9 +261,9 @@ DMR6X2UV2Codeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Contex
 }
 
 bool
-DMR6X2UV2Codeplug::GeneralSettingsElement::updateConfig(Context &ctx)
+DMR6X2UV2Codeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
 {
-  if (! DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(ctx))
+  if (! DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   // Get or add settings extension
@@ -888,7 +888,7 @@ DMR6X2UV2Codeplug::allocateGeneralSettings() {
 
 bool
 DMR6X2UV2Codeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx, err)) {
     errMsg(err) << "Cannot encode general settings element.";
     return false;
   }
@@ -903,7 +903,7 @@ DMR6X2UV2Codeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const
 
 bool
 DMR6X2UV2Codeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx, err)) {
     errMsg(err) << "Cannot decode general settings element.";
     return false;
   }
