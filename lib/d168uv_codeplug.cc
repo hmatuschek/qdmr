@@ -126,6 +126,37 @@ D168UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
 
 /* ******************************************************************************************** *
+ * Implementation of D168UVCodeplug::FixedLocationNamesElement
+ * ******************************************************************************************** */
+D168UVCodeplug::FixedLocationNamesElement::FixedLocationNamesElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+D168UVCodeplug::FixedLocationNamesElement::clear() {
+  memset(_data, 0x00, size());
+}
+
+
+QString
+D168UVCodeplug::FixedLocationNamesElement::name(unsigned int n) const {
+  if (n >= Limit::nameCount())
+    return {};
+  return readASCII(Offset::names() + n*Offset::betweenNames(), Limit::nameLength(), 0x00);
+}
+
+void
+D168UVCodeplug::FixedLocationNamesElement::setName(unsigned int n, const QString &name) {
+  if (n >= Limit::nameCount())
+    return;
+  writeASCII(Offset::names() + n*Offset::betweenNames(), name, Limit::nameLength(), 0x00);
+}
+
+
+
+/* ******************************************************************************************** *
  * Implementation of D168UVCodeplug
  * ******************************************************************************************** */
 D168UVCodeplug::D168UVCodeplug(const QString &label, QObject *parent)
@@ -139,6 +170,20 @@ D168UVCodeplug::D168UVCodeplug(QObject *parent)
 {
   // pass...
 }
+
+
+void
+D168UVCodeplug::allocateUpdated() {
+  D878UVCodeplug::allocateUpdated();
+
+  // Fixed location names, not yet touched by dmrconf
+  image(0).addElement(Offset::fixedLocationNames(), FixedLocationNamesElement::size());
+
+  // allocate unknown segments
+  image(0).addElement(Offset::unknown_25c2000(), 0x0020);
+  image(0).addElement(Offset::unknown_25c2c80(), 0x0020);
+}
+
 
 bool
 D168UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
@@ -243,3 +288,6 @@ D168UVCodeplug::linkGeneralSettings(Context &ctx, const ErrorStack &err) {
 
   return true;
 }
+
+
+
