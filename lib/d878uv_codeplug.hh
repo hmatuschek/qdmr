@@ -219,6 +219,9 @@ public:
     /** Clears the DMR encryption key index. */
     void clearDMREncryptionKeyIndex() override;
 
+    bool adaptiveTDMA() const override;
+    void enableAdaptiveTDMA(bool enable) override;
+
     /** Constructs a Channel object from this element. */
     Channel *toChannelObj(Context &ctx) const override;
     /** Links a previously created channel object. */
@@ -245,13 +248,15 @@ public:
       static constexpr Bit advancedEncryptionType()        { return {0x003b, 5}; }
       static constexpr unsigned int fmAPRSFrequencyIndex() { return 0x003c; }
       static constexpr unsigned int arc4KeyIndex()         { return 0x003d; }
+      // Removed
+      static constexpr Bit adaptiveTDMA()                  { return {0, 0}; }
       /// @endcond
     };
   };
 
 
-  /** Starting from AT-D878UV, all AnyTone devices encode an channel settings extension element
-   * at an offset 0x2000 to the original channel. Also the size of the extension element is
+  /** Starting from AT-D878UV, all AnyTone devices encode a channel settings extension element
+   * at an offset 0x2000 to the original channel. Also, the size of the extension element is
    * identical to the channel element itself. This is weird. Anyway. This class encodes/decodes
    * these settings.
    *
@@ -801,8 +806,8 @@ public:
     /** Sets the bluetooth RX delay in ms. */
     virtual void setBTRXDelay(Interval delay);
 
-    bool fromConfig(const Flags &flags, Context &ctx) override;
-    bool updateConfig(Context &ctx) override;
+    bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) override;
+    bool updateConfig(Context &ctx, const ErrorStack &err) override;
     bool linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) override;
 
   public:
@@ -907,9 +912,11 @@ public:
   class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
   {
   protected:
-    /** Encoding of possible GNSSs. */
+    /** Encoding of possible GNSSs. Could someone explain those AnyTone engineers the concept of
+     * flags? */
     enum class GNSS {
-      GPS=0, Beidou=1, Both = 2
+      GPS = 0, Beidou = 1, GPS_Beidou = 2, Glonass = 3, GPS_Glonass = 4, Beidou_Glonass = 5,
+      GPS_Beidou_Glonass = 6
     };
 
     /** Talker alias encoding. */
@@ -1094,11 +1101,11 @@ public:
     virtual void setAllCallToneMelody(const Melody &melody);
 
     /** Encodes the settings from the config. */
-    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err);
     /** Update config from settings. */
-    virtual bool updateConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool updateConfig(Context &ctx, const ErrorStack &err);
     /** Link config from settings extension. */
-    virtual bool linkConfig(Context &ctx, const ErrorStack &err=ErrorStack());
+    virtual bool linkConfig(Context &ctx, const ErrorStack &err);
 
   public:
     /** Some limits for the settings. */
@@ -2044,6 +2051,7 @@ protected:
     static constexpr unsigned int roamingZones()                { return 0x01043000; }
     static constexpr unsigned int aesKeys()                     { return 0x024C4000; }
     static constexpr unsigned int aesKeyBitmap()                { return 0x024C8000; }
+    static constexpr unsigned int primaryId()                   { return 0x02582000; }
     static constexpr unsigned int arc4Keys()                    { return 0x025C0C00; }
     static constexpr unsigned int arc4KeyBitmap()               { return 0x025C1C00; }
     /// @endcond

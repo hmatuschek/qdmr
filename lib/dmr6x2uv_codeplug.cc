@@ -1029,9 +1029,9 @@ DMR6X2UVCodeplug::GeneralSettingsElement::setManualDialedPrivateCallHangTime(uns
 
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx)
+DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
-  if (! D868UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx))
+  if (! D868UVCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
@@ -1110,8 +1110,8 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
 }
 
 bool
-DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
-  if (! D868UVCodeplug::GeneralSettingsElement::updateConfig(ctx))
+DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   ctx.config()->settings()->gnss()->setUnits(
@@ -2300,7 +2300,7 @@ DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(FMAPRSSystem *sys, Conte
     ch->setPower(power());
     ch->setTXTone(txTone());
     logInfo() << "No matching APRS channel found for TX frequency " << fmFrequency().format()
-              << "MHz, create one as 'APRS Channel'";
+              << ", create one as 'APRS Channel'";
     ctx.config()->channelList()->add(ch);
   }
   sys->setRevertChannel(ch);
@@ -2347,7 +2347,13 @@ DMR6X2UVCodeplug::APRSSettingsElement::linkDMRAPRSSystem(int idx, DMRAPRSSystem 
     sys->setRevertChannel(ctx.get<Channel>(dmrChannelIndex(idx))->as<DMRChannel>());
 
   // Search for a matching contact in contacts
-  DMRContact *cont = ctx.config()->contacts()->findDigitalContact(dmrDestination(idx));
+  DMRContact *cont = nullptr;
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
+    if (ctx.get<DMRContact>(i)->number() == dmrDestination(idx)) {
+      cont = ctx.get<DMRContact>(i);
+      break;
+    }
+  }
   // If no matching contact is found, create one
   if (nullptr == cont) {
     cont = new DMRContact(dmrCallType(idx), tr("GPS #%1 Contact").arg(idx+1),
@@ -2512,7 +2518,7 @@ DMR6X2UVCodeplug::allocateGeneralSettings() {
 
 bool
 DMR6X2UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).fromConfig(flags, ctx, err)) {
     errMsg(err) << "Cannot encode general settings element.";
     return false;
   }
@@ -2527,7 +2533,7 @@ DMR6X2UVCodeplug::encodeGeneralSettings(const Flags &flags, Context &ctx, const 
 
 bool
 DMR6X2UVCodeplug::decodeGeneralSettings(Context &ctx, const ErrorStack &err) {
-  if (! GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx)) {
+  if (! GeneralSettingsElement(data(Offset::settings())).updateConfig(ctx, err)) {
     errMsg(err) << "Cannot decode general settings element.";
     return false;
   }

@@ -105,16 +105,6 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   // Wire-up "General Settings" view
   _generalSettings = new GeneralSettingsView(config);
   ui->tabs->addTab(_generalSettings, tr("Settings"));
-  if (settings.showCommercialFeatures()) {
-    _generalSettings->hideDMRID(true);
-  } else {
-    _generalSettings->hideDMRID(false);
-  }
-  if (settings.showExtensions()) {
-    _generalSettings->hideExtensions(false);
-  } else {
-    _generalSettings->hideExtensions(true);
-  }
 
   // Wire-up "Radio IDs" view
   _radioIdTab = new RadioIDListView(config);
@@ -136,59 +126,16 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   // Wire-up "Roaming Zone List" view
   _roamingZoneList = new RoamingZoneListView(config);
   ui->tabs->addTab(_roamingZoneList, tr("Roaming Zones"));
-  // Wire-up "extension view"
+  // Wire-up "extension view" for direct editing
   _extensionView = new ExtensionView();
   _extensionView->setObject(config, config);
   ui->tabs->addTab(_extensionView, tr("Extensions"));
-
-  if (! settings.showCommercialFeatures()) {
-    ui->tabs->removeTab(ui->tabs->indexOf(_radioIdTab));
-    _radioIdTab->setHidden(true);
-  }
-  if (! settings.showExtensions()) {
-    ui->tabs->removeTab(ui->tabs->indexOf(_extensionView));
-    _extensionView->setHidden(true);
-  }
 
   restoreGeometry(settings.mainWindowState());
 
   connect(config, &ConfigItem::modified, [this, config]() {
     this->setWindowModified(config->isModified());
   });
-}
-
-
-void
-MainWindow::applySettings() {
-  Settings settings;
-  // Handle commercial features
-  if (settings.showCommercialFeatures()) {
-    if (-1 == ui->tabs->indexOf(_radioIdTab)) {
-      ui->tabs->insertTab(ui->tabs->indexOf(_generalSettings)+1, _radioIdTab, tr("Radio IDs"));
-      update();
-    }
-    _generalSettings->hideDMRID(true);
-  } else if (! settings.showCommercialFeatures()) {
-    if (-1 != ui->tabs->indexOf(_radioIdTab)) {
-      ui->tabs->removeTab(ui->tabs->indexOf(_radioIdTab));
-      update();
-    }
-    _generalSettings->hideDMRID(false);
-  }
-  // Handle extensions
-  if (settings.showExtensions()) {
-    if (-1 == ui->tabs->indexOf(_extensionView)) {
-      ui->tabs->insertTab(ui->tabs->indexOf(_roamingZoneList)+1, _extensionView, tr("Extensions"));
-      update();
-    }
-    _generalSettings->hideExtensions(false);
-  } else {
-    if (-1 != ui->tabs->indexOf(_extensionView)) {
-      ui->tabs->removeTab(ui->tabs->indexOf(_extensionView));
-      update();
-    }
-    _generalSettings->hideExtensions(true);
-  }
 }
 
 

@@ -17,42 +17,6 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QGroupBox" name="dmrIDBox">
-       <property name="title">
-        <string>DMR Radio ID</string>
-       </property>
-       <layout class="QFormLayout" name="formLayout_2">
-        <item row="0" column="0">
-         <widget class="QLabel" name="dMRIDLabel">
-          <property name="text">
-           <string>DMR ID</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="nameLabel">
-          <property name="text">
-           <string>Radio Name</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="radioName">
-          <property name="toolTip">
-           <string>Enter your name or callsign.</string>
-          </property>
-          <property name="accessibleName">
-           <string>Name/Callsign</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="dmrID"/>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
       <widget class="QGroupBox" name="bootSettingsBox">
        <property name="title">
         <string>Boot Settings</string>

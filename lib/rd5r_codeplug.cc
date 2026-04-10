@@ -274,7 +274,7 @@ RD5RCodeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack 
   for (unsigned int i=0; i<Limit::contactCount(); i++) {
     ContactElement el(data(Offset::contacts() + i*ContactElement::size()));
     el.clear();
-    if (i >= (unsigned int) ctx.count<DMRContact>())
+    if (i >= (unsigned int) ctx.count<DigitalContact>())
       continue;
     if (! el.fromContactObj(ctx.get<DMRContact>(i+1), ctx, err)) {
       errMsg(err) << "Cannot encode contact '" << ctx.get<DMRContact>(i+1)->name()
@@ -364,8 +364,8 @@ RD5RCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack 
     for (unsigned int i=0; (i<ChannelBankElement::Limit::channelCount())&&(c<Limit::channelCount()); i++, c++) {
       ChannelElement el(bank.get(i));
       if (c < ctx.count<Channel>()) {
-        if (! el.fromChannelObj(ctx.get<Channel>(c+1), ctx, err)) {
-          errMsg(err) << "Cannot encode channel " << c+1 << " (" << i << " of bank " << b <<").";
+        if (! el.fromChannelObj(ctx.get<Channel>(c+1), ctx)) {
+          errMsg(err) << "Cannot encode channel " << c << " (" << i << " of bank " << b <<").";
           return false;
         }
         bank.enable(i,true);
@@ -418,10 +418,6 @@ RD5RCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
-void
-RD5RCodeplug::clearBootSettings() {
-  BootSettingsElement(data(Offset::bootSettings())).clear();
-}
 
 void
 RD5RCodeplug::clearMenuSettings() {
@@ -429,19 +425,22 @@ RD5RCodeplug::clearMenuSettings() {
 }
 
 void
-RD5RCodeplug::clearBootText() {
+RD5RCodeplug::clearBootSettings() {
+  BootSettingsElement(data(Offset::bootSettings())).clear();
   BootTextElement(data(Offset::bootText())).clear();
 }
 
 bool
-RD5RCodeplug::encodeBootText(const Flags &flags, Context &ctx, const ErrorStack &err) {
+RD5RCodeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
+  BootSettingsElement(data(Offset::bootSettings())).encode(ctx, err);
   BootTextElement(data(Offset::bootText())).fromConfig(ctx, err);
   return true;
 }
 
 bool
-RD5RCodeplug::decodeBootText(Context &ctx, const ErrorStack &err) {
+RD5RCodeplug::decodeBootSettings(Context &ctx, const ErrorStack &err) {
+  BootSettingsElement(data(Offset::bootSettings())).decode(ctx, err);
   BootTextElement(data(Offset::bootText())).updateConfig(ctx, err);
   return true;
 }

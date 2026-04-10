@@ -247,10 +247,10 @@ bool
 MD390Codeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
-  for (int i=0; i<NUM_CHANNELS; i++) {
+  for (unsigned int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
-    if (i < ctx.config()->channelList()->count()) {
-      chan.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    if (i < ctx.count<Channel>()) {
+      chan.fromChannelObj(ctx.get<Channel>(i+1), ctx);
     } else {
       chan.clear();
     }
@@ -301,7 +301,7 @@ MD390Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStack
   // Encode contacts
   for (unsigned int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
-    if (i < ctx.count<DMRContact>())
+    if (i < ctx.count<DigitalContact>())
       cont.fromContactObj(ctx.get<DMRContact>(i+1));
     else
       cont.clear();

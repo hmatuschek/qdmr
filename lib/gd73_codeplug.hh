@@ -8,6 +8,7 @@
 #include "rxgrouplist.hh"
 #include "channel.hh"
 #include "zone.hh"
+#include "bootsettings.hh"
 #include "radioddity_extensions.hh"
 
 
@@ -302,9 +303,9 @@ public:
     void setLoneWorkerRemindPeriod(const Interval &interval);
 
     /** Returns the boot display mode. */
-    BootDisplayMode bootDisplayMode() const;
+    BootSettings::BootDisplay bootDisplayMode() const;
     /** Sets the boot display mode. */
-    void setBootDisplayMode(BootDisplayMode mode);
+    void setBootDisplayMode(BootSettings::BootDisplay mode);
     /** Returns the first line of the boot text. */
     QString bootTextLine1() const;
     /** Sets the first line of the boot text. */

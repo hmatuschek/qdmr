@@ -461,6 +461,10 @@ DM1701Codeplug::ZoneExtElement::clear() {
   memset(_data, 0x00, 0xe0);
 }
 
+bool
+DM1701Codeplug::ZoneExtElement::hasMemberIndexA(unsigned n) const {
+  return 0 != memberIndexA(n);
+}
 uint16_t
 DM1701Codeplug::ZoneExtElement::memberIndexA(unsigned n) const {
   return getUInt16_le(0x00 + 2*n);
@@ -471,6 +475,10 @@ DM1701Codeplug::ZoneExtElement::setMemberIndexA(unsigned n, uint16_t idx) {
   setUInt16_le(0x00 + 2*n, idx);
 }
 
+bool
+DM1701Codeplug::ZoneExtElement::hasMemberIndexB(unsigned n) const {
+  return 0 != memberIndexB(n);
+}
 uint16_t
 DM1701Codeplug::ZoneExtElement::memberIndexB(unsigned n) const {
   return getUInt16_le(0x60 + 2*n);
@@ -485,9 +493,10 @@ bool
 DM1701Codeplug::ZoneExtElement::fromZoneObj(const Zone *zone, Context &ctx) {
   // Store remaining channels from list A
   for (int i=16; i<64; i++) {
-    if (i < zone->A()->count())
-      setMemberIndexA(i-16, ctx.index(zone->A()->get(i)));
-    else
+    if (i < zone->A()->count()) {
+      int idx = ctx.index(zone->A()->get(i));
+      setMemberIndexA(i-16, idx);
+    } else
       setMemberIndexA(i-16, 0);
   }
   // Store channel from list B
@@ -503,18 +512,18 @@ DM1701Codeplug::ZoneExtElement::fromZoneObj(const Zone *zone, Context &ctx) {
 
 bool
 DM1701Codeplug::ZoneExtElement::linkZoneObj(Zone *zone, Context &ctx) {
-  for (int i=0; (i<48) && memberIndexA(i); i++) {
+  for (int i=0; (i<48) && hasMemberIndexA(i); i++) {
     if (! ctx.has<Channel>(memberIndexA(i))) {
-      logError() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
-      return false;
+      logWarn() << "Cannot link zone extension: Channel index " << memberIndexA(i) << " not defined.";
+      continue;
     }
     zone->A()->add(ctx.get<Channel>(memberIndexA(i)));
   }
 
-  for (int i=0; (i<64) && memberIndexB(i); i++) {
+  for (int i=0; (i<64) && hasMemberIndexB(i); i++) {
     if (! ctx.has<Channel>(memberIndexB(i))) {
       logWarn() << "Cannot link zone extension: Channel index " << memberIndexB(i) << " not defined.";
-      return false;
+      continue;
     }
     zone->B()->add(ctx.get<Channel>(memberIndexB(i)));
   }
@@ -581,10 +590,10 @@ bool
 DM1701Codeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Define Channels
-  for (int i=0; i<NUM_CHANNELS; i++) {
+  for (unsigned int i=0; i<NUM_CHANNELS; i++) {
     ChannelElement chan(data(ADDR_CHANNELS+i*CHANNEL_SIZE));
-    if (i < ctx.config()->channelList()->count()) {
-      chan.fromChannelObj(ctx.config()->channelList()->channel(i), ctx);
+    if (i < ctx.count<Channel>()) {
+      chan.fromChannelObj(ctx.get<Channel>(i+1), ctx);
     } else {
       chan.clear();
     }
@@ -635,7 +644,7 @@ DM1701Codeplug::encodeContacts(const Flags &flags, Context &ctx, const ErrorStac
   // Encode contacts
   for (unsigned int i=0; i<NUM_CONTACTS; i++) {
     ContactElement cont(data(ADDR_CONTACTS+i*CONTACT_SIZE));
-    if (i < ctx.count<DMRContact>())
+    if (i < ctx.count<DigitalContact>())
       cont.fromContactObj(ctx.get<DMRContact>(i+1));
     else
       cont.clear();

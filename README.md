@@ -64,7 +64,8 @@ qdmr or dmrconf.
 <a href="https://repology.org/project/qdmr/versions">
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
- 
+
+ * **[Version 0.14.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.14.0)** -- Bugfix release.
  * **[Version 0.14.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.14.0)** -- Added support for Baofeng DM-32UV, added AM channels.
  * **[Version 0.13.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.3)** -- Added support BTech DMR6X2PRO and OpenUV390.
  * **[Version 0.12.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.3)** -- Added support BTech DR-1801UV (A6, still unstable) and Radioddity GD-73.

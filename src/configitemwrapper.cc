@@ -1,7 +1,6 @@
 #include "configitemwrapper.hh"
 #include <cmath>
 #include "logger.hh"
-#include "utils.hh"
 #include <QColor>
 #include <QPalette>
 #include <QWidget>
@@ -308,14 +307,14 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 6:
     return channel->rxOnly() ? tr("On") : tr("Off");
   case 7:
-    if (DMRChannel *digi = channel->as<DMRChannel>()) {
-      switch (digi->admit()) {
+    if (DMRChannel *dmr = channel->as<DMRChannel>()) {
+      switch (dmr->admit()) {
       case DMRChannel::Admit::Always: return tr("Always"); break;
       case DMRChannel::Admit::Free: return tr("Free"); break;
       case DMRChannel::Admit::ColorCode: return tr("Color"); break;
       }
-    } else if (FMChannel *analog = channel->as<FMChannel>()) {
-      switch (analog->admit()) {
+    } else if (FMChannel *fm = channel->as<FMChannel>()) {
+      switch (fm->admit()) {
       case FMChannel::Admit::Always: return tr("Always"); break;
       case FMChannel::Admit::Free: return tr("Free"); break;
       case FMChannel::Admit::Tone: return tr("Tone"); break;
@@ -342,6 +341,8 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
   case 10:
     if (DMRChannel *digi = channel->as<DMRChannel>()) {
       return digi->colorCode();
+    } else if (M17Channel *m17 = channel->as<M17Channel>()) {
+            return m17->accessNumber();
     } else if (channel->is<FMChannel>()) {
       return tr("[None]");
     }
@@ -410,7 +411,7 @@ ChannelListWrapper::data(const QModelIndex &index, int role) const {
     }
     break;
   case 17:
-    if (channel->is<DMRChannel>()) {
+    if (channel->is<DMRChannel>() || channel->is<M17Channel>()) {
       return tr("[None]");
     } else if (FMChannel *fm = channel->as<FMChannel>()) {
       if (fm->defaultSquelch())
@@ -666,21 +667,21 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
           return QVariant();
       }
     } else if (contact->is<DMRContact>()) {
-      DMRContact *digi = contact->as<DMRContact>();
+      DMRContact *dmr = contact->as<DMRContact>();
       switch (index.column()) {
       case 0:
-        switch (digi->type()) {
+        switch (dmr->type()) {
         case DMRContact::PrivateCall: return tr("Private Call");
         case DMRContact::GroupCall: return tr("Group Call");
         case DMRContact::AllCall: return tr("All Call");
         }
       break;
       case 1:
-      return digi->name();
+      return dmr->name();
       case 2:
-      return digi->number();
+      return dmr->number();
       case 3:
-      return (digi->ring() ? tr("On") : tr("Off"));
+      return (dmr->ring() ? tr("On") : tr("Off"));
       case 4: {
         auto exts = formatExtensions(index.row());
         if (exts.isEmpty())
@@ -690,8 +691,25 @@ ContactListWrapper::data(const QModelIndex &index, int role) const {
       default:
       return QVariant();
       }
+    } else if (contact->is<M17Contact>()) {
+      M17Contact *m17 = contact->as<M17Contact>();
+      switch (index.column()) {
+      case 0:
+        return tr("M17");
+      case 1:
+        return m17->name();
+      case 2:
+        if (m17->isBroadcast())
+          return tr("[Broadcast]");
+        return m17->call();
+      case 3:
+        return (m17->ring() ? tr("On") : tr("Off"));
+      default:
+        return QVariant();
+      }
     }
   }
+
   return QVariant();
 }
 

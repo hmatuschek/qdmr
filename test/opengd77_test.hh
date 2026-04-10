@@ -37,6 +37,11 @@ private slots:
   void testDTMFContacts();
   /** Regression test for #697. */
   void testChannelTransmitTimeout();
+  /** Regression test for #856. */
+  void testConfigVerification();
+  void testBootMelody();
+  /** Regression tests for #878. */
+  void testBootMelodyPauses();
 
 protected:
   static bool encodeDecode(Config &config, Config &decoded, const ErrorStack &err=ErrorStack());

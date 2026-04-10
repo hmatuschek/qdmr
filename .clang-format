@@ -105,7 +105,7 @@ BraceWrapping:
 BreakAdjacentStringLiterals: true
 BreakAfterAttributes: Leave
 BreakAfterJavaFieldAnnotations: false
-BreakAfterReturnType: TopLevel
+BreakAfterReturnType: AllDefinitions
 BreakArrays:     true
 BreakBeforeBinaryOperators: All
 BreakBeforeConceptDeclarations: Always

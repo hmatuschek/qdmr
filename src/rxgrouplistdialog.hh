@@ -44,7 +44,8 @@ class RXGroupListBox: public QComboBox
 public:
   RXGroupListBox(RXGroupLists *groups, QWidget *parent=0);
 
-  RXGroupList *groupList();
+  void setGroupList(RXGroupList *lst);
+  RXGroupList *groupList() const;
 };
 
 void populateRXGroupListBox(QComboBox *box, RXGroupLists *groups, RXGroupList *list=nullptr);

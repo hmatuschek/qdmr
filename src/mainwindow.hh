@@ -20,9 +20,6 @@ class MainWindow: public QMainWindow
 public:
   explicit MainWindow(Config *config, QWidget *parent=nullptr);
 
-public slots:
-  void applySettings();
-
 protected:
   void closeEvent(QCloseEvent *event);
 

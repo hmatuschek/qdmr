@@ -285,12 +285,12 @@ AnytoneCodeplug::ChannelElement::setTXTone(const SelectiveCall &code) {
 }
 
 bool
-AnytoneCodeplug::ChannelElement::ctcssPhaseReversal() const {
-  return getBit(Offset::ctcssPhaseReversal());
+AnytoneCodeplug::ChannelElement::rxTxSwapped() const {
+  return getBit(Offset::swapRXTX());
 }
 void
-AnytoneCodeplug::ChannelElement::enableCTCSSPhaseReversal(bool enable) {
-  setBit(Offset::ctcssPhaseReversal(), enable);
+AnytoneCodeplug::ChannelElement::enableSwapRxTx(bool enable) {
+  setBit(Offset::swapRXTX(), enable);
 }
 bool
 AnytoneCodeplug::ChannelElement::rxOnly() const {
@@ -499,7 +499,7 @@ AnytoneCodeplug::ChannelElement::dtmfIDIndex() const {
 }
 void
 AnytoneCodeplug::ChannelElement::setDTMFIDIndex(unsigned idx) {
-  setUInt8(Offset::fiveToneIDIndex(), idx);
+  setUInt8(Offset::dtmfIDIndex(), idx);
 }
 
 unsigned
@@ -600,7 +600,6 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     // no per channel squelch settings
     ach->setSquelchDefault();
     ach->extended()->enableTalkaround(talkaround());
-    ach->extended()->enableReverseBurst(ctcssPhaseReversal());
 
     // Create extension
     AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension();
@@ -745,7 +744,7 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
     // Apply common settings
     enableTalkaround(ac->extended()->talkaround());
     // Apply FM settings
-    enableCTCSSPhaseReversal(ac->extended()->reverseBurst());
+
     // Handle extension
     if (AnytoneFMChannelExtension *ext = ac->anytoneChannelExtension()) {
       setCustomCTCSSFrequency(ext->customCTCSS());
@@ -1142,7 +1141,7 @@ AnytoneCodeplug::GroupListElement::fromGroupListObj(const RXGroupList *lst, Cont
   for (uint8_t i=0; i<Limit::members(); i++) {
     // Skip non-private-call entries
     while((lst->count() > j) && (DMRContact::GroupCall != lst->contact(j)->type())) {
-      logWarn() << "Contact '" << lst->contact(i)->name() << "' in group list '" << lst->name()
+      logWarn() << "Contact '" << lst->contact(j)->name() << "' in group list '" << lst->name()
                 << "' is not a group call. Skip entry.";
       j++;
     }
@@ -1402,7 +1401,7 @@ AnytoneCodeplug::ScanListElement::fromScanListObj(ScanList *lst, Context &ctx) {
     setMemberIndex(i, ctx.index(lst->channel(i)));
   }
 
-  return false;
+  return true;
 }
 
 
@@ -1487,6 +1486,107 @@ AnytoneCodeplug::RadioIDBitmapElement::RadioIDBitmapElement(uint8_t *ptr)
 }
 
 
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::PrimaryRadioIdElement
+ * ********************************************************************************************* */
+AnytoneCodeplug::PrimaryRadioIdElement::PrimaryRadioIdElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+AnytoneCodeplug::PrimaryRadioIdElement::clear() {
+  memset(_data, 0x00, size());
+}
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::isValid() const {
+  return 0 != number() && ! name().isEmpty();
+}
+
+unsigned int
+AnytoneCodeplug::PrimaryRadioIdElement::number() const {
+  return getBCD8_be(Offset::id());
+}
+
+void
+AnytoneCodeplug::PrimaryRadioIdElement::setNumber(unsigned number) {
+  setBCD8_be(Offset::id(), number);
+}
+
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::enabled() const {
+  return 0x01 == getUInt8(Offset::enabled());
+}
+
+void
+AnytoneCodeplug::PrimaryRadioIdElement::enable(bool enabled) {
+  setUInt8(Offset::enabled(), enabled ? 0x01 : 0x00);
+}
+
+
+QString
+AnytoneCodeplug::PrimaryRadioIdElement::name() const {
+  return readASCII(Offset::name(), Limit::name(), 0x00);
+}
+
+void
+AnytoneCodeplug::PrimaryRadioIdElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::name(), 0x00);
+}
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::encode(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  bool enabled = this->enabled();
+  if (! flags.updateCodeplug())
+    enabled = false;
+
+  clear();
+
+  if (nullptr == ctx.config()->settings()->defaultId())
+    return true;
+
+  auto id = ctx.config()->settings()->defaultId();
+  setName(id->name());
+  setNumber(id->number());
+  enable(enabled);
+
+  return true;
+}
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  // pass...
+  return true;
+}
+
+bool
+AnytoneCodeplug::PrimaryRadioIdElement::link(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  if (! isValid()) return true;
+
+  // Check if ID is already present as a DMR radio id
+  auto id = ctx.config()->radioIDs()->find(number());
+  // If not, create one
+  if (nullptr == id) {
+    id = new DMRRadioID(name(), number());
+    ctx.config()->radioIDs()->add(id, 0);
+  }
+  // ... and set as default.
+  ctx.config()->settings()->setDefaultId(id);
+
+  return true;
+}
+
+
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::GeneralSettingsElement
  * ********************************************************************************************* */
@@ -1545,14 +1645,26 @@ AnytoneCodeplug::GeneralSettingsElement::setAutoShutdownDelay(Interval intv) {
   }
 }
 
-AnytoneBootSettingsExtension::BootDisplay
+
+BootSettings::BootDisplay
 AnytoneCodeplug::GeneralSettingsElement::bootDisplay() const {
-  return (AnytoneBootSettingsExtension::BootDisplay) getUInt8(Offset::bootDisplay());
+  switch ((BootDisplay) getUInt8(Offset::bootDisplay())) {
+    case BootDisplay::Default: return BootSettings::BootDisplay::Logo;
+    case BootDisplay::CustomText: return BootSettings::BootDisplay::Text;
+    case BootDisplay::CustomImage: return BootSettings::BootDisplay::Image;
+  }
+  return BootSettings::BootDisplay::Logo;
 }
+
 void
-AnytoneCodeplug::GeneralSettingsElement::setBootDisplay(AnytoneBootSettingsExtension::BootDisplay mode) {
-  setUInt8(Offset::bootDisplay(), (unsigned)mode);
+AnytoneCodeplug::GeneralSettingsElement::setBootDisplay(BootSettings::BootDisplay mode) {
+  switch (mode) {
+  case BootSettings::BootDisplay::Logo: setUInt8(Offset::bootDisplay(), (unsigned)BootDisplay::Default); break;
+  case BootSettings::BootDisplay::Text: setUInt8(Offset::bootDisplay(), (unsigned)BootDisplay::CustomText); break;
+  case BootSettings::BootDisplay::Image: setUInt8(Offset::bootDisplay(), (unsigned)BootDisplay::CustomImage); break;
+  }
 }
+
 
 bool
 AnytoneCodeplug::GeneralSettingsElement::bootPassword() const {
@@ -1581,7 +1693,9 @@ AnytoneCodeplug::GeneralSettingsElement::setSquelchLevelB(Level level) {
 }
 
 bool
-AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
+AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   // Set microphone gain
   // For the 868UV, this setting sets both, FM and DMR mic gain.
   // For all other devices, there is an additional FM mic gain setting.
@@ -1602,6 +1716,34 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
   // Set default squelch level
   setSquelchLevelA(ctx.config()->settings()->squelch());
   setSquelchLevelB(ctx.config()->settings()->squelch());
+
+  // Encode boot settings
+  setBootDisplay(ctx.config()->settings()->boot()->bootDisplay());
+  enableBootPassword(ctx.config()->settings()->boot()->bootPasswordEnabled());
+  enableDefaultChannel(
+        ctx.config()->settings()->boot()->defaultChannelEnabled() &&
+        (! ctx.config()->settings()->boot()->zoneA()->isNull()) &&
+        (! ctx.config()->settings()->boot()->zoneB()->isNull()));
+
+  if (defaultChannel()) {
+    setDefaultZoneIndexA(ctx.index(ctx.config()->settings()->boot()->zoneA()->as<Zone>()));
+    if (ctx.config()->settings()->boot()->channelA()->isNull() ||
+        (! ctx.config()->settings()->boot()->zoneA()->as<Zone>()->A()->has(
+           ctx.config()->settings()->boot()->channelA()->as<Channel>())))
+      setDefaultChannelAToVFO();
+    else
+      setDefaultChannelAIndex(ctx.config()->settings()->boot()->zoneA()->as<Zone>()->A()->indexOf(
+                                ctx.config()->settings()->boot()->channelA()->as<Channel>()));
+
+    setDefaultZoneIndexB(ctx.index(ctx.config()->settings()->boot()->zoneB()->as<Zone>()));
+    if (ctx.config()->settings()->boot()->channelB()->isNull() ||
+        (! ctx.config()->settings()->boot()->zoneB()->as<Zone>()->A()->has(
+           ctx.config()->settings()->boot()->channelB()->as<Channel>())))
+      setDefaultChannelBToVFO();
+    else
+      setDefaultChannelBIndex(ctx.config()->settings()->boot()->zoneB()->as<Zone>()->A()->indexOf(
+                                ctx.config()->settings()->boot()->channelB()->as<Channel>()));
+  }
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
@@ -1625,34 +1767,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     setMaxVFOScanFrequencyUHF(ext->maxVFOScanFrequencyUHF());
     setMinVFOScanFrequencyVHF(ext->minVFOScanFrequencyVHF());
     setMaxVFOScanFrequencyVHF(ext->maxVFOScanFrequencyVHF());
-
-    // Encode boot settings
-    setBootDisplay(ext->bootSettings()->bootDisplay());
-    enableBootPassword(ext->bootSettings()->bootPasswordEnabled());
-    enableDefaultChannel(
-          ext->bootSettings()->defaultChannelEnabled() &&
-          (! ext->bootSettings()->zoneA()->isNull()) &&
-          (! ext->bootSettings()->zoneB()->isNull()));
-
-    if (defaultChannel()) {
-      setDefaultZoneIndexA(ctx.index(ext->bootSettings()->zoneA()->as<Zone>()));
-      if (ext->bootSettings()->channelA()->isNull() ||
-          (! ext->bootSettings()->zoneA()->as<Zone>()->A()->has(
-             ext->bootSettings()->channelA()->as<Channel>())))
-        setDefaultChannelAToVFO();
-      else
-        setDefaultChannelAIndex(ext->bootSettings()->zoneA()->as<Zone>()->A()->indexOf(
-                                  ext->bootSettings()->channelA()->as<Channel>()));
-
-      setDefaultZoneIndexB(ctx.index(ext->bootSettings()->zoneB()->as<Zone>()));
-      if (ext->bootSettings()->channelB()->isNull() ||
-          (! ext->bootSettings()->zoneB()->as<Zone>()->A()->has(
-             ext->bootSettings()->channelB()->as<Channel>())))
-        setDefaultChannelBToVFO();
-      else
-        setDefaultChannelBIndex(ext->bootSettings()->zoneB()->as<Zone>()->A()->indexOf(
-                                  ext->bootSettings()->channelB()->as<Channel>()));
-    }
 
     // Encode key settings
     setFuncKeyAShort(ext->keySettings()->funcKeyAShort());
@@ -1731,12 +1845,19 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
 }
 
 bool
-AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
+AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   // get microphone gain
   ctx.config()->settings()->setMicLevel(dmrMicGain());
   // D868UV does not support speech synthesis?
   ctx.config()->settings()->enableSpeech(false);
   ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB()));
+
+  // Store boot settings
+  ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
+  ctx.config()->settings()->boot()->enableBootPassword(bootPassword());
+  ctx.config()->settings()->boot()->enableDefaultChannel(this->defaultChannel());
 
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
@@ -1766,11 +1887,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
   ext->setMaxVFOScanFrequencyUHF(this->maxVFOScanFrequencyUHF());
   ext->setMinVFOScanFrequencyVHF(this->minVFOScanFrequencyVHF());
   ext->setMaxVFOScanFrequencyVHF(this->maxVFOScanFrequencyVHF());
-
-  // Store boot settings
-  ext->bootSettings()->setBootDisplay(bootDisplay());
-  ext->bootSettings()->enableBootPassword(bootPassword());
-  ext->bootSettings()->enableDefaultChannel(this->defaultChannel());
 
   // Store key settings
   ext->keySettings()->setFuncKeyAShort(funcKeyAShort());
@@ -1836,11 +1952,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx) {
 
 bool
 AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
-  if (! settings->anytoneExtension())
-    return false;
-
-  AnytoneSettingsExtension *ext = settings->anytoneExtension();
-
   // Link boot settings
   if (this->defaultChannel()) {
     if (! ctx.has<Zone>(this->defaultZoneIndexA())) {
@@ -1850,7 +1961,7 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
     }
 
     Zone *zoneA = ctx.get<Zone>(this->defaultZoneIndexA());
-    ext->bootSettings()->zoneA()->set(zoneA);
+    ctx.config()->settings()->boot()->zoneA()->set(zoneA);
     if (this->defaultChannelAIsVFO()) {
       // pass...
     } else if (this->defaultChannelAIndex() >= (unsigned int)zoneA->A()->count()) {
@@ -1858,7 +1969,7 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
                   << " not defined.";
       return false;
     } else {
-      ext->bootSettings()->channelA()->set(
+      ctx.config()->settings()->boot()->channelA()->set(
             zoneA->A()->get(this->defaultChannelAIndex())->as<Channel>());
     }
 
@@ -1868,7 +1979,7 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
       return false;
     }
     Zone *zoneB = ctx.get<Zone>(this->defaultZoneIndexB());
-    ext->bootSettings()->zoneB()->set(zoneB);
+    ctx.config()->settings()->boot()->zoneB()->set(zoneB);
     if (this->defaultChannelBIsVFO()) {
       // pass...
     } else if (this->defaultChannelBIndex() >= (unsigned int)zoneB->A()->count()) {
@@ -1876,10 +1987,14 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
                   << " not defined.";
       return false;
     } else {
-      ext->bootSettings()->channelB()->set(
+      ctx.config()->settings()->boot()->channelB()->set(
             zoneB->A()->get(this->defaultChannelBIndex())->as<Channel>());
     }
   }
+
+  if (! settings->anytoneExtension())
+    return false;
+  AnytoneSettingsExtension *ext = settings->anytoneExtension();
 
   // Link repeater offsets
   if (this->hasAutoRepeaterOffsetFrequencyIndexVHF()) {
@@ -2015,7 +2130,7 @@ AnytoneCodeplug::ZoneChannelListElement::clear() {
 
 bool
 AnytoneCodeplug::ZoneChannelListElement::hasChannelA(unsigned n) const {
-  return 0xffff == channelIndexA(n);
+  return 0xffff != channelIndexA(n);
 }
 unsigned
 AnytoneCodeplug::ZoneChannelListElement::channelIndexA(unsigned n) const {
@@ -2032,7 +2147,7 @@ AnytoneCodeplug::ZoneChannelListElement::clearChannelIndexA(unsigned n) {
 
 bool
 AnytoneCodeplug::ZoneChannelListElement::hasChannelB(unsigned n) const {
-  return 0xffff == channelIndexB(n);
+  return 0xffff != channelIndexB(n);
 }
 unsigned
 AnytoneCodeplug::ZoneChannelListElement::channelIndexB(unsigned n) const {
@@ -2118,11 +2233,10 @@ AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ct
   setIntroLine1(ctx.config()->settings()->introLine1());
   setIntroLine2(ctx.config()->settings()->introLine2());
 
-  // Handle extensions
-  if (ctx.config()->settings()->anytoneExtension()) {
-    AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
-    setPassword(ext->bootSettings()->bootPassword());
-  }
+  if (ctx.config()->settings()->boot()->bootPasswordEnabled())
+    setPassword(ctx.config()->settings()->boot()->bootPassword());
+  else
+    setPassword("");
 
   return true;
 }
@@ -2132,13 +2246,8 @@ AnytoneCodeplug::BootSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->setIntroLine1(introLine1());
   ctx.config()->settings()->setIntroLine2(introLine2());
 
-  // Create/update extension
-  AnytoneSettingsExtension *ext = nullptr;
-  if (ctx.config()->settings()->anytoneExtension())
-    ext = ctx.config()->settings()->anytoneExtension();
-  else
-    ctx.config()->settings()->setAnytoneExtension(ext = new AnytoneSettingsExtension());
-  ext->bootSettings()->setBootPassword(password());
+  ctx.config()->settings()->boot()->setBootPassword(password());
+  ctx.config()->settings()->boot()->enableBootPassword(! password().isEmpty());
 
   return true;
 }
@@ -2407,7 +2516,13 @@ bool
 AnytoneCodeplug::DMRAPRSSettingsElement::linkGPSSystem(uint8_t i, Context &ctx) {
   DMRContact *cont = nullptr;
   // Find matching contact, if not found -> create one.
-  if (nullptr == (cont = ctx.config()->contacts()->findDigitalContact(destination()))) {
+  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
+    if (ctx.get<DMRContact>(i)->number() == destination()) {
+      cont = ctx.get<DMRContact>(i);
+      break;
+    }
+  }
+  if (nullptr == cont) {
     cont = new DMRContact(callType(), QString("GPS target"), destination());
     ctx.config()->contacts()->add(cont);
   }
@@ -4443,6 +4558,10 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
       ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d); d++;
     } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
       ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a); a++;
+    } else {
+      logInfo() << "Cannot index contact '" << config->contacts()->contact(i)->name()
+                << "'. Contact type '" << config->contacts()->contact(i)->metaObject()->className()
+                << "' not supported by or implemented for AnyTone devices.";
     }
   }
 
@@ -4543,10 +4662,10 @@ AnytoneCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
-  // Remove all AM channels
-  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  // Remove all AM & M17 channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject, M17Channel::staticMetaObject};
   if (! amFilter.process(intermediate, err)) {
-    errMsg(err) << "Remove AM channels.";
+    errMsg(err) << "Remove AM & M17 channels.";
     delete intermediate;
     return nullptr;
   }

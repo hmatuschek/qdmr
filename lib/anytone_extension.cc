@@ -194,7 +194,7 @@ AnytoneFMChannelExtension::setScramblerFrequency(const Frequency &f) {
  * Implementation of AnytoneDigitalChannelExtension
  * ********************************************************************************************* */
 AnytoneDMRChannelExtension::AnytoneDMRChannelExtension(QObject *parent)
-  : AnytoneChannelExtension(parent),  _adaptiveTDMA(false), _throughMode(false)
+  : AnytoneChannelExtension(parent),  _adaptiveTDMA(false), _throughMode(false), _crc(true)
 {
   // pass...
 }
@@ -233,6 +233,19 @@ AnytoneDMRChannelExtension::enableThroughMode(bool enable) {
   _throughMode = enable;
   emit modified(this);
 }
+
+
+bool AnytoneDMRChannelExtension::crcEnabled() const {
+  return _crc;
+}
+
+void AnytoneDMRChannelExtension::enableCRC(bool enable) {
+  if (enable == _crc)
+    return;
+  _crc = enable;
+  emit modified(this);
+}
+
 
 
 /* ********************************************************************************************* *

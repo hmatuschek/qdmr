@@ -656,8 +656,6 @@ class TyTSettingsExtension: public ConfigExtension
   Q_PROPERTY(bool wakeupPreamble READ wakeupPreamble WRITE enableWakeupPreamble)
   Q_CLASSINFO("wakeupPreambleDescription", "If enabled, the radio will transmit a short wake-up "
               "preamble before each call.")
-  /** If @c true, a picture is shown during boot. */
-  Q_PROPERTY(bool bootPicture READ bootPicture WRITE enableBootPicture)
   /** If @c true, the radio is in channel mode. */
   Q_PROPERTY(bool channelMode READ channelMode WRITE enableChannelMode)
   /** If @c true or channelMode is true, the VFO A is in channel mode. */
@@ -686,10 +684,6 @@ class TyTSettingsExtension: public ConfigExtension
   Q_PROPERTY(bool keypadLockManual READ keypadLockManual WRITE enableKeypadLockManual)
   /** If @c keypadLockManual is @c false, specifies the keypad lock time. */
   Q_PROPERTY(unsigned keypadLockTime READ keypadLockTime WRITE setKeypadLockTime)
-  /** If @c true the power-on password is enabled. */
-  Q_PROPERTY(bool powerOnPasswordEnabled READ powerOnPasswordEnabled WRITE enablePowerOnPassword)
-  /** If @c powerOnPasswordEnabled is @c true, specifies the power-on password. */
-  Q_PROPERTY(unsigned powerOnPassword READ powerOnPassword WRITE setPowerOnPassword)
   /** If @c true the radio programming password is enabled. */
   Q_PROPERTY(bool radioProgPasswordEnabled READ radioProgPasswordEnabled WRITE enableRadioProgPassword)
   /** If @c radioProgPasswordEnabled is @c true, specifies the radio programming password. */
@@ -762,11 +756,6 @@ public:
   /** Enables transmission of wakeup preamble. */
   void enableWakeupPreamble(bool enable);
 
-  /** Returns @c true if a picture is shown during boot. */
-  bool bootPicture() const;
-  /** Enables the boot picture. */
-  void enableBootPicture(bool enable);
-
   /** Returns @c true if the radio is in channel mode. Overrides @c channelModeA and @c channelModeB. */
   bool channelMode() const;
   /** Enables/disables channel mode for the radio. */
@@ -832,15 +821,6 @@ public:
   /** Sets the keypad lock time in seconds. */
   void setKeypadLockTime(unsigned sec);
 
-  /** Returns @c true if power-on password is enabled. */
-  bool powerOnPasswordEnabled() const;
-  /** Enables the power on password. */
-  void enablePowerOnPassword(bool enable);
-  /** Returns the power-on password. */
-  unsigned powerOnPassword() const;
-  /** Sets the power-on password. */
-  void setPowerOnPassword(unsigned passwd);
-
   /** Returns @c true if radio programming password is enabled. */
   bool radioProgPasswordEnabled() const;
   /** Enables the radio programming password. */
@@ -882,8 +862,6 @@ protected:
   bool _powerSaveMode;
   /** If @c true, the wake-up preamble is sent. */
   bool _wakeupPreamble;
-  /** If @c true the boot picture is enabled. */
-  bool _bootPicture;
   /** If @c true or channelMode is true, the VFO A is in channel (memory) mode. */
   bool _channelModeA;
   /** If @c true or channelMode is true, the VFO B is in channel (memory) mode. */
@@ -918,16 +896,14 @@ protected:
   bool _keypadLockManual;
   /** Holds the keypad lock time. */
   unsigned _keypadLockTime;
-  /** If @c true, the power-on password is enabled. */
-  bool _powerOnPasswordEnabled;
-  /** Holds the power-on password. */
-  unsigned _powerOnPassword;
+  /** If @c true, the programming password is enabled. */
+  bool _pcProgPasswordEnabled;
+  /** Holds the programming password. */
+  QString _pcProgPassword;
   /** If @c true, the radio programming password is enabled. */
   bool _radioProgPasswordEnabled;
   /** Holds the radio programming password. */
   unsigned _radioProgPassword;
-  /** Holds the PC programming password. */
-  QString  _pcProgPassword;
   /** If @c true, the private call IDs must match. */
   bool _privateCallMatch;
   /** If @c true, the group call IDs must match. */

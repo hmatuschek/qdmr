@@ -818,22 +818,28 @@ TyTCodeplug::ZoneElement::setName(const QString &name) {
   writeUnicode(0, name, 16);
 }
 
+bool
+TyTCodeplug::ZoneElement::hasMemberIndex(unsigned n) const {
+  return 0 != memberIndex(n);
+}
 uint16_t
 TyTCodeplug::ZoneElement::memberIndex(unsigned n) const {
-  return getUInt16_le(0x20 + n*2);
+  return getUInt16_le(0x20 + n*sizeof(uint16_t));
 }
 void
 TyTCodeplug::ZoneElement::setMemberIndex(unsigned n, uint16_t idx) {
-  setUInt16_le(0x20 + n*2, idx);
+  setUInt16_le(0x20 + n*sizeof(uint16_t), idx);
 }
 
 bool
 TyTCodeplug::ZoneElement::fromZoneObj(const Zone *zone, Context &ctx) {
   setName(zone->name());
   for (int i=0; i<16; i++) {
-    if (i < zone->A()->count())
-      setMemberIndex(i, ctx.index(zone->A()->get(i)));
-    else
+    if (i < zone->A()->count()) {
+      Channel *ch = zone->A()->get(i)->as<Channel>();
+      int idx = ctx.index(ch);
+      setMemberIndex(i, idx);
+    } else
       setMemberIndex(i, 0);
   }
   return true;
@@ -851,7 +857,7 @@ TyTCodeplug::ZoneElement::linkZone(Zone *zone, Context &ctx) const {
   if (! isValid())
     return false;
 
-  for (int i=0; ((i<16) && memberIndex(i)); i++) {
+  for (int i=0; ((i<16) && hasMemberIndex(i)); i++) {
     if (! ctx.has<Channel>(memberIndex(i))) {
       logWarn() << "Cannot link channel with index " << memberIndex(i)
                 << " to zone '" << zone->name() << "': channel not defined.";
@@ -1231,7 +1237,7 @@ TyTCodeplug::GeneralSettingsElement::clear() {
   enableTalkPermitToneAnalog(false);
 
   setBit(0x42,0, 0); setBit(0x41,1, 1); setBit(0x42,2, 0); setBit(0x42,3, 1);
-  enableIntroPicture(true);
+  setBootDisplay(BootSettings::BootDisplay::Logo);
   setBit(0x42,5, 1); setBit(0x42,6, 1); setBit(0x42,7, 1);
 
   setUInt8(0x43, 0xff);
@@ -1364,14 +1370,23 @@ TyTCodeplug::GeneralSettingsElement::enableTalkPermitToneAnalog(bool enable) {
   setBit(0x41,7, enable);
 }
 
-bool
-TyTCodeplug::GeneralSettingsElement::introPicture() const {
-  return getBit(0x42,4);
+
+BootSettings::BootDisplay
+TyTCodeplug::GeneralSettingsElement::bootDisplay() const {
+  return getBit(Offset::bootImageEnabled())
+    ? BootSettings::BootDisplay::Logo
+    : BootSettings::BootDisplay::Text;
 }
+
 void
-TyTCodeplug::GeneralSettingsElement::enableIntroPicture(bool enable) {
-  setBit(0x42,4, enable);
+TyTCodeplug::GeneralSettingsElement::setBootDisplay(BootSettings::BootDisplay mode) {
+  switch (mode) {
+  case BootSettings::BootDisplay::Text: setBit(Offset::bootImageEnabled(), false); break;
+  case BootSettings::BootDisplay::Logo:
+  case BootSettings::BootDisplay::Image: setBit(Offset::bootImageEnabled(), true); break;
+  }
 }
+
 
 uint32_t
 TyTCodeplug::GeneralSettingsElement::dmrId() const {
@@ -1586,6 +1601,12 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   setIntroLine2(config->settings()->introLine2());
   setVOXSesitivity(config->settings()->vox());
 
+  setBootDisplay(config->settings()->boot()->bootDisplay());
+  if (! config->settings()->boot()->bootPasswordEnabled())
+    setPowerOnPassword(0);
+  else
+    setPowerOnPassword(config->settings()->boot()->bootPassword().toUInt());
+
   setPrivateCallHangTime(config->settings()->dmr()->privateCallHangTime());
   setGroupCallHangTime(config->settings()->dmr()->groupCallHangTime());
   setTXPreambleDuration(config->settings()->dmr()->preamble());
@@ -1600,7 +1621,6 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
     disableAllTones(ex->allTonesDisabled());
     setSaveModeRX(ex->powerSaveMode());
     setSavePreamble(ex->wakeupPreamble());
-    enableIntroPicture(ex->bootPicture());
     setLowBatteryInterval(ex->lowBatteryWarnInterval());
     if (ex->callAlertToneContinuous())
       setCallAlertToneContinuous();
@@ -1618,10 +1638,6 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
       keypadLockTimeSetManual();
     else
       setKeypadLockTime(ex->keypadLockTime());
-    if (! ex->powerOnPasswordEnabled())
-      setPowerOnPassword(0);
-    else
-      setPowerOnPassword(ex->powerOnPassword());
     if (! ex->radioProgPasswordEnabled())
       radioProgPasswordDisable();
     else
@@ -1646,6 +1662,10 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   config->settings()->setIntroLine2(introLine2());
   config->settings()->setVOX(voxSesitivity());
 
+  config->settings()->boot()->setBootDisplay(bootDisplay());
+  config->settings()->boot()->enableBootPassword(0 != powerOnPassword());
+  config->settings()->boot()->setBootPassword(QString::number(powerOnPassword()));
+
   config->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
   config->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
   config->settings()->dmr()->setPreamble(txPreambleDuration());
@@ -1663,7 +1683,6 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   ex->disableAllTones(allTonesDisabled());
   ex->enablePowerSaveMode(saveModeRX());
   ex->enableWakeupPreamble(savePreamble());
-  ex->enableBootPicture(introPicture());
   ex->setLowBatteryWarnInterval(lowBatteryInterval());
   ex->enableCallAlertToneContinuous(callAlertToneIsContinuous());
   if (! callAlertToneIsContinuous())
@@ -2905,10 +2924,15 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
 
   // Map digital and DTMF contacts
   for (int i=0, d=0, a=0; i<config->contacts()->count(); i++) {
-    if (config->contacts()->contact(i)->is<DMRContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d+1); d++;
-    } else if (config->contacts()->contact(i)->is<DTMFContact>()) {
-      ctx.add(config->contacts()->contact(i)->as<DTMFContact>(), a+1); a++;
+    Contact *contact = config->contacts()->contact(i);
+    if (contact->is<DMRContact>()) {
+      ctx.add(contact->as<DMRContact>(), d+1); d++;
+    } else if (contact->is<DTMFContact>()) {
+      ctx.add(contact->as<DTMFContact>(), a+1); a++;
+    } else {
+      logInfo() << "Cannot index contact '" << contact->name()
+                << "'. Contact type '" << contact->metaObject()->className()
+                << "' not supported by or implemented for TyT devices.";
     }
   }
 
@@ -2917,8 +2941,16 @@ TyTCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
     ctx.add(config->rxGroupLists()->list(i), i+1);
 
   // Map channels
-  for (int i=0; i<config->channelList()->count(); i++)
-    ctx.add(config->channelList()->channel(i), i+1);
+  for (int i=0, c=0; i<config->channelList()->count(); i++) {
+    Channel *channel = config->channelList()->channel(i);
+    if (channel->is<FMChannel>() || channel->is<DMRChannel>()) {
+      ctx.add(channel, c+1); c++;
+    } else {
+      logInfo() << "Cannot index channel '" << channel->name()
+                << "'. Channel type '" << channel->metaObject()->className()
+                << "' not supported by or implemented for TyT devices.";
+    }
+  }
 
   // Map zones
   for (int i=0; i<config->zones()->count(); i++)
@@ -2996,10 +3028,10 @@ TyTCodeplug::preprocess(Config *config, const ErrorStack &err) const {
     return nullptr;
   }
 
-  // Remove all AM channels
-  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject};
+  // Remove all AM & M17 channels
+  ObjectFilterVisitor amFilter{AMChannel::staticMetaObject, M17Channel::staticMetaObject};
   if (! amFilter.process(intermediate, err)) {
-    errMsg(err) << "Remove AM channels.";
+    errMsg(err) << "Remove AM & M17 channels.";
     delete intermediate;
     return nullptr;
   }
