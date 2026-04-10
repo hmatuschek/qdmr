@@ -4,133 +4,17 @@
 <context>
     <name>AMChannelDialog</name>
     <message>
-        <location filename="../src/amchanneldialog.ui" line="14"/>
-        <source>Edit AM Channel</source>
-        <translation>Modifica canale AM</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="24"/>
-        <source>Basic</source>
-        <translation>Base</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="32"/>
-        <source>Name</source>
-        <translation>Nome</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="49"/>
-        <source>Rx Frequency</source>
-        <translation>Frequenza RX</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="59"/>
-        <source>Tx Frequency</source>
-        <translation>Frequenza TX</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="69"/>
-        <source>Tx Offset</source>
-        <translation>Offset TX</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="121"/>
-        <source>Power</source>
-        <translation>Potenza</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="137"/>
-        <source>Max</source>
-        <translation>Massima</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="142"/>
-        <source>High</source>
-        <translation>Alta</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="147"/>
-        <source>Mid</source>
-        <translation>Media</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="152"/>
-        <source>Low</source>
-        <translation>Bassa</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="157"/>
-        <source>Min</source>
-        <translation>Minima</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="165"/>
-        <location filename="../src/amchanneldialog.ui" line="202"/>
-        <location filename="../src/amchanneldialog.ui" line="236"/>
-        <location filename="../src/amchanneldialog.ui" line="307"/>
-        <source>Default</source>
-        <translation>Predefinito/a</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="174"/>
-        <source>Tx Timeout</source>
-        <translation>Timeout TX</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="189"/>
-        <location filename="../src/amchanneldialog.ui" line="226"/>
-        <source>Off</source>
-        <translation>Disattivato</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="211"/>
-        <source>VOX Level</source>
-        <translation>Livello VOX</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="245"/>
-        <source>Rx Only</source>
-        <translation>Solo RX</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="255"/>
-        <source>Scan List</source>
-        <translation>Lista di scansione</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="282"/>
+        <location filename="../src/amchanneldialog.cc" line="11"/>
         <source>Squelch</source>
         <translation>Squelch</translation>
     </message>
+</context>
+<context>
+    <name>APRSSelect</name>
     <message>
-        <location filename="../src/amchanneldialog.ui" line="297"/>
-        <source>Open</source>
-        <translation>Aperto</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.ui" line="319"/>
-        <source>Extensions</source>
-        <translation>Estensioni</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.cc" line="47"/>
+        <location filename="../src/aprsselect.cc" line="44"/>
         <source>[None]</source>
-        <translation>[Nessuno/a]</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.cc" line="63"/>
-        <source>No offset</source>
-        <translation>Nessun offset</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.cc" line="65"/>
-        <source>Positive offset</source>
-        <translation>Offset positivo</translation>
-    </message>
-    <message>
-        <location filename="../src/amchanneldialog.cc" line="67"/>
-        <source>Negative offset</source>
-        <translation>Offset negativo</translation>
+        <translation type="unfinished">[Nessuno/a]</translation>
     </message>
 </context>
 <context>
@@ -165,173 +49,6 @@
         <location filename="../shared/ui/aboutdialog.ui" line="88"/>
         <source>Supported Radios</source>
         <translation>Radio supportate</translation>
-    </message>
-</context>
-<context>
-    <name>AnalogChannelDialog</name>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="20"/>
-        <source>Edit Analog Channel</source>
-        <translation>Modifica canale analogico</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="29"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Nota:&lt;/span&gt; qdmr fornisce un completamento automatico per i canali. In pratica, inizia a digitare il nominativo di un ripetitore. Dopo aver inserito tre caratteri, viene inviata una richiesta a repeaterbook.com per recuperare i ripetitori corrispondenti. Queste operazioni possono richiedere qualche istante. I risultati vengono memorizzati localmente in una cache.&lt;/p&gt;&lt;p&gt;Apparirà un menu a discesa che permette di selezionare un ripetitore. Una volta selezionato un ripetitore, le frequenze RX/TX e i toni CTCSS vengono compilati automaticamente (se applicabili).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;nascondi&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="46"/>
-        <source>Basic</source>
-        <translation>Base</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="54"/>
-        <source>Name</source>
-        <translation>Nome</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="71"/>
-        <source>Rx Frequency</source>
-        <translation>Frequenza RX</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="81"/>
-        <source>Tx Frequency</source>
-        <translation>Frequenza TX</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="91"/>
-        <source>Tx Offset</source>
-        <translation>Offset Tx</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="143"/>
-        <source>Power</source>
-        <translation>Potenza</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="159"/>
-        <source>Max</source>
-        <translation>Massima</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="164"/>
-        <source>High</source>
-        <translation>Alta</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="169"/>
-        <source>Mid</source>
-        <translation>Media</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="174"/>
-        <source>Low</source>
-        <translation>Bassa</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="179"/>
-        <source>Min</source>
-        <translation>Minima</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="187"/>
-        <location filename="../src/fmchanneldialog.ui" line="224"/>
-        <location filename="../src/fmchanneldialog.ui" line="258"/>
-        <location filename="../src/fmchanneldialog.ui" line="361"/>
-        <source>Default</source>
-        <translation>Predefinito/a</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="196"/>
-        <source>Tx Timeout</source>
-        <translation>Timeout TX</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="211"/>
-        <location filename="../src/fmchanneldialog.ui" line="248"/>
-        <source>Off</source>
-        <translation>Disattivato</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="233"/>
-        <source>VOX Level</source>
-        <translation>Livello VOX</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="267"/>
-        <source>Rx Only</source>
-        <translation>Solo RX</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="277"/>
-        <source>Scan List</source>
-        <translation>Lista di scansione</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="304"/>
-        <source>Tx Admit</source>
-        <translation>Consenti TX</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="318"/>
-        <source>Always</source>
-        <translation>Sempre</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="323"/>
-        <source>Channel Free</source>
-        <translation>Canale libero</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="328"/>
-        <source>Tone</source>
-        <translation>Tono</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="336"/>
-        <source>Squelch</source>
-        <translation>Squelch</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="370"/>
-        <source>Rx Tone</source>
-        <translation>Tono RX</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="387"/>
-        <source>Tx Tone</source>
-        <translation>Tono TX</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="404"/>
-        <source>Bandwidth</source>
-        <translation>Larghezza di banda</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="418"/>
-        <source>Narrow (12.5 kHz)</source>
-        <translation>stretta (12.5 kHz)</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="423"/>
-        <source>Wide (25 kHz)</source>
-        <translation>larga (25 kHz)</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="431"/>
-        <source>APRS</source>
-        <translation>APRS</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="351"/>
-        <source>Open</source>
-        <translation>Aperto</translation>
-    </message>
-    <message>
-        <location filename="../src/fmchanneldialog.ui" line="451"/>
-        <source>Extensions</source>
-        <translation>Estensioni</translation>
     </message>
 </context>
 <context>
@@ -602,46 +319,185 @@
         <translation>Scrittura completata</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="857"/>
+        <location filename="../src/application.cc" line="855"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (alias di %2 %3)</translation>
     </message>
 </context>
 <context>
+    <name>BandwidthSelect</name>
+    <message>
+        <location filename="../src/bandwidthselect.cc" line="8"/>
+        <source>Narrow (12.5 kHz)</source>
+        <translation type="unfinished">stretta (12.5 kHz)</translation>
+    </message>
+    <message>
+        <location filename="../src/bandwidthselect.cc" line="9"/>
+        <source>Wide (25 kHz)</source>
+        <translation type="unfinished">larga (25 kHz)</translation>
+    </message>
+</context>
+<context>
+    <name>ChannelDialog</name>
+    <message>
+        <location filename="../src/channeldialog.ui" line="14"/>
+        <source>Edit Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="23"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Nota:&lt;/span&gt; qdmr fornisce un completamento automatico per i canali. In pratica, inizia a digitare il nominativo di un ripetitore. Dopo aver inserito tre caratteri, viene inviata una richiesta a repeaterbook.com per recuperare i ripetitori corrispondenti. Queste operazioni possono richiedere qualche istante. I risultati vengono memorizzati localmente in una cache.&lt;/p&gt;&lt;p&gt;Apparirà un menu a discesa che permette di selezionare un ripetitore. Una volta selezionato un ripetitore, le frequenze RX/TX e i toni CTCSS vengono compilati automaticamente (se applicabili).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;nascondi&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="40"/>
+        <source>Basic</source>
+        <translation type="unfinished">Base</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="48"/>
+        <source>Name</source>
+        <translation type="unfinished">Nome</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="65"/>
+        <source>Rx Frequency</source>
+        <translation type="unfinished">Frequenza RX</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="75"/>
+        <source>Tx Frequency</source>
+        <translation type="unfinished">Frequenza TX</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="85"/>
+        <source>Tx Offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="137"/>
+        <source>Power</source>
+        <translation type="unfinished">Potenza</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="153"/>
+        <source>Max</source>
+        <translation type="unfinished">Massima</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="158"/>
+        <source>High</source>
+        <translation type="unfinished">Alta</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="163"/>
+        <source>Mid</source>
+        <translation type="unfinished">Media</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="168"/>
+        <source>Low</source>
+        <translation type="unfinished">Bassa</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="173"/>
+        <source>Min</source>
+        <translation type="unfinished">Minima</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="181"/>
+        <location filename="../src/channeldialog.ui" line="218"/>
+        <location filename="../src/channeldialog.ui" line="252"/>
+        <source>Default</source>
+        <translation type="unfinished">Predefinito/a</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="190"/>
+        <source>Tx Timeout</source>
+        <translation type="unfinished">Timeout TX</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="205"/>
+        <location filename="../src/channeldialog.ui" line="242"/>
+        <source>Off</source>
+        <translation type="unfinished">Disattivato</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="227"/>
+        <source>VOX Level</source>
+        <translation type="unfinished">Livello VOX</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="261"/>
+        <source>Rx Only</source>
+        <translation type="unfinished">Solo RX</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="271"/>
+        <source>Scan List</source>
+        <translation type="unfinished">Lista di scansione</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="301"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Estensioni</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.cc" line="25"/>
+        <source>No offset</source>
+        <translation type="unfinished">Nessun offset</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.cc" line="27"/>
+        <source>Positive offset</source>
+        <translation type="unfinished">Offset positivo</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.cc" line="29"/>
+        <source>Negative offset</source>
+        <translation type="unfinished">Offset negativo</translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.cc" line="50"/>
+        <source>[None]</source>
+        <translation type="unfinished">[Nessuno/a]</translation>
+    </message>
+</context>
+<context>
     <name>ChannelListView</name>
     <message>
-        <location filename="../src/channellistview.cc" line="87"/>
+        <location filename="../src/channellistview.cc" line="102"/>
         <source>Select a single channel first</source>
         <translation>Selezionare prima un singolo canale</translation>
     </message>
     <message>
-        <location filename="../src/channellistview.cc" line="88"/>
+        <location filename="../src/channellistview.cc" line="103"/>
         <source>To clone a channel, please select a single channel to clone.</source>
         <translation>Per clonare un canale, selezionare un canale singolo da clonare.</translation>
     </message>
     <message>
-        <location filename="../src/channellistview.cc" line="147"/>
+        <location filename="../src/channellistview.cc" line="159"/>
         <source>Cannot delete channel</source>
         <translation>Impossibile eliminare il canale</translation>
     </message>
     <message>
-        <location filename="../src/channellistview.cc" line="148"/>
+        <location filename="../src/channellistview.cc" line="160"/>
         <source>Cannot delete channel: You have to select a channel first.</source>
         <translation>Impossibile eliminare il canale: devi prima selezionarne uno.</translation>
     </message>
     <message>
-        <location filename="../src/channellistview.cc" line="158"/>
-        <location filename="../src/channellistview.cc" line="162"/>
+        <location filename="../src/channellistview.cc" line="170"/>
+        <location filename="../src/channellistview.cc" line="174"/>
         <source>Delete channel?</source>
         <translation>Eliminare il canale?</translation>
     </message>
     <message>
-        <location filename="../src/channellistview.cc" line="158"/>
+        <location filename="../src/channellistview.cc" line="170"/>
         <source>Delete channel %1?</source>
         <translation>Eliminare il canale &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="../src/channellistview.cc" line="162"/>
+        <location filename="../src/channellistview.cc" line="174"/>
         <source>Delete %1 channels?</source>
         <translation>Eliminare %1 canali?</translation>
     </message>
@@ -653,7 +509,7 @@
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Channel ...</source>
-        <translation type="unfinished">Aggiungi canale...</translation>
+        <translation>Aggiungi canale…</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
@@ -709,227 +565,227 @@
 <context>
     <name>ChannelListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="280"/>
+        <location filename="../src/configitemwrapper.cc" line="279"/>
         <source>FM</source>
         <translation>FM</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="278"/>
+        <location filename="../src/configitemwrapper.cc" line="277"/>
         <source>DMR</source>
         <translation>DMR</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="282"/>
+        <location filename="../src/configitemwrapper.cc" line="281"/>
         <source>AM</source>
         <translation>AM</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="293"/>
-        <location filename="../src/configitemwrapper.cc" line="304"/>
-        <location filename="../src/configitemwrapper.cc" line="380"/>
-        <location filename="../src/configitemwrapper.cc" line="406"/>
-        <location filename="../src/configitemwrapper.cc" line="417"/>
-        <location filename="../src/configitemwrapper.cc" line="424"/>
+        <location filename="../src/configitemwrapper.cc" line="292"/>
+        <location filename="../src/configitemwrapper.cc" line="303"/>
+        <location filename="../src/configitemwrapper.cc" line="381"/>
+        <location filename="../src/configitemwrapper.cc" line="407"/>
+        <location filename="../src/configitemwrapper.cc" line="418"/>
+        <location filename="../src/configitemwrapper.cc" line="425"/>
         <source>[Default]</source>
         <translation>[Predefinito/a]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="295"/>
+        <location filename="../src/configitemwrapper.cc" line="294"/>
         <source>Max</source>
         <translation>Massima</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="296"/>
+        <location filename="../src/configitemwrapper.cc" line="295"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="297"/>
+        <location filename="../src/configitemwrapper.cc" line="296"/>
         <source>Mid</source>
         <translation>Media</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="298"/>
+        <location filename="../src/configitemwrapper.cc" line="297"/>
         <source>Low</source>
         <translation>Bassa</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="299"/>
+        <location filename="../src/configitemwrapper.cc" line="298"/>
         <source>Min</source>
         <translation>Minima</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="306"/>
-        <location filename="../src/configitemwrapper.cc" line="309"/>
+        <location filename="../src/configitemwrapper.cc" line="305"/>
+        <location filename="../src/configitemwrapper.cc" line="308"/>
         <source>Off</source>
         <translation>Disattivato</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="309"/>
+        <location filename="../src/configitemwrapper.cc" line="308"/>
         <source>On</source>
         <translation>Attivato</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="313"/>
-        <location filename="../src/configitemwrapper.cc" line="319"/>
+        <location filename="../src/configitemwrapper.cc" line="312"/>
+        <location filename="../src/configitemwrapper.cc" line="318"/>
         <source>Always</source>
         <translation>Sempre</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="314"/>
-        <location filename="../src/configitemwrapper.cc" line="320"/>
+        <location filename="../src/configitemwrapper.cc" line="313"/>
+        <location filename="../src/configitemwrapper.cc" line="319"/>
         <source>Free</source>
         <translation>Libero</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="315"/>
+        <location filename="../src/configitemwrapper.cc" line="314"/>
         <source>Color</source>
         <translation>Colore</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="321"/>
+        <location filename="../src/configitemwrapper.cc" line="320"/>
         <source>Tone</source>
         <translation>Tono</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="324"/>
-        <location filename="../src/configitemwrapper.cc" line="346"/>
-        <location filename="../src/configitemwrapper.cc" line="353"/>
-        <location filename="../src/configitemwrapper.cc" line="364"/>
-        <location filename="../src/configitemwrapper.cc" line="374"/>
-        <location filename="../src/configitemwrapper.cc" line="383"/>
-        <location filename="../src/configitemwrapper.cc" line="409"/>
-        <location filename="../src/configitemwrapper.cc" line="414"/>
-        <location filename="../src/configitemwrapper.cc" line="433"/>
-        <location filename="../src/configitemwrapper.cc" line="440"/>
-        <location filename="../src/configitemwrapper.cc" line="447"/>
-        <location filename="../src/configitemwrapper.cc" line="458"/>
+        <location filename="../src/configitemwrapper.cc" line="323"/>
+        <location filename="../src/configitemwrapper.cc" line="347"/>
+        <location filename="../src/configitemwrapper.cc" line="354"/>
+        <location filename="../src/configitemwrapper.cc" line="365"/>
+        <location filename="../src/configitemwrapper.cc" line="375"/>
+        <location filename="../src/configitemwrapper.cc" line="384"/>
+        <location filename="../src/configitemwrapper.cc" line="410"/>
+        <location filename="../src/configitemwrapper.cc" line="415"/>
+        <location filename="../src/configitemwrapper.cc" line="434"/>
+        <location filename="../src/configitemwrapper.cc" line="441"/>
+        <location filename="../src/configitemwrapper.cc" line="448"/>
+        <location filename="../src/configitemwrapper.cc" line="459"/>
         <source>[None]</source>
         <translation>[Nessuno/a]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="419"/>
-        <location filename="../src/configitemwrapper.cc" line="426"/>
+        <location filename="../src/configitemwrapper.cc" line="420"/>
+        <location filename="../src/configitemwrapper.cc" line="427"/>
         <source>Open</source>
         <translation>Aperto</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="450"/>
+        <location filename="../src/configitemwrapper.cc" line="451"/>
         <source>Wide</source>
         <translation>Larga</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="452"/>
+        <location filename="../src/configitemwrapper.cc" line="453"/>
         <source>Narrow</source>
         <translation>Stretta</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="473"/>
+        <location filename="../src/configitemwrapper.cc" line="474"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="474"/>
+        <location filename="../src/configitemwrapper.cc" line="475"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="475"/>
+        <location filename="../src/configitemwrapper.cc" line="476"/>
         <source>Rx Frequency</source>
         <translation>Frequenza RX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="476"/>
+        <location filename="../src/configitemwrapper.cc" line="477"/>
         <source>Tx Frequency</source>
         <translation>Frequenza TX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="477"/>
+        <location filename="../src/configitemwrapper.cc" line="478"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="478"/>
+        <location filename="../src/configitemwrapper.cc" line="479"/>
         <source>Timeout</source>
         <translation>Timeout</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="479"/>
+        <location filename="../src/configitemwrapper.cc" line="480"/>
         <source>Rx Only</source>
         <translation>Solo RX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="480"/>
+        <location filename="../src/configitemwrapper.cc" line="481"/>
         <source>Admit</source>
         <translation>Consenti</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="481"/>
+        <location filename="../src/configitemwrapper.cc" line="482"/>
         <source>Scanlist</source>
         <translation>Lista di scansione</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="482"/>
+        <location filename="../src/configitemwrapper.cc" line="483"/>
         <source>Zones</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="483"/>
+        <location filename="../src/configitemwrapper.cc" line="484"/>
         <source>CC</source>
         <translation>CC</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="484"/>
+        <location filename="../src/configitemwrapper.cc" line="485"/>
         <source>TS</source>
         <translation>TS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="485"/>
+        <location filename="../src/configitemwrapper.cc" line="486"/>
         <source>RX Group List</source>
         <translation>Lista gruppi RX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="486"/>
+        <location filename="../src/configitemwrapper.cc" line="487"/>
         <source>TX Contact</source>
         <translation>Contatto TX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="487"/>
+        <location filename="../src/configitemwrapper.cc" line="488"/>
         <source>DMR ID</source>
         <translation>ID DMR</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="488"/>
+        <location filename="../src/configitemwrapper.cc" line="489"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="489"/>
+        <location filename="../src/configitemwrapper.cc" line="490"/>
         <source>Roaming</source>
         <translation>Roaming</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="490"/>
+        <location filename="../src/configitemwrapper.cc" line="491"/>
         <source>Squelch</source>
         <translation>Squelch</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="491"/>
+        <location filename="../src/configitemwrapper.cc" line="492"/>
         <source>Rx Tone</source>
         <translation>Tono RX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="492"/>
+        <location filename="../src/configitemwrapper.cc" line="493"/>
         <source>Tx Tone</source>
         <translation>Tono TX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="493"/>
+        <location filename="../src/configitemwrapper.cc" line="494"/>
         <source>Bandwidth</source>
         <translation>Larghezza di banda</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="494"/>
+        <location filename="../src/configitemwrapper.cc" line="495"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
@@ -937,7 +793,7 @@
 <context>
     <name>ChannelRefListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="522"/>
+        <location filename="../src/configitemwrapper.cc" line="523"/>
         <source>Channel</source>
         <translation>Canale</translation>
     </message>
@@ -955,7 +811,7 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="17"/>
         <source>Merging codeplugs ...</source>
-        <translation type="unfinished">Unione dei codeplug...</translation>
+        <translation>Unione dei codeplug…</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="32"/>
@@ -1179,32 +1035,32 @@
 <context>
     <name>ContactListView</name>
     <message>
-        <location filename="../src/contactlistview.cc" line="63"/>
+        <location filename="../src/contactlistview.cc" line="83"/>
         <source>Cannot delete contact</source>
         <translation>Impossibile eliminare il contatto</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.cc" line="64"/>
+        <location filename="../src/contactlistview.cc" line="84"/>
         <source>Cannot delete contact: You have to select a contact first.</source>
         <translation>Impossibile eliminare il contatto: devi prima selezionarne uno.</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.cc" line="74"/>
+        <location filename="../src/contactlistview.cc" line="94"/>
         <source>Delete contact?</source>
         <translation>Eliminare il contatto?</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.cc" line="74"/>
+        <location filename="../src/contactlistview.cc" line="94"/>
         <source>Delete contact %1?</source>
         <translation>Eliminare il contatto &apos;%1&apos;?</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.cc" line="78"/>
+        <location filename="../src/contactlistview.cc" line="98"/>
         <source>Delete contacts?</source>
         <translation>Eliminare i contatti?</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.cc" line="78"/>
+        <location filename="../src/contactlistview.cc" line="98"/>
         <source>Delete %1 contacts?</source>
         <translation>Eliminare %1 contatti?</translation>
     </message>
@@ -1214,32 +1070,57 @@
         <translation>Aggiunge un contatto alla lista.</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="35"/>
-        <source>Add Digital Contact</source>
-        <translation>Aggiungi contatto digitale</translation>
-    </message>
-    <message>
         <location filename="../src/contactlistview.ui" line="38"/>
         <source>Alt++</source>
         <translation>Alt++</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="45"/>
+        <location filename="../src/contactlistview.ui" line="60"/>
+        <source>Add M17 Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="63"/>
+        <source>Adds an M17 contact to the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="68"/>
         <source>Add DTMF Contact</source>
         <translation>Aggiungi contatto DTMF</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="52"/>
+        <location filename="../src/contactlistview.ui" line="71"/>
+        <source>Adds an DTMF (analog) contact to the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="76"/>
+        <source>Add DMR Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="79"/>
+        <source>Adds an DMR contact to the list.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="45"/>
         <source>Delete contact button</source>
         <translation>Pulsante elimina contatto</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="55"/>
+        <location filename="../src/contactlistview.ui" line="35"/>
+        <source>Add Contact</source>
+        <translation type="unfinished">Aggiungi contatto</translation>
+    </message>
+    <message>
+        <location filename="../src/contactlistview.ui" line="48"/>
         <source>Delete Contact</source>
         <translation>Elimina contatto</translation>
     </message>
     <message>
-        <location filename="../src/contactlistview.ui" line="58"/>
+        <location filename="../src/contactlistview.ui" line="51"/>
         <source>Alt+-</source>
         <translation>Alt+-</translation>
     </message>
@@ -1247,124 +1128,165 @@
 <context>
     <name>ContactListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="656"/>
+        <location filename="../src/configitemwrapper.cc" line="657"/>
         <source>DTMF</source>
         <translation>DTMF</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="662"/>
-        <location filename="../src/configitemwrapper.cc" line="683"/>
+        <location filename="../src/configitemwrapper.cc" line="663"/>
+        <location filename="../src/configitemwrapper.cc" line="684"/>
+        <location filename="../src/configitemwrapper.cc" line="706"/>
         <source>On</source>
         <translation>Attivato</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="662"/>
-        <location filename="../src/configitemwrapper.cc" line="683"/>
+        <location filename="../src/configitemwrapper.cc" line="663"/>
+        <location filename="../src/configitemwrapper.cc" line="684"/>
+        <location filename="../src/configitemwrapper.cc" line="706"/>
         <source>Off</source>
         <translation>Disattivato</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="673"/>
+        <location filename="../src/configitemwrapper.cc" line="674"/>
         <source>Private Call</source>
         <translation>Chiamata privata</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="674"/>
+        <location filename="../src/configitemwrapper.cc" line="675"/>
         <source>Group Call</source>
         <translation>Chiamata di gruppo</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="675"/>
+        <location filename="../src/configitemwrapper.cc" line="676"/>
         <source>All Call</source>
         <translation>Chiamata generale</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="687"/>
+        <location filename="../src/configitemwrapper.cc" line="688"/>
         <source>[None]</source>
         <translation>[Nessuno/a]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="705"/>
+        <location filename="../src/configitemwrapper.cc" line="698"/>
+        <source>M17</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="703"/>
+        <source>[Broadcast]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/configitemwrapper.cc" line="723"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="707"/>
+        <location filename="../src/configitemwrapper.cc" line="725"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="709"/>
+        <location filename="../src/configitemwrapper.cc" line="727"/>
         <source>Number</source>
         <translation>Numero</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="711"/>
+        <location filename="../src/configitemwrapper.cc" line="729"/>
         <source>RX Tone</source>
         <translation>Tono RX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="713"/>
+        <location filename="../src/configitemwrapper.cc" line="731"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
 </context>
 <context>
+    <name>DMRAdmitSelect</name>
+    <message>
+        <location filename="../src/admitselect.cc" line="35"/>
+        <source>Always</source>
+        <translation type="unfinished">Sempre</translation>
+    </message>
+    <message>
+        <location filename="../src/admitselect.cc" line="36"/>
+        <source>Channel Free</source>
+        <translation type="unfinished">Canale libero</translation>
+    </message>
+    <message>
+        <location filename="../src/admitselect.cc" line="37"/>
+        <source>Other Color-code</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DMRChannelDialog</name>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="60"/>
-        <location filename="../src/dmrchanneldialog.cc" line="75"/>
-        <location filename="../src/dmrchanneldialog.cc" line="84"/>
-        <location filename="../src/dmrchanneldialog.cc" line="91"/>
-        <source>[None]</source>
-        <translation>[Nessuno/a]</translation>
+        <location filename="../src/dmrchanneldialog.cc" line="36"/>
+        <source>Radio Id</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="92"/>
-        <location filename="../src/dmrchanneldialog.cc" line="101"/>
-        <source>[Default]</source>
-        <translation>[Predefinito/a]</translation>
+        <location filename="../src/dmrchanneldialog.cc" line="38"/>
+        <source>Tx Admit</source>
+        <translation type="unfinished">Consenti TX</translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="119"/>
-        <source>No offset</source>
-        <translation>Nessun offset</translation>
+        <location filename="../src/dmrchanneldialog.cc" line="40"/>
+        <source>Color-code</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="121"/>
-        <source>Positive offset</source>
-        <translation>Offset positivo</translation>
+        <location filename="../src/dmrchanneldialog.cc" line="43"/>
+        <source>Time-slot</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="123"/>
-        <source>Negative offset</source>
-        <translation>Offset negativo</translation>
+        <location filename="../src/dmrchanneldialog.cc" line="45"/>
+        <source>Group list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/dmrchanneldialog.cc" line="47"/>
+        <source>Tx Contact</source>
+        <translation type="unfinished">Contatto TX</translation>
+    </message>
+    <message>
+        <location filename="../src/dmrchanneldialog.cc" line="49"/>
+        <source>APRS</source>
+        <translation type="unfinished">APRS</translation>
+    </message>
+    <message>
+        <location filename="../src/dmrchanneldialog.cc" line="51"/>
+        <source>Roaming zone</source>
+        <translation type="unfinished">Zona roaming</translation>
     </message>
 </context>
 <context>
     <name>DMRContactDialog</name>
     <message>
-        <location filename="../src/dmrcontactdialog.cc" line="23"/>
+        <location filename="../src/dmrcontactdialog.cc" line="27"/>
         <source>Create DMR Contact</source>
         <translation>Crea contatto DMR</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.cc" line="48"/>
+        <location filename="../src/dmrcontactdialog.cc" line="52"/>
         <source>Edit DMR Contact</source>
         <translation>Modifica contatto DMR</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.cc" line="79"/>
+        <location filename="../src/dmrcontactdialog.cc" line="83"/>
         <source>Private Call</source>
         <translation>Chiamata privata</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.cc" line="80"/>
+        <location filename="../src/dmrcontactdialog.cc" line="84"/>
         <source>Group Call</source>
         <translation>Chiamata di gruppo</translation>
     </message>
     <message>
-        <location filename="../src/dmrcontactdialog.cc" line="81"/>
+        <location filename="../src/dmrcontactdialog.cc" line="85"/>
         <source>All Call</source>
         <translation>Chiamata generale</translation>
     </message>
@@ -1400,6 +1322,14 @@
     </message>
 </context>
 <context>
+    <name>DMRContactSelect</name>
+    <message>
+        <location filename="../src/dmrcontactdialog.cc" line="181"/>
+        <source>[None]</source>
+        <translation type="unfinished">[Nessuno/a]</translation>
+    </message>
+</context>
+<context>
     <name>DMRIDDialog</name>
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
@@ -1420,6 +1350,14 @@
         <location filename="../src/dmriddialog.ui" line="57"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
+    </message>
+</context>
+<context>
+    <name>DMRIdSelect</name>
+    <message>
+        <location filename="../src/idselect.cc" line="9"/>
+        <source>[Default]</source>
+        <translation type="unfinished">[Predefinito/a]</translation>
     </message>
 </context>
 <context>
@@ -1474,183 +1412,6 @@
     </message>
 </context>
 <context>
-    <name>DigitalChannelDialog</name>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="20"/>
-        <source>Edit Digital Channel</source>
-        <translation>Modifica canale digitale</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="29"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and color-code are filled in.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Nota:&lt;/span&gt; qdmr fornisce un completamento automatico per i canali. In pratica, inizia a digitare il nominativo di un ripetitore. Dopo aver inserito tre caratteri, viene inviata una richiesta a repeaterbook.com per recuperare i ripetitori corrispondenti. Queste operazioni possono richiedere qualche istante. I risultati vengono memorizzati localmente in una cache.&lt;/p&gt;&lt;p&gt;Apparirà un menu a discesa che permette di selezionare un ripetitore. Una volta selezionato un ripetitore, le frequenze RX/TX e il codice colore vengono compilati automaticamente.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;nascondi&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="46"/>
-        <source>Basic</source>
-        <translation>Base</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="54"/>
-        <source>Name</source>
-        <translation>Nome</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="77"/>
-        <source>Rx Frequency</source>
-        <translation>Frequenza RX</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="94"/>
-        <source>Tx Frequency</source>
-        <translation>Frequenza TX</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="151"/>
-        <source>Power</source>
-        <translation>Potenza</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="204"/>
-        <source>Tx Timeout</source>
-        <translation>Timeout TX</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="275"/>
-        <source>Rx Only</source>
-        <translation>Solo RX</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="285"/>
-        <source>Scan List</source>
-        <translation>Lista di scansione</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="167"/>
-        <source>Max</source>
-        <translation>Massima</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="111"/>
-        <source>Tx Offset</source>
-        <translation>Offset Tx</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="172"/>
-        <source>High</source>
-        <translation>Alta</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="177"/>
-        <source>Mid</source>
-        <translation>Media</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="182"/>
-        <source>Low</source>
-        <translation>Bassa</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="187"/>
-        <source>Min</source>
-        <translation>Minima</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="195"/>
-        <location filename="../src/dmrchanneldialog.ui" line="235"/>
-        <location filename="../src/dmrchanneldialog.ui" line="266"/>
-        <source>Default</source>
-        <translation>Predefinito/a</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="219"/>
-        <source>Specifies the transmit timeout in seconds. A value of 0 means that the transmit timeout is disabled.</source>
-        <translation>Specifica il timeout di trasmissione in secondi. Un valore pari a 0 significa che il timeout di trasmissione è disabilitato.</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="222"/>
-        <location filename="../src/dmrchanneldialog.ui" line="259"/>
-        <source>Off</source>
-        <translation>Disattivato</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="244"/>
-        <source>VOX Level</source>
-        <translation>Livello VOX</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="323"/>
-        <source>Tx Admit</source>
-        <translation>Consenti TX</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="337"/>
-        <source>Always</source>
-        <translation>Sempre</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="342"/>
-        <source>Channel Free</source>
-        <translation>Canale libero</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="347"/>
-        <location filename="../src/dmrchanneldialog.ui" line="355"/>
-        <source>Color Code</source>
-        <translation>Color code</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="378"/>
-        <source>Time Slot</source>
-        <translation>Time slot</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="395"/>
-        <source>TS 1</source>
-        <translation>TS 1</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="400"/>
-        <source>TS 2</source>
-        <translation>TS 2</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="408"/>
-        <source>Rx Group List</source>
-        <translation>Lista gruppi</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="425"/>
-        <source>Tx Contact</source>
-        <translation>Contatto TX</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="442"/>
-        <source>Positioning System</source>
-        <translation>Sistema di posizionamento</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="459"/>
-        <source>Roaming Zone</source>
-        <translation>Zona roaming</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="306"/>
-        <source>DMR ID</source>
-        <translation>ID DMR</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="479"/>
-        <source>Extended</source>
-        <translation>Esteso</translation>
-    </message>
-    <message>
-        <location filename="../src/dmrchanneldialog.ui" line="482"/>
-        <source>Device specific settings</source>
-        <translation>Impostazioni specifiche del dispositivo</translation>
-    </message>
-</context>
-<context>
     <name>ErrorMessageView</name>
     <message>
         <location filename="../src/errormessageview.cc" line="12"/>
@@ -1671,22 +1432,22 @@
 <context>
     <name>ExtensionView</name>
     <message>
-        <location filename="../src/extensionview.cc" line="109"/>
+        <location filename="../src/extensionview.cc" line="110"/>
         <source>Cannot create extension.</source>
         <translation>Impossibile creare l&apos;estensione.</translation>
     </message>
     <message>
-        <location filename="../src/extensionview.cc" line="110"/>
+        <location filename="../src/extensionview.cc" line="111"/>
         <source>Cannot create extension, consider reporting a bug.</source>
         <translation>Impossibile creare l’estensione, considera di segnalare un bug.</translation>
     </message>
     <message>
-        <location filename="../src/extensionview.cc" line="113"/>
+        <location filename="../src/extensionview.cc" line="114"/>
         <source>Cannot create list element.</source>
         <translation>Impossibile creare l&apos;elemento della lista.</translation>
     </message>
     <message>
-        <location filename="../src/extensionview.cc" line="114"/>
+        <location filename="../src/extensionview.cc" line="115"/>
         <source>Cannot create list element, consider reporting a bug.</source>
         <translation>Impossibile creare l’elemento della lista, considera di segnalare un bug.</translation>
     </message>
@@ -1699,6 +1460,14 @@
         <location filename="../src/extensionview.ui" line="32"/>
         <source>Remove</source>
         <translation>Rimuovere</translation>
+    </message>
+</context>
+<context>
+    <name>FMAPRSSelect</name>
+    <message>
+        <location filename="../src/aprsselect.cc" line="11"/>
+        <source>[None]</source>
+        <translation type="unfinished">[Nessuno/a]</translation>
     </message>
 </context>
 <context>
@@ -2145,27 +1914,54 @@
     </message>
 </context>
 <context>
+    <name>FMAdmitSelect</name>
+    <message>
+        <location filename="../src/admitselect.cc" line="9"/>
+        <source>Always</source>
+        <translation type="unfinished">Sempre</translation>
+    </message>
+    <message>
+        <location filename="../src/admitselect.cc" line="10"/>
+        <source>Channel Free</source>
+        <translation type="unfinished">Canale libero</translation>
+    </message>
+    <message>
+        <location filename="../src/admitselect.cc" line="11"/>
+        <source>Other Tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FMChannelDialog</name>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="57"/>
-        <location filename="../src/fmchanneldialog.cc" line="75"/>
-        <source>[None]</source>
-        <translation>[Nessuno/a]</translation>
+        <location filename="../src/fmchanneldialog.cc" line="32"/>
+        <source>Squelch</source>
+        <translation type="unfinished">Squelch</translation>
     </message>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="92"/>
-        <source>No offset</source>
-        <translation>Nessun offset</translation>
+        <location filename="../src/fmchanneldialog.cc" line="34"/>
+        <source>Tx Admit</source>
+        <translation type="unfinished">Consenti TX</translation>
     </message>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="94"/>
-        <source>Positive offset</source>
-        <translation>Offset positivo</translation>
+        <location filename="../src/fmchanneldialog.cc" line="36"/>
+        <source>Rx Tone</source>
+        <translation type="unfinished">Tono RX</translation>
     </message>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="96"/>
-        <source>Negative offset</source>
-        <translation>Offset negativo</translation>
+        <location filename="../src/fmchanneldialog.cc" line="38"/>
+        <source>Tx Tone</source>
+        <translation type="unfinished">Tono TX</translation>
+    </message>
+    <message>
+        <location filename="../src/fmchanneldialog.cc" line="40"/>
+        <source>Bandwidth</source>
+        <translation type="unfinished">Larghezza di banda</translation>
+    </message>
+    <message>
+        <location filename="../src/fmchanneldialog.cc" line="42"/>
+        <source>APRS</source>
+        <translation type="unfinished">APRS</translation>
     </message>
 </context>
 <context>
@@ -2173,7 +1969,7 @@
     <message>
         <location filename="../src/flageditdialog.ui" line="14"/>
         <source>Select Flags</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleziona flag</translation>
     </message>
 </context>
 <context>
@@ -2233,142 +2029,117 @@
     <name>GeneralSettingsView</name>
     <message>
         <location filename="../src/generalsettingsview.ui" line="22"/>
-        <source>DMR Radio ID</source>
-        <translation>ID DMR della radio</translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="28"/>
-        <source>DMR ID</source>
-        <translation>ID DMR</translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="35"/>
-        <source>Radio Name</source>
-        <translation>Nome della radio</translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="42"/>
-        <source>Enter your name or callsign.</source>
-        <translation>Inserisci il tuo nome o il nominativo.</translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="45"/>
-        <source>Name/Callsign</source>
-        <translation>Nome/Nominativo</translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="58"/>
         <source>Boot Settings</source>
         <translation>Impostazioni di avvio</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="64"/>
+        <location filename="../src/generalsettingsview.ui" line="28"/>
         <source>Intro Line 1</source>
         <translation>Riga introduttiva 1</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="71"/>
+        <location filename="../src/generalsettingsview.ui" line="35"/>
         <source>First greeting line (if supported by the radio).</source>
         <translation>Prima riga di benvenuto (se supportata dalla radio).</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="74"/>
+        <location filename="../src/generalsettingsview.ui" line="38"/>
         <source>Intro line 1</source>
         <translation>Riga introduttiva 1</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="81"/>
+        <location filename="../src/generalsettingsview.ui" line="45"/>
         <source>Intro Line 2</source>
         <translation>Riga introduttiva 2</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="88"/>
+        <location filename="../src/generalsettingsview.ui" line="52"/>
         <source>Second greeting line (if supported by the radio).</source>
         <translation>Seconda riga di benvenuto (se supportata dalla radio).</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="94"/>
+        <location filename="../src/generalsettingsview.ui" line="58"/>
         <source>Intro line 2</source>
         <translation>Riga introduttiva 2</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="104"/>
+        <location filename="../src/generalsettingsview.ui" line="68"/>
         <source>Audio Settings</source>
         <translation>Impostazioni audio</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="110"/>
+        <location filename="../src/generalsettingsview.ui" line="74"/>
         <source>MIC Amp.</source>
         <translation>Amp. MIC.</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="127"/>
+        <location filename="../src/generalsettingsview.ui" line="91"/>
         <source>Speech Synthesis</source>
         <translation>Sintesi vocale</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="144"/>
+        <location filename="../src/generalsettingsview.ui" line="108"/>
         <source>Channel Default Values</source>
         <translation>Valori predefiniti dei canali</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="150"/>
+        <location filename="../src/generalsettingsview.ui" line="114"/>
         <source>Power</source>
         <translation>Potenza</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="158"/>
+        <location filename="../src/generalsettingsview.ui" line="122"/>
         <source>Max</source>
         <translation>Massima</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="163"/>
+        <location filename="../src/generalsettingsview.ui" line="127"/>
         <source>High</source>
         <translation>Alta</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="168"/>
+        <location filename="../src/generalsettingsview.ui" line="132"/>
         <source>Mid</source>
         <translation>Media</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="173"/>
+        <location filename="../src/generalsettingsview.ui" line="137"/>
         <source>Low</source>
         <translation>Bassa</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="178"/>
+        <location filename="../src/generalsettingsview.ui" line="142"/>
         <source>Min</source>
         <translation>Minima</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="186"/>
+        <location filename="../src/generalsettingsview.ui" line="150"/>
         <source>Squelch</source>
         <translation>Squelch</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="193"/>
+        <location filename="../src/generalsettingsview.ui" line="157"/>
         <source>Open</source>
         <translation>Aperto</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="203"/>
+        <location filename="../src/generalsettingsview.ui" line="167"/>
         <source>Transmit Timeout</source>
         <translation>Timeout di trasmissione</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="210"/>
-        <location filename="../src/generalsettingsview.ui" line="230"/>
+        <location filename="../src/generalsettingsview.ui" line="174"/>
+        <location filename="../src/generalsettingsview.ui" line="194"/>
         <source>Off</source>
         <translation>Disattivato</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="223"/>
+        <location filename="../src/generalsettingsview.ui" line="187"/>
         <source>VOX Level</source>
         <translation>Livello VOX</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="247"/>
+        <location filename="../src/generalsettingsview.ui" line="211"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
@@ -2376,7 +2147,7 @@
 <context>
     <name>GroupListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="917"/>
+        <location filename="../src/configitemwrapper.cc" line="935"/>
         <source>Contact</source>
         <translation>Contatto</translation>
     </message>
@@ -2433,9 +2204,117 @@
 <context>
     <name>GroupListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="893"/>
+        <location filename="../src/configitemwrapper.cc" line="911"/>
         <source>RX Group Lists</source>
         <translation>Liste gruppi</translation>
+    </message>
+</context>
+<context>
+    <name>M17ChannelDialog</name>
+    <message>
+        <location filename="../src/m17channeldialog.cc" line="47"/>
+        <source>Channel mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17channeldialog.cc" line="49"/>
+        <source>Access number</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17channeldialog.cc" line="52"/>
+        <source>Tx contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17channeldialog.cc" line="54"/>
+        <source>Send position</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>M17ChannelModeSelect</name>
+    <message>
+        <location filename="../src/m17channeldialog.cc" line="15"/>
+        <source>Voice</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17channeldialog.cc" line="16"/>
+        <source>Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17channeldialog.cc" line="17"/>
+        <source>Voice + Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>M17ContactDialog</name>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="14"/>
+        <location filename="../src/m17contactdialog.cc" line="43"/>
+        <source>Edit M17 Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="24"/>
+        <source>Basic</source>
+        <translation type="unfinished">Base</translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="30"/>
+        <source>Name</source>
+        <translation type="unfinished">Nome</translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="37"/>
+        <source>The name of the contact.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="44"/>
+        <source>Call</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="51"/>
+        <source>The callsign of the contact. Must be not longer than 9 chars, A-Z, 0-9, ., /, -.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="58"/>
+        <source>Ring</source>
+        <translation type="unfinished">Suoneria</translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="68"/>
+        <source>Broadcast</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="75"/>
+        <source>Sets this contact to be the M17 broadcast contact, the specified call is then ignored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.ui" line="86"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Estensioni</translation>
+    </message>
+    <message>
+        <location filename="../src/m17contactdialog.cc" line="49"/>
+        <source>Create M17 Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>M17ContactSelect</name>
+    <message>
+        <location filename="../src/m17contactdialog.cc" line="94"/>
+        <source>[None]</source>
+        <translation type="unfinished">[Nessuno/a]</translation>
     </message>
 </context>
 <context>
@@ -2630,7 +2509,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="318"/>
         <source>Export to CHIRP ...</source>
-        <translation type="unfinished">Esporta in CHIRP...</translation>
+        <translation>Esporta in CHIRP…</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="321"/>
@@ -2640,7 +2519,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="326"/>
         <source>Import ...</source>
-        <translation type="unfinished">Importa...</translation>
+        <translation>Importa…</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="329"/>
@@ -2660,7 +2539,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="345"/>
         <source>Edit Satellites ...</source>
-        <translation type="unfinished">Modifica i satelliti...</translation>
+        <translation>Modifica i satelliti…</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="348"/>
@@ -2708,64 +2587,62 @@
         <translation>Elementi orbitali aggiornati e caricati.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="121"/>
-        <location filename="../src/mainwindow.cc" line="167"/>
+        <location filename="../src/mainwindow.cc" line="111"/>
         <source>Radio IDs</source>
         <translation>ID Radio</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="123"/>
+        <location filename="../src/mainwindow.cc" line="113"/>
         <source>Contacts</source>
         <translation>Contatti</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="125"/>
+        <location filename="../src/mainwindow.cc" line="115"/>
         <source>Group Lists</source>
         <translation>Liste gruppi</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="127"/>
+        <location filename="../src/mainwindow.cc" line="117"/>
         <source>Channels</source>
         <translation>Canali</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="129"/>
+        <location filename="../src/mainwindow.cc" line="119"/>
         <source>Zones</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="131"/>
+        <location filename="../src/mainwindow.cc" line="121"/>
         <source>Scan Lists</source>
         <translation>Liste di scansione</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="133"/>
+        <location filename="../src/mainwindow.cc" line="123"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="135"/>
+        <location filename="../src/mainwindow.cc" line="125"/>
         <source>Roaming Channels</source>
         <translation>Canali roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="138"/>
+        <location filename="../src/mainwindow.cc" line="128"/>
         <source>Roaming Zones</source>
         <translation>Zone roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="142"/>
-        <location filename="../src/mainwindow.cc" line="181"/>
+        <location filename="../src/mainwindow.cc" line="132"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="198"/>
+        <location filename="../src/mainwindow.cc" line="145"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Modifiche non salvate al codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="199"/>
+        <location filename="../src/mainwindow.cc" line="146"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Ci sono modifiche non salvate al codeplug corrente. Procedendo queste modifiche andranno perse.</translation>
     </message>
@@ -2871,60 +2748,60 @@
 <context>
     <name>PositioningSystemListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="771"/>
+        <location filename="../src/configitemwrapper.cc" line="789"/>
         <source>DMR</source>
         <translation>DMR</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="773"/>
+        <location filename="../src/configitemwrapper.cc" line="791"/>
         <source>APRS</source>
         <translation>APRS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="783"/>
-        <location filename="../src/configitemwrapper.cc" line="811"/>
-        <location filename="../src/configitemwrapper.cc" line="819"/>
+        <location filename="../src/configitemwrapper.cc" line="801"/>
+        <location filename="../src/configitemwrapper.cc" line="829"/>
+        <location filename="../src/configitemwrapper.cc" line="837"/>
         <source>[None]</source>
         <translation>[Nessuno/a]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="800"/>
-        <location filename="../src/configitemwrapper.cc" line="804"/>
+        <location filename="../src/configitemwrapper.cc" line="818"/>
+        <location filename="../src/configitemwrapper.cc" line="822"/>
         <source>[Selected]</source>
         <translation>[Selezionato]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="835"/>
+        <location filename="../src/configitemwrapper.cc" line="853"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="836"/>
+        <location filename="../src/configitemwrapper.cc" line="854"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="837"/>
+        <location filename="../src/configitemwrapper.cc" line="855"/>
         <source>Destination</source>
         <translation>Destinazione</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="838"/>
+        <location filename="../src/configitemwrapper.cc" line="856"/>
         <source>Period</source>
         <translation>Intervallo</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="839"/>
+        <location filename="../src/configitemwrapper.cc" line="857"/>
         <source>Channel</source>
         <translation>Canale</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="840"/>
+        <location filename="../src/configitemwrapper.cc" line="858"/>
         <source>Message</source>
         <translation>Messaggio</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="841"/>
+        <location filename="../src/configitemwrapper.cc" line="859"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
@@ -2934,12 +2811,12 @@
     <message>
         <location filename="../src/propertydelegate.cc" line="74"/>
         <source>None</source>
-        <translation type="unfinished">Nessuno/a</translation>
+        <translation>Nessuno/a</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="75"/>
         <source>Off</source>
-        <translation type="unfinished">Disattivato</translation>
+        <translation>Disattivato</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="112"/>
@@ -2960,59 +2837,59 @@
 <context>
     <name>PropertyWrapper</name>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="350"/>
+        <location filename="../src/extensionwrapper.cc" line="352"/>
         <source>new element</source>
         <translation>nuovo elemento</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="526"/>
+        <location filename="../src/extensionwrapper.cc" line="528"/>
         <source>Property</source>
         <translation>Proprietà</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="527"/>
+        <location filename="../src/extensionwrapper.cc" line="529"/>
         <source>Value</source>
         <translation>Valore</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="528"/>
+        <location filename="../src/extensionwrapper.cc" line="530"/>
         <source>Description</source>
         <translation>Descrizione</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="590"/>
+        <location filename="../src/extensionwrapper.cc" line="592"/>
         <source>true</source>
         <translation>vero</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="591"/>
+        <location filename="../src/extensionwrapper.cc" line="593"/>
         <source>false</source>
         <translation>falso</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="612"/>
-        <source>None</source>
-        <translation type="unfinished">Nessuno/a</translation>
-    </message>
-    <message>
         <location filename="../src/extensionwrapper.cc" line="614"/>
-        <source>Off</source>
-        <translation type="unfinished">Disattivato</translation>
+        <source>None</source>
+        <translation>Nessuno/a</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="625"/>
-        <location filename="../src/extensionwrapper.cc" line="633"/>
-        <location filename="../src/extensionwrapper.cc" line="641"/>
+        <location filename="../src/extensionwrapper.cc" line="616"/>
+        <source>Off</source>
+        <translation>Disattivato</translation>
+    </message>
+    <message>
+        <location filename="../src/extensionwrapper.cc" line="627"/>
+        <location filename="../src/extensionwrapper.cc" line="635"/>
+        <location filename="../src/extensionwrapper.cc" line="643"/>
         <source>[None]</source>
         <translation>[Nessuno/a]</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="643"/>
+        <location filename="../src/extensionwrapper.cc" line="645"/>
         <source>Instance of %1</source>
         <translation>Istanza di &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/extensionwrapper.cc" line="648"/>
+        <location filename="../src/extensionwrapper.cc" line="650"/>
         <source>List of %1 instances</source>
         <translation>Elenco di %1 istanze</translation>
     </message>
@@ -3020,7 +2897,7 @@
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/rxgrouplistdialog.cc" line="111"/>
+        <location filename="../src/rxgrouplistdialog.cc" line="126"/>
         <source>[None]</source>
         <translation>[Nessuno/a]</translation>
     </message>
@@ -3038,12 +2915,12 @@
         <translation>Modifica lista gruppi</translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.cc" line="84"/>
+        <location filename="../src/rxgrouplistdialog.cc" line="82"/>
         <source>Cannot remove group call</source>
         <translation>Impossibile rimuovere la chiamata di gruppo</translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.cc" line="85"/>
+        <location filename="../src/rxgrouplistdialog.cc" line="83"/>
         <source>Cannot remove group call: You have to select at least one group call first.</source>
         <translation>Impossibile rimuovere la chiamata di gruppo: devi prima selezionarne almeno una.</translation>
     </message>
@@ -3134,27 +3011,27 @@
 <context>
     <name>RadioIdListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="980"/>
+        <location filename="../src/configitemwrapper.cc" line="998"/>
         <source>[None]</source>
         <translation>[Nessuno/a]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="995"/>
+        <location filename="../src/configitemwrapper.cc" line="1013"/>
         <source>Type</source>
         <translation>Tipo</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="996"/>
+        <location filename="../src/configitemwrapper.cc" line="1014"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="997"/>
+        <location filename="../src/configitemwrapper.cc" line="1015"/>
         <source>Number</source>
         <translation>Numero</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="998"/>
+        <location filename="../src/configitemwrapper.cc" line="1016"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
@@ -3302,48 +3179,48 @@
 <context>
     <name>RoamingChannelListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="556"/>
-        <location filename="../src/configitemwrapper.cc" line="564"/>
+        <location filename="../src/configitemwrapper.cc" line="557"/>
+        <location filename="../src/configitemwrapper.cc" line="565"/>
         <source>[Selected]</source>
         <translation>[Selezionato]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="578"/>
+        <location filename="../src/configitemwrapper.cc" line="579"/>
         <source>[None]</source>
         <translation>[Nessuno/a]</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="593"/>
+        <location filename="../src/configitemwrapper.cc" line="594"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="594"/>
+        <location filename="../src/configitemwrapper.cc" line="595"/>
         <source>RX Frequency</source>
         <translation>Frequenza RX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="595"/>
+        <location filename="../src/configitemwrapper.cc" line="596"/>
         <source>TX Frequency</source>
         <translation>Frequenza TX</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="597"/>
+        <location filename="../src/configitemwrapper.cc" line="598"/>
         <source>TS</source>
         <translation>TS</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="598"/>
+        <location filename="../src/configitemwrapper.cc" line="599"/>
         <source>Zones</source>
         <translation>Zone</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="599"/>
+        <location filename="../src/configitemwrapper.cc" line="600"/>
         <source>Extensions</source>
         <translation>Estensioni</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="596"/>
+        <location filename="../src/configitemwrapper.cc" line="597"/>
         <source>CC</source>
         <translation>CC</translation>
     </message>
@@ -3351,7 +3228,7 @@
 <context>
     <name>RoamingChannelRefListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="626"/>
+        <location filename="../src/configitemwrapper.cc" line="627"/>
         <source>Roaming Channel</source>
         <translation>Canale roaming</translation>
     </message>
@@ -3359,12 +3236,12 @@
 <context>
     <name>RoamingListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="935"/>
+        <location filename="../src/configitemwrapper.cc" line="953"/>
         <source>%1 (containing %2 channels)</source>
         <translation>%1 (contenente %2 canali)</translation>
     </message>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="942"/>
+        <location filename="../src/configitemwrapper.cc" line="960"/>
         <source>Roaming zone</source>
         <translation>Zona roaming</translation>
     </message>
@@ -3372,22 +3249,22 @@
 <context>
     <name>RoamingZoneDialog</name>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="12"/>
+        <location filename="../src/roamingzonedialog.cc" line="15"/>
         <source>Create Roaming Zone</source>
         <translation>Crea zona roaming</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="19"/>
+        <location filename="../src/roamingzonedialog.cc" line="22"/>
         <source>Set Roaming Zone</source>
         <translation>Modifica zona roaming</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="82"/>
+        <location filename="../src/roamingzonedialog.cc" line="83"/>
         <source>Cannot remove channels.</source>
         <translation>Impossibile rimuovere i canali.</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="83"/>
+        <location filename="../src/roamingzonedialog.cc" line="84"/>
         <source>Cannot remove channels. Select at least one channel first.</source>
         <translation>Impossibile rimuovere i canali. Seleziona prima almeno un canale.</translation>
     </message>
@@ -3506,6 +3383,19 @@
     </message>
 </context>
 <context>
+    <name>RoamingZoneSelect</name>
+    <message>
+        <location filename="../src/roamingzonedialog.cc" line="121"/>
+        <source>[None]</source>
+        <translation type="unfinished">[Nessuno/a]</translation>
+    </message>
+    <message>
+        <location filename="../src/roamingzonedialog.cc" line="122"/>
+        <source>[Default]</source>
+        <translation type="unfinished">[Predefinito/a]</translation>
+    </message>
+</context>
+<context>
     <name>SatelliteDatabaseDialog</name>
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="20"/>
@@ -3537,51 +3427,51 @@
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="14"/>
         <source>Edit Satellite Transponder</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifica transponder satellitare</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="26"/>
         <source>FM Voice Transponder</source>
-        <translation type="unfinished"></translation>
+        <translation>Transponder voce FM</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="32"/>
         <location filename="../src/satellitetransponderdialog.ui" line="105"/>
         <source>Uplink Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenza di uplink</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="42"/>
         <location filename="../src/satellitetransponderdialog.ui" line="121"/>
         <source>Uplink Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Tono di uplink</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="58"/>
         <location filename="../src/satellitetransponderdialog.ui" line="143"/>
         <source>Downlink Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenza di downlink</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="68"/>
         <location filename="../src/satellitetransponderdialog.ui" line="159"/>
         <source>Downlink Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Tono di downlink</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="93"/>
         <source>APRS Transponder</source>
-        <translation type="unfinished"></translation>
+        <translation>Transponder APRS</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="184"/>
         <source>Beacon</source>
-        <translation type="unfinished"></translation>
+        <translation>Beacon</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="196"/>
         <source>Beacon Frequency</source>
-        <translation type="unfinished"></translation>
+        <translation>Frequenza del beacon</translation>
     </message>
 </context>
 <context>
@@ -3722,7 +3612,7 @@
 <context>
     <name>ScanListsWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="869"/>
+        <location filename="../src/configitemwrapper.cc" line="887"/>
         <source>Scan-List</source>
         <translation>Lista di scansione</translation>
     </message>
@@ -3772,7 +3662,7 @@
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.cc" line="482"/>
+        <location filename="../src/settings.cc" line="461"/>
         <source>Warning!</source>
         <translation>Attenzione!</translation>
     </message>
@@ -3944,25 +3834,41 @@
         <source>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</source>
         <translation>Se abilitati, questi prefissi DMR separati da virgola vengono utilizzati per selezionare le voci del database dei nominativi.</translation>
     </message>
+</context>
+<context>
+    <name>SquelchEdit</name>
     <message>
-        <location filename="../src/settingsdialog.ui" line="413"/>
-        <source>Extensions</source>
-        <translation>Estensioni</translation>
+        <location filename="../src/squelchedit.ui" line="20"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="425"/>
-        <source>Extended Features</source>
-        <translation>Funzioni avanzate</translation>
+        <location filename="../src/squelchedit.ui" line="32"/>
+        <source>Open</source>
+        <translation type="unfinished">Aperto</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="431"/>
-        <source>Show commercial features</source>
-        <translation>Mostra funzioni commerciali</translation>
+        <location filename="../src/squelchedit.ui" line="45"/>
+        <source>Uses the global squelch setting if enabled.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="445"/>
-        <source>Show device extensions</source>
-        <translation>Mostra estensioni del dispositivo</translation>
+        <location filename="../src/squelchedit.ui" line="48"/>
+        <source>Default</source>
+        <translation type="unfinished">Predefinito/a</translation>
+    </message>
+</context>
+<context>
+    <name>TimeslotSelect</name>
+    <message>
+        <location filename="../src/timeslotselect.cc" line="6"/>
+        <source>Slot 1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/timeslotselect.cc" line="7"/>
+        <source>Slot 2</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3970,7 +3876,7 @@
     <message>
         <location filename="../src/transponderfrequencydelegate.cc" line="28"/>
         <source>None</source>
-        <translation type="unfinished">Nessuno/a</translation>
+        <translation>Nessuno/a</translation>
     </message>
 </context>
 <context>
@@ -4042,14 +3948,14 @@
         <translation>Crea zona</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.cc" line="76"/>
-        <location filename="../src/zonedialog.cc" line="107"/>
+        <location filename="../src/zonedialog.cc" line="73"/>
+        <location filename="../src/zonedialog.cc" line="104"/>
         <source>Cannot remove channel</source>
         <translation>Impossibile eliminare il canale</translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.cc" line="77"/>
-        <location filename="../src/zonedialog.cc" line="108"/>
+        <location filename="../src/zonedialog.cc" line="74"/>
+        <location filename="../src/zonedialog.cc" line="105"/>
         <source>Select at least one channel first.</source>
         <translation>Seleziona prima almeno un canale.</translation>
     </message>
@@ -4110,7 +4016,7 @@
 <context>
     <name>ZoneListWrapper</name>
     <message>
-        <location filename="../src/configitemwrapper.cc" line="740"/>
+        <location filename="../src/configitemwrapper.cc" line="758"/>
         <source>Zone</source>
         <translation>Zona</translation>
     </message>
