@@ -87,7 +87,7 @@ brew install \
 1. **Clone the repository**
 
    ```sh
-   git clone https://github.com/billbonney/qdmr.git
+   git clone https://github.com/hmatuschek/qdmr.git
    cd qdmr
    ```
 
