@@ -301,6 +301,16 @@ Settings::setShowDisclaimer(bool show) {
   setValue("showDisclaimer", show);
 }
 
+QString
+Settings::uiLanguage() const {
+  return value("uiLanguage", QStringLiteral("system")).toString();
+}
+
+void
+Settings::setUiLanguage(const QString &localeId) {
+  setValue("uiLanguage", localeId);
+}
+
 ConfigMergeVisitor::ItemStrategy
 Settings::configMergeItemStrategy() const {
   return (ConfigMergeVisitor::ItemStrategy)value(

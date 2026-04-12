@@ -89,6 +89,9 @@ private slots:
 
   void onPaletteChanged(const QPalette &palette);
 
+private:
+  bool loadLanguage(const QString &localeId);
+
 protected:
   Config *_config;
   MainWindow *_mainWindow;

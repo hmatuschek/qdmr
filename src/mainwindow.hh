@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+class QActionGroup;
+
 class Config;
 class GeneralSettingsView;
 class RadioIDListView;
@@ -24,7 +26,10 @@ protected:
   void closeEvent(QCloseEvent *event);
 
 private:
+  void updateLanguageMenuChecks();
+
   Ui::MainWindow *ui;
+  QActionGroup *_languageGroup;
   GeneralSettingsView *_generalSettings;
   RadioIDListView *_radioIdTab;
   RoamingZoneListView *_roamingZoneList;
