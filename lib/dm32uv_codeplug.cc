@@ -80,7 +80,7 @@ DM32UVCodeplug::ChannelElement::setChannelType(ChannelType type) {
 
 Channel::Power
 DM32UVCodeplug::ChannelElement::power() const {
-  switch ((Power)getUInt2(Offset::power())) {
+  switch ((Power)getUInt4(Offset::power())) {
   case Power::Low: return Channel::Power::Low;
   case Power::Medium: return Channel::Power::Mid;
   case Power::High: return Channel::Power::High;
@@ -93,14 +93,14 @@ DM32UVCodeplug::ChannelElement::setPower(Channel::Power power) {
   switch (power) {
   case Channel::Power::Min:
   case Channel::Power::Low:
-    setUInt2(Offset::power(), (unsigned int)Power::Low);
+    setUInt4(Offset::power(), (unsigned int)Power::Low);
     break;
   case Channel::Power::Mid:
-    setUInt2(Offset::power(), (unsigned int)Power::Medium);
+    setUInt4(Offset::power(), (unsigned int)Power::Medium);
     break;
   case Channel::Power::High:
   case Channel::Power::Max:
-    setUInt2(Offset::power(), (unsigned int)Power::High);
+    setUInt4(Offset::power(), (unsigned int)Power::High);
     break;
   }
 }
@@ -231,12 +231,12 @@ DM32UVCodeplug::ChannelElement::clearEmergencySystemIndex() {
 
 Level
 DM32UVCodeplug::ChannelElement::squelchLevel() const {
-  return Level::fromValue(getUInt4(Offset::squelchLevel()), Limit::squelchLevel());
+  return Level::fromValue(getUInt8(Offset::squelchLevel()), Limit::squelchLevel());
 }
 
 void
 DM32UVCodeplug::ChannelElement::setSquelchLevel(Level level) {
-  setUInt4(Offset::squelchLevel(), level.mapTo(Limit::squelchLevel()));
+  setUInt8(Offset::squelchLevel(), level.mapTo(Limit::squelchLevel()));
 }
 
 
@@ -4342,6 +4342,7 @@ DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
                     + indexInBlock * ChannelElement::size();
     // Create channel
+    ChannelElement(data(addr)).fill(0x00);
     if (! ChannelElement(data(addr)).encode(ctx.get<Channel>(i), ctx, err)) {
       errMsg(err) << "Cannot encode channel at index " << i << ".";
       return false;
@@ -4363,6 +4364,7 @@ DM32UVCodeplug::encodeChannels(Context &ctx, const ErrorStack &err) {
     uint32_t addr = Offset::channelExtensionBanks()
         + blockNumber * ChannelExtensionBankElement::Offset::betweenBanks()
         + indexInBlock * ChannelExtensionElement::size();
+    ChannelExtensionElement(data(addr)).fill(0x00);
     if (! ChannelExtensionElement(data(addr)).encode(ctx.get<Channel>(i), ctx, err)) {
       errMsg(err) << "Cannot encode channel extension at index " << i << ".";
       return false;

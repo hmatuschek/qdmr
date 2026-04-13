@@ -243,7 +243,7 @@ public:
       static constexpr unsigned int rxFrequency() { return 0x0010; }
       static constexpr unsigned int txFrequency() { return 0x0014; }
       static constexpr Bit channelType()          { return {0x0018, 4}; }
-      static constexpr Bit power()                { return {0x0018, 1}; }
+      // 0x18 bits 2-1: busy lock (not yet implemented)
       static constexpr Bit loneWorker()           { return {0x0018, 0}; }
       static constexpr Bit bandwidth()            { return {0x0019, 7}; }
       static constexpr Bit scanListIndex()        { return {0x0019, 2}; }
@@ -253,14 +253,15 @@ public:
       static constexpr Bit emergencyNotification() { return {0x001b, 7}; }
       static constexpr Bit emergencyACK()         { return {0x001b, 6}; }
       static constexpr Bit emergencySystemIndex() { return {0x001b, 0}; }
-      static constexpr Bit squelchLevel()         { return {0x001c, 4}; }
-      static constexpr Bit rxOnly()               { return {0x001c, 3}; }
+      static constexpr Bit power()                { return {0x001c, 4}; }
+      static constexpr Bit rxOnly()               { return {0x0018, 3}; }
       static constexpr Bit dmrAPRS()              { return {0x001c, 2}; }
       static constexpr Bit privateCallACK()       { return {0x001d, 7}; }
       static constexpr Bit dataACK()              { return {0x001d, 6}; }
       static constexpr Bit dcdm()                 { return {0x001d, 5}; }
       static constexpr Bit timeslot()             { return {0x001d, 4}; }
       static constexpr Bit colorcode()            { return {0x001d, 0}; }
+      static constexpr unsigned int squelchLevel()  { return 0x001e; }
       static constexpr Bit encryptionEnable()     { return {0x001f, 6}; }
       static constexpr Bit groupListIndex()       { return {0x001f, 0}; }
       static constexpr Bit dmrAPRSChannelIndex()  { return {0x0020, 0}; }
