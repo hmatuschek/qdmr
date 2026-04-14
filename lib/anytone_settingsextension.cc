@@ -1915,26 +1915,6 @@ AnytoneAudioSettingsExtension::setMuteDelay(Interval intv) {
   emit modified(this);
 }
 
-bool
-AnytoneAudioSettingsExtension::fmMicGainEnabled() const {
-  return _analogMicGain.isFinite();
-}
-Level
-AnytoneAudioSettingsExtension::fmMicGain() const {
-  return _analogMicGain;
-}
-void
-AnytoneAudioSettingsExtension::setFMMicGain(Level gain) {
-  if (_analogMicGain == gain)
-    return;
-  _analogMicGain = gain;
-  emit modified(this);
-}
-void
-AnytoneAudioSettingsExtension::disableFMMicGain() {
-  _analogMicGain = Level::invalid();
-}
-
 
 AnytoneAudioSettingsExtension::Speaker
 AnytoneAudioSettingsExtension::speaker() const {

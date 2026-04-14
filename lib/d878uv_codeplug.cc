@@ -2746,20 +2746,22 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
+  // Encode audio settings
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
+  else
+    setFMMicGain(ctx.config()->settings()->micLevel());
+
   // Encode GPS settings
   setGNSS(ctx.config()->settings()->gnss()->systems());
 
   enableSendTalkerAlias(ctx.config()->settings()->dmr()->sendTalkerAliasEnabled());
   setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
 
-  if (nullptr == ctx.config()->settings()->anytoneExtension()) {
-    // If there is no extension, reuse DMR mic gain setting
-    setFMMicGain(ctx.config()->settings()->micLevel());
-    return true;
-  }
-
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return true;
 
   // Encode DMR settings
   setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
@@ -2775,12 +2777,6 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   enableTOTNotification(ext->toneSettings()->totNotification());
   enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
   setCallEndToneMelody(*ext->toneSettings()->callEndMelody());
-
-  // Encode audio settings
-  if (ext->audioSettings()->fmMicGainEnabled())
-    setFMMicGain(ext->audioSettings()->fmMicGain());
-  else
-    setFMMicGain(ctx.config()->settings()->micLevel());
 
   // Encode DMR settings
   setManDialGroupCallHangTime(ext->dmrSettings()->manualGroupCallHangTime());
@@ -2858,12 +2854,6 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
   this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
 
-  // Store FM mic gain separately, if different
-  if (ctx.config()->settings()->micLevel() == fmMicGain())
-    ext->audioSettings()->disableFMMicGain();
-  else
-    ext->audioSettings()->setFMMicGain(fmMicGain());
-
   // Store display settings
   ext->displaySettings()->enableShowColorCode(this->showColorCode());
   ext->displaySettings()->enableShowTimeSlot(this->showTimeSlot());
@@ -2895,6 +2885,12 @@ bool
 D878UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {
   if (! AnytoneCodeplug::ExtendedSettingsElement::linkConfig(ctx, err))
     return false;
+
+  // Store FM mic gain separately, if different
+  if (ctx.config()->settings()->micLevel() == fmMicGain())
+    ctx.config()->settings()->audio()->disableFMMicGain();
+  else
+    ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
 
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();

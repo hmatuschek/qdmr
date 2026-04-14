@@ -32,7 +32,7 @@ D878UVTest::initTestCase() {
   UnitTestBase::initTestCase();
 
   ErrorStack err;
-  if (! _micGainConfig.readYAML(":/data/anytone_audio_settings_extension.yaml", err)) {
+  if (! _micGainConfig.readYAML(":/data/audio_settings_extension.yaml", err)) {
     QFAIL(QString("Cannot open codeplug file: %1")
           .arg(err.format()).toStdString().c_str());
   }
@@ -68,22 +68,10 @@ D878UVTest::testBasicConfigDecoding() {
 
 void
 D878UVTest::testAnalogMicGain() {
-  ErrorStack err;
-  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
-  D878UVCodeplug codeplug;
-  if (! codeplug.encode(&_micGainConfig, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-
   Config config;
-  if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-
-  QVERIFY(config.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
-  QCOMPARE(config.settings()->anytoneExtension()->audioSettings()->fmMicGain(), Level::fromValue(5));
+  encodeDecode(_micGainConfig, config);
+  QVERIFY(config.settings()->audio()->fmMicGainEnabled());
+  QCOMPARE(config.settings()->audio()->fmMicGain(), Level::fromValue(5));
 }
 
 void

@@ -2953,6 +2953,11 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Encode GPS settings
   setGNSS(ctx.config()->settings()->gnss()->systems());
+  // Encode audio settings
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
+  else
+    setFMMicGain(ctx.config()->settings()->micLevel());
 
   setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
 
@@ -2987,10 +2992,6 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   setCallEndToneMelody(*ext->toneSettings()->callEndMelody());
 
   // Encode audio settings
-  if (ext->audioSettings()->fmMicGainEnabled())
-    setFMMicGain(ext->audioSettings()->fmMicGain());
-  else
-    setFMMicGain(ctx.config()->settings()->micLevel());
   setSpeaker(ext->audioSettings()->speaker());
   setMicSpeakerSource(ext->audioSettings()->handsetSpeaker());
   setMicType(ext->audioSettings()->handsetType());
@@ -3052,7 +3053,12 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store GPS settings
   ctx.config()->settings()->gnss()->setSystems(this->gnss());
-
+  // Store audio settings
+  if (ctx.config()->settings()->micLevel() == fmMicGain())
+    ctx.config()->settings()->audio()->disableFMMicGain();
+  else
+    ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
+  // Store DMR settings
   ctx.config()->config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Get or add extension if not present
@@ -3084,10 +3090,6 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
 
   // Store FM mic gain separately, if different
-  if (ctx.config()->settings()->micLevel() == fmMicGain())
-    ext->audioSettings()->disableFMMicGain();
-  else
-    ext->audioSettings()->setFMMicGain(fmMicGain());
   ext->audioSettings()->setSpeaker(speaker());
   ext->audioSettings()->setHandsetSpeaker(micSpeakerSource());
   ext->audioSettings()->setHandsetType(micType());

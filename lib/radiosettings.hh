@@ -5,6 +5,7 @@
 #include "channel.hh"
 
 #include "bootsettings.hh"
+#include "audiosettings.hh"
 #include "gnsssettings.hh"
 #include "dmrsettings.hh"
 #include "radioddity_extensions.hh"
@@ -37,6 +38,8 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(DMRRadioIDReference *defaultID READ defaultIdRef)
   /** Common boot settings. */
   Q_PROPERTY(BootSettings* boot READ boot);
+  /** Common audio and tone settings. */
+  Q_PROPERTY(AudioSettings *audio READ audio);
   /** The GNSS settings. */
   Q_PROPERTY(GNSSSettings *gnss READ gnss);
   /** The common DMR settings. */
@@ -117,6 +120,8 @@ public:
 
   /** Returns the boot settings. */
   BootSettings *boot() const;
+  /** Returns the audio/tone settings. */
+  AudioSettings *audio() const;
   /** Returns the GNSS settings. */
   GNSSSettings *gnss() const;
   /** Returns the DMR settings. */
@@ -172,6 +177,8 @@ protected:
   DMRRadioIDReference *_defaultId;
   /** The boot settings. */
   BootSettings *_boot;
+  /** The audio/tone settings. */
+  AudioSettings *_audio;
   /** The GNSS settings. */
   GNSSSettings *_gnss;
   /** The DMR settings. */

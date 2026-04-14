@@ -834,9 +834,6 @@ class AnytoneAudioSettingsExtension: public ConfigItem
   /** The maximum head-phone volume setting [0-10]. */
   Q_PROPERTY(unsigned int maxHeadPhoneVolume READ maxHeadPhoneVolume WRITE setMaxHeadPhoneVolume)
 
-  /** The FM mic gain [1,10]. */
-  Q_PROPERTY(Level fmMicGain READ fmMicGain WRITE setFMMicGain)
-
   /** The enables speakers. */
   Q_PROPERTY(Speaker speaker READ speaker WRITE setSpeaker)
   /** The source for the handset speaker. */
@@ -908,15 +905,6 @@ public:
   Interval muteDelay() const;
   /** Sets the mute delay. */
   void setMuteDelay(Interval intv);
-
-  /** Returns @c true, if the FM mic gain is set independently. */
-  bool fmMicGainEnabled() const;
-  /** Returns the FM mic gain. */
-  Level fmMicGain() const;
-  /** Sets the FM mic gain. */
-  void setFMMicGain(Level gain);
-  /** Disables the FM mic gain. */
-  void disableFMMicGain();
 
   /** Returns the speaker that are enabled. */
   Speaker speaker() const;

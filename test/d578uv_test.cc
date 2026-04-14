@@ -155,7 +155,7 @@ D578UVTest::testMicGain() {
   QCOMPARE(copy.settings()->micLevel(), Level::fromValue(10));
   QVERIFY(copy.settings()->anytoneExtension());
   // FM mic gain enabled only if it differs from DMR gain
-  QVERIFY(! copy.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
+  QVERIFY(! copy.settings()->audio()->fmMicGainEnabled());
 
   QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
   for (auto pair: pairs) {

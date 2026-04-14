@@ -34,7 +34,7 @@ public:
   inline bool isInvalid() const {
     return std::numeric_limits<unsigned int>::max() == _level;
   }
-  /** Test for finite values. */
+  /** Test for finite values. That is, if the value is neither null nor invalid. */
   inline bool isFinite() const { return (!isNull()) && (!isInvalid()); }
 
   inline bool operator ==(const Level &other) const { ///< Comparison.

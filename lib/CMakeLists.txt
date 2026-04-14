@@ -19,7 +19,7 @@ qt_add_library(libdmrconf SHARED
   radiosettings.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
   roamingzone.cc roamingchannel.cc callsigndb.cc talkgroupdatabase.cc radioid.cc transferflags.cc
   encryptionextension.cc commercial_extension.cc smsextension.cc gnsssettings.cc dmrsettings.cc
-  channel_extension.cc bootsettings.cc packetstream.cc
+  channel_extension.cc bootsettings.cc audiosettings.cc packetstream.cc
   satellitedatabase.cc orbitalelementsdatabase.cc transponderdatabase.cc satelliteconfig.cc
   tyt_radio.cc tyt_interface.cc tyt_codeplug.cc tyt_callsigndb.cc tyt_extensions.cc
   md2017.cc md2017_codeplug.cc md2017_callsigndb.cc md2017_filereader.cc md2017_limits.cc
@@ -61,7 +61,7 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   radiosettings.hh contact.hh rxgrouplist.hh channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh
   roamingzone.hh roamingchannel.hh callsigndb.hh talkgroupdatabase.hh radioid.hh transferflags.hh
   encryptionextension.hh commercial_extension.hh smsextension.hh gnsssettings.hh dmrsettings.hh
-  channel_extension.hh bootsettings.hh packetstream.hh
+  channel_extension.hh bootsettings.hh audiosettings.hh packetstream.hh
   satellitedatabase.hh orbitalelementsdatabase.hh transponderdatabase.hh satelliteconfig.hh
   tyt_radio.hh tyt_interface.hh tyt_codeplug.hh tyt_callsigndb.hh tyt_extensions.hh
   md2017.hh md2017_codeplug.hh md2017_callsigndb.hh md2017_filereader.hh md2017_limits.hh
