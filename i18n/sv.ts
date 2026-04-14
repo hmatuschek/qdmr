@@ -439,7 +439,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="301"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="25"/>
@@ -786,7 +786,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="495"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
 </context>
 <context>
@@ -1198,7 +1198,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="731"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
 </context>
 <context>
@@ -2300,7 +2300,7 @@
     <message>
         <location filename="../src/m17contactdialog.ui" line="86"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.cc" line="49"/>
@@ -2633,7 +2633,7 @@
     <message>
         <location filename="../src/mainwindow.cc" line="132"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="145"/>
@@ -2803,7 +2803,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="859"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
 </context>
 <context>
@@ -2957,7 +2957,7 @@
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="88"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
 </context>
 <context>
@@ -3033,7 +3033,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="1016"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
 </context>
 <context>
@@ -3217,7 +3217,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="600"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="597"/>
@@ -3532,7 +3532,7 @@
     <message>
         <location filename="../src/scanlistdialog.ui" line="136"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="24"/>
@@ -3841,11 +3841,6 @@
 <context>
     <name>SquelchEdit</name>
     <message>
-        <location filename="../src/squelchedit.ui" line="20"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>
         <translation type="unfinished">Öppet</translation>
@@ -4084,7 +4079,7 @@ Dvs en samling kanaler för repeatrar inom en viss region. &lt;/p&gt;
     <message>
         <location filename="../src/aprssystemdialog.ui" line="192"/>
         <source>Extensions</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Extensions</translation>
     </message>
 </context>
 <context>

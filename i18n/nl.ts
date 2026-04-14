@@ -391,7 +391,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="163"/>
         <source>Mid</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Middel</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="168"/>
@@ -3833,11 +3833,6 @@
 </context>
 <context>
     <name>SquelchEdit</name>
-    <message>
-        <location filename="../src/squelchedit.ui" line="20"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>

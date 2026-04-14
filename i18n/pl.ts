@@ -401,7 +401,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="173"/>
         <source>Min</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Minimum</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="181"/>
@@ -3833,11 +3833,6 @@
 </context>
 <context>
     <name>SquelchEdit</name>
-    <message>
-        <location filename="../src/squelchedit.ui" line="20"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>

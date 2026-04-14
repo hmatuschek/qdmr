@@ -3838,11 +3838,6 @@
 <context>
     <name>SquelchEdit</name>
     <message>
-        <location filename="../src/squelchedit.ui" line="20"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>
         <translation type="unfinished">Open</translation>
