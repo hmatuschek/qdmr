@@ -1220,6 +1220,24 @@
     </message>
 </context>
 <context>
+    <name>DMRAdmitSelect</name>
+    <message>
+        <location filename="../src/admitselect.cc" line="35"/>
+        <source>Always</source>
+        <translation type="unfinished">Alltid</translation>
+    </message>
+    <message>
+        <location filename="../src/admitselect.cc" line="36"/>
+        <source>Channel Free</source>
+        <translation type="unfinished">Kanal Tillgänglig</translation>
+    </message>
+    <message>
+        <location filename="../src/admitselect.cc" line="37"/>
+        <source>Other Color-code</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DMRChannelDialog</name>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="36"/>
