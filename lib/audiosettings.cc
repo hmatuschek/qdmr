@@ -3,7 +3,7 @@
 
 AudioSettings::AudioSettings(QObject *parent)
   : ConfigExtension(parent), _fmMicGain(Level::null()), _m17MicGain(Level::null()),
-    _satMicGain(Level::null())
+    _satMicGain(Level::null()), _voxDelay(Interval::null())
 {
   // pass...
 }
@@ -87,3 +87,15 @@ AudioSettings::disableSatMicGain() {
   setSatMicGain(Level::null());
 }
 
+Interval
+AudioSettings::voxDelay() const {
+  return _voxDelay;
+}
+
+void
+AudioSettings::setVOXDelay(Interval voxDelay) {
+  if (_voxDelay == voxDelay)
+    return;
+  _voxDelay = voxDelay;
+  emit modified(this);
+}

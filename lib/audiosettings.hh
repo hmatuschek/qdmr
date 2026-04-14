@@ -3,6 +3,8 @@
 
 #include "configobject.hh"
 #include "level.hh"
+#include "interval.hh"
+
 
 /** Collects common audio and tone settings */
 class AudioSettings: public ConfigExtension
@@ -20,6 +22,8 @@ class AudioSettings: public ConfigExtension
   Q_CLASSINFO("satMicGainDescription", "Specifies the FM microphone gain for satellite operation.")
   Q_CLASSINFO("satMicGainLongDescription", "If set to null or invalid, the global default (DMR) mic gain is used.")
   Q_PROPERTY(Level satMicGain READ satMicGain WRITE setSatMicGain)
+
+  Q_PROPERTY(Interval voxDelay READ voxDelay WRITE setVOXDelay)
 
 public:
   /** Default constructor. */
@@ -55,6 +59,11 @@ public:
   /** Disables FM mic gain for sat operation. */
   void disableSatMicGain();
 
+  /** Returns the VOX delay. */
+  Interval voxDelay() const;
+  /** Sets the VOX delay. */
+  void setVOXDelay(Interval ms);
+
 protected:
   /** The FM mic gain. */
   Level _fmMicGain;
@@ -62,6 +71,8 @@ protected:
   Level _m17MicGain;
   /** The FM mic gain for satellite operation. */
   Level _satMicGain;
+  /** Specifies the VOX delay. */
+  Interval _voxDelay;
 };
 
 

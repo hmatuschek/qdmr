@@ -1202,6 +1202,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
   // Set default VOX sensitivity
   setVOXLevel(ctx.config()->settings()->vox());
+  setVOXDelay(ctx.config()->settings()->audio()->voxDelay());
 
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -1220,7 +1221,6 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
   // Encode audio settings
-  setVOXDelay(ext->audioSettings()->voxDelay());
   setVOXSource(ext->audioSettings()->voxSource());
   setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
 
@@ -1242,6 +1242,7 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
     return false;
 
   ctx.config()->settings()->setVOX(voxLevel());
+  ctx.config()->settings()->audio()->setVOXDelay(voxDelay());
 
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
@@ -1265,7 +1266,6 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   ext->toneSettings()->setKeyToneLevel(keyToneLevel());
 
   // Decode audio settings
-  ext->audioSettings()->setVOXDelay(voxDelay());
   ext->audioSettings()->setVOXSource(voxSource());
   ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
 

@@ -1877,7 +1877,7 @@ public:
     virtual Level voxLevel() const;
     /** Sets the VOX level. */
     virtual void setVOXLevel(Level voxLevel);
-    /** Retruns the VOX delay. */
+    /** Returns the VOX delay. */
     virtual Interval voxDelay() const;
     /** Sets the VOX delay. */
     virtual void setVoxDelay(Interval delay);

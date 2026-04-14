@@ -226,7 +226,7 @@ public:
   /** Returns the squelch level [1,10]. */
   Level squelch() const;
   /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
-    bool setSquelch(Level squelch);
+  bool setSquelch(Level squelch);
   /** Disables the quelch. */
   void disableSquelch();
   /** Sets the squelch to the global default value. */

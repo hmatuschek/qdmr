@@ -495,9 +495,15 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   // Apply settings
   ctx.config()->settings()->setIntroLine1(bootTextLine1());
   ctx.config()->settings()->setIntroLine2(bootTextLine2());
+  // Audio settings
   ctx.config()->settings()->setMicLevel(dmrMicGain());
+  if (dmrMicGain() == fmMicGain())
+    ctx.config()->settings()->audio()->disableFMMicGain();
+  else
+    ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
   ctx.config()->settings()->setSquelch(squelch());
   ctx.config()->settings()->setVOX(vox());
+
   if (! totIsSet())
     ctx.config()->settings()->disableTOT();
   else
@@ -530,7 +536,6 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ext->buttons()->setFuncKey2Short(keyFunctionShortPressP2());
   ext->buttons()->setFuncKey2Long(keyFunctionLongPressP2());
 
-  ext->tone()->setFMMicGain(fmMicGain());
   ext->tone()->enableKeyTone(keyToneEnabled());
   ext->tone()->setKeyToneVolume(keyToneVolume());
   ext->tone()->enableLowBatteryWarn(lowBatteryToneEnabled());
@@ -560,10 +565,14 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   // Apply settings
   setBootTextLine1(ctx.config()->settings()->introLine1());
   setBootTextLine2(ctx.config()->settings()->introLine2());
+
   setDMRMicGain(ctx.config()->settings()->micLevel());
   setFMMicGain(ctx.config()->settings()->micLevel());
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
   setSquelch(ctx.config()->settings()->squelch());
   setVOX(ctx.config()->settings()->vox());
+
   if (ctx.config()->settings()->totDisabled())
     clearTOT();
   else
@@ -600,7 +609,6 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setKeyFunctionShortPressP2(ext->buttons()->funcKey2Short());
   setKeyFunctionLongPressP2(ext->buttons()->funcKey2Long());
 
-  setFMMicGain(ext->tone()->fmMicGain());
   enableKeyTone(ext->tone()->keyTone());
   setKeyToneVolume(ext->tone()->keyToneVolume());
   enableLowBatteryTone(ext->tone()->lowBatteryWarn());

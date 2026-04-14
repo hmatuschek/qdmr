@@ -815,8 +815,6 @@ class AnytoneAudioSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  /** The VOX delay in ms. */
-  Q_PROPERTY(Interval voxDelay READ voxDelay WRITE setVOXDelay)
   /** The VOX source. */
   Q_PROPERTY(VoxSource voxSource READ voxSource WRITE setVOXSource)
 
@@ -871,11 +869,6 @@ public:
   explicit AnytoneAudioSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-
-  /** Returns the VOX delay in ms. */
-  Interval voxDelay() const;
-  /** Sets the VOX delay in ms. */
-  void setVOXDelay(Interval ms);
 
   /** Returns the VOX source. */
   VoxSource voxSource() const;

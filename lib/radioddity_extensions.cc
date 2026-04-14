@@ -112,7 +112,7 @@ RadioddityToneSettingsExtension::RadioddityToneSettingsExtension(QObject *parent
   _lowBatteryWarnVolume(5), _callAlertDuration(Interval::fromSeconds(120)), _resetTone(false),
   _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _digitalTalkPermitTone(false),
   _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
-  _disableAllTones(false), _txExitTone(false), _keyTone(false), _keyToneVolume(5), _fmMicGain(Level::fromValue(5))
+  _disableAllTones(false), _txExitTone(false), _keyTone(false), _keyToneVolume(5)
 {
   // pass...
 }
@@ -309,17 +309,6 @@ RadioddityToneSettingsExtension::setKeyToneVolume(unsigned int volume) {
   emit modified(this);
 }
 
-Level
-RadioddityToneSettingsExtension::fmMicGain() const {
-  return _fmMicGain;
-}
-void
-RadioddityToneSettingsExtension::setFMMicGain(Level gain) {
-  if (gain == _fmMicGain)
-    return;
-  _fmMicGain = gain;
-  emit modified(this);
-}
 
 
 /* ********************************************************************************************* *

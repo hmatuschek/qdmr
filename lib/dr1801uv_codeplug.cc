@@ -1271,6 +1271,7 @@ DR1801UVCodeplug::SettingsElement::setPowerSaveMode(PowerSaveMode mode) {
   setUInt8(Offset::powerSaveMode(), (uint8_t) mode);
 }
 
+
 Level
 DR1801UVCodeplug::SettingsElement::voxSensitivity() const {
   if (0x00 == getUInt8(Offset::voxEnabled())) {
@@ -1278,6 +1279,7 @@ DR1801UVCodeplug::SettingsElement::voxSensitivity() const {
   }
   return Level::fromValue(getUInt8(Offset::voxSensitivity()), Limit::vox());
 }
+
 void
 DR1801UVCodeplug::SettingsElement::setVOXSensitivity(Level sens) {
   if (sens.isNull()) {
@@ -1287,14 +1289,20 @@ DR1801UVCodeplug::SettingsElement::setVOXSensitivity(Level sens) {
     setUInt8(Offset::voxSensitivity(), sens.mapTo(Limit::vox()));
   }
 }
-unsigned int
+
+
+Interval
 DR1801UVCodeplug::SettingsElement::voxDelay() const {
-  return getUInt8(Offset::voxDelay())*500;
+  return Interval::fromMilliseconds(getUInt8(Offset::voxDelay())*500);
 }
+
 void
-DR1801UVCodeplug::SettingsElement::setVOXDelay(unsigned int ms) {
-  setUInt8(Offset::voxDelay(), ms/500);
+DR1801UVCodeplug::SettingsElement::setVOXDelay(Interval delay) {
+  if (! delay.isFinite())
+    setUInt8(Offset::voxDelay(), 0);
+  setUInt8(Offset::voxDelay(), delay.milliseconds()/500);
 }
+
 
 bool
 DR1801UVCodeplug::SettingsElement::encryptionEnabled() const {
@@ -1627,6 +1635,7 @@ DR1801UVCodeplug::SettingsElement::decode(Config *config, const ErrorStack &err)
 
   // Handle VOX settings.
   config->settings()->setVOX(voxSensitivity());
+  config->settings()->audio()->setVOXDelay(voxDelay());
 
   // Handle boot settings
   config->settings()->boot()->setBootDisplay(bootScreen());
@@ -1650,6 +1659,7 @@ DR1801UVCodeplug::SettingsElement::encode(Config *config, const ErrorStack &err)
   setDMRID(id->number());
 
   setVOXSensitivity(config->settings()->vox());
+  setVOXDelay(config->settings()->audio()->voxDelay());
 
   // Encode boot settings
   setBootScreen(config->settings()->boot()->bootDisplay());

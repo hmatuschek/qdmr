@@ -3319,13 +3319,18 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
   ctx.config()->settings()->setIntroLine2(bootMessage2());
   ctx.config()->settings()->boot()->enableReset(mcuResetEnabled());
 
+  // Audio settings
+  ctx.config()->settings()->setMicLevel(dmrMicLevel());
+  if (dmrMicLevel() != fmMicLevel())
+    ctx.config()->settings()->audio()->setFMMicGain(fmMicLevel());
+  ctx.config()->settings()->audio()->setVOXDelay(voxDelay());
   ctx.config()->settings()->enableSpeech(voicePromptEnabled());
   ctx.config()->settings()->setVOX(voxLevel());
+
   if (transmitTimeout().isInfinite())
     ctx.config()->settings()->disableTOT();
   else
     ctx.config()->settings()->setTOT(transmitTimeout());
-  ctx.config()->settings()->setMicLevel(std::max(fmMicLevel(), dmrMicLevel()));
   ctx.config()->smsExtension()->setFormat(smsFormat());
 
   ctx.config()->settings()->gnss()->setSystems(gnss());
@@ -3351,11 +3356,20 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
   setBootMessage2(ctx.config()->settings()->introLine2());
   enableMCUReset(ctx.config()->settings()->boot()->resetEnabled());
 
+  // audio settings
+  setDMRMicLevel(ctx.config()->settings()->micLevel());
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFMMicLevel(ctx.config()->settings()->audio()->fmMicGain());
+  else
+    setFMMicLevel(ctx.config()->settings()->micLevel());
+
   enableVoicePrompt(ctx.config()->settings()->speech());
   if (ctx.config()->settings()->voxDisabled())
     setVOXLevel(Level::null());
   else
     setVOXLevel(ctx.config()->settings()->vox());
+  setVoxDelay(ctx.config()->settings()->audio()->voxDelay());
+
   if (ctx.config()->settings()->totDisabled())
     setTransmitTimeout(Interval::infinity());
   else

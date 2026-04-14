@@ -1832,18 +1832,6 @@ AnytoneAudioSettingsExtension::clone() const {
   return ext;
 }
 
-Interval
-AnytoneAudioSettingsExtension::voxDelay() const {
-  return _voxDelay;
-}
-void
-AnytoneAudioSettingsExtension::setVOXDelay(Interval ms) {
-  if (_voxDelay == ms)
-    return;
-  _voxDelay = ms;
-  emit modified(this);
-}
-
 bool
 AnytoneAudioSettingsExtension::recordingEnabled() const {
   return _recording;

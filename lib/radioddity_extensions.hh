@@ -129,8 +129,6 @@ class RadioddityToneSettingsExtension: public ConfigItem
   Q_PROPERTY(bool allTonesDisabled READ allTonesDisabled WRITE disableAllTones)
   /** If @c true, the TX exit tone is enabled. */
   Q_PROPERTY(bool txExitTone READ txExitTone WRITE enableTXExitTone)
-  /** Sets the FM mic gain (GD-73 only). */
-  Q_PROPERTY(Level fmMicGain READ fmMicGain WRITE setFMMicGain);
 
 public:
   /** Possible ARTS tone settings. */
@@ -218,11 +216,6 @@ public:
   /** Enables/disables TX exit tone. */
   void enableTXExitTone(bool enable);
 
-  /** Returns the FM mic gain [1,10]. */
-  Level fmMicGain() const;
-  /** Sets the FM mic gain [1,10]. */
-  void setFMMicGain(Level gain);
-
 protected:
   /** If @c true, a low-battery charge is indicated by a warning. */
   bool _lowBatteryWarn;
@@ -254,8 +247,6 @@ protected:
   bool _keyTone;
   /** Holds the key-tone volume [1,10]. */
   unsigned int _keyToneVolume;
-  /** The FM mic gain. */
-  Level _fmMicGain;
 };
 
 /** Represents the boot settings for Radioddity devices.
