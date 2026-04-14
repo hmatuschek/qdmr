@@ -107,6 +107,42 @@ public:
     };
   };
 
+  /** Represents a set of up to 8 fixed location names. The locations are stored in the
+   * APRSSettingsElement. */
+  class FixedLocationNamesElement: public Element
+  {
+  public:
+    /** Constructor. */
+    explicit FixedLocationNamesElement(uint8_t *ptr);
+
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x0090; }
+
+    void clear() override;
+
+    /** Returns the n-th name. */
+    virtual QString name(unsigned int n) const;
+    /** Sets the n-th name. */
+    virtual void setName(unsigned int n, const QString &name);
+
+  public:
+    /** Some limits. */
+    struct Limit: public D878UVCodeplug::Limit {
+      /// Number of names.
+      static constexpr unsigned int nameCount() { return 8; }
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: D878UVCodeplug::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int names() { return 0x0003; }
+      static constexpr unsigned int betweenNames() { return Limit::nameLength() + 1; }
+      /// @endcond
+    };
+  };
+
 protected:
   /** Hidden constructor. */
   explicit D168UVCodeplug(const QString &label, QObject *parent = nullptr);
@@ -116,6 +152,8 @@ public:
   explicit D168UVCodeplug(QObject *parent = nullptr);
 
 protected:
+  void allocateUpdated() override;
+
   bool encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) override;
   bool createChannels(Context &ctx, const ErrorStack &err) override;
   bool linkChannels(Context &ctx, const ErrorStack &err) override;
@@ -128,7 +166,9 @@ protected:
   /** Internal used offsets within the codeplug. */
   struct Offset: public D878UVCodeplug::Offset {
     /// @cond DO_NOT_DOCUMENT
-
+    static constexpr unsigned int fixedLocationNames() { return 0x02504800; }
+    static constexpr unsigned int unknown_25c2000()    { return 0x025c2000; }
+    static constexpr unsigned int unknown_25c2c80()    { return 0x025c2c80; }
     /// @endcond
   };
 };
