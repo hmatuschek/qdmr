@@ -342,7 +342,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="14"/>
         <source>Edit Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit Channel</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="23"/>
@@ -372,7 +372,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="85"/>
         <source>Tx Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Tx Offset</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="137"/>
@@ -1077,12 +1077,12 @@
     <message>
         <location filename="../src/contactlistview.ui" line="60"/>
         <source>Add M17 Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Add M17 Contact</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="63"/>
         <source>Adds an M17 contact to the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Adds an M17 contact to the list.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="68"/>
@@ -1092,17 +1092,17 @@
     <message>
         <location filename="../src/contactlistview.ui" line="71"/>
         <source>Adds an DTMF (analog) contact to the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Adds a DTMF (analog) contact to the list.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="76"/>
         <source>Add DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Add DMR Contact</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="79"/>
         <source>Adds an DMR contact to the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Adds a DMR contact to the list.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
@@ -1169,12 +1169,12 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="698"/>
         <source>M17</source>
-        <translation type="unfinished"></translation>
+        <translation>M17</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="703"/>
         <source>[Broadcast]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Broadcast]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="723"/>
@@ -1217,7 +1217,7 @@
     <message>
         <location filename="../src/admitselect.cc" line="37"/>
         <source>Other Color-code</source>
-        <translation type="unfinished"></translation>
+        <translation>Other Color-code</translation>
     </message>
 </context>
 <context>
@@ -1225,7 +1225,7 @@
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="36"/>
         <source>Radio Id</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio Id</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="38"/>
@@ -1235,17 +1235,17 @@
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="40"/>
         <source>Color-code</source>
-        <translation type="unfinished"></translation>
+        <translation>Color-code</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="43"/>
         <source>Time-slot</source>
-        <translation type="unfinished"></translation>
+        <translation>Time-slot</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="45"/>
         <source>Group list</source>
-        <translation type="unfinished"></translation>
+        <translation>Group list</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="47"/>
@@ -1928,7 +1928,7 @@
     <message>
         <location filename="../src/admitselect.cc" line="11"/>
         <source>Other Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Other Tone</translation>
     </message>
 </context>
 <context>
@@ -2214,22 +2214,22 @@
     <message>
         <location filename="../src/m17channeldialog.cc" line="47"/>
         <source>Channel mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Channel mode</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="49"/>
         <source>Access number</source>
-        <translation type="unfinished"></translation>
+        <translation>Access number</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="52"/>
         <source>Tx contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Tx contact</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="54"/>
         <source>Send position</source>
-        <translation type="unfinished"></translation>
+        <translation>Send position</translation>
     </message>
 </context>
 <context>
@@ -2237,17 +2237,17 @@
     <message>
         <location filename="../src/m17channeldialog.cc" line="15"/>
         <source>Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>Voice</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="16"/>
         <source>Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Data</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="17"/>
         <source>Voice + Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Voice + Data</translation>
     </message>
 </context>
 <context>
@@ -2256,7 +2256,7 @@
         <location filename="../src/m17contactdialog.ui" line="14"/>
         <location filename="../src/m17contactdialog.cc" line="43"/>
         <source>Edit M17 Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Edit M17 Contact</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="24"/>
@@ -2271,17 +2271,17 @@
     <message>
         <location filename="../src/m17contactdialog.ui" line="37"/>
         <source>The name of the contact.</source>
-        <translation type="unfinished"></translation>
+        <translation>The name of the contact.</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="44"/>
         <source>Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Call</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="51"/>
         <source>The callsign of the contact. Must be not longer than 9 chars, A-Z, 0-9, ., /, -.</source>
-        <translation type="unfinished"></translation>
+        <translation>The call-sign of the contact. Must not be longer than 9 chars, A-Z, 0-9, ., /, -.</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="58"/>
@@ -2291,12 +2291,12 @@
     <message>
         <location filename="../src/m17contactdialog.ui" line="68"/>
         <source>Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Broadcast</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="75"/>
         <source>Sets this contact to be the M17 broadcast contact, the specified call is then ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sets this contact to be the M17 broadcast contact, the specified call is then ignored.</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="86"/>
@@ -2306,7 +2306,7 @@
     <message>
         <location filename="../src/m17contactdialog.cc" line="49"/>
         <source>Create M17 Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Create M17 Contact</translation>
     </message>
 </context>
 <context>
@@ -3838,11 +3838,6 @@
 <context>
     <name>SquelchEdit</name>
     <message>
-        <location filename="../src/squelchedit.ui" line="20"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>
         <translation type="unfinished">Open</translation>
@@ -3850,7 +3845,7 @@
     <message>
         <location filename="../src/squelchedit.ui" line="45"/>
         <source>Uses the global squelch setting if enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uses the global squelch setting if enabled.</translation>
     </message>
     <message>
         <location filename="../src/squelchedit.ui" line="48"/>
@@ -3863,12 +3858,12 @@
     <message>
         <location filename="../src/timeslotselect.cc" line="6"/>
         <source>Slot 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Slot 1</translation>
     </message>
     <message>
         <location filename="../src/timeslotselect.cc" line="7"/>
         <source>Slot 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Slot 2</translation>
     </message>
 </context>
 <context>

@@ -14,7 +14,7 @@
     <message>
         <location filename="../src/aprsselect.cc" line="44"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
 </context>
 <context>
@@ -342,7 +342,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="14"/>
         <source>Edit Channel</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal bearbeiten</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="23"/>
@@ -425,7 +425,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="227"/>
         <source>VOX Level</source>
-        <translation type="unfinished"></translation>
+        <translation>VOX Empfindlichkeit</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="261"/>
@@ -460,7 +460,7 @@
     <message>
         <location filename="../src/channeldialog.cc" line="50"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
 </context>
 <context>
@@ -1077,12 +1077,12 @@
     <message>
         <location filename="../src/contactlistview.ui" line="60"/>
         <source>Add M17 Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>M17 Kanal hinzufügen</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="63"/>
         <source>Adds an M17 contact to the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Füg einen M17 Kanal zur Liste hinzu.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="68"/>
@@ -1092,17 +1092,17 @@
     <message>
         <location filename="../src/contactlistview.ui" line="71"/>
         <source>Adds an DTMF (analog) contact to the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fügt einen DTMF (analog) Kontakt zur Liste hinzu.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="76"/>
         <source>Add DMR Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR Kontakt hinzufügen</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="79"/>
         <source>Adds an DMR contact to the list.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fügt einen DMR Kontakt zur Liste hinzu.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
@@ -1169,12 +1169,12 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="698"/>
         <source>M17</source>
-        <translation type="unfinished"></translation>
+        <translation>M17</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="703"/>
         <source>[Broadcast]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Rundruf]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="723"/>
@@ -1217,7 +1217,7 @@
     <message>
         <location filename="../src/admitselect.cc" line="37"/>
         <source>Other Color-code</source>
-        <translation type="unfinished"></translation>
+        <translation>Abweichender Farbcode</translation>
     </message>
 </context>
 <context>
@@ -1225,27 +1225,27 @@
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="36"/>
         <source>Radio Id</source>
-        <translation type="unfinished"></translation>
+        <translation>Radio Id</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="38"/>
         <source>Tx Admit</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Voraussetzung</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="40"/>
         <source>Color-code</source>
-        <translation type="unfinished"></translation>
+        <translation>Farbcode</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="43"/>
         <source>Time-slot</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitschlitz</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="45"/>
         <source>Group list</source>
-        <translation type="unfinished"></translation>
+        <translation>Empfangsgruppe</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="47"/>
@@ -1326,7 +1326,7 @@
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="181"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
 </context>
 <context>
@@ -1467,7 +1467,7 @@
     <message>
         <location filename="../src/aprsselect.cc" line="11"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
 </context>
 <context>
@@ -1928,7 +1928,7 @@
     <message>
         <location filename="../src/admitselect.cc" line="11"/>
         <source>Other Tone</source>
-        <translation type="unfinished"></translation>
+        <translation>Abweichender Subton</translation>
     </message>
 </context>
 <context>
@@ -1941,7 +1941,7 @@
     <message>
         <location filename="../src/fmchanneldialog.cc" line="34"/>
         <source>Tx Admit</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Voraussetzung</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="36"/>
@@ -2214,22 +2214,22 @@
     <message>
         <location filename="../src/m17channeldialog.cc" line="47"/>
         <source>Channel mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanalmodus</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="49"/>
         <source>Access number</source>
-        <translation type="unfinished"></translation>
+        <translation>Zugriffsnummer</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="52"/>
         <source>Tx contact</source>
-        <translation type="unfinished"></translation>
+        <translation>TX Kontakt</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="54"/>
         <source>Send position</source>
-        <translation type="unfinished"></translation>
+        <translation>Position senden</translation>
     </message>
 </context>
 <context>
@@ -2237,17 +2237,17 @@
     <message>
         <location filename="../src/m17channeldialog.cc" line="15"/>
         <source>Voice</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprache</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="16"/>
         <source>Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Daten</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="17"/>
         <source>Voice + Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprache &amp; Daten</translation>
     </message>
 </context>
 <context>
@@ -2256,7 +2256,7 @@
         <location filename="../src/m17contactdialog.ui" line="14"/>
         <location filename="../src/m17contactdialog.cc" line="43"/>
         <source>Edit M17 Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>M17 Kontakt bearbeiten</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="24"/>
@@ -2271,17 +2271,17 @@
     <message>
         <location filename="../src/m17contactdialog.ui" line="37"/>
         <source>The name of the contact.</source>
-        <translation type="unfinished"></translation>
+        <translation>Der Name des Kontakts.</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="44"/>
         <source>Call</source>
-        <translation type="unfinished"></translation>
+        <translation>Rufzeichen</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="51"/>
         <source>The callsign of the contact. Must be not longer than 9 chars, A-Z, 0-9, ., /, -.</source>
-        <translation type="unfinished"></translation>
+        <translation>Das Rufzeichen des Kontakts. Darf nicht länger als 9 Zeichen sein und nur aus A-Z, 0-9, ., / und - bestehen.</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="58"/>
@@ -2291,12 +2291,12 @@
     <message>
         <location filename="../src/m17contactdialog.ui" line="68"/>
         <source>Broadcast</source>
-        <translation type="unfinished"></translation>
+        <translation>Rundruf</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="75"/>
         <source>Sets this contact to be the M17 broadcast contact, the specified call is then ignored.</source>
-        <translation type="unfinished"></translation>
+        <translation>Setz diesen Kontakt als Rundrufkontakt, das gesetzte Rufzeichen wird dann ignoriert.</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="86"/>
@@ -2306,7 +2306,7 @@
     <message>
         <location filename="../src/m17contactdialog.cc" line="49"/>
         <source>Create M17 Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>Einen M17 Kontakt hinzufügen</translation>
     </message>
 </context>
 <context>
@@ -2314,7 +2314,7 @@
     <message>
         <location filename="../src/m17contactdialog.cc" line="94"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
 </context>
 <context>
@@ -3387,7 +3387,7 @@
     <message>
         <location filename="../src/roamingzonedialog.cc" line="121"/>
         <source>[None]</source>
-        <translation type="unfinished"></translation>
+        <translation>[Kein]</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.cc" line="122"/>
@@ -3838,11 +3838,6 @@
 <context>
     <name>SquelchEdit</name>
     <message>
-        <location filename="../src/squelchedit.ui" line="20"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>
         <translation type="unfinished">Offen</translation>
@@ -3850,7 +3845,7 @@
     <message>
         <location filename="../src/squelchedit.ui" line="45"/>
         <source>Uses the global squelch setting if enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn ausgewählt, benutzt die globale Rauschsperreneinstellung.</translation>
     </message>
     <message>
         <location filename="../src/squelchedit.ui" line="48"/>
@@ -3863,12 +3858,12 @@
     <message>
         <location filename="../src/timeslotselect.cc" line="6"/>
         <source>Slot 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitschlitz 1</translation>
     </message>
     <message>
         <location filename="../src/timeslotselect.cc" line="7"/>
         <source>Slot 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeitschlitz 2</translation>
     </message>
 </context>
 <context>

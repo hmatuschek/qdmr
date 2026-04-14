@@ -377,7 +377,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="137"/>
         <source>Power</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Puissance</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="153"/>
@@ -397,7 +397,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="168"/>
         <source>Low</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Basse</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="173"/>
@@ -430,7 +430,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="261"/>
         <source>Rx Only</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">RX Uniquement</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="271"/>
@@ -3837,11 +3837,6 @@
 </context>
 <context>
     <name>SquelchEdit</name>
-    <message>
-        <location filename="../src/squelchedit.ui" line="20"/>
-        <source>Form</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>
