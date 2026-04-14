@@ -2,7 +2,7 @@
 
 
 AudioSettings::AudioSettings(QObject *parent)
-  : ConfigExtension(parent), _fmMicGain(Level::null()), _m17MicGain(Level::null()),
+  : ConfigItem(parent), _fmMicGain(Level::null()), _m17MicGain(Level::null()),
     _satMicGain(Level::null()), _voxDelay(Interval::null())
 {
   // pass...

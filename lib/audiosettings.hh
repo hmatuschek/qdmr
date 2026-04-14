@@ -7,22 +7,13 @@
 
 
 /** Collects common audio and tone settings */
-class AudioSettings: public ConfigExtension
+class AudioSettings: public ConfigItem
 {
   Q_OBJECT
 
-  Q_CLASSINFO("fmMicGainDescription", "Specifies the FM microphone gain.")
-  Q_CLASSINFO("fmMicGainLongDescription", "If set to null or invalid, the global default (DMR) mic gain is used.")
   Q_PROPERTY(Level fmMicGain READ fmMicGain WRITE setFMMicGain)
-
-  Q_CLASSINFO("m17MicGainDescription", "Specifies the M17 microphone gain.")
-  Q_CLASSINFO("m17MicGainLongDescription", "If set to null or invalid, the global default (DMR) mic gain is used.")
   Q_PROPERTY(Level m17MicGain READ m17MicGain WRITE setM17MicGain)
-
-  Q_CLASSINFO("satMicGainDescription", "Specifies the FM microphone gain for satellite operation.")
-  Q_CLASSINFO("satMicGainLongDescription", "If set to null or invalid, the global default (DMR) mic gain is used.")
   Q_PROPERTY(Level satMicGain READ satMicGain WRITE setSatMicGain)
-
   Q_PROPERTY(Interval voxDelay READ voxDelay WRITE setVOXDelay)
 
 public:
