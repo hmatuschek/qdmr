@@ -45,10 +45,10 @@
 
 
 
-inline QStringList getLanguages() {
+static QStringList systemLocaleCandidates() {
   QStringList languages = {QLocale::system().name()};
-  if (languages.last().contains("_")) {
-    languages.append(languages.last().split("_").first());
+  if (languages.last().contains(QLatin1Char('_'))) {
+    languages.append(languages.last().split(QLatin1Char('_')).first());
   }
   return languages;
 }
@@ -75,17 +75,14 @@ Application::Application(int &argc, char *argv[])
 
   // handle translations
   _translator = new QTranslator(this);
-  foreach (QString language, getLanguages()) {
-    logDebug() << "Search for translation in ':/i18n/" << language << ".qm'.";
-    if (_translator->load(language, ":/i18n/", "", ".qm")) {
-      this->installTranslator(_translator);
-      logDebug() << "Installed translator for locale '" << QLocale::system().name() << "'.";
-      break;
-    }
+  Settings settings;
+  {
+    const QString langPref =
+        settings.uiLanguage().isEmpty() ? QStringLiteral("system") : settings.uiLanguage();
+    loadLanguage(langPref);
   }
 
-  // load settings
-  Settings settings;
+  // load settings (same Settings instance as above)
   // load databases
   _repeater   = new RepeaterDatabase(this);
   if (settings.repeaterBookSourceEnabled())
@@ -917,3 +914,41 @@ Application::onPaletteChanged(const QPalette &palette) {
 }
 
 
+bool
+Application::loadLanguage(const QString &localeId) {
+  removeTranslator(_translator);
+  bool loaded = false;
+  const bool useSystemLocale =
+      localeId.isEmpty() || localeId == QStringLiteral("system");
+
+  if (! useSystemLocale) {
+    logDebug() << "Try translation ':/i18n/" << localeId << ".qm'.";
+    loaded = _translator->load(localeId, QStringLiteral(":/i18n/"), QString(), QStringLiteral(".qm"));
+    if (! loaded && localeId.contains(QLatin1Char('_'))) {
+      const QString shortTag = localeId.split(QLatin1Char('_')).first();
+      loaded = _translator->load(shortTag, QStringLiteral(":/i18n/"), QString(), QStringLiteral(".qm"));
+    }
+  } else {
+    foreach (const QString &cand, systemLocaleCandidates()) {
+      logDebug() << "Try system translation ':/i18n/" << cand << ".qm'.";
+      loaded = _translator->load(cand, QStringLiteral(":/i18n/"), QString(), QStringLiteral(".qm"));
+      if (loaded)
+        break;
+    }
+  }
+
+  if (! loaded) {
+    logDebug() << "Fallback to ':/i18n/en_US.qm'.";
+    loaded = _translator->load(QStringLiteral("en_US"), QStringLiteral(":/i18n/"), QString(),
+                               QStringLiteral(".qm"));
+  }
+
+  if (loaded) {
+    installTranslator(_translator);
+    logDebug() << "Installed translator for UI language preference '" << localeId << "'.";
+  } else {
+    logError() << "Failed to load any translation.";
+  }
+
+  return loaded;
+}

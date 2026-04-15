@@ -109,9 +109,15 @@
     <addaction name="actionRefreshOrbitalElements"/>
     <addaction name="actionEditSatellites"/>
    </widget>
+   <widget class="QMenu" name="menuLanguage">
+    <property name="title">
+     <string>Language</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuDevice"/>
    <addaction name="menuDatabases"/>
+   <addaction name="menuLanguage"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">

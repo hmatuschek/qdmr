@@ -97,6 +97,10 @@ public:
   bool showDisclaimer() const;
   void setShowDisclaimer(bool show);
 
+  /// Application UI language: `"system"` or a locale tag matching `i18n/*.qm` (e.g. `en_US`, `de`, `ru_RU`).
+  QString uiLanguage() const;
+  void setUiLanguage(const QString &localeId);
+
   ConfigMergeVisitor::ItemStrategy configMergeItemStrategy() const;
   void setConfigMergeItemStrategy(ConfigMergeVisitor::ItemStrategy strategy);
 

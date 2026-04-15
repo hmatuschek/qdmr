@@ -1,5 +1,6 @@
 #include "mainwindow.hh"
 #include "ui_mainwindow.h"
+#include <QActionGroup>
 #include <QProgressBar>
 #include <QCloseEvent>
 #include <QMessageBox>
@@ -26,7 +27,7 @@
 
 
 MainWindow::MainWindow(Config *config, QWidget *parent)
-  : QMainWindow(parent), ui(new Ui::MainWindow)
+  : QMainWindow(parent), ui(new Ui::MainWindow), _languageGroup(nullptr)
 {
   ui->setupUi(this);
   Application *app = qobject_cast<Application*>(QApplication::instance());
@@ -102,6 +103,45 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   connect(ui->actionUpload, SIGNAL(triggered()), app, SLOT(uploadCodeplug()));
   connect(ui->actionWriteSatellites, SIGNAL(triggered()), app, SLOT(uploadSatellites()));
 
+  _languageGroup = new QActionGroup(this);
+  _languageGroup->setExclusive(true);
+  ui->menuLanguage->clear();
+  // Locale ids match basenames of i18n/*.ts shipped as :/i18n/*.qm
+  static const struct {
+    const char *id;
+    const char *label;
+  } kUiLanguages[] = {
+      {"system", QT_TR_NOOP("System default")},
+      {"de", QT_TR_NOOP("German")},
+      {"en_US", QT_TR_NOOP("English")},
+      {"fr", QT_TR_NOOP("French")},
+      {"it", QT_TR_NOOP("Italian")},
+      {"nl", QT_TR_NOOP("Dutch")},
+      {"pl", QT_TR_NOOP("Polish")},
+      {"pt_BR", QT_TR_NOOP("Portuguese (Brazil)")},
+      {"ru_RU", QT_TR_NOOP("Russian")},
+      {"sv", QT_TR_NOOP("Swedish")},
+  };
+  for (const auto &entry : kUiLanguages) {
+    const QString id = QString::fromLatin1(entry.id);
+    QAction *a = ui->menuLanguage->addAction(tr(entry.label));
+    a->setCheckable(true);
+    a->setData(id);
+    _languageGroup->addAction(a);
+    QObject::connect(a, &QAction::triggered, this, [this, id]() {
+      const QString before =
+          Settings().uiLanguage().isEmpty() ? QStringLiteral("system") : Settings().uiLanguage();
+      Settings().setUiLanguage(id);
+      updateLanguageMenuChecks();
+      if (before != id) {
+        QMessageBox::information(
+              this, tr("Language"),
+              tr("The language will be applied fully after you restart the application."));
+      }
+    });
+  }
+  updateLanguageMenuChecks();
+
   // Wire-up "General Settings" view
   _generalSettings = new GeneralSettingsView(config);
   ui->tabs->addTab(_generalSettings, tr("Settings"));
@@ -136,6 +176,21 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   connect(config, &ConfigItem::modified, [this, config]() {
     this->setWindowModified(config->isModified());
   });
+}
+
+
+void
+MainWindow::updateLanguageMenuChecks() {
+  const QString sel =
+      Settings().uiLanguage().isEmpty() ? QStringLiteral("system") : Settings().uiLanguage();
+  for (QAction *a : _languageGroup->actions()) {
+    if (a->data().toString() == sel) {
+      a->setChecked(true);
+      return;
+    }
+  }
+  if (!_languageGroup->actions().isEmpty())
+    _languageGroup->actions().first()->setChecked(true);
 }
 
 
