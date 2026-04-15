@@ -827,11 +827,6 @@ class AnytoneAudioSettingsExtension: public ConfigItem
   /** The mute delay in minutes. */
   Q_PROPERTY(Interval muteDelay READ muteDelay WRITE setMuteDelay)
 
-  /** The maximum volume setting [0-10]. */
-  Q_PROPERTY(unsigned int maxVolume READ maxVolume WRITE setMaxVolume)
-  /** The maximum head-phone volume setting [0-10]. */
-  Q_PROPERTY(unsigned int maxHeadPhoneVolume READ maxHeadPhoneVolume WRITE setMaxHeadPhoneVolume)
-
   /** The enables speakers. */
   Q_PROPERTY(Speaker speaker READ speaker WRITE setSpeaker)
   /** The source for the handset speaker. */
@@ -880,15 +875,6 @@ public:
   /** Enables/disables recording. */
   void enableRecording(bool enable);
 
-  /** Returns the maximum volume setting [0-10]. */
-  unsigned int maxVolume() const;
-  /** Sets the maximum volume. */
-  void setMaxVolume(unsigned int vol);
-  /** Returns the maximum head-phone volume setting [0-10]. */
-  unsigned int maxHeadPhoneVolume() const;
-  /** Sets the maximum head-phone volume. */
-  void setMaxHeadPhoneVolume(unsigned int vol);
-
   /** Returns @c true if the audio is "enhanced". */
   bool enhanceAudioEnabled() const;
   /** Enables/disables enhanced audio. */
@@ -918,11 +904,8 @@ protected:
   Interval _voxDelay;               ///< VOX delay in ms.
   bool _recording;                  ///< Recording enabled.
   VoxSource _voxSource;             ///< The VOX source.
-  unsigned int _maxVolume;          ///< The maximum volume.
-  unsigned int _maxHeadPhoneVolume; ///< The maximum head-phone volume.
   bool _enhanceAudio;               ///< Enhance audio.
   Interval _muteDelay;              ///< Mute delay in minutes.
-  Level _analogMicGain;             ///< The FM mic gain.
   Speaker _speaker;                 ///< Specifies which speaker are enabled.
   HandsetSpeakerSource _handsetSpeaker; ///< Specifies the handset speaker source.
   HandsetType _handsetType;         ///< Handset type.

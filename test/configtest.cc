@@ -185,12 +185,12 @@ ConfigTest::testGNSSSettings() {
 void
 ConfigTest::testAudioSettings() {
   Config config; config.readYAML(":/data/audio_settings_extension.yaml");
-  QCOMPARE(config.settings()->micLevel(), Level::fromValue(3));
+  QCOMPARE(config.settings()->audio()->micGain(), Level::fromValue(3));
   QCOMPARE(config.settings()->audio()->fmMicGain(), Level::fromValue(6));
 
   Config copyConfig;
   QVERIFY(copyConfig.copy(config));
-  QCOMPARE(copyConfig.settings()->micLevel(), config.settings()->micLevel());
+  QCOMPARE(copyConfig.settings()->audio()->micGain(), config.settings()->audio()->micGain());
   QCOMPARE(copyConfig.settings()->audio()->fmMicGain(), config.settings()->audio()->fmMicGain());
 }
 

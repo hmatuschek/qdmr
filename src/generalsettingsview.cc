@@ -27,31 +27,52 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
     this->_config->settings()->setIntroLine1(ui->introLine2->text().simplified());
   });
 
+  connect(ui->squelch, &QSpinBox::valueChanged, [this](int value) {
+    this->_config->settings()->audio()->setSquelch(Level::fromValue(value));
+    if (this->ui->dmrSquelchDefault->isChecked())
+      this->ui->dmrSquelch->setValue(value);
+  });
+  connect(ui->dmrSquelch, &QSpinBox::valueChanged, [this](int value) {
+    if (! this->ui->dmrSquelchDefault->isChecked())
+      this->_config->settings()->audio()->setDMRSquelch(Level::fromValue(value));
+  });
+  connect(ui->dmrSquelchDefault, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
+    if (Qt::CheckState::Checked == state) {
+      this->_config->settings()->audio()->disableDMRSquelch();
+      this->ui->dmrSquelch->setEnabled(false);
+    } else {
+      this->_config->settings()->audio()->setDMRSquelch(Level::fromValue(this->ui->dmrSquelch->value()));
+      this->ui->dmrSquelch->setEnabled(true);
+    }
+  });
   connect(ui->mic, &QSpinBox::valueChanged, [this](int value) {
-    this->_config->settings()->setMicLevel(Level::fromValue(value));
+    this->_config->settings()->audio()->setMicGain(Level::fromValue(value));
   });
   connect(ui->fmMicGain, &QSpinBox::valueChanged, [this] (int value) {
     this->_config->settings()->audio()->setFMMicGain(Level::fromValue(value));
   });
   connect(ui->voxValue, &QSpinBox::valueChanged, [this](int value) {
     if (0 == value)
-      this->_config->settings()->disableVOX();
+      this->_config->settings()->audio()->disableVox();
     else
-      this->_config->settings()->setVOX(Level::fromValue(value));
+      this->_config->settings()->audio()->setVox(Level::fromValue(value));
   });
   connect(ui->voxDelay, &QLineEdit::editingFinished, [this]() {
     Interval delay; delay.parse(this->ui->voxDelay->text().simplified());
     this->_config->settings()->audio()->setVOXDelay(delay);
   });
+  connect(ui->maxSpeakerVolume, &QSpinBox::valueChanged, [this](int value) {
+    this->_config->settings()->audio()->setMaxSpeakerVolume(Level::fromValue(value));
+  });
+  connect(ui->maxHeadphoneVolume, &QSpinBox::valueChanged, [this](int value) {
+    this->_config->settings()->audio()->setMaxHeadphoneVolume(Level::fromValue(value));
+  });
   connect(ui->speech, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
-    this->_config->settings()->enableSpeech(Qt::CheckState::Checked == state);
+    this->_config->settings()->audio()->enableSpeechSynthesis(Qt::CheckState::Checked == state);
   });
 
   connect(ui->powerValue, &QComboBox::currentIndexChanged, [this](int index) {
     this->_config->settings()->setPower(this->ui->powerValue->itemData(index).value<Channel::Power>());
-  });
-  connect(ui->squelchValue, &QSpinBox::valueChanged, [this](int value) {
-    this->_config->settings()->setSquelch(Level::fromValue(value));
   });
   connect(ui->totValue, &QSpinBox::valueChanged, [this](int value) {
     if (0 == value)
@@ -72,11 +93,22 @@ GeneralSettingsView::onConfigModified() {
   ui->introLine2->setText(_config->settings()->introLine2());
 
   // audio settings
-  ui->mic->setValue(_config->settings()->micLevel().value());
+  ui->squelch->setValue(_config->settings()->audio()->squelch().value());
+  if (_config->settings()->audio()->dmrSquelchEnabled()) {
+    ui->dmrSquelch->setValue(_config->settings()->audio()->dmrSquelch().value());
+    ui->dmrSquelchDefault->setChecked(false);
+    ui->dmrSquelch->setEnabled(true);
+  } else {
+    ui->dmrSquelch->setValue(3);
+    ui->dmrSquelchDefault->setChecked(true);
+    ui->dmrSquelch->setEnabled(false);
+  }
+
+  ui->mic->setValue(_config->settings()->audio()->micGain().value());
   ui->fmMicGain->setValue(_config->settings()->audio()->fmMicGain().value());
-  ui->voxValue->setValue(_config->settings()->vox().value());
+  ui->voxValue->setValue(_config->settings()->audio()->vox().value());
   ui->voxDelay->setText(_config->settings()->audio()->voxDelay().format());
-  ui->speech->setChecked(_config->settings()->speech());
+  ui->speech->setChecked(_config->settings()->audio()->speechSynthesisEnabled());
 
   // channel default settings
   switch(_config->settings()->power()) {
@@ -86,7 +118,6 @@ GeneralSettingsView::onConfigModified() {
   case Channel::Power::Low: ui->powerValue->setCurrentIndex(3); break;
   case Channel::Power::Min: ui->powerValue->setCurrentIndex(4); break;
   }
-  ui->squelchValue->setValue(_config->settings()->squelch().value());
   if (_config->settings()->totDisabled())
     ui->totValue->setValue(0);
   else

@@ -893,13 +893,13 @@ D578UVCodeplug::GeneralSettingsElement::enableCallEndPrompt(bool enable) {
   return setUInt8(Offset::callEndPrompt(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Level
 D578UVCodeplug::GeneralSettingsElement::maxSpeakerVolume() const {
-  return (((unsigned)getUInt8(Offset::maxSpeakerVolume()))*10)/8;
+  return Level::fromValue(getUInt8(Offset::maxSpeakerVolume()), Limit::volume());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setMaxSpeakerVolume(unsigned level) {
-  setUInt8(Offset::maxSpeakerVolume(), (level*8)/10);
+D578UVCodeplug::GeneralSettingsElement::setMaxSpeakerVolume(Level level) {
+  setUInt8(Offset::maxSpeakerVolume(), level.mapTo(Limit::volume()));
 }
 
 bool
@@ -2957,15 +2957,12 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (ctx.config()->settings()->audio()->fmMicGainEnabled())
     setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
   else
-    setFMMicGain(ctx.config()->settings()->micLevel());
+    setFMMicGain(ctx.config()->settings()->audio()->micGain());
 
   setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
 
-  if (nullptr == ctx.config()->settings()->anytoneExtension()) {
-    // If there is no extension, reuse DMR mic gain setting
-    setFMMicGain(ctx.config()->settings()->micLevel());
+  if (nullptr == ctx.config()->settings()->anytoneExtension())
     return true;
-  }
 
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -3054,7 +3051,7 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   // Store GPS settings
   ctx.config()->settings()->gnss()->setSystems(this->gnss());
   // Store audio settings
-  if (ctx.config()->settings()->micLevel() == fmMicGain())
+  if (ctx.config()->settings()->audio()->micGain() == fmMicGain())
     ctx.config()->settings()->audio()->disableFMMicGain();
   else
     ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());

@@ -496,13 +496,13 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ctx.config()->settings()->setIntroLine1(bootTextLine1());
   ctx.config()->settings()->setIntroLine2(bootTextLine2());
   // Audio settings
-  ctx.config()->settings()->setMicLevel(dmrMicGain());
+  ctx.config()->settings()->audio()->setMicGain(dmrMicGain());
   if (dmrMicGain() == fmMicGain())
     ctx.config()->settings()->audio()->disableFMMicGain();
   else
     ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
-  ctx.config()->settings()->setSquelch(squelch());
-  ctx.config()->settings()->setVOX(vox());
+  ctx.config()->settings()->audio()->setSquelch(squelch());
+  ctx.config()->settings()->audio()->setVox(vox());
 
   if (! totIsSet())
     ctx.config()->settings()->disableTOT();
@@ -566,12 +566,12 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setBootTextLine1(ctx.config()->settings()->introLine1());
   setBootTextLine2(ctx.config()->settings()->introLine2());
 
-  setDMRMicGain(ctx.config()->settings()->micLevel());
-  setFMMicGain(ctx.config()->settings()->micLevel());
+  setDMRMicGain(ctx.config()->settings()->audio()->micGain());
+  setFMMicGain(ctx.config()->settings()->audio()->micGain());
   if (ctx.config()->settings()->audio()->fmMicGainEnabled())
     setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
-  setSquelch(ctx.config()->settings()->squelch());
-  setVOX(ctx.config()->settings()->vox());
+  setSquelch(ctx.config()->settings()->audio()->squelch());
+  setVOX(ctx.config()->settings()->audio()->vox());
 
   if (ctx.config()->settings()->totDisabled())
     clearTOT();

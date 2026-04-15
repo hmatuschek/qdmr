@@ -437,7 +437,7 @@ RadioddityCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ct
   enableRXOnly(c->rxOnly());
 
   // Enable vox
-  bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
+  bool defaultVOXEnabled = (c->defaultVOX() && ctx.config()->settings()->audio()->voxEnabled());
   bool channelVOXEnabled = (! (c->voxDisabled()||c->defaultVOX()));
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
 
@@ -1807,7 +1807,7 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const Error
     return false;
   }
 
-  setVOXSensitivity(ctx.config()->settings()->vox());
+  setVOXSensitivity(ctx.config()->settings()->audio()->vox());
   enableAnimation(BootSettings::BootDisplay::Logo == ctx.config()->settings()->boot()->bootDisplay());
   setPreambleDuration(ctx.config()->settings()->dmr()->preamble());
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
@@ -1861,7 +1861,7 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
     ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()->setName(name());
     ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>()->setNumber(radioID());
   }
-  ctx.config()->settings()->setVOX(voxSensitivity());
+  ctx.config()->settings()->audio()->setVox(voxSensitivity());
   if (animation())
     ctx.config()->settings()->boot()->setBootDisplay(BootSettings::BootDisplay::Logo);
   ctx.config()->settings()->dmr()->setPreamble(preambleDuration());
@@ -1869,7 +1869,7 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
   ctx.config()->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
 
   // There is no global squelch settings either, so set it to 1
-  ctx.config()->settings()->setSquelch(Level::fromValue(1));
+  ctx.config()->settings()->audio()->setSquelch(Level::fromValue(1));
 
   // Allocate Radioddity extension if needed
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();

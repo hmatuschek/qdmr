@@ -663,7 +663,7 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
   setTransmitTimeout(c->timeout());
 
   // Enable vox
-  bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
+  bool defaultVOXEnabled = (c->defaultVOX() && ctx.config()->settings()->audio()->voxEnabled());
   bool channelVOXEnabled = (! (c->voxDisabled()||c->defaultVOX()));
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
 

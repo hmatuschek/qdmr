@@ -514,7 +514,7 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
   setPower(channel->power());
   enableRXOnly(channel->rxOnly());
   if (channel->defaultVOX())
-    enableVOX(! ctx.config()->settings()->voxDisabled());
+    enableVOX(ctx.config()->settings()->audio()->voxEnabled());
   else
     enableVOX(! channel->voxDisabled());
 
@@ -531,7 +531,7 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
       case DMRChannel::Admit::Free: setAdmitCriterion(Admit::ChannelFree); break;
       case DMRChannel::Admit::ColorCode: setAdmitCriterion(Admit::ToneOrCCMatch); break;
     }
-    setSquelchLevel(ctx.config()->settings()->squelch());
+    setSquelchLevel(ctx.config()->settings()->audio()->squelch());
     setTimeslot(dmr->timeSlot());
     setColorCode(dmr->colorCode());
     if (dmr->commercialExtension()) {
@@ -568,14 +568,14 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     case FMChannel::Admit::Free: setAdmitCriterion(Admit::ChannelFree); break;
     case FMChannel::Admit::Tone: setAdmitCriterion(Admit::ToneOrCCMatch); break;
     }
-    setSquelchLevel(fm->defaultSquelch() ? ctx.config()->settings()->squelch() : fm->squelch());
+    setSquelchLevel(fm->defaultSquelch() ? ctx.config()->settings()->audio()->squelch() : fm->squelch());
     setRXTone(fm->rxTone());
     setTXTone(fm->txTone());
     enableTalkaround(fm->extended()->talkaround());
   } else if (channel->is<AMChannel>()) {
     auto am = channel->as<AMChannel>();
     clearTXFrequency();
-    setSquelchLevel(am->defaultSquelch() ? ctx.config()->settings()->squelch() : am->squelch());
+    setSquelchLevel(am->defaultSquelch() ? ctx.config()->settings()->audio()->squelch() : am->squelch());
     enableRXOnly(true);
   }
 
@@ -3320,12 +3320,12 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
   ctx.config()->settings()->boot()->enableReset(mcuResetEnabled());
 
   // Audio settings
-  ctx.config()->settings()->setMicLevel(dmrMicLevel());
+  ctx.config()->settings()->audio()->setMicGain(dmrMicLevel());
   if (dmrMicLevel() != fmMicLevel())
     ctx.config()->settings()->audio()->setFMMicGain(fmMicLevel());
   ctx.config()->settings()->audio()->setVOXDelay(voxDelay());
-  ctx.config()->settings()->enableSpeech(voicePromptEnabled());
-  ctx.config()->settings()->setVOX(voxLevel());
+  ctx.config()->settings()->audio()->enableSpeechSynthesis(voicePromptEnabled());
+  ctx.config()->settings()->audio()->setVox(voxLevel());
 
   if (transmitTimeout().isInfinite())
     ctx.config()->settings()->disableTOT();
@@ -3357,25 +3357,25 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
   enableMCUReset(ctx.config()->settings()->boot()->resetEnabled());
 
   // audio settings
-  setDMRMicLevel(ctx.config()->settings()->micLevel());
+  setDMRMicLevel(ctx.config()->settings()->audio()->micGain());
   if (ctx.config()->settings()->audio()->fmMicGainEnabled())
     setFMMicLevel(ctx.config()->settings()->audio()->fmMicGain());
   else
-    setFMMicLevel(ctx.config()->settings()->micLevel());
+    setFMMicLevel(ctx.config()->settings()->audio()->micGain());
 
-  enableVoicePrompt(ctx.config()->settings()->speech());
-  if (ctx.config()->settings()->voxDisabled())
-    setVOXLevel(Level::null());
+  enableVoicePrompt(ctx.config()->settings()->audio()->speechSynthesisEnabled());
+  if (ctx.config()->settings()->audio()->voxEnabled())
+    setVOXLevel(ctx.config()->settings()->audio()->vox());
   else
-    setVOXLevel(ctx.config()->settings()->vox());
+    setVOXLevel(Level::null());
   setVoxDelay(ctx.config()->settings()->audio()->voxDelay());
 
   if (ctx.config()->settings()->totDisabled())
     setTransmitTimeout(Interval::infinity());
   else
     setTransmitTimeout(ctx.config()->settings()->tot());
-  setFMMicLevel(ctx.config()->settings()->micLevel());
-  setDMRMicLevel(ctx.config()->settings()->micLevel());
+  setFMMicLevel(ctx.config()->settings()->audio()->micGain());
+  setDMRMicLevel(ctx.config()->settings()->audio()->micGain());
   if (ctx.config()->smsExtension())
     setSMSFormat(ctx.config()->smsExtension()->format());
 

@@ -2763,7 +2763,7 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (ctx.config()->settings()->audio()->fmMicGainEnabled())
     setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
   else
-    setFMMicGain(ctx.config()->settings()->micLevel());
+    setFMMicGain(ctx.config()->settings()->audio()->micGain());
 
   // Encode GPS settings
   setGNSS(ctx.config()->settings()->gnss()->systems());
@@ -2900,7 +2900,7 @@ D878UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorSta
     return false;
 
   // Store FM mic gain separately, if different
-  if (ctx.config()->settings()->micLevel() == fmMicGain())
+  if (ctx.config()->settings()->audio()->micGain() == fmMicGain())
     ctx.config()->settings()->audio()->disableFMMicGain();
   else
     ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());

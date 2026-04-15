@@ -4,8 +4,8 @@
 
 
 RadioSettings::RadioSettings(QObject *parent)
-  : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(Level::fromValue(3)), _speech(false),
-    _squelch(Level::fromValue(1)), _power(Channel::Power::High), _vox(Level::null()),
+  : ConfigItem(parent), _introLine1(""), _introLine2(""),
+    _power(Channel::Power::High),
     _transmitTimeOut(Interval::infinity()), _defaultId(new DMRRadioIDReference(this)),
     _boot(new BootSettings(this)), _audio(new AudioSettings(this)),
     _gnss(new GNSSSettings(this)), _dmr(new DMRSettings(this)),
@@ -23,8 +23,6 @@ RadioSettings::copy(const ConfigItem &other) {
   const RadioSettings *set = other.as<RadioSettings>();
   if ((nullptr==set) || (!ConfigItem::copy(other)))
     return false;
-  if (set->voxDisabled())
-    disableVOX();
   if (set->totDisabled())
     disableTOT();
   return true;
@@ -46,11 +44,7 @@ RadioSettings::clear() {
 
   _introLine1.clear();
   _introLine2.clear();
-  _micLevel = Level::fromValue(3);
-  _speech = false;
-  _squelch = Level::fromValue(1);
   _power = Channel::Power::High;
-  disableVOX();
   disableTOT();
   defaultIdRef()->clear();
 
@@ -80,40 +74,6 @@ RadioSettings::setIntroLine2(const QString &line) {
   emit modified(this);
 }
 
-Level
-RadioSettings::micLevel() const {
-  return _micLevel;
-}
-void
-RadioSettings::setMicLevel(Level value) {
-  if (value.isInvalid() || value.isNull())
-    value = Level::fromValue(1);
-  if (_micLevel == value)
-    return;
-  _micLevel = value;
-  emit modified(this);
-}
-
-bool
-RadioSettings::speech() const {
-  return _speech;
-}
-void
-RadioSettings::enableSpeech(bool enabled) {
-  _speech = enabled;
-  emit modified(this);
-}
-
-Level
-RadioSettings::squelch() const {
-  return _squelch;
-}
-void
-RadioSettings::setSquelch(Level squelch) {
-  _squelch = squelch;
-  emit modified(this);
-}
-
 Channel::Power
 RadioSettings::power() const {
   return _power;
@@ -122,26 +82,6 @@ void
 RadioSettings::setPower(Channel::Power power) {
   _power = power;
   emit modified(this);
-}
-
-bool
-RadioSettings::voxDisabled() const {
-  return _vox.isNull();
-}
-Level
-RadioSettings::vox() const {
-  return _vox;
-}
-void
-RadioSettings::setVOX(Level level) {
-  if (_vox == level)
-    return;
-  _vox = level;
-  emit modified(this);
-}
-void
-RadioSettings::disableVOX() {
-  setVOX(Level::null());
 }
 
 
@@ -310,6 +250,19 @@ RadioSettings::parse(const YAML::Node &node, ConfigItem::Context &ctx, const Err
     else
       setTOT(to);
   }
+
+  /// @todo Remove with 0.17.0. Only parse "old" global settings, will be serialized in boot and audio sections.
+  if (Level micLevel; node["micLevel"] && node["micLevel"].IsScalar()
+    && micLevel.parse(QString::fromStdString(node["micLevel"].as<std::string>())))
+    audio()->setMicGain(micLevel);
+  if (node["speech"] && node["speech"].IsScalar())
+    audio()->enableSpeechSynthesis("true" == node["speech"].as<std::string>());
+  if (Level squelch; node["squelch"] && node["squelch"].IsScalar()
+    && squelch.parse(QString::fromStdString(node["squelch"].as<std::string>())))
+    audio()->setSquelch(squelch);
+  if (Level vox; node["vox"] && node["vox"].IsScalar()
+    && vox.parse(QString::fromStdString(node["vox"].as<std::string>())))
+    audio()->setVox(vox);
 
   return ConfigItem::parse(node, ctx, err);
 }

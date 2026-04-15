@@ -1815,8 +1815,8 @@ AnytoneDisplaySettingsExtension::enableCustomChannelBackground(bool enable) {
  * ********************************************************************************************* */
 AnytoneAudioSettingsExtension::AnytoneAudioSettingsExtension(QObject *parent)
   : ConfigItem(parent),  _voxDelay(), _recording(false), _voxSource(VoxSource::Both),
-  _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1)),
-  _analogMicGain(Level::invalid()), _speaker(Speaker::Radio), _handsetSpeaker(HandsetSpeakerSource::MainChannel),
+  _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1)),
+  _speaker(Speaker::Radio), _handsetSpeaker(HandsetSpeakerSource::MainChannel),
   _handsetType(HandsetType::Anytone)
 {
   // pass...
@@ -1853,29 +1853,6 @@ AnytoneAudioSettingsExtension::setVOXSource(VoxSource source) {
   if (_voxSource == source)
     return;
   _voxSource = source;
-  emit modified(this);
-}
-
-unsigned int
-AnytoneAudioSettingsExtension::maxVolume() const {
-  return _maxVolume;
-}
-void
-AnytoneAudioSettingsExtension::setMaxVolume(unsigned int vol) {
-  if (_maxVolume == vol)
-    return;
-  _maxVolume = vol;
-  emit modified(this);
-}
-unsigned int
-AnytoneAudioSettingsExtension::maxHeadPhoneVolume() const {
-  return _maxHeadPhoneVolume;
-}
-void
-AnytoneAudioSettingsExtension::setMaxHeadPhoneVolume(unsigned int vol) {
-  if (_maxHeadPhoneVolume == vol)
-    return;
-  _maxHeadPhoneVolume = vol;
   emit modified(this);
 }
 

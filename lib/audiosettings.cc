@@ -2,8 +2,10 @@
 
 
 AudioSettings::AudioSettings(QObject *parent)
-  : ConfigItem(parent), _fmMicGain(Level::null()), _m17MicGain(Level::null()),
-    _satMicGain(Level::null()), _voxDelay(Interval::null())
+  : ConfigItem(parent), _squelch(Level::fromValue(3)), _dmrSquelch(Level::invalid()),
+    _micGain(Level::fromValue(5)), _fmMicGain(Level::invalid()), _m17MicGain(Level::invalid()),
+    _maxSpeakerVolume(Level::fromValue(10)), _maxHeadphoneVolume(Level::fromValue(10)),
+    _vox(Level::null()), _voxDelay(Interval::null()), _speech(false)
 {
   // pass...
 }
@@ -17,6 +19,63 @@ AudioSettings::clone() const {
   }
   return obj;
 }
+
+Level
+AudioSettings::squelch() const {
+  return _squelch;
+}
+
+void
+AudioSettings::setSquelch(Level squelch) {
+  if (squelch.isInvalid())
+    squelch = Level::fromValue(3);
+  // squelch = 0 -> open squelch
+  if (_squelch == squelch)
+    return;
+  _squelch = squelch;
+  emit modified(this);
+}
+
+
+bool
+AudioSettings::dmrSquelchEnabled() const {
+  return ! _dmrSquelch.isInvalid();
+}
+
+Level
+AudioSettings::dmrSquelch() const {
+  return _dmrSquelch;
+}
+
+void
+AudioSettings::setDMRSquelch(Level dmrSquelch) {
+  if (_dmrSquelch == dmrSquelch)
+    return;
+  _dmrSquelch = dmrSquelch;
+  emit modified(this);
+}
+
+void
+AudioSettings::disableDMRSquelch() {
+  setDMRSquelch(Level::invalid());
+}
+
+
+Level
+AudioSettings::micGain() const {
+  return _micGain;
+}
+
+void
+AudioSettings::setMicGain(Level micGain) {
+  if (! micGain.isFinite())
+    micGain = Level::fromValue(1);
+  if (_micGain == micGain)
+    return;
+  _micGain = micGain;
+  emit modified(this);
+}
+
 
 bool
 AudioSettings::fmMicGainEnabled() const {
@@ -38,7 +97,7 @@ AudioSettings::setFMMicGain(Level fmMicGain) {
 
 void
 AudioSettings::disableFMMicGain() {
-  setFMMicGain(Level::null());
+  setFMMicGain(Level::invalid());
 }
 
 bool
@@ -61,31 +120,62 @@ AudioSettings::setM17MicGain(Level m17MicGain) {
 
 void
 AudioSettings::disableM17MicGain() {
-  setM17MicGain(Level::null());
+  setM17MicGain(Level::invalid());
 }
 
+
 bool
-AudioSettings::satMicGainEnabled() const {
-  return _satMicGain.isFinite();
+AudioSettings::voxEnabled() const {
+  return _vox.isFinite();
 }
 
 Level
-AudioSettings::satMicGain() const {
-  return _satMicGain;
+AudioSettings::vox() const {
+  return _vox;
 }
 
 void
-AudioSettings::setSatMicGain(Level satMicGain) {
-  if (_satMicGain == satMicGain)
+AudioSettings::setVox(Level vox) {
+  if (vox.isInvalid())
+    vox = Level::null();
+  if (_vox == vox)
     return;
-  _satMicGain = satMicGain;
+  _vox = vox;
   emit modified(this);
 }
 
 void
-AudioSettings::disableSatMicGain() {
-  setSatMicGain(Level::null());
+AudioSettings::disableVox() {
+  setVox(Level::null());
 }
+
+
+Level
+AudioSettings::maxSpeakerVolume() const {
+  return _maxSpeakerVolume;
+}
+
+void
+AudioSettings::setMaxSpeakerVolume(Level maxSpeakerVolume) {
+  if (_maxSpeakerVolume == maxSpeakerVolume)
+    return;
+  _maxSpeakerVolume = maxSpeakerVolume;
+  emit modified(this);
+}
+
+Level
+AudioSettings::maxHeadphoneVolume() const {
+  return _maxHeadphoneVolume;
+}
+
+void
+AudioSettings::setMaxHeadphoneVolume(Level maxHeadphoneVolume) {
+  if (_maxHeadphoneVolume == maxHeadphoneVolume)
+    return;
+  _maxHeadphoneVolume = maxHeadphoneVolume;
+  emit modified(this);
+}
+
 
 Interval
 AudioSettings::voxDelay() const {
@@ -97,5 +187,18 @@ AudioSettings::setVOXDelay(Interval voxDelay) {
   if (_voxDelay == voxDelay)
     return;
   _voxDelay = voxDelay;
+  emit modified(this);
+}
+
+bool
+AudioSettings::speechSynthesisEnabled() const {
+  return _speech;
+}
+
+void
+AudioSettings::enableSpeechSynthesis(bool speechSynthesis) {
+  if (_speech == speechSynthesis)
+    return;
+  _speech = speechSynthesis;
   emit modified(this);
 }

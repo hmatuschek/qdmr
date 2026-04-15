@@ -1696,11 +1696,6 @@ bool
 AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  // Set microphone gain
-  // For the 868UV, this setting sets both, FM and DMR mic gain.
-  // For all other devices, there is an additional FM mic gain setting.
-  setDMRMicGain(ctx.config()->settings()->micLevel());
-
   // If auto-enable GPS is enabled
   if (flags.autoEnableGPS()) {
     // Check if GPS is required -> enable
@@ -1713,9 +1708,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       enableGPS(false);
     }
   }
-  // Set default squelch level
-  setSquelchLevelA(ctx.config()->settings()->squelch());
-  setSquelchLevelB(ctx.config()->settings()->squelch());
 
   // Encode boot settings
   setBootDisplay(ctx.config()->settings()->boot()->bootDisplay());
@@ -1744,6 +1736,15 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       setDefaultChannelBIndex(ctx.config()->settings()->boot()->zoneB()->as<Zone>()->A()->indexOf(
                                 ctx.config()->settings()->boot()->channelB()->as<Channel>()));
   }
+
+  // Handle audio settings:
+  setSquelchLevelA(ctx.config()->settings()->audio()->squelch());
+  setSquelchLevelB(ctx.config()->settings()->audio()->squelch());
+  // Set microphone gain
+  // For the 868UV, this setting sets both, FM and DMR mic gain.
+  // For all other devices, there is an additional FM mic gain setting.
+  setDMRMicGain(ctx.config()->settings()->audio()->micGain());
+  setMaxSpeakerVolume(ctx.config()->settings()->audio()->maxSpeakerVolume());
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
@@ -1808,7 +1809,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     // Encode audio settings
     enableRecording(ext->audioSettings()->recordingEnabled());
     enableEnhancedAudio(ext->audioSettings()->enhanceAudioEnabled());
-    setMaxSpeakerVolume(ext->audioSettings()->maxVolume());
 
     // Encode menu settings
     setMenuExitTime(ext->menuSettings()->duration());
@@ -1849,10 +1849,12 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
   Q_UNUSED(err);
 
   // get microphone gain
-  ctx.config()->settings()->setMicLevel(dmrMicGain());
+  ctx.config()->settings()->audio()->setMicGain(dmrMicGain());
+  ctx.config()->settings()->audio()->setMaxSpeakerVolume(this->maxSpeakerVolume());
+
   // D868UV does not support speech synthesis?
-  ctx.config()->settings()->enableSpeech(false);
-  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB()));
+  ctx.config()->settings()->audio()->enableSpeechSynthesis(false);
+  ctx.config()->settings()->audio()->setSquelch(std::max(squelchLevelA(), squelchLevelB()));
 
   // Store boot settings
   ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
@@ -1930,7 +1932,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store audio settings
   ext->audioSettings()->enableRecording(recording());
-  ext->audioSettings()->setMaxVolume(this->maxSpeakerVolume());
   ext->audioSettings()->enableEnhanceAudio(this->enhanceAudio());
 
   // Store auto-repeater settings

@@ -588,7 +588,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   else
     setScanListIndex(0);
   // Enable vox
-  bool defaultVOXEnabled = (chan->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
+  bool defaultVOXEnabled = (chan->defaultVOX() && ctx.config()->settings()->audio()->voxEnabled());
   bool channelVOXEnabled = (! (chan->voxDisabled()||chan->defaultVOX()));
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
   // power setting must be set by specialized element
@@ -1599,7 +1599,7 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
 
   setIntroLine1(config->settings()->introLine1());
   setIntroLine2(config->settings()->introLine2());
-  setVOXSesitivity(config->settings()->vox());
+  setVOXSesitivity(config->settings()->audio()->vox());
 
   setBootDisplay(config->settings()->boot()->bootDisplay());
   if (! config->settings()->boot()->bootPasswordEnabled())
@@ -1660,7 +1660,7 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   }
   config->settings()->setIntroLine1(introLine1());
   config->settings()->setIntroLine2(introLine2());
-  config->settings()->setVOX(voxSesitivity());
+  config->settings()->audio()->setVox(voxSesitivity());
 
   config->settings()->boot()->setBootDisplay(bootDisplay());
   config->settings()->boot()->enableBootPassword(0 != powerOnPassword());

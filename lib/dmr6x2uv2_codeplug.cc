@@ -585,7 +585,7 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   if (ctx.config()->settings()->audio()->fmMicGainEnabled())
     setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
   else
-    setFMMicGain(ctx.config()->settings()->micLevel());
+    setFMMicGain(ctx.config()->settings()->audio()->micGain());
 
   // Encode device specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -635,7 +635,7 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   ctx.config()->settings()->gnss()->setSystems(gnss());
 
   // Store audio settings
-  if (ctx.config()->settings()->micLevel() == fmMicGain())
+  if (ctx.config()->settings()->audio()->micGain() == fmMicGain())
     ctx.config()->settings()->audio()->disableFMMicGain();
   else
     ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());

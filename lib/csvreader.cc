@@ -1804,7 +1804,7 @@ CSVReader::handleMicLevel(unsigned level, qint64 line, qint64 column, QString &e
   Q_UNUSED(errorMessage);
 
   if (_link) {
-    _config->settings()->setMicLevel(Level::fromValue(level));
+    _config->settings()->audio()->setMicGain(Level::fromValue(level));
   }
   return true;
 }
@@ -1817,7 +1817,7 @@ CSVReader::handleSpeech(bool speech, qint64 line, qint64 column, QString &errorM
   Q_UNUSED(errorMessage);
 
   if (_link) {
-    _config->settings()->enableSpeech(speech);
+    _config->settings()->audio()->enableSpeechSynthesis(speech);
   }
   return true;
 }

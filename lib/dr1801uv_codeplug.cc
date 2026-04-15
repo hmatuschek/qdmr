@@ -1634,7 +1634,7 @@ DR1801UVCodeplug::SettingsElement::decode(Config *config, const ErrorStack &err)
   config->settings()->setDefaultId(config->radioIDs()->get(idx)->as<DMRRadioID>());
 
   // Handle VOX settings.
-  config->settings()->setVOX(voxSensitivity());
+  config->settings()->audio()->setVox(voxSensitivity());
   config->settings()->audio()->setVOXDelay(voxDelay());
 
   // Handle boot settings
@@ -1658,7 +1658,7 @@ DR1801UVCodeplug::SettingsElement::encode(Config *config, const ErrorStack &err)
   setRadioName(id->name());
   setDMRID(id->number());
 
-  setVOXSensitivity(config->settings()->vox());
+  setVOXSensitivity(config->settings()->audio()->vox());
   setVOXDelay(config->settings()->audio()->voxDelay());
 
   // Encode boot settings
