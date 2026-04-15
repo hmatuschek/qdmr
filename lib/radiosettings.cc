@@ -4,16 +4,18 @@
 
 
 RadioSettings::RadioSettings(QObject *parent)
-  : ConfigItem(parent), _introLine1(""), _introLine2(""),
+  : ConfigItem(parent),
     _power(Channel::Power::High),
     _transmitTimeOut(Interval::infinity()), _defaultId(new DMRRadioIDReference(this)),
     _boot(new BootSettings(this)), _audio(new AudioSettings(this)),
+    _tone(new ToneSettings(this)),
     _gnss(new GNSSSettings(this)), _dmr(new DMRSettings(this)),
     _tytExtension(nullptr), _radioddityExtension(nullptr),
     _anytoneExtension(nullptr), _openGD77(nullptr)
 {
   connect(_boot, &BootSettings::modified, this, &RadioSettings::modified);
   connect(_audio, &AudioSettings::modified, this, &RadioSettings::modified);
+  connect(_tone, &ToneSettings::modified, this, &RadioSettings::modified);
   connect(_gnss, &GNSSSettings::modified, this, &RadioSettings::modified);
   connect(_dmr, &DMRSettings::modified, this, &RadioSettings::modified);
 }
@@ -42,8 +44,6 @@ void
 RadioSettings::clear() {
   ConfigItem::clear();
 
-  _introLine1.clear();
-  _introLine2.clear();
   _power = Channel::Power::High;
   disableTOT();
   defaultIdRef()->clear();
@@ -52,26 +52,6 @@ RadioSettings::clear() {
   setTyTExtension(nullptr);
   setRadioddityExtension(nullptr);
   setAnytoneExtension(nullptr);
-}
-
-const QString &
-RadioSettings::introLine1() const {
-  return _introLine1;
-}
-void
-RadioSettings::setIntroLine1(const QString &line) {
-  _introLine1 = line;
-  emit modified(this);
-}
-
-const QString &
-RadioSettings::introLine2() const {
-  return _introLine2;
-}
-void
-RadioSettings::setIntroLine2(const QString &line) {
-  _introLine2 = line;
-  emit modified(this);
 }
 
 Channel::Power
@@ -132,6 +112,11 @@ RadioSettings::boot() const {
 AudioSettings *
 RadioSettings::audio() const {
   return _audio;
+}
+
+ToneSettings *
+RadioSettings::tone() const {
+  return _tone;
 }
 
 GNSSSettings *
@@ -263,7 +248,10 @@ RadioSettings::parse(const YAML::Node &node, ConfigItem::Context &ctx, const Err
   if (Level vox; node["vox"] && node["vox"].IsScalar()
     && vox.parse(QString::fromStdString(node["vox"].as<std::string>())))
     audio()->setVox(vox);
-
+  if (node["introLine1"] && node["introLine1"].IsScalar())
+    boot()->setMessage1(QString::fromStdString(node["introLine1"].as<std::string>()));
+  if (node["introLine2"] && node["introLine2"].IsScalar())
+    boot()->setMessage2(QString::fromStdString(node["introLine2"].as<std::string>()));
   return ConfigItem::parse(node, ctx, err);
 }
 

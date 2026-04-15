@@ -112,7 +112,7 @@ RadioddityToneSettingsExtension::RadioddityToneSettingsExtension(QObject *parent
   _lowBatteryWarnVolume(5), _callAlertDuration(Interval::fromSeconds(120)), _resetTone(false),
   _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _digitalTalkPermitTone(false),
   _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
-  _disableAllTones(false), _txExitTone(false), _keyTone(false), _keyToneVolume(5)
+  _txExitTone(false)
 {
   // pass...
 }
@@ -261,18 +261,6 @@ RadioddityToneSettingsExtension::enableChannelFreeIndicationTone(bool enable) {
 }
 
 bool
-RadioddityToneSettingsExtension::allTonesDisabled() const {
-  return _disableAllTones;
-}
-void
-RadioddityToneSettingsExtension::disableAllTones(bool disable) {
-  if (_disableAllTones == disable)
-    return;
-  _disableAllTones = disable;
-  emit modified(this);
-}
-
-bool
 RadioddityToneSettingsExtension::txExitTone() const {
   return _txExitTone;
 }
@@ -284,30 +272,6 @@ RadioddityToneSettingsExtension::enableTXExitTone(bool enable) {
   emit modified(this);
 }
 
-bool
-RadioddityToneSettingsExtension::keyTone() const {
-  return _keyTone;
-}
-void
-RadioddityToneSettingsExtension::enableKeyTone(bool enable) {
-  if (enable == _keyTone)
-    return;
-  _keyTone = enable;
-  emit modified(this);
-}
-
-unsigned int
-RadioddityToneSettingsExtension::keyToneVolume() const {
-  return _keyToneVolume;
-}
-void
-RadioddityToneSettingsExtension::setKeyToneVolume(unsigned int volume) {
-  volume = std::min(10U, std::max(1U, volume));
-  if (volume == _keyToneVolume)
-    return;
-  _keyToneVolume = volume;
-  emit modified(this);
-}
 
 
 

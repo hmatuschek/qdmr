@@ -1638,15 +1638,15 @@ D878UVCodeplug::GeneralSettingsElement::setAutoRoamPeriod(Interval intv) {
 
 bool
 D878UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
-  return 0 == keyToneLevel();
+  return keyToneLevel().isNull();
 }
-unsigned
+Level
 D878UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((unsigned)getUInt8(Offset::keyToneLevel()))*10/15;
+  return Level::fromValue(getUInt8(Offset::keyToneLevel()), Limit::keyTone());
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
-  setUInt8(Offset::keyToneLevel(), level*10/15);
+D878UVCodeplug::GeneralSettingsElement::setKeyToneLevel(Level level) {
+  setUInt8(Offset::keyToneLevel(), level.mapTo(Limit::keyTone()));
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
@@ -2089,6 +2089,9 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
   enableBootReset(ctx.config()->settings()->boot()->resetEnabled());
 
+  // Encode tone settings
+  setKeyToneLevel(ctx.config()->settings()->tone()->keyToneVolume());
+
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
@@ -2119,9 +2122,6 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableKeypadLock(ext->keySettings()->keypadLockEnabled());
   enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
   enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
-
-  // Encode tone settings
-  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
   // Encode audio settings
   setMuteDelay(ext->audioSettings()->muteDelay());
@@ -2193,6 +2193,9 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
 
   ctx.config()->settings()->boot()->enableReset(this->bootReset());
 
+  // Decode tone settings
+  ctx.config()->settings()->tone()->setKeyToneVolume(keyToneLevel());
+
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
                                    GNSSSettings::Units::Metric);
@@ -2220,9 +2223,6 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   ext->keySettings()->enableKeypadLock(this->keypadLock());
   ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
   ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
-
-  // Decode tone settings
-  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
 
   // Store audio settings
   ext->audioSettings()->setMuteDelay(this->muteDelay());

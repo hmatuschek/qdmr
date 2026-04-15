@@ -630,8 +630,8 @@ public:
     virtual void setAutoRoamPeriod(Interval min);
 
     bool keyToneLevelAdjustable() const override;
-    unsigned keyToneLevel() const override;
-    void setKeyToneLevel(unsigned level) override;
+    Level keyToneLevel() const override;
+    void setKeyToneLevel(Level level) override;
     void setKeyToneLevelAdjustable() override;
 
     AnytoneDisplaySettingsExtension::Color callDisplayColor() const override;

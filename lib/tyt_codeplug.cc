@@ -1597,8 +1597,8 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   setRadioName(config->settings()->defaultIdRef()->as<DMRRadioID>()->name());
   setDMRId(config->settings()->defaultIdRef()->as<DMRRadioID>()->number());
 
-  setIntroLine1(config->settings()->introLine1());
-  setIntroLine2(config->settings()->introLine2());
+  setIntroLine1(config->settings()->boot()->message1());
+  setIntroLine2(config->settings()->boot()->message2());
   setVOXSesitivity(config->settings()->audio()->vox());
 
   setBootDisplay(config->settings()->boot()->bootDisplay());
@@ -1606,6 +1606,8 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
     setPowerOnPassword(0);
   else
     setPowerOnPassword(config->settings()->boot()->bootPassword().toUInt());
+
+  disableAllTones(config->settings()->tone()->silent());
 
   setPrivateCallHangTime(config->settings()->dmr()->privateCallHangTime());
   setGroupCallHangTime(config->settings()->dmr()->groupCallHangTime());
@@ -1618,7 +1620,6 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
     enableTalkPermitToneAnalog(ex->talkPermitToneAnalog());
     enablePasswdAndLock(ex->passwordAndLock());
     setChFreeIndicationTone(ex->channelFreeIndicationTone());
-    disableAllTones(ex->allTonesDisabled());
     setSaveModeRX(ex->powerSaveMode());
     setSavePreamble(ex->wakeupPreamble());
     setLowBatteryInterval(ex->lowBatteryWarnInterval());
@@ -1658,13 +1659,15 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
     logError() << "Cannot add radio DMR ID & cannot set default ID.";
     return false;
   }
-  config->settings()->setIntroLine1(introLine1());
-  config->settings()->setIntroLine2(introLine2());
+  config->settings()->boot()->setMessage1(introLine1());
+  config->settings()->boot()->setMessage2(introLine2());
   config->settings()->audio()->setVox(voxSesitivity());
 
   config->settings()->boot()->setBootDisplay(bootDisplay());
   config->settings()->boot()->enableBootPassword(0 != powerOnPassword());
   config->settings()->boot()->setBootPassword(QString::number(powerOnPassword()));
+
+  config->settings()->tone()->enableSilent(allTonesDisabled());
 
   config->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
   config->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
@@ -1680,7 +1683,6 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
   ex->enableTalkPermitToneAnalog(talkPermitToneAnalog());
   ex->enablePasswordAndLock(passwdAndLock());
   ex->enableChannelFreeIndicationTone(chFreeIndicationTone());
-  ex->disableAllTones(allTonesDisabled());
   ex->enablePowerSaveMode(saveModeRX());
   ex->enableWakeupPreamble(savePreamble());
   ex->setLowBatteryWarnInterval(lowBatteryInterval());

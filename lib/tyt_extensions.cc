@@ -784,7 +784,7 @@ TyTMenuSettings::enableGPSInformation(bool enable) {
 TyTSettingsExtension::TyTSettingsExtension(QObject *parent)
   : ConfigExtension(parent), _monitorType(MonitorType::Open), _allLEDsDisabled(false),
     _talkPermitToneDigital(false), _talkPermitToneAnalog(false), _passwdAndLock(false),
-    _channelFreeIndicationTone(true), _allTonesDisabled(false), _powerSaveMode(true),
+    _channelFreeIndicationTone(true), _powerSaveMode(true),
     _wakeupPreamble(true), _channelModeA(true), _channelModeB(true),
     _channelMode(true), _txPreambleDuration(600), _groupCallHangTime(3000),
     _privateCallHangTime(3000), _lowBatteryWarnInterval(120), _callAlertToneContinuous(false),
@@ -879,18 +879,6 @@ TyTSettingsExtension::enableChannelFreeIndicationTone(bool enable) {
   if (_channelFreeIndicationTone == enable)
     return;
   _channelFreeIndicationTone = enable;
-  emit modified(this);
-}
-
-bool
-TyTSettingsExtension::allTonesDisabled() const {
-  return _allTonesDisabled;
-}
-void
-TyTSettingsExtension::disableAllTones(bool disable) {
-  if (_allTonesDisabled == disable)
-    return;
-  _allTonesDisabled = disable;
   emit modified(this);
 }
 

@@ -1746,6 +1746,9 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
   setDMRMicGain(ctx.config()->settings()->audio()->micGain());
   setMaxSpeakerVolume(ctx.config()->settings()->audio()->maxSpeakerVolume());
 
+  // Handle tone settings:
+  enableKeyTone(ctx.config()->settings()->tone()->keyToneEnabled());
+
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
   // Handle extensions
@@ -1784,7 +1787,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     enableAutoKeyLock(ext->keySettings()->autoKeyLockEnabled());
 
     // Encode tone settings
-    enableKeyTone(ext->toneSettings()->keyToneEnabled());
     enableSMSAlert(ext->toneSettings()->smsAlertEnabled());
     enableCallAlert(ext->toneSettings()->callAlertEnabled());
     enableDMRTalkPermit(ext->toneSettings()->talkPermitDigitalEnabled());
@@ -1856,6 +1858,10 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
   ctx.config()->settings()->audio()->enableSpeechSynthesis(false);
   ctx.config()->settings()->audio()->setSquelch(std::max(squelchLevelA(), squelchLevelB()));
 
+  // Handle tone settings
+  ctx.config()->settings()->tone()->setKeyToneVolume(
+    this->keyToneEnabled() ? Level::fromValue(5) : Level::null());
+
   // Store boot settings
   ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
   ctx.config()->settings()->boot()->enableBootPassword(bootPassword());
@@ -1905,7 +1911,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->keySettings()->enableAutoKeyLock(autoKeyLock());
 
   // Store tone settings
-  ext->toneSettings()->enableKeyTone(this->keyToneEnabled());
   ext->toneSettings()->enableSMSAlert(smsAlert());
   ext->toneSettings()->enableCallAlert(callAlert());
   ext->toneSettings()->enableTalkPermitDigital(this->dmrTalkPermit());
@@ -2231,8 +2236,8 @@ AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
 bool
 AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   Q_UNUSED(flags)
-  setIntroLine1(ctx.config()->settings()->introLine1());
-  setIntroLine2(ctx.config()->settings()->introLine2());
+  setIntroLine1(ctx.config()->settings()->boot()->message1());
+  setIntroLine2(ctx.config()->settings()->boot()->message2());
 
   if (ctx.config()->settings()->boot()->bootPasswordEnabled())
     setPassword(ctx.config()->settings()->boot()->bootPassword());
@@ -2244,8 +2249,8 @@ AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ct
 
 bool
 AnytoneCodeplug::BootSettingsElement::updateConfig(Context &ctx) {
-  ctx.config()->settings()->setIntroLine1(introLine1());
-  ctx.config()->settings()->setIntroLine2(introLine2());
+  ctx.config()->settings()->boot()->setMessage1(introLine1());
+  ctx.config()->settings()->boot()->setMessage2(introLine2());
 
   ctx.config()->settings()->boot()->setBootPassword(password());
   ctx.config()->settings()->boot()->enableBootPassword(! password().isEmpty());

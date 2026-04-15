@@ -385,9 +385,9 @@ public:
     /** Returns @c true if the key-tone level is adjustable. */
     virtual bool keyToneLevelAdjustable() const;
     /** Returns the key-tone level (0=adjustable). */
-    virtual unsigned keyToneLevel() const;
+    virtual Level keyToneLevel() const;
     /** Sets the key-tone level. */
-    virtual void setKeyToneLevel(unsigned level);
+    virtual void setKeyToneLevel(Level level);
     /** Sets the key-tone level adjustable. */
     virtual void setKeyToneLevelAdjustable();
 
@@ -431,6 +431,8 @@ public:
       static constexpr Range<unsigned int> micGain() { return {0,4}; }
       /** Valid settings for the speaker and headphone volume settings. */
       static constexpr Range<unsigned int> volume() { return {0, 8}; }
+      /** Valid range for key tone volume. */
+      static constexpr Range<unsigned int> keyTone() { return {0,15}; }
     };
 
   protected:

@@ -105,10 +105,6 @@ class RadioddityToneSettingsExtension: public ConfigItem
   Q_PROPERTY(Interval lowBatteryWarnInterval READ lowBatteryWarnInterval WRITE setLowBatteryWarnInterval)
   /** Returns the low-battery warning volume [1,10]. (GD-73 only)*/
   Q_PROPERTY(bool lowBatteryWarnVolume READ lowBatteryWarnVolume WRITE setLowBatteryWarnVolume)
-  /** If @c true, the key tones are enabled. */
-  Q_PROPERTY(bool keyTone READ keyTone WRITE enableKeyTone)
-  /** Returns the key-tone volume. */
-  Q_PROPERTY(bool keyToneVolume READ keyToneVolume WRITE setKeyToneVolume)
   /** The call-alert duration in seconds. */
   Q_PROPERTY(Interval callAlertDuration READ callAlertDuration WRITE setCallAlertDuration)
   /** If @c true the reset tone is enabled. */
@@ -125,8 +121,6 @@ class RadioddityToneSettingsExtension: public ConfigItem
   Q_PROPERTY(bool selftestTone READ selftestTone WRITE enableSelftestTone)
   /** If @c true, the frequency indication tone is enabled. */
   Q_PROPERTY(bool channelFreeIndicationTone READ channelFreeIndicationTone WRITE enableChannelFreeIndicationTone)
-  /** If @c true, all tones are disabled. */
-  Q_PROPERTY(bool allTonesDisabled READ allTonesDisabled WRITE disableAllTones)
   /** If @c true, the TX exit tone is enabled. */
   Q_PROPERTY(bool txExitTone READ txExitTone WRITE enableTXExitTone)
 
@@ -157,15 +151,6 @@ public:
   unsigned int lowBatteryWarnVolume() const;
   /** Sets the volume of the low-battery warning tone [1,10]. */
   void setLowBatteryWarnVolume(unsigned int);
-
-  /** Returns @c true, if the key tones are enabled. */
-  bool keyTone() const;
-  /** Enables/disables key tones. */
-  void enableKeyTone(bool enable);
-  /** Returns the key-tone volume. */
-  unsigned int keyToneVolume() const;
-  /** Sets the key-tone volume. */
-  void setKeyToneVolume(unsigned int volume);
 
   /** Returns the call-alert duration in seconds. */
   Interval callAlertDuration() const;
@@ -206,11 +191,6 @@ public:
   /** Enables/disables the channel free indication tone. */
   void enableChannelFreeIndicationTone(bool enable);
 
-  /** Returns @c true if all tones are disabled. */
-  bool allTonesDisabled() const;
-  /** Disables/enables all tones. */
-  void disableAllTones(bool disable);
-
   /** Returns @c true if the TX exit tone is enabled. */
   bool txExitTone() const;
   /** Enables/disables TX exit tone. */
@@ -239,14 +219,8 @@ protected:
   bool _selftestTone;
   /** If @c true, the channel free indication tone is enabled. */
   bool _channelFreeIndicationTone;
-  /** If @c true, all tones are disabled. */
-  bool _disableAllTones;
   /** If @c true, the TX exit tone is enabled. */
   bool _txExitTone;
-  /** If @c true, the key-tones are enabled. */
-  bool _keyTone;
-  /** Holds the key-tone volume [1,10]. */
-  unsigned int _keyToneVolume;
 };
 
 /** Represents the boot settings for Radioddity devices.

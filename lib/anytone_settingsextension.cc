@@ -1265,13 +1265,12 @@ AnytoneKeySettingsExtension::enableForcedKeyLock(bool enable) {
  * Implementation of AnytoneToneSettingsExtension
  * ********************************************************************************************* */
 AnytoneToneSettingsExtension::AnytoneToneSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _keyTone(false), _smsAlert(false), _callAlert(false),
+  : ConfigItem(parent), _smsAlert(false), _callAlert(false),
     _talkPermitDigital(false), _talkPermitAnalog(false), _resetToneDigital(false),
     _dmrIdleChannelTone(false), _fmIdleChannelTone(false), _startupTone(false),
     _totNotification(false), _wxAlarm(false),
     _callMelody(new Melody(100, this)), _idleMelody(new Melody(100, this)),
-    _resetMelody(new Melody(100, this)), _callEndMelody(new Melody(100, this)),
-    _keyToneLevel(0)
+    _resetMelody(new Melody(100, this)), _callEndMelody(new Melody(100, this))
 {
   connect(_callMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
   connect(_idleMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
@@ -1286,18 +1285,6 @@ AnytoneToneSettingsExtension::clone() const {
     return nullptr;
   }
   return ext;
-}
-
-bool
-AnytoneToneSettingsExtension::keyToneEnabled() const {
-  return _keyTone;
-}
-void
-AnytoneToneSettingsExtension::enableKeyTone(bool enable) {
-  if (_keyTone==enable)
-    return;
-  _keyTone = enable;
-  emit modified(this);
 }
 
 bool
@@ -1437,17 +1424,6 @@ AnytoneToneSettingsExtension::callEndMelody() const {
   return _callEndMelody;
 }
 
-unsigned int
-AnytoneToneSettingsExtension::keyToneLevel() const {
-  return _keyToneLevel;
-}
-void
-AnytoneToneSettingsExtension::setKeyToneLevel(unsigned int level) {
-  if (_keyToneLevel == level)
-    return;
-  _keyToneLevel = level;
-  emit modified(this);
-}
 
 
 /* ********************************************************************************************* *

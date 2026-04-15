@@ -642,8 +642,6 @@ class TyTSettingsExtension: public ConfigExtension
   Q_PROPERTY(bool passwordAndLock READ passwordAndLock WRITE enablePasswordAndLock)
   /** If @c true, the channel free tone is enabled. */
   Q_PROPERTY(bool channelFreeIndicationTone READ channelFreeIndicationTone WRITE enableChannelFreeIndicationTone)
-  /** If @c true, all tones are disabled. */
-  Q_PROPERTY(bool allTonesDisabled READ allTonesDisabled WRITE disableAllTones)
   /** If @c true, the power save mode is enabled. */
   Q_PROPERTY(bool powerSaveMode READ powerSaveMode WRITE enablePowerSaveMode)
   Q_CLASSINFO("powerSaveModeDescription", "Puts the radio into sleep-mode when idle.")
@@ -740,11 +738,6 @@ public:
   bool channelFreeIndicationTone() const;
   /** Enables channel-free indication tone. */
   void enableChannelFreeIndicationTone(bool enable);
-
-  /** Returns @c true if all tones are disabled. */
-  bool allTonesDisabled() const;
-  /** Disables all tones. */
-  void disableAllTones(bool disable);
 
   /** Returns @c true if the power save mode is enabled. */
   bool powerSaveMode() const;
@@ -856,8 +849,6 @@ protected:
   bool _passwdAndLock;
   /** If @c true, the channel free indication tone is enabled. */
   bool _channelFreeIndicationTone;
-  /** If @c true, all tones are disabled. */
-  bool _allTonesDisabled;
   /** If @c true, the power save mode is enabled. */
   bool _powerSaveMode;
   /** If @c true, the wake-up preamble is sent. */

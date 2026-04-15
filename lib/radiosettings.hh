@@ -6,6 +6,7 @@
 
 #include "bootsettings.hh"
 #include "audiosettings.hh"
+#include "tonesettings.hh"
 #include "gnsssettings.hh"
 #include "dmrsettings.hh"
 #include "radioddity_extensions.hh"
@@ -18,10 +19,6 @@
 class RadioSettings : public ConfigItem
 {
   Q_OBJECT
-  /** The first intro line. */
-  Q_PROPERTY(QString introLine1 READ introLine1 WRITE setIntroLine1)
-  /** The second intro line. */
-  Q_PROPERTY(QString introLine2 READ introLine2 WRITE setIntroLine2)
   /** The default channel power */
   Q_PROPERTY(Channel::Power power READ power WRITE setPower)
   /** The default transmit timeout */
@@ -32,6 +29,8 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(BootSettings* boot READ boot);
   /** Common audio and tone settings. */
   Q_PROPERTY(AudioSettings *audio READ audio);
+  /** Common tone settings. */
+  Q_PROPERTY(ToneSettings *tone READ tone);
   /** The GNSS settings. */
   Q_PROPERTY(GNSSSettings *gnss READ gnss);
   /** The common DMR settings. */
@@ -54,16 +53,6 @@ public:
 
   /** Resets the settings. */
   void clear();
-
-  /** Returns the first intro line. */
-  const QString &introLine1() const;
-  /** (Re-)Sets the first intro line. */
-  void setIntroLine1(const QString &line);
-
-  /** Returns the second intro line. */
-  const QString &introLine2() const;
-  /** (Re-)Sets the second intro line. */
-  void setIntroLine2(const QString &line);
 
   /** Returns the default channel power. */
   Channel::Power power() const;
@@ -90,6 +79,8 @@ public:
   BootSettings *boot() const;
   /** Returns the audio/tone settings. */
   AudioSettings *audio() const;
+  /** Returns the tone settings. */
+  ToneSettings *tone() const;
   /** Returns the GNSS settings. */
   GNSSSettings *gnss() const;
   /** Returns the DMR settings. */
@@ -125,10 +116,6 @@ protected slots:
   void onExtensionModified();
 
 protected:
-  /** Holds the first intro line. */
-  QString _introLine1;
-  /** Holds the second intro line. */
-  QString _introLine2;
   /** Holds the global power setting. */
   Channel::Power _power;
   /** Holds the global transmit timeout. */
@@ -139,6 +126,8 @@ protected:
   BootSettings *_boot;
   /** The audio/tone settings. */
   AudioSettings *_audio;
+  /** The tone settings. */
+  ToneSettings *_tone;
   /** The GNSS settings. */
   GNSSSettings *_gnss;
   /** The DMR settings. */

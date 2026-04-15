@@ -1639,8 +1639,8 @@ DR1801UVCodeplug::SettingsElement::decode(Config *config, const ErrorStack &err)
 
   // Handle boot settings
   config->settings()->boot()->setBootDisplay(bootScreen());
-  config->settings()->setIntroLine1(bootLine1());
-  config->settings()->setIntroLine2(bootLine2());
+  config->settings()->boot()->setMessage1(bootLine1());
+  config->settings()->boot()->setMessage2(bootLine2());
   config->settings()->boot()->enableBootPassword(bootPasswordEnabled());
   config->settings()->boot()->setBootPassword(bootPassword());
 
@@ -1663,8 +1663,8 @@ DR1801UVCodeplug::SettingsElement::encode(Config *config, const ErrorStack &err)
 
   // Encode boot settings
   setBootScreen(config->settings()->boot()->bootDisplay());
-  setBootLine1(config->settings()->introLine1());
-  setBootLine2(config->settings()->introLine2());
+  setBootLine1(config->settings()->boot()->message1());
+  setBootLine2(config->settings()->boot()->message2());
   if (config->settings()->boot()->bootPasswordEnabled())
     setBootPassword(config->settings()->boot()->bootPassword());
   else

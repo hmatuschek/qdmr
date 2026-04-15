@@ -1813,6 +1813,7 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const Error
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
   setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
   // There is no global squelch settings either
+  disableAllTones(ctx.config()->settings()->tone()->silent());
 
   // Handle Radioddity extension
   if (RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension()) {
@@ -1830,7 +1831,6 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const Error
     enableAnalogTalkPermitTone(ext->tone()->analogTalkPermitTone());
     enableSelftestTone(ext->tone()->selftestTone());
     enableChannelFreeIndicationTone(ext->tone()->channelFreeIndicationTone());
-    disableAllTones(ext->tone()->allTonesDisabled());
     enableBatsaveRX(ext->powerSaveMode());
     enableBatsavePreamble(ext->wakeupPreamble());
     disableAllLEDs(ext->allLEDsDisabled());
@@ -1870,6 +1870,7 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
 
   // There is no global squelch settings either, so set it to 1
   ctx.config()->settings()->audio()->setSquelch(Level::fromValue(1));
+  ctx.config()->settings()->tone()->enableSilent(allTonesDisabled());
 
   // Allocate Radioddity extension if needed
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
@@ -1892,7 +1893,6 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
   ext->tone()->enableAnalogTalkPermitTone(analogTalkPermitTone());
   ext->tone()->enableSelftestTone(selftestTone());
   ext->tone()->enableChannelFreeIndicationTone(channelFreeIndicationTone());
-  ext->tone()->disableAllTones(allTonesDisabled());
   ext->enablePowerSaveMode(batsaveRX());
   ext->enableWakeupPreamble(batsavePreamble());
   ext->disableAllLEDs(allLEDsDisabled());
@@ -2623,16 +2623,16 @@ RadioddityCodeplug::BootTextElement::setLine2(const QString &text) {
 bool
 RadioddityCodeplug::BootTextElement::fromConfig(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  setLine1(ctx.config()->settings()->introLine1());
-  setLine2(ctx.config()->settings()->introLine2());
+  setLine1(ctx.config()->settings()->boot()->message1());
+  setLine2(ctx.config()->settings()->boot()->message2());
   return true;
 }
 
 bool
 RadioddityCodeplug::BootTextElement::updateConfig(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  ctx.config()->settings()->setIntroLine1(line1());
-  ctx.config()->settings()->setIntroLine2(line2());
+  ctx.config()->settings()->boot()->setMessage1(line1());
+  ctx.config()->settings()->boot()->setMessage2(line2());
   return true;
 }
 

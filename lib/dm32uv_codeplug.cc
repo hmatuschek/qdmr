@@ -3315,8 +3315,8 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
 
   // Boot settings
   ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
-  ctx.config()->settings()->setIntroLine1(bootMessage1());
-  ctx.config()->settings()->setIntroLine2(bootMessage2());
+  ctx.config()->settings()->boot()->setMessage1(bootMessage1());
+  ctx.config()->settings()->boot()->setMessage2(bootMessage2());
   ctx.config()->settings()->boot()->enableReset(mcuResetEnabled());
 
   // Audio settings
@@ -3326,6 +3326,11 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
   ctx.config()->settings()->audio()->setVOXDelay(voxDelay());
   ctx.config()->settings()->audio()->enableSpeechSynthesis(voicePromptEnabled());
   ctx.config()->settings()->audio()->setVox(voxLevel());
+
+  // Tone settings
+  ctx.config()->settings()->tone()->enableSilent(radioSilentEnabled());
+  ctx.config()->settings()->tone()->setKeyToneVolume(
+    keyToneEnabled() ? Level::fromValue(5) : Level::null());
 
   if (transmitTimeout().isInfinite())
     ctx.config()->settings()->disableTOT();
@@ -3352,8 +3357,8 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
 
   // boot settings
   setBootDisplay(ctx.config()->settings()->boot()->bootDisplay());
-  setBootMessage1(ctx.config()->settings()->introLine1());
-  setBootMessage2(ctx.config()->settings()->introLine2());
+  setBootMessage1(ctx.config()->settings()->boot()->message1());
+  setBootMessage2(ctx.config()->settings()->boot()->message2());
   enableMCUReset(ctx.config()->settings()->boot()->resetEnabled());
 
   // audio settings
@@ -3362,7 +3367,6 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
     setFMMicLevel(ctx.config()->settings()->audio()->fmMicGain());
   else
     setFMMicLevel(ctx.config()->settings()->audio()->micGain());
-
   enableVoicePrompt(ctx.config()->settings()->audio()->speechSynthesisEnabled());
   if (ctx.config()->settings()->audio()->voxEnabled())
     setVOXLevel(ctx.config()->settings()->audio()->vox());
@@ -3370,12 +3374,14 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
     setVOXLevel(Level::null());
   setVoxDelay(ctx.config()->settings()->audio()->voxDelay());
 
+  // tone settings
+  enableRadioSilent(ctx.config()->settings()->tone()->silent());
+  enableKeyTone(ctx.config()->settings()->tone()->keyToneEnabled());
+
   if (ctx.config()->settings()->totDisabled())
     setTransmitTimeout(Interval::infinity());
   else
     setTransmitTimeout(ctx.config()->settings()->tot());
-  setFMMicLevel(ctx.config()->settings()->audio()->micGain());
-  setDMRMicLevel(ctx.config()->settings()->audio()->micGain());
   if (ctx.config()->smsExtension())
     setSMSFormat(ctx.config()->smsExtension()->format());
 

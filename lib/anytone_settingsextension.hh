@@ -391,14 +391,6 @@ class AnytoneToneSettingsExtension: public ConfigItem
   Q_OBJECT
   Q_CLASSINFO("description", "Tone settings for AnyTone devices.")
 
-  Q_CLASSINFO("keyToneDescription", "If true, enables the key tones.")
-  /** The key tone setting. */
-  Q_PROPERTY(bool keyTone READ keyToneEnabled WRITE enableKeyTone)
-
-  Q_CLASSINFO("keyToneLevelDescription", "Specifies the key-tone level, 0=user adjustable.")
-  /** The key tone level setting. */
-  Q_PROPERTY(unsigned int keyToneLevel READ keyToneLevel WRITE setKeyToneLevel)
-
   Q_CLASSINFO("smsAlertDescription", "Enables/disables the SMS alert tone.")
   /** If @c true, the SMS alert tone is enabled. */
   Q_PROPERTY(bool smsAlert READ smsAlertEnabled WRITE enableSMSAlert)
@@ -444,11 +436,6 @@ public:
   explicit AnytoneToneSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-
-  /** Returns @c true if the key tone is enabled. */
-  bool keyToneEnabled() const;
-  /** Enables/disables the key tone. */
-  void enableKeyTone(bool enable);
 
   /** Returns @c true if SMS alert is enabled. */
   bool smsAlertEnabled() const;
@@ -509,13 +496,7 @@ public:
   /** Returns a reference to the call-end melody. */
   Melody *callEndMelody() const;
 
-  /** Returns the key-tone level. */
-  unsigned int keyToneLevel() const;
-  /** Sets the key-tone level. */
-  void setKeyToneLevel(unsigned int level);
-
 protected:
-  bool _keyTone;                   ///< Key tone property.
   bool _smsAlert;                  ///< SMS alert tone enabled.
   bool _callAlert;                 ///< Call alert tone enabled.
   bool _talkPermitDigital;         ///< DMR talk permit tone.
@@ -530,8 +511,6 @@ protected:
   Melody *_idleMelody;             ///< Idle melody.
   Melody *_resetMelody;            ///< Reset melody.
   Melody *_callEndMelody;          ///< Call end melody.
-  unsigned int _keyToneLevel;      ///< The level of key-tones, 0=user adjustable.
-
 };
 
 

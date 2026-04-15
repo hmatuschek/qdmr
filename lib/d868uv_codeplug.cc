@@ -1014,15 +1014,15 @@ D868UVCodeplug::GeneralSettingsElement::enableShowCurrentContact(bool enable) {
 
 bool
 D868UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
-  return 0 == keyToneLevel();
+  return keyToneLevel().isNull();
 }
-unsigned
+Level
 D868UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((unsigned)getUInt8(Offset::keyToneLevel()))*10/15;
+  return Level::fromValue(getUInt8(Offset::keyToneLevel()), Limit::keyTone());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
-  setUInt8(Offset::keyToneLevel(), level*10/15);
+D868UVCodeplug::GeneralSettingsElement::setKeyToneLevel(Level level) {
+  setUInt8(Offset::keyToneLevel(), level.mapTo(Limit::keyTone()));
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
@@ -1206,6 +1206,9 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setVOXDelay(ctx.config()->settings()->audio()->voxDelay());
   setMaxHeadphoneVolume(ctx.config()->settings()->audio()->maxHeadphoneVolume());
 
+  // Encode tone settings
+  setKeyToneLevel(ctx.config()->settings()->tone()->keyToneVolume());
+
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
     return true;
@@ -1218,9 +1221,6 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableKeypadLock(ext->keySettings()->keypadLockEnabled());
   enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
   enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
-
-  // Encode tone settings
-  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
   // Encode audio settings
   setVOXSource(ext->audioSettings()->voxSource());
@@ -1246,6 +1246,9 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   ctx.config()->settings()->audio()->setVOXDelay(voxDelay());
   ctx.config()->settings()->audio()->setMaxHeadphoneVolume(this->maxHeadphoneVolume());
 
+  // Decode tone settings
+  ctx.config()->settings()->tone()->setKeyToneVolume(keyToneLevel());
+
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
   if (ctx.config()->settings()->anytoneExtension()) {
@@ -1263,9 +1266,6 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   ext->keySettings()->enableKeypadLock(this->keypadLock());
   ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
   ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
-
-  // Decode tone settings
-  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
 
   // Decode audio settings
   ext->audioSettings()->setVOXSource(voxSource());
