@@ -217,6 +217,111 @@ ConfigTest::testCTCSSNull() {
 
 
 void
+ConfigTest::testSelectiveCallDCS() {
+  ErrorStack err;
+
+  auto dcsFromOctal = SelectiveCall(0, false);
+  auto dcsFromBinary = SelectiveCall::fromBinaryDCS(0x0, false);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "n000");
+  QCOMPARE(dcsFromOctal.binCode(), 0x0);
+  QCOMPARE(dcsFromOctal.octalCode(), 0);
+  QCOMPARE(dcsFromOctal.isInverted(), false);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(1, false);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x1, false);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "n001");
+  QCOMPARE(dcsFromOctal.binCode(), 0x1);
+  QCOMPARE(dcsFromOctal.octalCode(), 1);
+  QCOMPARE(dcsFromOctal.isInverted(), false);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(7, false);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x7, false);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "n007");
+  QCOMPARE(dcsFromOctal.binCode(), 0x7);
+  QCOMPARE(dcsFromOctal.octalCode(), 7);
+  QCOMPARE(dcsFromOctal.isInverted(), false);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(10, false);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x8, false);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "n010");
+  QCOMPARE(dcsFromOctal.binCode(), 0x8);
+  QCOMPARE(dcsFromOctal.octalCode(), 10);
+  QCOMPARE(dcsFromOctal.isInverted(), false);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(42, false);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x22, false);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "n042");
+  QCOMPARE(dcsFromOctal.binCode(), 0x22);
+  QCOMPARE(dcsFromOctal.octalCode(), 42);
+  QCOMPARE(dcsFromOctal.isInverted(), false);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(777, false);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x1ff, false);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "n777");
+  QCOMPARE(dcsFromOctal.binCode(), 0x1ff);
+  QCOMPARE(dcsFromOctal.octalCode(), 777);
+  QCOMPARE(dcsFromOctal.isInverted(), false);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(0, true);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x200 - 512, true);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "i000");
+  QCOMPARE(dcsFromOctal.binCode(), 0x0);
+  QCOMPARE(dcsFromOctal.octalCode(), 0);
+  QCOMPARE(dcsFromOctal.isInverted(), true);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(7, true);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x207 - 512, true);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "i007");
+  QCOMPARE(dcsFromOctal.binCode(), 0x7);
+  QCOMPARE(dcsFromOctal.octalCode(), 7);
+  QCOMPARE(dcsFromOctal.isInverted(), true);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(10, true);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x208 - 512, true);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "i010");
+  QCOMPARE(dcsFromOctal.binCode(), 0x8);
+  QCOMPARE(dcsFromOctal.octalCode(), 10);
+  QCOMPARE(dcsFromOctal.isInverted(), true);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(42, true);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x222 - 512, true);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "i042");
+  QCOMPARE(dcsFromOctal.binCode(), 0x22);
+  QCOMPARE(dcsFromOctal.octalCode(), 42);
+  QCOMPARE(dcsFromOctal.isInverted(), true);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+
+  dcsFromOctal = SelectiveCall(777, true);
+  dcsFromBinary = SelectiveCall::fromBinaryDCS(0x3ff - 512, true);
+  QVERIFY(dcsFromOctal.isDCS());
+  QCOMPARE(dcsFromOctal.format(), "i777");
+  QCOMPARE(dcsFromOctal.binCode(), 0x1ff);
+  QCOMPARE(dcsFromOctal.octalCode(), 777);
+  QCOMPARE(dcsFromOctal.isInverted(), true);
+  QCOMPARE(dcsFromOctal, dcsFromBinary);
+}
+
+
+void
 ConfigTest::testDMRIdVerification() {
   GD73Limits limits;
   RadioLimitContext ctx;
