@@ -7,9 +7,10 @@
 #include <QJsonValue>
 
 
-RepeaterMapSource::RepeaterMapSource(QObject *parent)
+RepeaterMapSource::RepeaterMapSource(const QByteArray &apiToken, QObject *parent)
   : DownloadableRepeaterDatabaseSource(
-      "repeatermap.cache.json", QUrl("https://repeatermap.de/apinew.php"), 5, parent)
+      "repeatermap.cache.json", QUrl("https://repeatermap.de/api/v1/repeaters.php"), 5,
+      {{"X-API-Token", apiToken}}, parent)
 {
   // pass...
 }
@@ -23,12 +24,13 @@ RepeaterMapSource::parse(const QByteArray &json) {
     logError() << "Cannot received JSON: " << err.errorString() << ".";
     return false;
   }
-  if ((! doc.isObject()) || (! doc.object().contains("relais")) || (! doc.object()["relais"].isArray())) {
+  if ((! doc.isObject()) || (! doc.object().contains("repeaters"))
+    || (! doc.object()["repeaters"].isArray())) {
     logError() << "Malformed result.";
     return false;
   }
 
-  QJsonArray list = doc.object()["relais"].toArray();
+  QJsonArray list = doc.object()["repeaters"].toArray();
   for (auto val: list) {
     if (! val.isObject())
       continue;

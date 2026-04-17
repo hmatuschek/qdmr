@@ -184,7 +184,9 @@ class DownloadableRepeaterDatabaseSource: public CachedRepeaterDatabaseSource
 
 protected:
   DownloadableRepeaterDatabaseSource(const QString &filename, const QUrl &source,
-                                     unsigned int maxAge=5, QObject *parent=nullptr);
+                                     unsigned int maxAge=5,
+                                     const QMultiHash<QByteArray, QByteArray> &header={},
+                                     QObject *parent=nullptr);
 
 public:
   bool needsUpdate() const;
@@ -200,6 +202,7 @@ protected slots:
 protected:
   QUrl _url;
   unsigned int _maxAge;
+  QMultiHash<QByteArray, QByteArray> _additionalHeaders;
   QNetworkAccessManager _network;
   QNetworkReply *_currentReply;
 };

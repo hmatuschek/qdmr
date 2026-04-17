@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QStandardPaths>
 #include <QDir>
+#include "config.h"
 #include <QFile>
 #include <QNetworkReply>
 #include <QtConcurrent>
@@ -469,9 +470,10 @@ CachedRepeaterDatabaseSource::query(const QString &call, const QGeoCoordinate &l
  * Implementation of DownloadableRepeaterDatabaseSource
  * ********************************************************************************************* */
 DownloadableRepeaterDatabaseSource::DownloadableRepeaterDatabaseSource(
-    const QString &filename, const QUrl &source, unsigned int maxAge, QObject *parent)
-  : CachedRepeaterDatabaseSource(filename, parent), _url(source), _maxAge(maxAge), _network(),
-    _currentReply(nullptr)
+    const QString &filename, const QUrl &source, unsigned int maxAge,
+    const QMultiHash<QByteArray, QByteArray> &header, QObject *parent)
+  : CachedRepeaterDatabaseSource(filename, parent), _url(source), _maxAge(maxAge),
+    _additionalHeaders(header), _network(), _currentReply(nullptr)
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(onRequestFinished(QNetworkReply*)));
@@ -497,15 +499,25 @@ DownloadableRepeaterDatabaseSource::load(const QString &call, const QGeoCoordina
 
 void
 DownloadableRepeaterDatabaseSource::download() {
+  if (_additionalHeaders.value("X-API-Token", {}).isEmpty()) {
+    logError() << "An empty API token is set!";
+    return;
+  }
+
   // Cancel running requests
   if (_currentReply)
     _currentReply->abort();
 
   QNetworkRequest request(_url);
-  request.setHeader(
-        QNetworkRequest::UserAgentHeader,
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/115.0.0.0 Safari/537.36 Edg/114.0.1823.86");
+
+  for (auto it=_additionalHeaders.begin(); it != _additionalHeaders.end(); ++it)
+    request.setRawHeader(it.key(), it.value());
+
+  if (! _additionalHeaders.contains("User-Agent")) {
+    request.setHeader(
+          QNetworkRequest::UserAgentHeader,
+          QLatin1String("qdmr/{} (DM3MAT)").arg(VERSION_STRING));
+  }
 
   logDebug() << "Query " << _url.toString() << "'.";
   _currentReply = _network.get(request);

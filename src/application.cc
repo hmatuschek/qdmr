@@ -90,8 +90,8 @@ Application::Application(int &argc, char *argv[])
   _repeater   = new RepeaterDatabase(this);
   if (settings.repeaterBookSourceEnabled())
     _repeater->addSource(new RepeaterBookSource());
-  if (settings.repeaterMapSourceEnabled())
-    _repeater->addSource(new RepeaterMapSource());
+  if (settings.repeaterMapSourceEnabled() && !settings.repeaterMapAPIToken().isEmpty())
+    _repeater->addSource(new RepeaterMapSource(settings.repeaterMapAPIToken().toHex().toLower()));
   if (settings.hearhamSourceEnabled())
     _repeater->addSource(new HearhamRepeaterSource());
   if (settings.radioIdRepeaterSourceEnabled())

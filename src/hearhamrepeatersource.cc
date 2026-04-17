@@ -11,7 +11,8 @@
 
 HearhamRepeaterSource::HearhamRepeaterSource(QObject *parent)
   : DownloadableRepeaterDatabaseSource(
-      "hearham.cache.json", QUrl("https://hearham.com/api/repeaters/v1"), 5, parent)
+      "hearham.cache.json", QUrl("https://hearham.com/api/repeaters/v1"), 5,
+      {}, parent)
 {
   // pass...
 }

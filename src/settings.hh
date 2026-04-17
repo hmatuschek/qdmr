@@ -39,6 +39,8 @@ public:
   void enableRepeaterBookSource(bool enable);
   bool repeaterMapSourceEnabled() const;
   void enableRepeaterMapSource(bool enable);
+  QByteArray repeaterMapAPIToken() const;
+  void setRepeaterMapAPIToken(const QByteArray &token);
   bool hearhamSourceEnabled() const;
   void enableHearhamSource(bool enable);
   bool radioIdRepeaterSourceEnabled() const;

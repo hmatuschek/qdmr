@@ -9,7 +9,7 @@ class RepeaterMapSource : public DownloadableRepeaterDatabaseSource
   Q_OBJECT
 
 public:
-  explicit RepeaterMapSource(QObject *parent = nullptr);
+  explicit RepeaterMapSource(const QByteArray &apiToken, QObject *parent = nullptr);
 
 protected:
   bool parse(const QByteArray &doc);

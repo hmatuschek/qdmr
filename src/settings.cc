@@ -80,6 +80,15 @@ Settings::enableRepeaterMapSource(bool enabled) {
   return setValue("repeaterSource/repeaterMap", enabled);
 }
 
+QByteArray
+Settings::repeaterMapAPIToken() const {
+  return value("repeaterSource/repeaterMapAPIToken", QByteArray()).toByteArray();
+}
+void
+Settings::setRepeaterMapAPIToken(const QByteArray &token) {
+  setValue("repeaterSource/repeaterMapAPIToken", token);
+}
+
 bool
 Settings::hearhamSourceEnabled() const {
   return value("repeaterSource/hearham", false).toBool();
@@ -402,7 +411,9 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   case RepeaterBookSource::World: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(0); break;
   case RepeaterBookSource::NorthAmerica: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(1); break;
   }
+
   Ui::SettingsDialog::repeaterMapEnable->setChecked(settings.repeaterMapSourceEnabled());
+  Ui::SettingsDialog::repeatermapAPIToken->setText(settings.repeaterMapAPIToken().toHex());
   Ui::SettingsDialog::hearhamEnable->setChecked(settings.hearhamSourceEnabled());
   Ui::SettingsDialog::radioIdEnable->setChecked(settings.radioIdRepeaterSourceEnabled());
 
@@ -495,6 +506,8 @@ SettingsDialog::accept() {
   else
     settings.setRepeaterBookRegion(RepeaterBookSource::NorthAmerica);
   settings.enableRepeaterMapSource(Ui::SettingsDialog::repeaterMapEnable->isChecked());
+  settings.setRepeaterMapAPIToken(
+    QByteArray::fromHex(Ui::SettingsDialog::repeatermapAPIToken->text().simplified().toLatin1()));
   settings.enableHearhamSource(Ui::SettingsDialog::hearhamEnable->isChecked());
   settings.enableRadioIdRepeaterSource(Ui::SettingsDialog::radioIdEnable->isChecked());
 
