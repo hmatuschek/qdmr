@@ -340,9 +340,12 @@ CachedRepeaterDatabaseSource::CachedRepeaterDatabaseSource(const QString &filena
     return;
   }
 
-  _cacheFile.setFileName(path + "/" + filename);
-  if (_cacheFile.exists() && _cacheFile.isReadable())
-    _parsing = QtConcurrent::run([this](){ QList<RepeaterDatabaseEntry> entries; this->parseCache(entries); return entries; })
+  QFileInfo info(path + "/" + filename);
+  if (! info.isFile() || !info.isReadable())
+    return;
+
+  _cacheFile.setFileName(info.absoluteFilePath());
+  _parsing = QtConcurrent::run([this](){ QList<RepeaterDatabaseEntry> entries; this->parseCache(entries); return entries; })
                  .then([this](const QList<RepeaterDatabaseEntry> &entries) { return this->loadEntries(entries); });
 }
 
@@ -388,7 +391,7 @@ CachedRepeaterDatabaseSource::parseCache(QList<RepeaterDatabaseEntry> &entries) 
     entries.append(entry);
   }
 
-  logDebug() << "Loaded " << _cache.size() << " entries from '" << _cacheFile.fileName() << "'.";
+  logDebug() << "Loaded " << entries.size() << " entries from '" << _cacheFile.fileName() << "'.";
   return true;
 }
 

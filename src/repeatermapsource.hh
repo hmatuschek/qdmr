@@ -12,7 +12,7 @@ public:
   explicit RepeaterMapSource(const QByteArray &apiToken, QObject *parent = nullptr);
 
 protected:
-  bool parse(const QByteArray &doc);
+  bool parse(const QByteArray &doc) override;
 };
 
 #endif // REPEATERMAPSOURCE_HH
