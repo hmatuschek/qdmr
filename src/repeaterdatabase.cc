@@ -1,17 +1,17 @@
 #include "repeaterdatabase.hh"
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QStandardPaths>
-#include <QDir>
+
 #include "config.h"
-#include <QFile>
-#include <QNetworkReply>
-#include <QtConcurrent>
 #include "logger.hh"
 #include "utils.hh"
-
-
+#include <QApplication>
+#include <QDir>
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkReply>
+#include <QStandardPaths>
+#include <QtConcurrent>
 
 /* ********************************************************************************************* *
  * Helper functions
@@ -516,7 +516,7 @@ DownloadableRepeaterDatabaseSource::download() {
   if (! _additionalHeaders.contains("User-Agent")) {
     request.setHeader(
           QNetworkRequest::UserAgentHeader,
-          QLatin1String("qdmr/{} (DM3MAT)").arg(VERSION_STRING));
+          QLatin1String("qdmr/%1 (%2)").arg(VERSION_STRING).arg(QGuiApplication::platformName()));
   }
 
   logDebug() << "Query " << _url.toString() << "'.";
