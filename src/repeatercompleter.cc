@@ -34,8 +34,12 @@ NearestRepeaterFilter::NearestRepeaterFilter(RepeaterDatabase *repeater, const Q
 
 bool
 NearestRepeaterFilter::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const {
+  if (! _location.isValid())
+    return source_left.row() < source_right.row();
+
   double ldist = _location.distanceTo(_repeater->get(source_left.row()).location());
   double rdist = _location.distanceTo(_repeater->get(source_right.row()).location());
+
   return ldist < rdist;
 }
 
