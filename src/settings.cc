@@ -62,6 +62,17 @@ Settings::position() const {
   return loc2deg(locator());
 }
 
+int
+Settings::repeaterSearchRadius() const {
+  return value("repeaterSource/repeaterSearchRadius", 50).toInt();
+}
+void
+Settings::setRepeaterSearchRadius(int radius) {
+  radius = std::min(150, std::max(20, radius));
+  setValue("repeaterSource/repeaterSearchRadius", radius);
+}
+
+
 bool
 Settings::repeaterBookSourceEnabled() const {
   return value("repeaterSource/repeaterBook", true).toBool();
@@ -405,6 +416,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   locatorEntry->setText(settings.locator());
   if (queryLocation->isChecked())
     locatorEntry->setEnabled(false);
+  Ui::SettingsDialog::searchRadius->setValue(settings.repeaterSearchRadius());
 
   Ui::SettingsDialog::repeaterBookEnable->setChecked(settings.repeaterBookSourceEnabled());
   switch (settings.repeaterBookRegion()) {
@@ -499,6 +511,7 @@ SettingsDialog::accept() {
   Settings settings;
   settings.setQueryPosition(queryLocation->isChecked());
   settings.setLocator(locatorEntry->text().simplified());
+  settings.setRepeaterSearchRadius(Ui::SettingsDialog::searchRadius->value());
   settings.setDisableAutoDetect(disableAutoDetect->isChecked());
   settings.enableRepeaterBookSource(Ui::SettingsDialog::repeaterBookEnable->isChecked());
   if (0 == Ui::SettingsDialog::repeaterBookRegion->currentIndex())

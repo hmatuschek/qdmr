@@ -12,8 +12,9 @@
 
 RadioidRepeaterSource::RadioidRepeaterSource(QObject *parent)
   : DownloadableRepeaterDatabaseSource(
-      "radioidrepeater.cache.json", QUrl("https://radioid.net/static/map.json"), 5,
-      {}, parent)
+      "radioidrepeater.cache.json",
+      QUrl("https://radioid.net/static/map.json"),
+      5, parent)
 {
   // pass...
 }

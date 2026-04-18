@@ -128,7 +128,10 @@ protected:
   explicit RepeaterDatabaseSource(QObject *parent = nullptr);
 
 public:
-  virtual bool query(const QString &call, const QGeoCoordinate &pos=QGeoCoordinate());
+  /** Sets the search radius (needed for some sources). */
+  virtual void setSearchRadius(const QGeoCoordinate &position, unsigned int radius);
+  /** Query some (partial-) call. */
+  virtual bool query(const QString &call);
 
   /** Returns the number of stored entries. By default, none are stored. */
   virtual unsigned int count() const;
@@ -142,7 +145,7 @@ signals:
 
 protected:
   /** Needs to be implemented to query new entries. */
-  virtual bool load(const QString &call, const QGeoCoordinate &pos) = 0;
+  virtual bool load(const QString &call) = 0;
 };
 
 
@@ -156,10 +159,10 @@ protected:
   CachedRepeaterDatabaseSource(const QString &filename, QObject *parent = nullptr);
 
 public:
-  unsigned int count() const;
-  RepeaterDatabaseEntry get(unsigned int idx) const;
+  unsigned int count() const override;
+  RepeaterDatabaseEntry get(unsigned int idx) const override;
 
-  bool query(const QString &call, const QGeoCoordinate &pos=QGeoCoordinate());
+  bool query(const QString &call) override;
 
 protected:
   bool loadCache();
@@ -185,15 +188,16 @@ class DownloadableRepeaterDatabaseSource: public CachedRepeaterDatabaseSource
 protected:
   DownloadableRepeaterDatabaseSource(const QString &filename, const QUrl &source,
                                      unsigned int maxAge=5,
-                                     const QMultiHash<QByteArray, QByteArray> &header={},
                                      QObject *parent=nullptr);
 
 public:
   bool needsUpdate() const;
 
 protected:
+  /** Gets called to prepare a network request to fetch the data. */
+  virtual bool prepareRequest(QNetworkRequest &request);
   virtual bool parse(const QByteArray &doc) = 0;
-  bool load(const QString &call, const QGeoCoordinate &pos);
+  bool load(const QString &call) override;
 
 protected slots:
   void onRequestFinished(QNetworkReply *reply);
@@ -202,7 +206,6 @@ protected slots:
 protected:
   QUrl _url;
   unsigned int _maxAge;
-  QMultiHash<QByteArray, QByteArray> _additionalHeaders;
   QNetworkAccessManager _network;
   QNetworkReply *_currentReply;
 };
@@ -218,10 +221,14 @@ public:
   /** Constructor. */
   explicit RepeaterDatabase(QObject *parent = nullptr);
 
+  /** Some sources require a search area to be set. This method forwards the search radius to all
+   * registered sources. */
+  void setSearchRadius(const QGeoCoordinate &coordinate, unsigned int radius);
+
   RepeaterDatabaseEntry get(unsigned int idx) const;
   void addSource(RepeaterDatabaseSource *source);
 
-  virtual bool query(const QString &call, const QGeoCoordinate &pos=QGeoCoordinate());
+  virtual bool query(const QString &call);
 
   int rowCount(const QModelIndex &parent = QModelIndex()) const;
   QVariant data(const QModelIndex &index, int role) const;
@@ -232,6 +239,8 @@ protected slots:
 
 
 protected:
+  QGeoCoordinate _searchPosition;
+  int _searchRadius;
   QList<RepeaterDatabaseSource *> _sources;
   QMap<RepeaterDatabaseEntry, unsigned int> _indices;
   QVector<RepeaterDatabaseEntry> _entries;
