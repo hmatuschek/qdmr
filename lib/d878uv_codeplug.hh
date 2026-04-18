@@ -1157,43 +1157,6 @@ public:
   };
 
 
-  /** Implements some storage to hold the names for the FM APRS frequencies. */
-  class FMAPRSFrequencyNamesElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    FMAPRSFrequencyNamesElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Constructor. */
-    explicit FMAPRSFrequencyNamesElement(uint8_t *ptr);
-
-    /** The size of the element. */
-    static constexpr unsigned int size() { return 0x0080; }
-
-    void clear();
-
-    /** Returns the n-th name. The 0-th name, is the name of the FM APRS system. */
-    virtual QString name(unsigned int n) const;
-    /** Sets the n-th name. The 0-th name, is the name of the FM APRS system. */
-    virtual void setName(unsigned int n, const QString &name);
-
-  public:
-    /** Some limits for the element. */
-    struct Limit {
-      static constexpr unsigned int nameLength() { return 16; }       ///< Maximum name length.
-    };
-
-  protected:
-    /** Some internal offsets within the element. */
-    struct Offset {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int betweenNames() { return 0x0010; }
-      /// @endcond
-    };
-  };
-
-
   /** Represents the APRS settings within the binary D878UV codeplug.
    *
    * Memory layout of APRS settings (size 0x00f0 bytes):
@@ -1397,11 +1360,9 @@ public:
 
     /** Configures this APRS system from the given generic config. */
     virtual bool fromFMAPRSSystem(const FMAPRSSystem *sys, Context &ctx,
-                                  FMAPRSFrequencyNamesElement &names,
                                   const ErrorStack &err=ErrorStack());
     /** Constructs a generic APRS system configuration from this APRS system. */
-    virtual FMAPRSSystem *toFMAPRSSystem(
-        Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err=ErrorStack());
+    virtual FMAPRSSystem *toFMAPRSSystem(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the transmit channel within the generic APRS system based on the transmit frequency
      * defined within this APRS system. */
     virtual bool linkFMAPRSSystem(FMAPRSSystem *sys, Context &ctx);
@@ -2044,7 +2005,7 @@ protected:
     static constexpr unsigned int aprsSettings()                { return 0x02501000; }
     static constexpr unsigned int analogAPRSMessage()           { return 0x02501200; }
     static constexpr unsigned int analogAPRSRXEntries()         { return 0x02501800; }
-    static constexpr unsigned int fmAPRSFrequencyNames()        { return 0x02502000; }
+    //static constexpr unsigned int fmAPRSFrequencyNames()        { return 0x02502000; }
     static constexpr unsigned int hiddenZoneBitmap()            { return 0x024c1360; }
     static constexpr unsigned int roamingChannelBitmap()        { return 0x01042000; }
     static constexpr unsigned int roamingChannels()             { return 0x01040000; }

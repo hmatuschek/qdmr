@@ -611,39 +611,6 @@ D878UVCodeplug::ChannelExtensionElement::fromChannelObj(const Channel *c, Contex
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::FMAPRSFrequencyNamesElement
- * ******************************************************************************************** */
-D878UVCodeplug::FMAPRSFrequencyNamesElement::FMAPRSFrequencyNamesElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-D878UVCodeplug::FMAPRSFrequencyNamesElement::FMAPRSFrequencyNamesElement(uint8_t *ptr)
-  : Element(ptr, size())
-{
-  // pass...
-}
-
-void
-D878UVCodeplug::FMAPRSFrequencyNamesElement::clear() {
-  memset(_data, 0xff, size());
-}
-
-QString
-D878UVCodeplug::FMAPRSFrequencyNamesElement::name(unsigned int n) const {
-  n = std::min(n, 7U);
-  return readASCII(n*Offset::betweenNames(), Limit::nameLength(), 0xff);
-}
-
-void
-D878UVCodeplug::FMAPRSFrequencyNamesElement::setName(unsigned int n, const QString &name) {
-  n = std::min(n, 7U);
-  writeASCII(n*Offset::betweenNames(), name, Limit::nameLength(), 0xff);
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::RoamingChannelElement
  * ******************************************************************************************** */
 D878UVCodeplug::RoamingChannelElement::RoamingChannelElement(uint8_t *ptr, unsigned size)
@@ -3037,10 +3004,12 @@ D878UVCodeplug::APRSSettingsElement::disableAutoTX() {
   setAutoTXInterval(Interval::fromMilliseconds(0));
 }
 
+
 bool
 D878UVCodeplug::APRSSettingsElement::fixedLocationEnabled() const {
   return getUInt8(Offset::fixedLocation());
 }
+
 QGeoCoordinate
 D878UVCodeplug::APRSSettingsElement::fixedLocation() const {
   double latitude  = getUInt8(Offset::fixedLatDeg()) + double(getUInt8(Offset::fixedLatMin()))/60
@@ -3068,7 +3037,9 @@ D878UVCodeplug::APRSSettingsElement::setFixedLocation(const QGeoCoordinate &loc)
   unsigned lon_deg = int(longitude); longitude -= lon_deg; longitude *= 60;
   unsigned lon_min = int(longitude); longitude -= lon_min; longitude *= 60;
   unsigned lon_sec = int(longitude);
-  unsigned height_ft = int(loc.altitude()*3.281);
+  unsigned height_ft = 0;
+  if (QGeoCoordinate::Coordinate3D == loc.type())
+    height_ft = int(loc.altitude()*3.281);
   setUInt8(Offset::fixedLatDeg(), lat_deg);
   setUInt8(Offset::fixedLatMin(), lat_min);
   setUInt8(Offset::fixedLatSec(), lat_sec);
@@ -3419,7 +3390,7 @@ D878UVCodeplug::APRSSettingsElement::updateConfig(Context &ctx, const ErrorStack
 
 bool
 D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
-    const FMAPRSSystem *sys, Context &ctx, FMAPRSFrequencyNamesElement &names, const ErrorStack &err)
+    const FMAPRSSystem *sys, Context &ctx, const ErrorStack &err)
 {
   Q_UNUSED(ctx)
   clear();
@@ -3428,7 +3399,6 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
   }
-  names.setName(0, sys->name());
   setFMFrequency(0, sys->revertChannel()->txFrequency());
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
@@ -3465,19 +3435,15 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
   for (int i=0; i<ext->frequencies()->count(); i++) {
     setFMFrequency(ctx.index(ext->frequencies()->get(i)),
                    ext->frequencies()->get(i)->as<AnytoneAPRSFrequency>()->frequency());
-    names.setName(ctx.index(ext->frequencies()->get(i)),
-                  ext->frequencies()->get(i)->name());
   }
 
   return true;
 }
 
 FMAPRSSystem *
-D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err) {
+D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
   QString name = QString("APRS %1").arg(destination());
-  if (names.isValid() && (! names.name(0).isEmpty()))
-    name = names.name(0);
   FMAPRSSystem *sys = new FMAPRSSystem(
         name, nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
@@ -3506,10 +3472,7 @@ D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFr
       continue;
     auto *f = new AnytoneAPRSFrequency();
     f->setFrequency(fmFrequency(i));
-    QString name = QString("APRS %1").arg(i);
-    if (names.isValid() && (! names.name(i).isEmpty()))
-      name = names.name(i);
-    f->setName(name);
+    f->setName(QString("APRS %1").arg(i));
     ext->frequencies()->add(f);
     ctx.add(f, i);
   }
@@ -3998,9 +3961,6 @@ D878UVCodeplug::allocateUpdated() {
   // allocate APRS RX list
   image(0).addElement(Offset::analogAPRSRXEntries(),
                       Limit::analogAPRSRXEntries()*AnalogAPRSRXEntryElement::size());
-
-  // allocate FM APRS frequency names
-  image(0).addElement(Offset::fmAPRSFrequencyNames(), FMAPRSFrequencyNamesElement::size());
 }
 
 void
@@ -4019,8 +3979,6 @@ D878UVCodeplug::allocateForDecoding() {
   this->allocateRoaming();
   this->allocateAESKeys();
   this->allocateARC4Keys();
-  // allocate FM APRS frequency names
-  image(0).addElement(Offset::fmAPRSFrequencyNames(), FMAPRSFrequencyNamesElement::size());
 }
 
 void
@@ -4312,18 +4270,16 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   // replaces D868UVCodeplug::encodeGPSSystems
 
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
-  FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
-
-  if (! aprs.fromConfig(ctx, err)) {
-    errMsg(err) << "Cannot encode global APRS settings.";
-    return false;
-  }
 
   // Encode APRS system (there can only be one)
   if (0 < ctx.count<FMAPRSSystem>()) {
-    aprs.fromFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx, aprsNames, err);
+    aprs.fromFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx, err);
     AnalogAPRSMessageElement(data(Offset::analogAPRSMessage()))
         .setMessage(ctx.get<FMAPRSSystem>(0)->message());
+  }
+  if (! aprs.fromConfig(ctx, err)) {
+    errMsg(err) << "Cannot encode global APRS settings.";
+    return false;
   }
 
   // Encode GPS systems
@@ -4347,9 +4303,6 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Before creating any GPS/APRS systems, get global auto TX interval
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
-  FMAPRSFrequencyNamesElement aprsNames(isAllocated(Offset::fmAPRSFrequencyNames()) ?
-                                          data(Offset::fmAPRSFrequencyNames()):
-                                          nullptr);
   AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
 
   if (! aprs.updateConfig(ctx, err)) {
@@ -4359,7 +4312,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Create APRS system (if enabled)
   if (aprs.isValid()) {
-    FMAPRSSystem *sys = aprs.toFMAPRSSystem(ctx, aprsNames, err);
+    FMAPRSSystem *sys = aprs.toFMAPRSSystem(ctx, err);
     if (nullptr == sys) {
       errMsg(err) << "Cannot decode positioning systems.";
       return false;
