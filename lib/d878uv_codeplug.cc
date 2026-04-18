@@ -3004,10 +3004,12 @@ D878UVCodeplug::APRSSettingsElement::disableAutoTX() {
   setAutoTXInterval(Interval::fromMilliseconds(0));
 }
 
+
 bool
 D878UVCodeplug::APRSSettingsElement::fixedLocationEnabled() const {
   return getUInt8(Offset::fixedLocation());
 }
+
 QGeoCoordinate
 D878UVCodeplug::APRSSettingsElement::fixedLocation() const {
   double latitude  = getUInt8(Offset::fixedLatDeg()) + double(getUInt8(Offset::fixedLatMin()))/60
@@ -4269,16 +4271,15 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
 
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
 
-  if (! aprs.fromConfig(ctx, err)) {
-    errMsg(err) << "Cannot encode global APRS settings.";
-    return false;
-  }
-
   // Encode APRS system (there can only be one)
   if (0 < ctx.count<FMAPRSSystem>()) {
     aprs.fromFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx, err);
     AnalogAPRSMessageElement(data(Offset::analogAPRSMessage()))
         .setMessage(ctx.get<FMAPRSSystem>(0)->message());
+  }
+  if (! aprs.fromConfig(ctx, err)) {
+    errMsg(err) << "Cannot encode global APRS settings.";
+    return false;
   }
 
   // Encode GPS systems
