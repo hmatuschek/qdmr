@@ -44,7 +44,7 @@
 
 <para>
   Some data sources restrict search queries to a radius around some position. This radius is set in
-  <guilabel>Search radius</guilabel>. This is radius only limits the results obtained by specific sources,
+  <guilabel>Search radius</guilabel>. This is radius only limits the results obtained from specific sources,
   not the auto-completion by <application>qdmr</application>.
 </para>
 
