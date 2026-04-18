@@ -79,7 +79,8 @@ qt6_add_translations(qdmr TS_FILES
   ${PROJECT_SOURCE_DIR}/i18n/de.ts ${PROJECT_SOURCE_DIR}/i18n/en_US.ts
   ${PROJECT_SOURCE_DIR}/i18n/sv.ts ${PROJECT_SOURCE_DIR}/i18n/it.ts
   ${PROJECT_SOURCE_DIR}/i18n/nl.ts ${PROJECT_SOURCE_DIR}/i18n/pl.ts
-  ${PROJECT_SOURCE_DIR}/i18n/fr.ts ${PROJECT_SOURCE_DIR}/i18n/pt_BR.ts)
+  ${PROJECT_SOURCE_DIR}/i18n/fr.ts ${PROJECT_SOURCE_DIR}/i18n/pt_BR.ts
+  ${PROJECT_SOURCE_DIR}/i18n/ru.ts)
 
 #
 # Icon generation

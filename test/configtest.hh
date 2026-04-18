@@ -32,6 +32,9 @@ private slots:
 
   /** Regression test for #509. */
   void testCTCSSNull();
+
+  void testSelectiveCallDCS();
+
   /// Regression test #674.
   void testDMRIdVerification();
 
