@@ -18,7 +18,7 @@
  * Implementation of Channel
  * ********************************************************************************************* */
 Channel::Channel(QObject *parent)
-  : ConfigObject("ch", parent), _rxFreq(Frequency::fromHz(0)), _txFreq(Frequency::fromHz(0)),
+  : ConfigObject(parent), _rxFreq(Frequency::fromHz(0)), _txFreq(Frequency::fromHz(0)),
     _defaultPower(true), _power(Power::Low), _txTimeOut(Interval::null()),
     _rxOnly(false), _vox(), _scanlist(),
     _openGD77ChannelExtension(nullptr),
@@ -34,7 +34,7 @@ Channel::Channel(QObject *parent)
 }
 
 Channel::Channel(const Channel &other, QObject *parent)
-  : ConfigObject("ch", parent), _scanlist(), _openGD77ChannelExtension(nullptr),
+  : ConfigObject(parent), _scanlist(), _openGD77ChannelExtension(nullptr),
     _tytChannelExtension(nullptr)
 {
   Channel::copy(other);

@@ -57,6 +57,9 @@
              <height>0</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Enter a repater call-sign.</string>
+           </property>
           </widget>
          </item>
          <item row="1" column="0">

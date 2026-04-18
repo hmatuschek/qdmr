@@ -90,8 +90,9 @@ Application::Application(int &argc, char *argv[])
   _repeater   = new RepeaterDatabase(this);
   if (settings.repeaterBookSourceEnabled())
     _repeater->addSource(new RepeaterBookSource());
-  if (settings.repeaterMapSourceEnabled())
-    _repeater->addSource(new RepeaterMapSource());
+  if (settings.repeaterMapSourceEnabled() && !settings.repeaterMapAPIToken().isEmpty())
+    _repeater->addSource(new RepeaterMapSource(settings.repeaterMapAPIToken(),
+      settings.position(), settings.repeaterSearchRadius()));
   if (settings.hearhamSourceEnabled())
     _repeater->addSource(new HearhamRepeaterSource());
   if (settings.radioIdRepeaterSourceEnabled())
@@ -815,10 +816,11 @@ Application::showSettings() {
   if (! settings.queryPosition()) {
     if (_source)
       _source->stopUpdates();
-    _currentPosition = settings.position();
+    setSearchRadius(settings.position(), settings.repeaterSearchRadius());
   } else {
     if (_source)
       _source->startUpdates();
+    _searchRadius = settings.repeaterSearchRadius();
   }
 }
 
@@ -891,7 +893,7 @@ Application::onConfigModifed() {
 void
 Application::positionUpdated(const QGeoPositionInfo &info) {
   if (info.isValid())
-    _currentPosition = info.coordinate();
+    setSearchRadius(info.coordinate(), _searchRadius);
 }
 
 bool
@@ -902,6 +904,17 @@ Application::hasPosition() const {
 QGeoCoordinate
 Application::position() const {
   return _currentPosition;
+}
+
+void
+Application::setSearchRadius(const QGeoCoordinate &position, unsigned int radius) {
+  QGeoCoordinate lastPosition = _currentPosition;
+  _currentPosition = position;
+  _searchRadius = radius;
+  if (_searchRadius && _currentPosition.isValid()
+    && (!lastPosition.isValid() || _currentPosition.distanceTo(lastPosition)>100*_searchRadius)) {
+    _repeater->setSearchRadius(_currentPosition, _searchRadius);
+  }
 }
 
 void

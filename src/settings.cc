@@ -62,6 +62,17 @@ Settings::position() const {
   return loc2deg(locator());
 }
 
+int
+Settings::repeaterSearchRadius() const {
+  return value("repeaterSource/repeaterSearchRadius", 50).toInt();
+}
+void
+Settings::setRepeaterSearchRadius(int radius) {
+  radius = std::min(150, std::max(20, radius));
+  setValue("repeaterSource/repeaterSearchRadius", radius);
+}
+
+
 bool
 Settings::repeaterBookSourceEnabled() const {
   return value("repeaterSource/repeaterBook", true).toBool();
@@ -78,6 +89,15 @@ Settings::repeaterMapSourceEnabled() const {
 void
 Settings::enableRepeaterMapSource(bool enabled) {
   return setValue("repeaterSource/repeaterMap", enabled);
+}
+
+QByteArray
+Settings::repeaterMapAPIToken() const {
+  return value("repeaterSource/repeaterMapAPIToken", QByteArray()).toByteArray();
+}
+void
+Settings::setRepeaterMapAPIToken(const QByteArray &token) {
+  setValue("repeaterSource/repeaterMapAPIToken", token);
 }
 
 bool
@@ -396,13 +416,16 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   locatorEntry->setText(settings.locator());
   if (queryLocation->isChecked())
     locatorEntry->setEnabled(false);
+  Ui::SettingsDialog::searchRadius->setValue(settings.repeaterSearchRadius());
 
   Ui::SettingsDialog::repeaterBookEnable->setChecked(settings.repeaterBookSourceEnabled());
   switch (settings.repeaterBookRegion()) {
   case RepeaterBookSource::World: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(0); break;
   case RepeaterBookSource::NorthAmerica: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(1); break;
   }
+
   Ui::SettingsDialog::repeaterMapEnable->setChecked(settings.repeaterMapSourceEnabled());
+  Ui::SettingsDialog::repeatermapAPIToken->setText(settings.repeaterMapAPIToken().toHex());
   Ui::SettingsDialog::hearhamEnable->setChecked(settings.hearhamSourceEnabled());
   Ui::SettingsDialog::radioIdEnable->setChecked(settings.radioIdRepeaterSourceEnabled());
 
@@ -488,6 +511,7 @@ SettingsDialog::accept() {
   Settings settings;
   settings.setQueryPosition(queryLocation->isChecked());
   settings.setLocator(locatorEntry->text().simplified());
+  settings.setRepeaterSearchRadius(Ui::SettingsDialog::searchRadius->value());
   settings.setDisableAutoDetect(disableAutoDetect->isChecked());
   settings.enableRepeaterBookSource(Ui::SettingsDialog::repeaterBookEnable->isChecked());
   if (0 == Ui::SettingsDialog::repeaterBookRegion->currentIndex())
@@ -495,6 +519,8 @@ SettingsDialog::accept() {
   else
     settings.setRepeaterBookRegion(RepeaterBookSource::NorthAmerica);
   settings.enableRepeaterMapSource(Ui::SettingsDialog::repeaterMapEnable->isChecked());
+  settings.setRepeaterMapAPIToken(
+    QByteArray::fromHex(Ui::SettingsDialog::repeatermapAPIToken->text().simplified().toLatin1()));
   settings.enableHearhamSource(Ui::SettingsDialog::hearhamEnable->isChecked());
   settings.enableRadioIdRepeaterSource(Ui::SettingsDialog::radioIdEnable->isChecked());
 

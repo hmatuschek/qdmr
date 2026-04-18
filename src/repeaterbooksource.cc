@@ -26,9 +26,7 @@ RepeaterBookSource::RepeaterBookSource(QObject *parent)
 
 
 bool
-RepeaterBookSource::load(const QString &queryCall, const QGeoCoordinate &pos) {
-  Q_UNUSED(pos);
-
+RepeaterBookSource::load(const QString &queryCall) {
   // Cancel running requests
   if (_currentReply)
     _currentReply->abort();
