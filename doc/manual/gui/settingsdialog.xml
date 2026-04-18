@@ -43,12 +43,35 @@
 </para>
 
 <para>
-  The second section allows to set the source for the repeater database. This enables 
-  <application>qdmr</application> to automatically complete some information for a repeater if its 
-  callsign is entered as the name, when creating a new channel. For some weird reason, the single 
-  data source <ulink url="https://www.repeaterbook.com/">Repeater Book</ulink> provides two identical
-  APIs for North America and the rest of the World. You must select your source accordingly.
+  Some data sources restrict search queries to a radius around some position. This radius is set in
+  <guilabel>Search radius</guilabel>. This is radius only limits the results obtained by specific sources,
+  not the auto-completion by <application>qdmr</application>.
 </para>
+
+
+<para>
+  The second section allows to set the sources for the repeater database. This enables
+  <application>qdmr</application> to automatically complete some information for a repeater if its 
+  callsign is entered as the name, when creating a new channel. As several source may have different settings,
+  each source has its own settings tab.
+</para>
+
+<formalpara>
+  <title>repeaterbook.com</title>
+  <para>
+    For some weird reason, <ulink url="https://www.repeaterbook.com/">Repeater Book</ulink> provides two identical
+    APIs for North America and the rest of the World. You must select your source accordingly, also you need to
+    request a user-API access token and paste it here.
+  </para>
+</formalpara>
+
+<formalpara>
+  <title>repeatermap.de</title>
+  <para>
+    <ulink url="https://repeatermap.de/">repeatermap.de</ulink> also requires a user-API access token. See
+    <ulink url="https://repeatermap.de/api.php">API access page</ulink> from repeatermap.de.
+  </para>
+</formalpara>
 </section>
 
 
