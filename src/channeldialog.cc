@@ -196,8 +196,10 @@ ChannelDialog::onOffsetDirectionChanged(int index) {
 
 void
 ChannelDialog::updateOffsetFrequency() {
-  auto rx = Frequency::fromString(ui->rxFrequency->text()),
-    tx = Frequency::fromString(ui->txFrequency->text());
+  Frequency rx,tx;
+  if (!rx.parse(ui->rxFrequency->text().simplified()) ||
+      !tx.parse(ui->txFrequency->text().simplified()))
+    return;
   // Show absolute value
   ui->offsetLineEdit->setText((tx-rx).abs().format());
   // Use combo box to indicate direction

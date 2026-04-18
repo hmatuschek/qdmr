@@ -862,6 +862,7 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::encode(AnytoneKeySettingsEx
   case AnytoneKeySettingsExtension::KeyFunction::Record:            return (uint8_t)KeyFunction::Record;
   case AnytoneKeySettingsExtension::KeyFunction::SMS:               return (uint8_t)KeyFunction::SMS;
   case AnytoneKeySettingsExtension::KeyFunction::Dial:              return (uint8_t)KeyFunction::Dial;
+  case AnytoneKeySettingsExtension::KeyFunction::GPSInformation:    return (uint8_t)KeyFunction::GPSInformation;
   case AnytoneKeySettingsExtension::KeyFunction::Monitor:           return (uint8_t)KeyFunction::Monitor;
   case AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel: return (uint8_t)KeyFunction::ToggleMainChannel;
   case AnytoneKeySettingsExtension::KeyFunction::HotKey1:           return (uint8_t)KeyFunction::HotKey1;
@@ -879,6 +880,7 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::encode(AnytoneKeySettingsEx
   case AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality:   return (uint8_t)KeyFunction::MICSoundQuality;
   case AnytoneKeySettingsExtension::KeyFunction::LastCallReply:     return (uint8_t)KeyFunction::LastCallReply;
   case AnytoneKeySettingsExtension::KeyFunction::ChannelType:       return (uint8_t)KeyFunction::ChannelType;
+  case AnytoneKeySettingsExtension::KeyFunction::Ranging:           return (uint8_t)KeyFunction::Ranging;
   case AnytoneKeySettingsExtension::KeyFunction::Roaming:           return (uint8_t)KeyFunction::Roaming;
   case AnytoneKeySettingsExtension::KeyFunction::ChannelRanging:    return (uint8_t)KeyFunction::ChannelRanging;
   case AnytoneKeySettingsExtension::KeyFunction::MaxVolume:         return (uint8_t)KeyFunction::MaxVolume;
@@ -896,6 +898,9 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::encode(AnytoneKeySettingsEx
   case AnytoneKeySettingsExtension::KeyFunction::CDTScan:           return (uint8_t)KeyFunction::CDTScan;
   case AnytoneKeySettingsExtension::KeyFunction::APRSSend:          return (uint8_t)KeyFunction::APRSSend;
   case AnytoneKeySettingsExtension::KeyFunction::APRSInfo:          return (uint8_t)KeyFunction::APRSInfo;
+  case AnytoneKeySettingsExtension::KeyFunction::GPSRoaming:        return (uint8_t)KeyFunction::GPSRoaming;
+  case AnytoneKeySettingsExtension::KeyFunction::DIMShut:           return (uint8_t)KeyFunction::DIMShut;
+  case AnytoneKeySettingsExtension::KeyFunction::Squelch:           return (uint8_t)KeyFunction::Squelch;
   default:                                                          return (uint8_t)KeyFunction::Off;
   }
 }
@@ -920,6 +925,7 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
   case KeyFunction::Record:            return AnytoneKeySettingsExtension::KeyFunction::Record;
   case KeyFunction::SMS:               return AnytoneKeySettingsExtension::KeyFunction::SMS;
   case KeyFunction::Dial:              return AnytoneKeySettingsExtension::KeyFunction::Dial;
+  case KeyFunction::GPSInformation:    return AnytoneKeySettingsExtension::KeyFunction::GPSInformation;
   case KeyFunction::Monitor:           return AnytoneKeySettingsExtension::KeyFunction::Monitor;
   case KeyFunction::ToggleMainChannel: return AnytoneKeySettingsExtension::KeyFunction::ToggleMainChannel;
   case KeyFunction::HotKey1:           return AnytoneKeySettingsExtension::KeyFunction::HotKey1;
@@ -937,6 +943,7 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
   case KeyFunction::MICSoundQuality:   return AnytoneKeySettingsExtension::KeyFunction::MICSoundQuality;
   case KeyFunction::LastCallReply:     return AnytoneKeySettingsExtension::KeyFunction::LastCallReply;
   case KeyFunction::ChannelType:       return AnytoneKeySettingsExtension::KeyFunction::ChannelType;
+  case KeyFunction::Ranging:           return AnytoneKeySettingsExtension::KeyFunction::Ranging;
   case KeyFunction::Roaming:           return AnytoneKeySettingsExtension::KeyFunction::Roaming;
   case KeyFunction::ChannelRanging:    return AnytoneKeySettingsExtension::KeyFunction::ChannelRanging;
   case KeyFunction::MaxVolume:         return AnytoneKeySettingsExtension::KeyFunction::MaxVolume;
@@ -954,7 +961,13 @@ D878UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
   case KeyFunction::CDTScan:           return AnytoneKeySettingsExtension::KeyFunction::CDTScan;
   case KeyFunction::APRSSend:          return AnytoneKeySettingsExtension::KeyFunction::APRSSend;
   case KeyFunction::APRSInfo:          return AnytoneKeySettingsExtension::KeyFunction::APRSInfo;
-  default:                             return AnytoneKeySettingsExtension::KeyFunction::Off;
+  case KeyFunction::GPSRoaming:        return AnytoneKeySettingsExtension::KeyFunction::GPSRoaming;
+  case KeyFunction::DIMShut:           return AnytoneKeySettingsExtension::KeyFunction::DIMShut;
+  case KeyFunction::Squelch:           return AnytoneKeySettingsExtension::KeyFunction::Squelch;
+  default: {
+    logWarn() << "Unmapped Key Code: 0x" << QString::number(code, 16);
+    return AnytoneKeySettingsExtension::KeyFunction::Off;
+  }
   }
 }
 
