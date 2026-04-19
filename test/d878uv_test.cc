@@ -602,6 +602,19 @@ D878UVTest::testMicGain() {
 }
 
 
+void
+D878UVTest::testFixedLocation() {
+  ErrorStack err;
+  Config decoded, config; config.copy(_basicConfig);
+
+  config.settings()->gnss()->setFixedPositionLocator("JO62kk45");
+  config.settings()->gnss()->enableFixedPosition(true);
+  encodeDecode(config, decoded);
+
+  QVERIFY(decoded.settings()->gnss()->fixedPositionEnabled());
+  QCOMPARE(decoded.settings()->gnss()->fixedPositionLocator(), QString("JO62kk45"));
+}
+
 
 QTEST_GUILESS_MAIN(D878UVTest)
 

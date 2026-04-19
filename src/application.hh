@@ -7,6 +7,7 @@
 #include <QGeoPositionInfoSource>
 #include "releasenotes.hh"
 #include "radio.hh"
+#include <QPointer>
 
 class MainWindow;
 class QTranslator;
@@ -25,7 +26,6 @@ class PositioningSystemListView;
 class RoamingChannelListView;
 class RoamingZoneListView;
 class ExtensionView;
-
 
 
 class Application : public QApplication
@@ -47,6 +47,8 @@ public:
 
   bool hasPosition() const;
   QGeoCoordinate position() const;
+  unsigned int radius() const;
+  void setSearchRadius(const QGeoCoordinate &position, unsigned int radius);
 
   Radio *autoDetect(const ErrorStack &err=ErrorStack());
 
@@ -101,6 +103,7 @@ protected:
 
   QGeoPositionInfoSource *_source;
   QGeoCoordinate _currentPosition;
+  unsigned int _searchRadius;
 
   ReleaseNotes _releaseNotes;
 
