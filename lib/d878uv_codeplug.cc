@@ -2732,6 +2732,10 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   else
     setFMMicGain(ctx.config()->settings()->audio()->micGain());
 
+  // Encode tone settings.
+  enableFMIdleTone(ctx.config()->settings()->tone()->channelIdle().testFlag(Channel::Type::FM));
+  setCallEndToneMelody(*ctx.config()->settings()->tone()->callEndMelody());
+
   // Encode GPS settings
   setGNSS(ctx.config()->settings()->gnss()->systems());
 
@@ -2755,8 +2759,6 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Encode tone settings
   enableTOTNotification(ext->toneSettings()->totNotification());
-  enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
-  setCallEndToneMelody(*ext->toneSettings()->callEndMelody());
 
   // Encode DMR settings
   setManDialGroupCallHangTime(ext->dmrSettings()->manualGroupCallHangTime());
@@ -2809,6 +2811,13 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   // Store GPS settings
   ctx.config()->settings()->gnss()->setSystems(this->gnss());
 
+  // Store tone settings
+  ctx.config()->settings()->tone()->setChannelIdle(
+    ctx.config()->settings()->tone()->channelIdle()
+      | (fmIdleTone() ? Channel::Type::FM : Channel::Type::None));
+  callEndToneMelody(*ctx.config()->settings()->tone()->callEndMelody());
+
+  // Store DMR settings
   ctx.config()->settings()->dmr()->enableSendTalkerAlias(sendTalkerAlias());
   ctx.config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
 
@@ -2831,8 +2840,6 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store tone settings
   ext->toneSettings()->enableTOTNotification(this->totNotification());
-  ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
-  this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
 
   // Store display settings
   ext->displaySettings()->enableShowColorCode(this->showColorCode());

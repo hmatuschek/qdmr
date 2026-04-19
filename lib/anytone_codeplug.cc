@@ -1748,6 +1748,16 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Handle tone settings:
   enableKeyTone(ctx.config()->settings()->tone()->keyToneEnabled());
+  enableSMSAlert(ctx.config()->settings()->tone()->smsToneEnabled());
+  enableCallAlert(ctx.config()->settings()->tone()->ringtoneEnabled());
+  enableStartupTone(ctx.config()->settings()->tone()->bootToneEnabled());
+  enableDMRTalkPermit(ctx.config()->settings()->tone()->talkPermit().testFlag(Channel::Type::DMR));
+  enableFMTalkPermit(ctx.config()->settings()->tone()->talkPermit().testFlag(Channel::Type::FM));
+  setCallToneMelody(*ctx.config()->settings()->tone()->callStartMelody());
+  enableIdleChannelTone(ctx.config()->settings()->tone()->channelIdle().testAnyFlags(Channel::Type::FM | Channel::Type::DMR));
+  setIdleToneMelody(*ctx.config()->settings()->tone()->channelIdleMelody());
+  enableDMRResetTone(ctx.config()->settings()->tone()->callResetEnabled());
+  setResetToneMelody(*ctx.config()->settings()->tone()->callResetMelody());
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
@@ -1785,18 +1795,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     setFuncKey2Long(ext->keySettings()->funcKey2Long());
     setLongPressDuration(ext->keySettings()->longPressDuration());
     enableAutoKeyLock(ext->keySettings()->autoKeyLockEnabled());
-
-    // Encode tone settings
-    enableSMSAlert(ext->toneSettings()->smsAlertEnabled());
-    enableCallAlert(ext->toneSettings()->callAlertEnabled());
-    enableDMRTalkPermit(ext->toneSettings()->talkPermitDigitalEnabled());
-    enableFMTalkPermit(ext->toneSettings()->talkPermitAnalogEnabled());
-    enableDMRResetTone(ext->toneSettings()->digitalResetToneEnabled());
-    enableIdleChannelTone(ext->toneSettings()->dmrIdleChannelToneEnabled());
-    enableStartupTone(ext->toneSettings()->startupToneEnabled());
-    setCallToneMelody(*(ext->toneSettings()->callMelody()));
-    setIdleToneMelody(*(ext->toneSettings()->idleMelody()));
-    setResetToneMelody(*(ext->toneSettings()->resetMelody()));
 
     // Encode display settings
     enableDisplayFrequency(ext->displaySettings()->displayFrequencyEnabled());
@@ -1861,6 +1859,19 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
   // Handle tone settings
   ctx.config()->settings()->tone()->setKeyToneVolume(
     this->keyToneEnabled() ? Level::fromValue(5) : Level::null());
+  ctx.config()->settings()->tone()->enableSMSTone(smsAlert());
+  ctx.config()->settings()->tone()->enableRingtone(callAlert());
+  ctx.config()->settings()->tone()->enableBootTone(startupTone());
+  ctx.config()->settings()->tone()->setTalkPermit(
+    (dmrTalkPermit() ? Channel::Type::DMR : Channel::Type::None) |
+    (fmTalkPermit() ? Channel::Type::FM : Channel::Type::None) );
+  callToneMelody(*ctx.config()->settings()->tone()->callStartMelody());
+  ctx.config()->settings()->tone()->setChannelIdle(
+    idleChannelTone() ? Channel::Type::DMR : Channel::Type::None
+    );
+  idleToneMelody(*ctx.config()->settings()->tone()->channelIdleMelody());
+  ctx.config()->settings()->tone()->enableCallReset(dmrResetTone());
+  resetToneMelody(*ctx.config()->settings()->tone()->callResetMelody());
 
   // Store boot settings
   ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
@@ -1909,18 +1920,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->keySettings()->setFuncKey2Long(funcKey2Long());
   ext->keySettings()->setLongPressDuration(longPressDuration());
   ext->keySettings()->enableAutoKeyLock(autoKeyLock());
-
-  // Store tone settings
-  ext->toneSettings()->enableSMSAlert(smsAlert());
-  ext->toneSettings()->enableCallAlert(callAlert());
-  ext->toneSettings()->enableTalkPermitDigital(this->dmrTalkPermit());
-  ext->toneSettings()->enableTalkPermitAnalog(this->fmTalkPermit());
-  ext->toneSettings()->enableDigitalResetTone(this->dmrResetTone());
-  ext->toneSettings()->enableDMRIdleChannelTone(this->idleChannelTone());
-  ext->toneSettings()->enableStartupTone(this->startupTone());
-  this->callToneMelody(*(ext->toneSettings()->callMelody()));
-  this->idleToneMelody(*(ext->toneSettings()->idleMelody()));
-  this->resetToneMelody(*(ext->toneSettings()->resetMelody()));
 
   // Store display settings
   ext->displaySettings()->enableDisplayFrequency(displayFrequency());

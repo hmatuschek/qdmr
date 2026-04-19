@@ -634,14 +634,8 @@ class TyTSettingsExtension: public ConfigExtension
   Q_PROPERTY(MonitorType monitorType READ monitorType WRITE setMonitorType)
   /** If @c true, all LEDs are disabled. */
   Q_PROPERTY(bool allLEDsDisabled READ allLEDsDisabled WRITE disableAllLEDs)
-  /** If @c true, the talk permit tone for digital channels is enabled. */
-  Q_PROPERTY(bool talkPermitToneDigital READ talkPermitToneDigital WRITE enableTalkPermitToneDigital)
-  /** If @c true, the talk permit tone for analog channels is enabled. */
-  Q_PROPERTY(bool talkPermitToneAnalog READ talkPermitToneAnalog WRITE enableTalkPermitToneAnalog)
   /** If @c true, the password and lock is enabled. */
   Q_PROPERTY(bool passwordAndLock READ passwordAndLock WRITE enablePasswordAndLock)
-  /** If @c true, the channel free tone is enabled. */
-  Q_PROPERTY(bool channelFreeIndicationTone READ channelFreeIndicationTone WRITE enableChannelFreeIndicationTone)
   /** If @c true, the power save mode is enabled. */
   Q_PROPERTY(bool powerSaveMode READ powerSaveMode WRITE enablePowerSaveMode)
   Q_CLASSINFO("powerSaveModeDescription", "Puts the radio into sleep-mode when idle.")
@@ -719,25 +713,10 @@ public:
   /** Disables all LEDs. */
   void disableAllLEDs(bool disable);
 
-  /** Returns @c true if the talk permit tone is enabled for digital channels.*/
-  bool talkPermitToneDigital() const;
-  /** Enables the talk permit tone for digital channels. */
-  void enableTalkPermitToneDigital(bool enable);
-
-  /** Returns @c true if the talk permit tone is enabled for analog channels.*/
-  bool talkPermitToneAnalog() const;
-  /** Enables the talk permit tone for analog channels. */
-  void enableTalkPermitToneAnalog(bool enable);
-
   /** Returns @c true if the password and lock is enabled. */
   bool passwordAndLock() const;
   /** Enables the password and lock. */
   void enablePasswordAndLock(bool enable);
-
-  /** Returns @c true if channel-free indication tone is enabled. */
-  bool channelFreeIndicationTone() const;
-  /** Enables channel-free indication tone. */
-  void enableChannelFreeIndicationTone(bool enable);
 
   /** Returns @c true if the power save mode is enabled. */
   bool powerSaveMode() const;
@@ -841,14 +820,8 @@ protected:
   MonitorType _monitorType;
   /** If @c true all LEDs are disabled. */
   bool _allLEDsDisabled;
-  /** If @c true the talk-permit tone is enabled for digital channels. */
-  bool _talkPermitToneDigital;
-  /** If @c true the talk-permit tone is enabled for analog channels. */
-  bool _talkPermitToneAnalog;
   /** If @c true the password and lock is enabled. */
   bool _passwdAndLock;
-  /** If @c true, the channel free indication tone is enabled. */
-  bool _channelFreeIndicationTone;
   /** If @c true, the power save mode is enabled. */
   bool _powerSaveMode;
   /** If @c true, the wake-up preamble is sent. */

@@ -107,22 +107,12 @@ class RadioddityToneSettingsExtension: public ConfigItem
   Q_PROPERTY(bool lowBatteryWarnVolume READ lowBatteryWarnVolume WRITE setLowBatteryWarnVolume)
   /** The call-alert duration in seconds. */
   Q_PROPERTY(Interval callAlertDuration READ callAlertDuration WRITE setCallAlertDuration)
-  /** If @c true the reset tone is enabled. */
-  Q_PROPERTY(bool resetTone READ resetTone WRITE enableResetTone)
   /** @c true, the unknown number tone is enabled. */
   Q_PROPERTY(bool unknownNumberTone READ unknownNumberTone WRITE enableUnknownNumberTone)
   /** The ARTS tone mode. */
   Q_PROPERTY(ARTSTone artsToneMode READ artsToneMode WRITE setARTSToneMode)
-  /** If @c true, the talk permit tone is enabled for digital channels. */
-  Q_PROPERTY(bool digitalTalkPermitTone READ digitalTalkPermitTone WRITE enableDigitalTalkPermitTone)
-  /** If @c true, the talk permit tone is enabled for analog channels. */
-  Q_PROPERTY(bool analogTalkPermitTone READ analogTalkPermitTone WRITE enableAnalogTalkPermitTone)
   /** If @c true, the self-test tone is enabled. */
   Q_PROPERTY(bool selftestTone READ selftestTone WRITE enableSelftestTone)
-  /** If @c true, the frequency indication tone is enabled. */
-  Q_PROPERTY(bool channelFreeIndicationTone READ channelFreeIndicationTone WRITE enableChannelFreeIndicationTone)
-  /** If @c true, the TX exit tone is enabled. */
-  Q_PROPERTY(bool txExitTone READ txExitTone WRITE enableTXExitTone)
 
 public:
   /** Possible ARTS tone settings. */
@@ -157,11 +147,6 @@ public:
   /** Sets the call-allert duration in seconds. */
   void setCallAlertDuration(Interval sec);
 
-  /** Returns @c true if the reset tone is enabled. */
-  bool resetTone() const;
-  /** Enables/disables reset tone. */
-  void enableResetTone(bool enable);
-
   /** Returns @c true if the unknown number tone is enabled. */
   bool unknownNumberTone() const;
   /** Enables/disables reset tone. */
@@ -172,29 +157,10 @@ public:
   /** Sets the ARTS tone mode. */
   void setARTSToneMode(ARTSTone mode);
 
-  /** Returns @c true if the digital channel talk permit tone is enabled. */
-  bool digitalTalkPermitTone() const;
-  /** Enables/disables digital channel talk permit tone. */
-  void enableDigitalTalkPermitTone(bool enable);
-  /** Returns @c true if the analog channel talk permit tone is enabled. */
-  bool analogTalkPermitTone() const;
-  /** Enables/disables analog channel talk permit tone. */
-  void enableAnalogTalkPermitTone(bool enable);
-
   /** Returns @c true if the self-test tone is enabled. */
   bool selftestTone() const;
   /** Enables/disables self-test tone. */
   void enableSelftestTone(bool enable);
-
-  /** Returns @c true if the channel-free indication tone is enabled. */
-  bool channelFreeIndicationTone() const;
-  /** Enables/disables the channel free indication tone. */
-  void enableChannelFreeIndicationTone(bool enable);
-
-  /** Returns @c true if the TX exit tone is enabled. */
-  bool txExitTone() const;
-  /** Enables/disables TX exit tone. */
-  void enableTXExitTone(bool enable);
 
 protected:
   /** If @c true, a low-battery charge is indicated by a warning. */
@@ -205,22 +171,12 @@ protected:
   unsigned int _lowBatteryWarnVolume;
   /** Holds the call alert duration in seconds. */
   Interval _callAlertDuration;
-  /** If @c true the reset tone is enabled. */
-  bool _resetTone;
   /** If @c true, the unknown number tone is enabled. */
   bool _unknownNumberTone;
   /** Holds the ARTS tone mode. */
   ARTSTone _artsToneMode;
-  /** If @c true, the talk permit tone is enabled for digital channels. */
-  bool _digitalTalkPermitTone;
-  /** If @c true, the talk permit tone is enabled for analog channels. */
-  bool _analogTalkPermitTone;
   /** If @c true, the self-test tone is enabled. */
   bool _selftestTone;
-  /** If @c true, the channel free indication tone is enabled. */
-  bool _channelFreeIndicationTone;
-  /** If @c true, the TX exit tone is enabled. */
-  bool _txExitTone;
 };
 
 /** Represents the boot settings for Radioddity devices.

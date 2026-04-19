@@ -3331,6 +3331,14 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
   ctx.config()->settings()->tone()->enableSilent(radioSilentEnabled());
   ctx.config()->settings()->tone()->setKeyToneVolume(
     keyToneEnabled() ? Level::fromValue(5) : Level::null());
+  ctx.config()->settings()->tone()->enableSMSTone(smsToneEnabled());
+  ctx.config()->settings()->tone()->enableBootTone(bootToneEnabled());
+  ctx.config()->settings()->tone()->enableRingtone(
+    privateCallToneEnabled());
+  ctx.config()->settings()->tone()->setTalkPermit(
+    talkPermitToneEnabled() ? (Channel::Type::FM|Channel::Type::DMR) : Channel::Type::None );
+  ctx.config()->settings()->tone()->setCallEnd(
+    eotToneEnabled() ? (Channel::Type::FM|Channel::Type::DMR) : Channel::Type::None );
 
   if (transmitTimeout().isInfinite())
     ctx.config()->settings()->disableTOT();
@@ -3377,6 +3385,14 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
   // tone settings
   enableRadioSilent(ctx.config()->settings()->tone()->silent());
   enableKeyTone(ctx.config()->settings()->tone()->keyToneEnabled());
+  enableSMSTone(ctx.config()->settings()->tone()->smsToneEnabled());
+  enableBootTone(ctx.config()->settings()->tone()->bootToneEnabled());
+  enablePrivateCallTone(ctx.config()->settings()->tone()->ringtoneEnabled());
+  enableTalkPermitTone(
+    ctx.config()->settings()->tone()->talkPermit().testAnyFlags(
+      Channel::Type::FM | Channel::Type::DMR));
+  enableEOTTone(ctx.config()->settings()->tone()->callEnd().testAnyFlags(
+    Channel::Type::FM | Channel::Type::DMR));
 
   if (ctx.config()->settings()->totDisabled())
     setTransmitTimeout(Interval::infinity());

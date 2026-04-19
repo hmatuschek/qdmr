@@ -783,8 +783,8 @@ TyTMenuSettings::enableGPSInformation(bool enable) {
  * ******************************************************************************************** */
 TyTSettingsExtension::TyTSettingsExtension(QObject *parent)
   : ConfigExtension(parent), _monitorType(MonitorType::Open), _allLEDsDisabled(false),
-    _talkPermitToneDigital(false), _talkPermitToneAnalog(false), _passwdAndLock(false),
-    _channelFreeIndicationTone(true), _powerSaveMode(true),
+    _passwdAndLock(false),
+    _powerSaveMode(true),
     _wakeupPreamble(true), _channelModeA(true), _channelModeB(true),
     _channelMode(true), _txPreambleDuration(600), _groupCallHangTime(3000),
     _privateCallHangTime(3000), _lowBatteryWarnInterval(120), _callAlertToneContinuous(false),
@@ -835,30 +835,6 @@ TyTSettingsExtension::disableAllLEDs(bool disable) {
 }
 
 bool
-TyTSettingsExtension::talkPermitToneDigital() const {
-  return _talkPermitToneDigital;
-}
-void
-TyTSettingsExtension::enableTalkPermitToneDigital(bool enable) {
-  if (_talkPermitToneDigital == enable)
-    return;
-  _talkPermitToneDigital = enable;
-  emit modified(this);
-}
-
-bool
-TyTSettingsExtension::talkPermitToneAnalog() const {
-  return _talkPermitToneAnalog;
-}
-void
-TyTSettingsExtension::enableTalkPermitToneAnalog(bool enable) {
-  if (_talkPermitToneAnalog == enable)
-    return;
-  _talkPermitToneAnalog = enable;
-  emit modified(this);
-}
-
-bool
 TyTSettingsExtension::passwordAndLock() const {
   return _passwdAndLock;
 }
@@ -867,18 +843,6 @@ TyTSettingsExtension::enablePasswordAndLock(bool enable) {
   if (_passwdAndLock == enable)
     return;
   _passwdAndLock = enable;
-  emit modified(this);
-}
-
-bool
-TyTSettingsExtension::channelFreeIndicationTone() const {
-  return _channelFreeIndicationTone;
-}
-void
-TyTSettingsExtension::enableChannelFreeIndicationTone(bool enable) {
-  if (_channelFreeIndicationTone == enable)
-    return;
-  _channelFreeIndicationTone = enable;
   emit modified(this);
 }
 

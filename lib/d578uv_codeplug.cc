@@ -2948,6 +2948,10 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! flags.updateCodeplug())
     this->clear();
 
+  // Encode tone settings
+  enableFMIdleTone(ctx.config()->settings()->tone()->channelIdle().setFlag(Channel::Type::FM));
+  setCallEndToneMelody(*ctx.config()->settings()->tone()->callEndMelody());
+
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
@@ -2985,8 +2989,6 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Encode tone settings
   enableTOTNotification(ext->toneSettings()->totNotification());
-  enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
-  setCallEndToneMelody(*ext->toneSettings()->callEndMelody());
 
   // Encode audio settings
   setSpeaker(ext->audioSettings()->speaker());
@@ -3050,11 +3052,19 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store GPS settings
   ctx.config()->settings()->gnss()->setSystems(this->gnss());
+
   // Store audio settings
   if (ctx.config()->settings()->audio()->micGain() == fmMicGain())
     ctx.config()->settings()->audio()->disableFMMicGain();
   else
     ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
+
+  // Store tone settings
+  ctx.config()->settings()->tone()->setChannelIdle(
+    ctx.config()->settings()->tone()->channelIdle()
+      | (fmIdleTone() ? Channel::Type::FM : Channel::Type::None));
+  this->callEndToneMelody(*ctx.config()->settings()->tone()->callEndMelody());
+
   // Store DMR settings
   ctx.config()->config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
 
@@ -3083,8 +3093,6 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store tone settings
   ext->toneSettings()->enableTOTNotification(this->totNotification());
-  ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
-  this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
 
   // Store FM mic gain separately, if different
   ext->audioSettings()->setSpeaker(speaker());

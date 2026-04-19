@@ -1813,7 +1813,17 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const Error
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
   setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
   // There is no global squelch settings either
+  // Apply tone settings
   disableAllTones(ctx.config()->settings()->tone()->silent());
+  enableDigitalTalkPermitTone(ctx.config()->settings()->tone()->talkPermit().testFlag(Channel::Type::DMR));
+  enableAnalogTalkPermitTone(ctx.config()->settings()->tone()->talkPermit().testFlag(Channel::Type::FM));
+  enableTXExitTone(
+    ctx.config()->settings()->tone()->callEnd().testFlags(
+      Channel::Type::DMR | Channel::Type::FM));
+  enableChannelFreeIndicationTone(
+    ctx.config()->settings()->tone()->channelIdle().testAnyFlags(
+      Channel::Type::DMR|Channel::Type::FM));
+  enableResetTone(ctx.config()->settings()->tone()->callResetEnabled());
 
   // Handle Radioddity extension
   if (RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension()) {
@@ -1824,18 +1834,13 @@ RadioddityCodeplug::GeneralSettingsElement::fromConfig(Context &ctx, const Error
     setLoneWorkerReminderPeriod(ext->loneWorkerReminderPeriod().seconds());
     enableDownChannelModeVFO(ext->downChannelModeVFO());
     enableUpChannelModeVFO(ext->upChannelModeVFO());
-    enableResetTone(ext->tone()->resetTone());
     enableUnknownNumberTone(ext->tone()->unknownNumberTone());
     setARTSToneMode(ext->tone()->artsToneMode());
-    enableDigitalTalkPermitTone(ext->tone()->digitalTalkPermitTone());
-    enableAnalogTalkPermitTone(ext->tone()->analogTalkPermitTone());
     enableSelftestTone(ext->tone()->selftestTone());
-    enableChannelFreeIndicationTone(ext->tone()->channelFreeIndicationTone());
     enableBatsaveRX(ext->powerSaveMode());
     enableBatsavePreamble(ext->wakeupPreamble());
     disableAllLEDs(ext->allLEDsDisabled());
     inhibitQuickKeyOverride(ext->quickKeyOverrideInhibited());
-    enableTXExitTone(ext->tone()->txExitTone());
     enableTXOnActiveChannel(ext->txOnActiveChannel());
     setScanMode(ext->scanMode());
     setRepeaterEndDelay(ext->repeaterEndDelay().seconds());
@@ -1868,9 +1873,20 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
   ctx.config()->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
   ctx.config()->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
 
-  // There is no global squelch settings either, so set it to 1
+  // Apply audio settings.
+  // there is no global squelch settings either, so set it to 1
   ctx.config()->settings()->audio()->setSquelch(Level::fromValue(1));
+
+  // Apply tone settings
   ctx.config()->settings()->tone()->enableSilent(allTonesDisabled());
+  ctx.config()->settings()->tone()->setTalkPermit(
+    (digitalTalkPermitTone() ? Channel::Type::DMR : Channel::Type::None) |
+    (analogTalkPermitTone() ? Channel::Type::FM : Channel::Type::None) );
+  ctx.config()->settings()->tone()->setCallEnd(
+    txExitTone() ? (Channel::Type::FM|Channel::Type::DMR) : Channel::Type::None);
+  ctx.config()->settings()->tone()->setChannelIdle(
+    channelFreeIndicationTone() ? (Channel::Type::FM|Channel::Type::DMR) : Channel::Type::None);
+  ctx.config()->settings()->tone()->enableCallReset(resetTone());
 
   // Allocate Radioddity extension if needed
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
@@ -1886,18 +1902,13 @@ RadioddityCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Err
   ext->setLoneWorkerReminderPeriod(Interval::fromSeconds(loneWorkerReminderPeriod()));
   ext->enableDownChannelModeVFO(downChannelModeVFO());
   ext->enableUpChannelModeVFO(upChannelModeVFO());
-  ext->tone()->enableResetTone(resetTone());
   ext->tone()->enableUnknownNumberTone(unknownNumberTone());
   ext->tone()->setARTSToneMode(artsToneMode());
-  ext->tone()->enableDigitalTalkPermitTone(digitalTalkPermitTone());
-  ext->tone()->enableAnalogTalkPermitTone(analogTalkPermitTone());
   ext->tone()->enableSelftestTone(selftestTone());
-  ext->tone()->enableChannelFreeIndicationTone(channelFreeIndicationTone());
   ext->enablePowerSaveMode(batsaveRX());
   ext->enableWakeupPreamble(batsavePreamble());
   ext->disableAllLEDs(allLEDsDisabled());
   ext->inhibitQuickKeyOverride(quickKeyOverrideInhibited());
-  ext->tone()->enableTXExitTone(txExitTone());
   ext->enableTXOnActiveChannel(txOnActiveChannel());
   ext->setScanMode(scanMode());
   ext->setRepeaterEndDelay(Interval::fromSeconds(repeaterEndDelay()));

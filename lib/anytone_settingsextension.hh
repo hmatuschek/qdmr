@@ -391,91 +391,17 @@ class AnytoneToneSettingsExtension: public ConfigItem
   Q_OBJECT
   Q_CLASSINFO("description", "Tone settings for AnyTone devices.")
 
-  Q_CLASSINFO("smsAlertDescription", "Enables/disables the SMS alert tone.")
-  /** If @c true, the SMS alert tone is enabled. */
-  Q_PROPERTY(bool smsAlert READ smsAlertEnabled WRITE enableSMSAlert)
-
-  Q_CLASSINFO("callAlertDescription", "Enables/disables the call alert tone.")
-  /** If @c true, the call alert tone is enabled. */
-  Q_PROPERTY(bool callAlert READ callAlertEnabled WRITE enableCallAlert)
-
-  Q_CLASSINFO("dmrTalkPermitDescription", "Enables/disables the talk-permit tone for DMR channels.")
-  /** If @c true, the DMR talk permit tone is enabled. */
-  Q_PROPERTY(bool dmrTalkPermit READ talkPermitDigitalEnabled WRITE enableTalkPermitDigital)
-
-  Q_CLASSINFO("dmrResetDescription", "Enables/disables the reset tone for DMR channels.")
-  /** If @c true, the DMR reset tone is enabled. */
-  Q_PROPERTY(bool dmrReset READ digitalResetToneEnabled WRITE enableDigitalResetTone)
-
-  Q_CLASSINFO("fmTalkPermitDescription", "Enables/disables the talk-permit tone for FM channels.")
-  /** If @c true, the FM talk permit tone is enabled. */
-  Q_PROPERTY(bool fmTalkPermit READ talkPermitAnalogEnabled WRITE enableTalkPermitAnalog)
-
-  /** If @c true, the idle tone is enabled for DMR channels. */
-  Q_PROPERTY(bool dmrIdle READ dmrIdleChannelToneEnabled WRITE enableDMRIdleChannelTone)
-  /** If @c true, the idle tone is enabled for FM channels. */
-  Q_PROPERTY(bool fmIdle READ fmIdleChannelToneEnabled WRITE enableFMIdleChannelTone)
-  /** If @c true, the startup tone is enabled. */
-  Q_PROPERTY(bool startup READ startupToneEnabled WRITE enableStartupTone)
   /** Enables transmit timeout notification (5s before TOT). */
   Q_PROPERTY(bool tot READ totNotification WRITE enableTOTNotification)
   /** Enables weather alarm tone. */
   Q_PROPERTY(bool wxAlarm READ wxAlarm WRITE enableWXAlarm)
 
-  /** The call melody. */
-  Q_PROPERTY(Melody * callMelody READ callMelody)
-  /** The idle melody. */
-  Q_PROPERTY(Melody * idleMelody READ idleMelody)
-  /** The reset melody. */
-  Q_PROPERTY(Melody * resetMelody READ resetMelody)
-  /** The call-end melody. */
-  Q_PROPERTY(Melody * callEndMelody READ callEndMelody)
 
 public:
   /** Empty constructor. */
   explicit AnytoneToneSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-
-  /** Returns @c true if SMS alert is enabled. */
-  bool smsAlertEnabled() const;
-  /** Enables/disables SMS alert. */
-  void enableSMSAlert(bool enable);
-
-  /** Returns @c true if call alert is enabled. */
-  bool callAlertEnabled() const;
-  /** Enables/disables call alert. */
-  void enableCallAlert(bool enable);
-
-  /** Returns @c true if the talk permit tone is enabled for digital channels. */
-  bool talkPermitDigitalEnabled() const;
-  /** Enables/disables the talk permit tone for digital channels. */
-  void enableTalkPermitDigital(bool enable);
-
-  /** Returns @c true if the talk permit tone is enabled for digital channels. */
-  bool talkPermitAnalogEnabled() const;
-  /** Enables/disables the talk permit tone for analog channels. */
-  void enableTalkPermitAnalog(bool enable);
-
-  /** Returns @c true if the reset tone is enabled for digital calls. */
-  bool digitalResetToneEnabled() const;
-  /** Enables/disables the reset tone for digital calls. */
-  void enableDigitalResetTone(bool enable);
-
-  /** Returns @c true if the idle channel tone is enabled for DMR channel. */
-  bool dmrIdleChannelToneEnabled() const;
-  /** Enables/disables the idle DMR channel tone. */
-  void enableDMRIdleChannelTone(bool enable);
-
-  /** Returns @c true if the idle channel tone is enabled for FM channel. */
-  bool fmIdleChannelToneEnabled() const;
-  /** Enables/disables the idle FM channel tone. */
-  void enableFMIdleChannelTone(bool enable);
-
-  /** Returns @c true if the startup tone is enabled. */
-  bool startupToneEnabled() const;
-  /** Enables/disables the startup tone. */
-  void enableStartupTone(bool enable);
 
   /** Returns @c true if the transmit timeout notification is enabled (5s before TOT). */
   bool totNotification() const;
@@ -487,30 +413,9 @@ public:
   /** Enables/disables weather alarm. */
   void enableWXAlarm(bool enable);
 
-  /** Returns a reference to the call melody. */
-  Melody *callMelody() const;
-  /** Returns a reference to the idle melody. */
-  Melody *idleMelody() const;
-  /** Returns a reference to the reset melody. */
-  Melody *resetMelody() const;
-  /** Returns a reference to the call-end melody. */
-  Melody *callEndMelody() const;
-
 protected:
-  bool _smsAlert;                  ///< SMS alert tone enabled.
-  bool _callAlert;                 ///< Call alert tone enabled.
-  bool _talkPermitDigital;         ///< DMR talk permit tone.
-  bool _talkPermitAnalog;          ///< FM talk permit tone.
-  bool _resetToneDigital;          ///< DMR reset tone.
-  bool _dmrIdleChannelTone;        ///< Idle channel tone (DMR).
-  bool _fmIdleChannelTone;         ///< Idle channel tone (FM).
-  bool _startupTone;               ///< Startup tone enabled.
   bool _totNotification;           ///< TOT notification enabled.
   bool _wxAlarm;                   ///< Weather alarm.
-  Melody *_callMelody;             ///< Call melody.
-  Melody *_idleMelody;             ///< Idle melody.
-  Melody *_resetMelody;            ///< Reset melody.
-  Melody *_callEndMelody;          ///< Call end melody.
 };
 
 

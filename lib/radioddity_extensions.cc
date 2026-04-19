@@ -109,10 +109,8 @@ RadioddityButtonSettingsExtension::setFuncKey3Long(Function func) {
  * ********************************************************************************************* */
 RadioddityToneSettingsExtension::RadioddityToneSettingsExtension(QObject *parent)
   : ConfigItem(parent), _lowBatteryWarn(true), _lowBatteryWarnInterval(Interval::fromSeconds(30)),
-  _lowBatteryWarnVolume(5), _callAlertDuration(Interval::fromSeconds(120)), _resetTone(false),
-  _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _digitalTalkPermitTone(false),
-  _analogTalkPermitTone(false), _selftestTone(true), _channelFreeIndicationTone(false),
-  _txExitTone(false)
+  _lowBatteryWarnVolume(5), _callAlertDuration(Interval::fromSeconds(120)),
+  _unknownNumberTone(false), _artsToneMode(ARTSTone::Once), _selftestTone(true)
 {
   // pass...
 }
@@ -177,18 +175,6 @@ RadioddityToneSettingsExtension::setCallAlertDuration(Interval sec) {
 }
 
 bool
-RadioddityToneSettingsExtension::resetTone() const {
-  return _resetTone;
-}
-void
-RadioddityToneSettingsExtension::enableResetTone(bool enable) {
-  if (_resetTone == enable)
-    return;
-  _resetTone = enable;
-  emit modified(this);
-}
-
-bool
 RadioddityToneSettingsExtension::unknownNumberTone() const {
   return _unknownNumberTone;
 }
@@ -213,30 +199,6 @@ RadioddityToneSettingsExtension::setARTSToneMode(ARTSTone mode) {
 }
 
 bool
-RadioddityToneSettingsExtension::digitalTalkPermitTone() const {
-  return _digitalTalkPermitTone;
-}
-void
-RadioddityToneSettingsExtension::enableDigitalTalkPermitTone(bool enable) {
-  if (_digitalTalkPermitTone == enable)
-    return;
-  _digitalTalkPermitTone = enable;
-  emit modified(this);
-}
-
-bool
-RadioddityToneSettingsExtension::analogTalkPermitTone() const {
-  return _analogTalkPermitTone;
-}
-void
-RadioddityToneSettingsExtension::enableAnalogTalkPermitTone(bool enable) {
-  if (_analogTalkPermitTone == enable)
-    return;
-  _analogTalkPermitTone = enable;
-  emit modified(this);
-}
-
-bool
 RadioddityToneSettingsExtension::selftestTone() const {
   return _selftestTone;
 }
@@ -247,31 +209,6 @@ RadioddityToneSettingsExtension::enableSelftestTone(bool enable) {
   _selftestTone = enable;
   emit modified(this);
 }
-
-bool
-RadioddityToneSettingsExtension::channelFreeIndicationTone() const {
-  return _channelFreeIndicationTone;
-}
-void
-RadioddityToneSettingsExtension::enableChannelFreeIndicationTone(bool enable) {
-  if (_channelFreeIndicationTone == enable)
-    return;
-  _channelFreeIndicationTone = enable;
-  emit modified(this);
-}
-
-bool
-RadioddityToneSettingsExtension::txExitTone() const {
-  return _txExitTone;
-}
-void
-RadioddityToneSettingsExtension::enableTXExitTone(bool enable) {
-  if (_txExitTone == enable)
-    return;
-  _txExitTone = enable;
-  emit modified(this);
-}
-
 
 
 

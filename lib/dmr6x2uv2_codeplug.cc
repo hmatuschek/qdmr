@@ -587,6 +587,9 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   else
     setFMMicGain(ctx.config()->settings()->audio()->micGain());
 
+  // tone settings
+  enableFMIdleTone(ctx.config()->settings()->tone()->channelIdle().setFlag(Channel::Type::FM));
+
   // Encode device specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -604,7 +607,6 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   setBluetoothPTTSleepTimeout(ext->bluetoothSettings()->pttSleepTimer());
 
   // Encode audio settings
-  enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
   enableTOTWarningTone(ext->toneSettings()->totNotification());
   enableWXAlarm(ext->toneSettings()->wxAlarm());
 
@@ -640,6 +642,11 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   else
     ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
 
+  // Store tone settings
+  ctx.config()->settings()->tone()->setChannelIdle(
+    ctx.config()->settings()->tone()->channelIdle()
+      | (fmIdleToneEnabled() ? Channel::Type::FM : Channel::Type::None) );
+
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
     ext = new AnytoneSettingsExtension();
@@ -657,7 +664,6 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   ext->bluetoothSettings()->enablePTTLatch(bluetoothPTTLatchEnabled());
   ext->bluetoothSettings()->setPTTSleepTimer(bluetoothPTTSleepTimeout());
 
-  ext->toneSettings()->enableFMIdleChannelTone(fmIdleToneEnabled());
   ext->toneSettings()->enableTOTNotification(totWarningToneEnabled());
   ext->toneSettings()->enableWXAlarm(wxAlarmEnabled());
 

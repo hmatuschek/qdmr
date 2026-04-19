@@ -1265,16 +1265,8 @@ AnytoneKeySettingsExtension::enableForcedKeyLock(bool enable) {
  * Implementation of AnytoneToneSettingsExtension
  * ********************************************************************************************* */
 AnytoneToneSettingsExtension::AnytoneToneSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _smsAlert(false), _callAlert(false),
-    _talkPermitDigital(false), _talkPermitAnalog(false), _resetToneDigital(false),
-    _dmrIdleChannelTone(false), _fmIdleChannelTone(false), _startupTone(false),
-    _totNotification(false), _wxAlarm(false),
-    _callMelody(new Melody(100, this)), _idleMelody(new Melody(100, this)),
-    _resetMelody(new Melody(100, this)), _callEndMelody(new Melody(100, this))
+  : ConfigItem(parent), _totNotification(false), _wxAlarm(false)
 {
-  connect(_callMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
-  connect(_idleMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
-  connect(_resetMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
 }
 
 ConfigItem *
@@ -1287,106 +1279,12 @@ AnytoneToneSettingsExtension::clone() const {
   return ext;
 }
 
-bool
-AnytoneToneSettingsExtension::smsAlertEnabled() const {
-  return _smsAlert;
-}
-void
-AnytoneToneSettingsExtension::enableSMSAlert(bool enable) {
-  if (_smsAlert == enable)
-    return;
-  _smsAlert = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::callAlertEnabled() const {
-  return _callAlert;
-}
-void
-AnytoneToneSettingsExtension::enableCallAlert(bool enable) {
-  if (_callAlert == enable)
-    return;
-  _callAlert = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::talkPermitDigitalEnabled() const {
-  return _talkPermitDigital;
-}
-void
-AnytoneToneSettingsExtension::enableTalkPermitDigital(bool enable) {
-  if (_talkPermitDigital == enable)
-    return;
-  _talkPermitDigital = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::talkPermitAnalogEnabled() const {
-  return _talkPermitAnalog;
-}
-void
-AnytoneToneSettingsExtension::enableTalkPermitAnalog(bool enable) {
-  if (_talkPermitAnalog == enable)
-    return;
-  _talkPermitAnalog = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::digitalResetToneEnabled() const {
-  return _resetToneDigital;
-}
-void
-AnytoneToneSettingsExtension::enableDigitalResetTone(bool enable) {
-  if (_resetToneDigital == enable)
-    return;
-  _resetToneDigital = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::dmrIdleChannelToneEnabled() const {
-  return _dmrIdleChannelTone;
-}
-void
-AnytoneToneSettingsExtension::enableDMRIdleChannelTone(bool enable) {
-  if (_dmrIdleChannelTone == enable)
-    return;
-  _dmrIdleChannelTone = enable;
-  return modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::fmIdleChannelToneEnabled() const {
-  return _fmIdleChannelTone;
-}
-void
-AnytoneToneSettingsExtension::enableFMIdleChannelTone(bool enable) {
-  if (_fmIdleChannelTone == enable)
-    return;
-  _fmIdleChannelTone = enable;
-  return modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::startupToneEnabled() const {
-  return _startupTone;
-}
-void
-AnytoneToneSettingsExtension::enableStartupTone(bool enable) {
-  if (_startupTone == enable)
-    return;
-  _startupTone = enable;
-  return modified(this);
-}
 
 bool
 AnytoneToneSettingsExtension::totNotification() const {
   return _totNotification;
 }
+
 void
 AnytoneToneSettingsExtension::enableTOTNotification(bool enable) {
   if (enable == _totNotification)
@@ -1394,6 +1292,7 @@ AnytoneToneSettingsExtension::enableTOTNotification(bool enable) {
   _totNotification = enable;
   emit modified(this);
 }
+
 
 bool
 AnytoneToneSettingsExtension::wxAlarm() const {
@@ -1405,23 +1304,6 @@ AnytoneToneSettingsExtension::enableWXAlarm(bool enable) {
     return;
   _wxAlarm = enable;
   emit modified(this);
-}
-
-Melody *
-AnytoneToneSettingsExtension::callMelody() const {
-  return _callMelody;
-}
-Melody *
-AnytoneToneSettingsExtension::idleMelody() const {
-  return _idleMelody;
-}
-Melody *
-AnytoneToneSettingsExtension::resetMelody() const {
-  return _resetMelody;
-}
-Melody *
-AnytoneToneSettingsExtension::callEndMelody() const {
-  return _callEndMelody;
 }
 
 

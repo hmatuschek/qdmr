@@ -1637,6 +1637,10 @@ DR1801UVCodeplug::SettingsElement::decode(Config *config, const ErrorStack &err)
   config->settings()->audio()->setVox(voxSensitivity());
   config->settings()->audio()->setVOXDelay(voxDelay());
 
+  // Handle tone settings
+  config->settings()->tone()->enableRingtone(RingTone::Off != ringTone());
+  config->settings()->tone()->enableSMSTone(messageToneEnabled());
+
   // Handle boot settings
   config->settings()->boot()->setBootDisplay(bootScreen());
   config->settings()->boot()->setMessage1(bootLine1());
@@ -1660,6 +1664,10 @@ DR1801UVCodeplug::SettingsElement::encode(Config *config, const ErrorStack &err)
 
   setVOXSensitivity(config->settings()->audio()->vox());
   setVOXDelay(config->settings()->audio()->voxDelay());
+
+  // Handle tone settings
+  setRingTone(config->settings()->tone()->ringtoneEnabled() ? RingTone::RingTone1 : RingTone::Off);
+  enableMessageTone(config->settings()->tone()->smsToneEnabled());
 
   // Encode boot settings
   setBootScreen(config->settings()->boot()->bootDisplay());
