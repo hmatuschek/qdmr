@@ -139,9 +139,9 @@ DM32UVInterface::ValueResponse::receive(DM32UVInterface *dev, const ErrorStack &
   return dev->receive(data, this->length, TIMEOUT, err);
 }
 
-QString
+QByteArray
 DM32UVInterface::ValueResponse::string() const {
-  return QString::fromLatin1(QByteArray((const char *)payload,length));
+  return {reinterpret_cast<const char *>(payload), length};
 }
 
 uint32_t
@@ -560,6 +560,11 @@ DM32UVInterface::enter_program_mode(const ErrorStack &err) {
   if (State::SystemInfo != _state) {
     errMsg(err) << "Cannot enter PROGRAM mode. Interface not in SYSINFO mode.";
     return false;
+  }
+
+  if (_firmwareVersion.isEmpty() && !DM32UV::supportedFirmwareVersions().contains(_firmwareVersion)) {
+    logWarn() << "Firmware version " << _firmwareVersion << " is currently not supported by qdmr. "
+              << "Supported versions: " << DM32UV::supportedFirmwareVersions().values().join(", ") << ".";
   }
 
   EnterProgramModeRequest progReq;

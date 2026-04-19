@@ -133,7 +133,7 @@ public:
      * should implement this method. */
     virtual void clear();
 
-    /** Fills the memsets the entire element to the given value. */
+    /** Fills memsets the entire element to the given value. */
     bool fill(uint8_t value, unsigned offset=0, int size=-1);
 
     /** Reads a specific bit at the given byte-offset. */
