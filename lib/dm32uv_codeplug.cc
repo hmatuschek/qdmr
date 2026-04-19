@@ -21,6 +21,10 @@ DM32UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
   // pass...
 }
 
+void
+DM32UVCodeplug::ChannelElement::clear() {
+  fill(0x00);
+}
 
 QString
 DM32UVCodeplug::ChannelElement::name() const {
@@ -503,6 +507,7 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
 bool
 DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+  clear();
   setName(channel->name());
   setRXFrequency(channel->rxFrequency());
   if (channel->txFrequency().isZero())

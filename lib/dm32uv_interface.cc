@@ -139,9 +139,9 @@ DM32UVInterface::ValueResponse::receive(DM32UVInterface *dev, const ErrorStack &
   return dev->receive(data, this->length, TIMEOUT, err);
 }
 
-QString
+QByteArray
 DM32UVInterface::ValueResponse::string() const {
-  return QString::fromLatin1(QByteArray((const char *)payload,length));
+  return {reinterpret_cast<const char *>(payload), length};
 }
 
 uint32_t
@@ -322,13 +322,11 @@ DM32UVInterface::getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err, v
     // Unpack prefix
     uint8_t prefix = (uint8_t)mapRes.payload()[0];
     // If prefix is invalid -> do not map
-    if ((0x00 == prefix) || (0xff == prefix)) {
-      logDebug() << "Address " << Qt::hex << addr << "h unallocated.";
+    if ((0x00 == prefix) || (0xff == prefix))
       continue;
-    }
     // add to address map
     uint32_t vaddr = ((uint32_t)prefix) << 12;
-    logDebug() << "Map " << Qt::hex << addr << "h -> " << vaddr << "h.";
+    //logDebug() << "Map " << Qt::hex << addr << "h -> " << vaddr << "h.";
     map.map(addr, vaddr);
     // Signal progress
     if (progress) progress((100*addr)/_codeplugMemory.second);
@@ -562,6 +560,11 @@ DM32UVInterface::enter_program_mode(const ErrorStack &err) {
     return false;
   }
 
+  if (_firmwareVersion.isEmpty() && !DM32UV::supportedFirmwareVersions().contains(_firmwareVersion)) {
+    logWarn() << "Firmware version " << _firmwareVersion << " is currently not supported by qdmr. "
+              << "Supported versions: " << DM32UV::supportedFirmwareVersions().values().join(", ") << ".";
+  }
+
   EnterProgramModeRequest progReq;
   ACKResponse progRes;
   if (! sendReceive(progReq, progRes, err)) {
@@ -591,7 +594,7 @@ bool
 DM32UVInterface::send(const char *data, qint64 n, int timeout, const ErrorStack &err) {
   Q_UNUSED(timeout)
 
-  logDebug() << "Send " << QByteArray(data, n).toHex(' ') << ".";
+  //logDebug() << "Send " << QByteArray(data, n).toHex(' ') << ".";
   while (n) {
     auto k = QSerialPort::write(data, n);
     if (0 > k) {
