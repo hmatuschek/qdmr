@@ -82,6 +82,7 @@ public:
   enum class Type {
     None=0, DMR=1, M17=2, FM=4, AM=8, Analog=FM|AM, Digital=DMR|M17, All=Analog|Digital
   };
+  Q_ENUM(Type);
   Q_DECLARE_FLAGS(Types, Type);
   Q_FLAGS(Types);
 

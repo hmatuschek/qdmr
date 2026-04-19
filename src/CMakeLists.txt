@@ -70,6 +70,9 @@ qt6_add_executable(qdmr WIN32
   aprsselect.hh aprsselect.cc
   idselect.hh idselect.cc
   timeslotselect.hh timeslotselect.cc
+  melody_edit.hh melody_edit.cc
+		channel_type_edit.cc
+		channel_type_edit.hh
 )
 
 #
@@ -99,7 +102,8 @@ generate_icons(
         document-new document-open document-verify document-save-as document-download
         document-import document-export
         edit-move-10-down edit-move-10-up edit-move-down edit-move-up edit-move-bottom edit-move-top
-        edit-satellites edit-clear item-filter
+        edit-satellites edit-clear item-filter edit-edit
+		media-play
         help-contents help-about
         symbol-minus symbol-plus symbol-none
   THEMES light dark

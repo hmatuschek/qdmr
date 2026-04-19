@@ -1,7 +1,8 @@
 #include "generalsettingsview.hh"
-#include "ui_generalsettingsview.h"
-#include "config.hh"
 
+#include "channel_type_edit.hh"
+#include "config.hh"
+#include "ui_generalsettingsview.h"
 
 GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   : QWidget(parent), ui(new Ui::GeneralSettingsView), _config(config) {
@@ -15,6 +16,11 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
 
   ui->extensionView->setObjectName("radioSettingsExtension");
   ui->extensionView->setObject(_config->settings(), _config);
+  ui->bootMelodyEdit->setMelody(_config->settings()->tone()->bootMelody());
+  ui->callStartEdit->setMelody(_config->settings()->tone()->callStartMelody());
+  ui->callEndEdit->setMelody(_config->settings()->tone()->callEndMelody());
+  ui->channelIdleEdit->setMelody(_config->settings()->tone()->channelIdleMelody());
+  ui->callResetEdit->setMelody(_config->settings()->tone()->callResetMelody());
 
   // update view from config
   onConfigModified();
@@ -77,6 +83,26 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   connect(ui->keyToneVolume, &QSpinBox::valueChanged, [this](int value) {
     this->_config->settings()->tone()->setKeyToneVolume(Level::fromValue(value));
   });
+  connect(ui->bootMelodyEnable, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
+    this->_config->settings()->tone()->enableBootTone(Qt::Checked == state);
+  });
+  connect(ui->talkPermitSelect, &ChannelTypeEdit::typesChanged, [this](Channel::Types types) {
+    this->_config->settings()->tone()->setTalkPermit(types);
+  });
+  connect(ui->callStartSelect, &ChannelTypeEdit::typesChanged, [this](Channel::Types types) {
+    this->_config->settings()->tone()->setCallStart(types);
+  });
+  connect(ui->callEndSelect, &ChannelTypeEdit::typesChanged, [this](Channel::Types types) {
+    this->_config->settings()->tone()->setCallEnd(types);
+  });
+  connect(ui->channelIdleSelect, &ChannelTypeEdit::typesChanged, [this](Channel::Types types) {
+    this->_config->settings()->tone()->setChannelIdle(types);
+  });
+  connect(ui->callResetEnable, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
+    this->_config->settings()->tone()->enableCallReset(Qt::Checked == state);
+  });
+
+
 
   connect(ui->powerValue, &QComboBox::currentIndexChanged, [this](int index) {
     this->_config->settings()->setPower(this->ui->powerValue->itemData(index).value<Channel::Power>());
@@ -119,6 +145,12 @@ GeneralSettingsView::onConfigModified() {
   // Tone settings:
   ui->disableAllTones->setChecked(_config->settings()->tone()->silent());
   ui->keyToneVolume->setValue(_config->settings()->tone()->keyToneVolume().value());
+  ui->bootMelodyEnable->setChecked(_config->settings()->tone()->bootToneEnabled());
+  ui->talkPermitSelect->setTypes(_config->settings()->tone()->talkPermit());
+  ui->callStartSelect->setTypes(_config->settings()->tone()->callStart());
+  ui->callEndSelect->setTypes(_config->settings()->tone()->callEnd());
+  ui->channelIdleSelect->setTypes(_config->settings()->tone()->channelIdle());
+  ui->callResetEnable->setChecked(_config->settings()->tone()->callResetEnabled());
 
   // channel default settings
   switch(_config->settings()->power()) {

@@ -278,9 +278,9 @@
         <attribute name="title">
          <string>Tone Settings</string>
         </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0">
          <item>
-          <layout class="QFormLayout" name="tineLeftForm">
+          <layout class="QFormLayout" name="toneLeftForm">
            <item row="0" column="0">
             <widget class="QLabel" name="disableAllTonesLabel">
              <property name="text">
@@ -315,10 +315,178 @@
              </property>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="smsToneLabel">
+             <property name="text">
+              <string>SMS tone</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="smsTone">
+             <property name="toolTip">
+              <string>Enables a tone on SMS reception.</string>
+             </property>
+             <property name="text">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="ringtoneLabel">
+             <property name="text">
+              <string>Ringtone</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QCheckBox" name="ringtone">
+             <property name="toolTip">
+              <string>Enables the ringtone on incoming private calls.</string>
+             </property>
+             <property name="text">
+              <string notr="true"/>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="talkPermitLabel">
+             <property name="text">
+              <string>Talk permit</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="ChannelTypeEdit" name="talkPermitSelect" native="true"/>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="bootMelodyLabel">
+             <property name="text">
+              <string>Boot melody</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+             </property>
+             <property name="buddy">
+              <cstring>bootMelodyEnable</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <layout class="QVBoxLayout" name="bootMelodyLayout">
+             <item>
+              <widget class="QCheckBox" name="bootMelodyEnable">
+               <property name="text">
+                <string>Enabled</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="MelodyEdit" name="bootMelodyEdit" native="true"/>
+             </item>
+            </layout>
+           </item>
           </layout>
          </item>
          <item>
-          <layout class="QFormLayout" name="toneRightForm"/>
+          <layout class="QFormLayout" name="toneRightForm">
+           <item row="0" column="0">
+            <widget class="QLabel" name="callStartLabel">
+             <property name="text">
+              <string>Call Start</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="callEndLabel">
+             <property name="text">
+              <string>Call End</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="channelIdleLabel">
+             <property name="text">
+              <string>Channel Idle</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="callResetLabel">
+             <property name="text">
+              <string>Call Reset</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <layout class="QVBoxLayout" name="callStartLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="ChannelTypeEdit" name="callStartSelect" native="true"/>
+             </item>
+             <item>
+              <widget class="MelodyEdit" name="callStartEdit" native="true"/>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="1">
+            <layout class="QVBoxLayout" name="callEndLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="ChannelTypeEdit" name="callEndSelect" native="true"/>
+             </item>
+             <item>
+              <widget class="MelodyEdit" name="callEndEdit" native="true"/>
+             </item>
+            </layout>
+           </item>
+           <item row="2" column="1">
+            <layout class="QVBoxLayout" name="channelIdleLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="ChannelTypeEdit" name="channelIdleSelect" native="true"/>
+             </item>
+             <item>
+              <widget class="MelodyEdit" name="channelIdleEdit" native="true"/>
+             </item>
+            </layout>
+           </item>
+           <item row="3" column="1">
+            <layout class="QVBoxLayout" name="callResetLayout">
+             <property name="spacing">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="callResetEnable">
+               <property name="text">
+                <string>CheckBox</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="MelodyEdit" name="callResetEdit" native="true"/>
+             </item>
+            </layout>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
@@ -406,6 +574,18 @@
    <class>ExtensionView</class>
    <extends>QWidget</extends>
    <header>extensionview.hh</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MelodyEdit</class>
+   <extends>QWidget</extends>
+   <header>melody_edit.hh</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ChannelTypeEdit</class>
+   <extends>QWidget</extends>
+   <header>channel_type_edit.hh</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
