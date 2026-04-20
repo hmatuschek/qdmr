@@ -14,7 +14,7 @@ qt_add_library(libdmrconf SHARED
   utils.cc crc32.cc addressmap.cc radiointerface.cc errorstack.cc frequency.cc interval.cc
   ranges.cc dummyfilereader.cc chirpformat.cc signaling.cc radio.cc dfu_libusb.cc usbserial.cc
   radioinfo.cc usbdevice.cc radiolimits.cc csvreader.cc dfufile.cc userdatabase.cc logger.cc level.cc
-  melody.cc visitor.cc configlabelingvisitor.cc configcopyvisitor.cc
+  melody.cc melody_stream.cc visitor.cc configlabelingvisitor.cc configcopyvisitor.cc
   intermediaterepresentation.cc configmergevisitor.cc configobject.cc configreference.cc config.cc
   radiosettings.cc contact.cc rxgrouplist.cc channel.cc zone.cc scanlist.cc gpssystem.cc codeplug.cc
   roamingzone.cc roamingchannel.cc callsigndb.cc talkgroupdatabase.cc radioid.cc transferflags.cc
@@ -56,7 +56,7 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   libdmrconf.hh utils.hh ${hid_HEADERS} crc32.hh addressmap.hh radiointerface.hh errorstack.hh
   frequency.hh interval.hh ranges.hh dummyfilereader.hh chirpformat.hh signaling.hh radio.hh level.hh
   dfu_libusb.hh usbserial.hh radioinfo.hh usbdevice.hh radiolimits.hh csvreader.hh dfufile.hh
-  userdatabase.hh logger.hh melody.hh visitor.hh configlabelingvisitor.hh configcopyvisitor.hh
+  userdatabase.hh logger.hh melody.hh melody_stream.hh visitor.hh configlabelingvisitor.hh configcopyvisitor.hh
   intermediaterepresentation.hh configmergevisitor.hh configobject.hh configreference.hh config.hh
   radiosettings.hh contact.hh rxgrouplist.hh channel.hh zone.hh scanlist.hh gpssystem.hh codeplug.hh
   roamingzone.hh roamingchannel.hh callsigndb.hh talkgroupdatabase.hh radioid.hh transferflags.hh
@@ -99,7 +99,7 @@ set_target_properties(libdmrconf PROPERTIES
   SOVERSION "${PROJECT_VERSION_MAJOR}")
 
 target_link_libraries(libdmrconf PRIVATE Qt6::Core Qt6::SerialPort Qt6::Positioning Qt6::Network
-  Qt6::Concurrent
+  Qt6::Concurrent Qt6::Multimedia
   ${LIBUSB_1_LIBRARIES} ${YAMLCPP_LIBRARIES} ${ADDITIONAL_LIBS})
 
 install(TARGETS libdmrconf DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR}

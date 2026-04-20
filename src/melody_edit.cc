@@ -1,6 +1,7 @@
 #include "melody_edit.hh"
 
 #include "melody.hh"
+#include "melody_player.hh"
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QPushButton>
@@ -9,7 +10,8 @@
 
 MelodyEdit::MelodyEdit(QWidget *parent) :
   QWidget(parent), _melody(), _bpm(new QSpinBox(this)),
-  _melodyEdit(new QLineEdit(this)) {
+  _melodyEdit(new QLineEdit(this)), _player(new MelodyPlayer(this))
+{
   _bpm->setRange(10,1000);
   _bpm->setSuffix(tr("bpm", "Beats per minute. Unit in a spin box."));
   _melodyEdit->setToolTip(tr("Specify the melody in Lilypond format.",
@@ -22,8 +24,10 @@ MelodyEdit::MelodyEdit(QWidget *parent) :
 
   auto play = new QPushButton();
   play->setIcon(QIcon::fromTheme("media-play"));
-  play->setEnabled(false);
+  play->setCheckable(true);
   play->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+  connect(play, &QPushButton::toggled, _player, &MelodyPlayer::togglePlay);
+  connect(_player, &MelodyPlayer::stateChanged, play, &QPushButton::setChecked);
 
   auto hbox = new QHBoxLayout(this);
   hbox->addWidget(_bpm);
@@ -60,4 +64,6 @@ MelodyEdit::onMelodyChanged(ConfigItem *item) {
   Q_UNUSED(item);
   _bpm->setValue(_melody->bpm());
   _melodyEdit->setText(_melody->toLilypond());
+  _player->togglePlay(false);
+  _player->setMelody(_melody);
 }

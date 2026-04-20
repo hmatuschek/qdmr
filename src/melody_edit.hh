@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QPointer>
 
+#include "melody_player.hh"
+
 class Melody;
 class QSpinBox;
 class QLineEdit;
@@ -28,6 +30,7 @@ private:
   QPointer<Melody> _melody;
   QSpinBox *_bpm;
   QLineEdit *_melodyEdit;
+  MelodyPlayer *_player;
 };
 
 

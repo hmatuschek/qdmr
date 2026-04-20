@@ -73,6 +73,8 @@ qt6_add_executable(qdmr WIN32
   melody_edit.hh melody_edit.cc
 		channel_type_edit.cc
 		channel_type_edit.hh
+        melody_player.cc
+        melody_player.hh
 )
 
 #
@@ -142,7 +144,7 @@ if (UNIX AND APPLE AND INSTALL_BUNDLE)
 endif(UNIX AND APPLE AND INSTALL_BUNDLE)
 
 target_link_libraries(qdmr PRIVATE Qt6::Core Qt6::Widgets Qt6::Network Qt6::Positioning Qt6::UiTools
-  Qt6::Concurrent ${LIBUSB_1_LIBS} libdmrconf)
+  Qt6::Concurrent Qt6::Multimedia ${LIBUSB_1_LIBS} libdmrconf)
 target_include_directories(qdmr PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Install binary only if not a bundle under MacOS X
