@@ -15,7 +15,7 @@ MelodyEdit::MelodyEdit(QWidget *parent) :
   _bpm->setRange(10,1000);
   _bpm->setSuffix(tr("bpm", "Beats per minute. Unit in a spin box."));
   _melodyEdit->setToolTip(tr("Specify the melody in Lilypond format.",
-    "Tooltip for a melody entrie field."));
+    "Tooltip for a melody entry field."));
   _melodyEdit->setValidator(
     new QRegularExpressionValidator(
       QRegularExpression(R"(([a-zA-Z]+)([,]+|[']+|)(1|2|4|8|16|)(\.|))"
@@ -50,6 +50,8 @@ MelodyEdit::MelodyEdit(QWidget *parent) :
 
 void
 MelodyEdit::setMelody(Melody *melody) {
+  if (! _melody.isNull())
+    disconnect(_melody, &Melody::modified, this, &MelodyEdit::onMelodyChanged);
   _melody = melody;
   if (! _melody.isNull()) {
     onMelodyChanged(_melody);
@@ -57,6 +59,7 @@ MelodyEdit::setMelody(Melody *melody) {
   }
   _bpm->setEnabled(! _melody.isNull());
   _melodyEdit->setEnabled(! _melody.isNull());
+  _player->setMelody(melody);
 }
 
 void
@@ -65,5 +68,4 @@ MelodyEdit::onMelodyChanged(ConfigItem *item) {
   _bpm->setValue(_melody->bpm());
   _melodyEdit->setText(_melody->toLilypond());
   _player->togglePlay(false);
-  _player->setMelody(_melody);
 }

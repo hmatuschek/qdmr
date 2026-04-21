@@ -15,9 +15,10 @@ class MelodyPlayer: public QObject
 
 public:
   explicit MelodyPlayer(QObject *parent = nullptr);
+  virtual ~MelodyPlayer();
 
 public slots:
-  void setMelody(const Melody *melody);
+  void setMelody(Melody *melody);
   void togglePlay(bool play);
 
 signals:

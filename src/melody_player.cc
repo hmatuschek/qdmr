@@ -18,8 +18,13 @@ MelodyPlayer::MelodyPlayer(QObject *parent)
   });
 }
 
+MelodyPlayer::~MelodyPlayer() {
+  _playbackSink->stop();
+  _stream->close();
+}
+
 void
-MelodyPlayer::setMelody(const Melody *melody) {
+MelodyPlayer::setMelody(Melody *melody) {
   if (_stream->isOpen())
     _stream->close();
   _stream->setMelody(melody);
