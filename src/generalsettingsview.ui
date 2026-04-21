@@ -25,7 +25,7 @@
         <attribute name="title">
          <string>Boot Settings</string>
         </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
          <item>
           <layout class="QFormLayout" name="bootLeftForm">
            <item row="0" column="0">
@@ -76,7 +76,7 @@
         <attribute name="title">
          <string>Audio Settings</string>
         </attribute>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="1,1">
          <item>
           <layout class="QFormLayout" name="audioLeftForm">
            <item row="0" column="0">
@@ -380,7 +380,7 @@
              <item>
               <widget class="QCheckBox" name="bootMelodyEnable">
                <property name="text">
-                <string>Enabled</string>
+                <string extracomment="Label for a checkbox, enabling the boot melody">Enabled</string>
                </property>
               </widget>
              </item>
@@ -401,6 +401,9 @@
              <property name="alignment">
               <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
              </property>
+             <property name="buddy">
+              <cstring>callStartSelect</cstring>
+             </property>
             </widget>
            </item>
            <item row="1" column="0">
@@ -411,12 +414,18 @@
              <property name="alignment">
               <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
              </property>
+             <property name="buddy">
+              <cstring>callEndSelect</cstring>
+             </property>
             </widget>
            </item>
            <item row="2" column="0">
             <widget class="QLabel" name="channelIdleLabel">
              <property name="text">
               <string>Channel Idle</string>
+             </property>
+             <property name="buddy">
+              <cstring>channelIdleSelect</cstring>
              </property>
             </widget>
            </item>
@@ -427,6 +436,9 @@
              </property>
              <property name="alignment">
               <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+             </property>
+             <property name="buddy">
+              <cstring>callResetEnable</cstring>
              </property>
             </widget>
            </item>
@@ -477,7 +489,7 @@
              <item>
               <widget class="QCheckBox" name="callResetEnable">
                <property name="text">
-                <string>CheckBox</string>
+                <string extracomment="Label for a checkbox enabling the call-reset tone.">Enabled</string>
                </property>
               </widget>
              </item>
@@ -494,62 +506,69 @@
         <attribute name="title">
          <string>Default Values</string>
         </attribute>
-        <layout class="QFormLayout" name="formLayout_3">
-         <item row="0" column="0">
-          <widget class="QLabel" name="powerLabel">
-           <property name="text">
-            <string>Power</string>
-           </property>
-          </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,1">
+         <item>
+          <layout class="QFormLayout" name="defaultLeftForm">
+           <item row="0" column="0">
+            <widget class="QLabel" name="powerLabel">
+             <property name="text">
+              <string>Power</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="powerValue">
+             <item>
+              <property name="text">
+               <string>Max</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>High</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mid</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Low</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Min</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="transmitTimeoutLabel">
+             <property name="text">
+              <string>Transmit Timeout</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSpinBox" name="totValue">
+             <property name="specialValueText">
+              <string>Off</string>
+             </property>
+             <property name="suffix">
+              <string notr="true"> s</string>
+             </property>
+             <property name="maximum">
+              <number>9999</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="powerValue">
-           <item>
-            <property name="text">
-             <string>Max</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>High</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Mid</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Low</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Min</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="transmitTimeoutLabel">
-           <property name="text">
-            <string>Transmit Timeout</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QSpinBox" name="totValue">
-           <property name="specialValueText">
-            <string>Off</string>
-           </property>
-           <property name="suffix">
-            <string notr="true"> s</string>
-           </property>
-           <property name="maximum">
-            <number>9999</number>
-           </property>
-          </widget>
+         <item>
+          <layout class="QFormLayout" name="defaultRightForm"/>
          </item>
         </layout>
        </widget>
