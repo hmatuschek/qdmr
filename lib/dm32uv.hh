@@ -94,6 +94,10 @@ public:
 
 
 public:
+  /** Returns a set of supported firmware versions. */
+  static inline QSet<QByteArray> supportedFirmwareVersions() { return {"DM32.01.L01.048"}; }
+
+public:
   /** Some constants. */
   struct Offset {
     /** Size for each codeplug block. */
