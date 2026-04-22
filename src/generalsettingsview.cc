@@ -42,8 +42,8 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
     if (! this->ui->dmrSquelchDefault->isChecked())
       this->_config->settings()->audio()->setDMRSquelch(Level::fromValue(value));
   });
-  connect(ui->dmrSquelchDefault, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
-    if (Qt::CheckState::Checked == state) {
+  connect(ui->dmrSquelchDefault, &QCheckBox::toggled, [this](bool checked) {
+    if (checked) {
       this->_config->settings()->audio()->disableDMRSquelch();
       this->ui->dmrSquelch->setEnabled(false);
     } else {
@@ -73,18 +73,18 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   connect(ui->maxHeadphoneVolume, &QSpinBox::valueChanged, [this](int value) {
     this->_config->settings()->audio()->setMaxHeadphoneVolume(Level::fromValue(value));
   });
-  connect(ui->speech, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
-    this->_config->settings()->audio()->enableSpeechSynthesis(Qt::CheckState::Checked == state);
+  connect(ui->speech, &QCheckBox::toggled, [this](bool checked) {
+    this->_config->settings()->audio()->enableSpeechSynthesis(checked);
   });
 
-  connect(ui->disableAllTones, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
-    this->_config->settings()->tone()->enableSilent(Qt::Checked == state);
+  connect(ui->disableAllTones, &QCheckBox::toggled, [this](bool checked) {
+    this->_config->settings()->tone()->enableSilent(checked);
   });
   connect(ui->keyToneVolume, &QSpinBox::valueChanged, [this](int value) {
     this->_config->settings()->tone()->setKeyToneVolume(Level::fromValue(value));
   });
-  connect(ui->bootMelodyEnable, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
-    this->_config->settings()->tone()->enableBootTone(Qt::Checked == state);
+  connect(ui->bootMelodyEnable, &QCheckBox::toggled, [this](bool checked) {
+    this->_config->settings()->tone()->enableBootTone(checked);
   });
   connect(ui->talkPermitSelect, &ChannelTypeEdit::typesChanged, [this](Channel::Types types) {
     this->_config->settings()->tone()->setTalkPermit(types);
@@ -98,8 +98,8 @@ GeneralSettingsView::GeneralSettingsView(Config *config, QWidget *parent)
   connect(ui->channelIdleSelect, &ChannelTypeEdit::typesChanged, [this](Channel::Types types) {
     this->_config->settings()->tone()->setChannelIdle(types);
   });
-  connect(ui->callResetEnable, &QCheckBox::checkStateChanged, [this](Qt::CheckState state) {
-    this->_config->settings()->tone()->enableCallReset(Qt::Checked == state);
+  connect(ui->callResetEnable, &QCheckBox::toggled, [this](bool checked) {
+    this->_config->settings()->tone()->enableCallReset(checked);
   });
 
 
