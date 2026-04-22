@@ -32,7 +32,7 @@ include(GNUInstallDirs)
 include(GenerateIcons)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets UiTools Network SerialPort Positioning
-  Concurrent LinguistTools)
+  Concurrent LinguistTools Multimedia)
 qt6_standard_project_setup()
 
 find_package(LIBUSB_1 REQUIRED)

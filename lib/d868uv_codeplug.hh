@@ -228,12 +228,12 @@ public:
     virtual void setVOXSource(AnytoneAudioSettingsExtension::VoxSource source);
     Level dmrMicGain() const;
     void setDMRMicGain(Level gain);
-    unsigned maxSpeakerVolume() const;
-    void setMaxSpeakerVolume(unsigned level);
+    Level maxSpeakerVolume() const;
+    void setMaxSpeakerVolume(Level level);
     /** Returns the maximum headphone volume. */
-    virtual unsigned maxHeadPhoneVolume() const;
+    virtual Level maxHeadphoneVolume() const;
     /** Sets the maximum headphone volume. */
-    virtual void setMaxHeadPhoneVolume(unsigned max);
+    virtual void setMaxHeadphoneVolume(Level max);
     bool enhanceAudio() const;
     void enableEnhancedAudio(bool enable);
     bool recording() const;
@@ -385,9 +385,9 @@ public:
     /** Returns @c true if the key-tone level is adjustable. */
     virtual bool keyToneLevelAdjustable() const;
     /** Returns the key-tone level (0=adjustable). */
-    virtual unsigned keyToneLevel() const;
+    virtual Level keyToneLevel() const;
     /** Sets the key-tone level. */
-    virtual void setKeyToneLevel(unsigned level);
+    virtual void setKeyToneLevel(Level level);
     /** Sets the key-tone level adjustable. */
     virtual void setKeyToneLevelAdjustable();
 
@@ -429,6 +429,10 @@ public:
       static constexpr Range<unsigned int> vox() { return {1,3}; }
       /** Valid mic gain settings. */
       static constexpr Range<unsigned int> micGain() { return {0,4}; }
+      /** Valid settings for the speaker and headphone volume settings. */
+      static constexpr Range<unsigned int> volume() { return {0, 8}; }
+      /** Valid range for key tone volume. */
+      static constexpr Range<unsigned int> keyTone() { return {0,15}; }
     };
 
   protected:

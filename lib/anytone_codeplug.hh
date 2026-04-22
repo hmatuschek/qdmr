@@ -1146,9 +1146,9 @@ public:
     /** Enables/disables the call-end prompt. */
     virtual void enableCallEndPrompt(bool enable) = 0;
     /** Returns the maximum volume. */
-    virtual unsigned maxSpeakerVolume() const = 0;
+    virtual Level maxSpeakerVolume() const = 0;
     /** Sets the maximum volume. */
-    virtual void setMaxSpeakerVolume(unsigned level) = 0;
+    virtual void setMaxSpeakerVolume(Level level) = 0;
     /** Returns @c true if get GPS position is enabled. */
     virtual bool getGPSPosition() const = 0;
     /** Enables/disables get GPS position. */

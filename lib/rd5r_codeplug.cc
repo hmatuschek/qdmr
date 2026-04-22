@@ -43,14 +43,14 @@ RD5RCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx, con
   if (c->is<FMChannel>()) {
     const FMChannel *ac = c->as<FMChannel>();
     if (ac->defaultSquelch())
-      setSquelch(ctx.config()->settings()->squelch());
+      setSquelch(ctx.config()->settings()->audio()->squelch());
     else if (ac->squelchDisabled())
       setSquelch(Level::null());
     else
       setSquelch(ac->squelch());
   } else {
-    // If digital channel, reuse global quelch setting
-    setSquelch(ctx.config()->settings()->squelch());
+    // If digital channel, reuse global squelch setting
+    setSquelch(ctx.config()->settings()->audio()->squelch());
   }
 
   return true;

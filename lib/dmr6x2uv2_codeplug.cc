@@ -581,6 +581,14 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   // GPS settings
   setGNSS(ctx.config()->settings()->gnss()->systems());
 
+  // audio settings
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
+  else
+    setFMMicGain(ctx.config()->settings()->audio()->micGain());
+
+  // tone settings
+  enableFMIdleTone(ctx.config()->settings()->tone()->channelIdle().setFlag(Channel::Type::FM));
 
   // Encode device specific settings
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -599,11 +607,6 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Conte
   setBluetoothPTTSleepTimeout(ext->bluetoothSettings()->pttSleepTimer());
 
   // Encode audio settings
-  enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
-  if (ext->audioSettings()->fmMicGainEnabled())
-    setFMMicGain(ext->audioSettings()->fmMicGain());
-  else
-    setFMMicGain(ctx.config()->settings()->micLevel());
   enableTOTWarningTone(ext->toneSettings()->totNotification());
   enableWXAlarm(ext->toneSettings()->wxAlarm());
 
@@ -633,6 +636,17 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   // Store GPS settings
   ctx.config()->settings()->gnss()->setSystems(gnss());
 
+  // Store audio settings
+  if (ctx.config()->settings()->audio()->micGain() == fmMicGain())
+    ctx.config()->settings()->audio()->disableFMMicGain();
+  else
+    ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
+
+  // Store tone settings
+  ctx.config()->settings()->tone()->setChannelIdle(
+    ctx.config()->settings()->tone()->channelIdle()
+      | (fmIdleToneEnabled() ? Channel::Type::FM : Channel::Type::None) );
+
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext) {
     ext = new AnytoneSettingsExtension();
@@ -650,12 +664,6 @@ DMR6X2UV2Codeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Err
   ext->bluetoothSettings()->enablePTTLatch(bluetoothPTTLatchEnabled());
   ext->bluetoothSettings()->setPTTSleepTimer(bluetoothPTTSleepTimeout());
 
-  // Store FM mic gain separately, if different
-  ext->toneSettings()->enableFMIdleChannelTone(fmIdleToneEnabled());
-  if (ctx.config()->settings()->micLevel() == fmMicGain())
-    ext->audioSettings()->disableFMMicGain();
-  else
-    ext->audioSettings()->setFMMicGain(fmMicGain());
   ext->toneSettings()->enableTOTNotification(totWarningToneEnabled());
   ext->toneSettings()->enableWXAlarm(wxAlarmEnabled());
 

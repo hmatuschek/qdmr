@@ -29,7 +29,8 @@ private slots:
   void testMelodyDecoding(); 
 
   void testGNSSSettings();
-
+  void testAudioSettings();
+  
   /** Regression test for #509. */
   void testCTCSSNull();
 
