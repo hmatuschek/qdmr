@@ -195,6 +195,32 @@ D578UVTest::testSettingsRoamingNotificationCount() {
   QCOMPARE(testConfig.settings()->anytoneExtension()->roamingSettings()->notificationCount(), 1);
 }
 
+void
+D578UVTest::testIdleToneEnable() {
+  ErrorStack err;
+  Config config, testConfig;
+
+  if (! config.readYAML(":/data/config_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  config.settings()->tone()->setChannelIdle(Channel::Type::FM);
+  encodeDecode(config, testConfig);
+  QCOMPARE(config.settings()->tone()->channelIdle(), Channel::Type::FM);
+
+  config.settings()->tone()->setChannelIdle(Channel::Type::DMR);
+  encodeDecode(config, testConfig);
+  QCOMPARE(config.settings()->tone()->channelIdle(), Channel::Type::DMR);
+
+  config.settings()->tone()->setChannelIdle(Channel::Type::FM|Channel::Type::DMR);
+  encodeDecode(config, testConfig);
+  QCOMPARE(config.settings()->tone()->channelIdle(), Channel::Type::FM|Channel::Type::DMR);
+
+  config.settings()->tone()->setChannelIdle(Channel::Type::None);
+  encodeDecode(config, testConfig);
+  QCOMPARE(config.settings()->tone()->channelIdle(), Channel::Type::None);
+}
 
 void
 D578UVTest::testARC4Encryption() {
