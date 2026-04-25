@@ -362,7 +362,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="61"/>
         <source>Enter a repeater call-sign.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enter a repeater call-sign.</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="68"/>
