@@ -207,19 +207,19 @@ D578UVTest::testIdleToneEnable() {
 
   config.settings()->tone()->setChannelIdle(Channel::Type::FM);
   encodeDecode(config, testConfig);
-  QCOMPARE(config.settings()->tone()->channelIdle(), Channel::Type::FM);
+  QCOMPARE(testConfig.settings()->tone()->channelIdle(), Channel::Type::FM);
 
   config.settings()->tone()->setChannelIdle(Channel::Type::DMR);
   encodeDecode(config, testConfig);
-  QCOMPARE(config.settings()->tone()->channelIdle(), Channel::Type::DMR);
+  QCOMPARE(testConfig.settings()->tone()->channelIdle(), Channel::Type::DMR);
 
   config.settings()->tone()->setChannelIdle(Channel::Type::FM|Channel::Type::DMR);
   encodeDecode(config, testConfig);
-  QCOMPARE(config.settings()->tone()->channelIdle(), Channel::Type::FM|Channel::Type::DMR);
+  QCOMPARE(testConfig.settings()->tone()->channelIdle(), Channel::Type::FM|Channel::Type::DMR);
 
   config.settings()->tone()->setChannelIdle(Channel::Type::None);
   encodeDecode(config, testConfig);
-  QCOMPARE(config.settings()->tone()->channelIdle(), Channel::Type::None);
+  QCOMPARE(testConfig.settings()->tone()->channelIdle(), Channel::Type::None);
 }
 
 void

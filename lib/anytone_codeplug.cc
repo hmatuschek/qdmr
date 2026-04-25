@@ -1754,7 +1754,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
   enableDMRTalkPermit(ctx.config()->settings()->tone()->talkPermit().testFlag(Channel::Type::DMR));
   enableFMTalkPermit(ctx.config()->settings()->tone()->talkPermit().testFlag(Channel::Type::FM));
   setCallToneMelody(*ctx.config()->settings()->tone()->callStartMelody());
-  enableIdleChannelTone(ctx.config()->settings()->tone()->channelIdle().testAnyFlags(Channel::Type::FM | Channel::Type::DMR));
   setIdleToneMelody(*ctx.config()->settings()->tone()->channelIdleMelody());
   enableDMRResetTone(ctx.config()->settings()->tone()->callResetEnabled());
   setResetToneMelody(*ctx.config()->settings()->tone()->callResetMelody());
@@ -1866,9 +1865,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
     (dmrTalkPermit() ? Channel::Type::DMR : Channel::Type::None) |
     (fmTalkPermit() ? Channel::Type::FM : Channel::Type::None) );
   callToneMelody(*ctx.config()->settings()->tone()->callStartMelody());
-  ctx.config()->settings()->tone()->setChannelIdle(
-    idleChannelTone() ? Channel::Type::DMR : Channel::Type::None
-    );
   idleToneMelody(*ctx.config()->settings()->tone()->channelIdleMelody());
   ctx.config()->settings()->tone()->enableCallReset(dmrResetTone());
   resetToneMelody(*ctx.config()->settings()->tone()->callResetMelody());

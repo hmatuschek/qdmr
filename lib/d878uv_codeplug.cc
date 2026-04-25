@@ -2057,6 +2057,8 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableBootReset(ctx.config()->settings()->boot()->resetEnabled());
 
   // Encode tone settings
+  enableIdleChannelTone(
+    ctx.config()->settings()->tone()->channelIdle().testFlag(Channel::Type::DMR));
   setKeyToneLevel(ctx.config()->settings()->tone()->keyToneVolume());
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
@@ -2162,6 +2164,9 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
 
   // Decode tone settings
   ctx.config()->settings()->tone()->setKeyToneVolume(keyToneLevel());
+  ctx.config()->settings()->tone()->setChannelIdle(
+    idleChannelTone() ? Channel::Type::DMR : Channel::Type::None
+  );
 
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
