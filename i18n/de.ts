@@ -218,7 +218,7 @@
     <message>
         <location filename="../src/application.cc" line="501"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation>Der aktuelle Codeplug passt zum Gerät &apos;%1&apos;.</translation>
+        <translation type="unfinished">Der aktuelle Codeplug passt zum Gerät &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="545"/>
