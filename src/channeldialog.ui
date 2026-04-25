@@ -58,7 +58,7 @@
             </size>
            </property>
            <property name="toolTip">
-            <string>Enter a repater call-sign.</string>
+            <string>Enter a repeater call-sign.</string>
            </property>
           </widget>
          </item>
