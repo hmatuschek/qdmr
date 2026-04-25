@@ -228,7 +228,7 @@
     <message>
         <location filename="../src/application.cc" line="501"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation>Кодплаг совпадает с данными в радиостанции «%1»</translation>
+        <translation type="unfinished">Кодплаг совпадает с данными в радиостанции «%1»</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="545"/>
@@ -361,7 +361,7 @@
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="61"/>
-        <source>Enter a repater call-sign.</source>
+        <source>Enter a repeater call-sign.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
