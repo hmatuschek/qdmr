@@ -54,171 +54,161 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../src/application.cc" line="180"/>
-        <location filename="../src/application.cc" line="198"/>
-        <location filename="../src/application.cc" line="520"/>
+        <location filename="../src/application.cc" line="181"/>
+        <location filename="../src/application.cc" line="199"/>
+        <location filename="../src/application.cc" line="521"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Modifications au codeplug non enregistrées.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="181"/>
-        <location filename="../src/application.cc" line="199"/>
-        <location filename="../src/application.cc" line="521"/>
+        <location filename="../src/application.cc" line="182"/>
+        <location filename="../src/application.cc" line="200"/>
+        <location filename="../src/application.cc" line="522"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Il y a des modifications non enregsitrées dans le codeplug. Ces modifications seront perdues si vous continuez.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="207"/>
+        <location filename="../src/application.cc" line="208"/>
         <source>Open codeplug</source>
         <translation>Ouvrir un codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="209"/>
+        <location filename="../src/application.cc" line="210"/>
         <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
         <translation>Fichiers Codeplug (*.yaml);;Fichiers Codeplug Files, ancien format (*.conf *.csv *.txt);;Tous les fichiers (*)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="286"/>
-        <location filename="../src/application.cc" line="323"/>
-        <location filename="../src/application.cc" line="362"/>
+        <location filename="../src/application.cc" line="287"/>
+        <location filename="../src/application.cc" line="324"/>
+        <location filename="../src/application.cc" line="363"/>
         <source>Cannot open file</source>
         <translation>Impossible d&apos;ouvrir le fichier</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="217"/>
-        <location filename="../src/application.cc" line="231"/>
-        <location filename="../src/application.cc" line="250"/>
-        <location filename="../src/application.cc" line="363"/>
+        <location filename="../src/application.cc" line="218"/>
+        <location filename="../src/application.cc" line="232"/>
+        <location filename="../src/application.cc" line="251"/>
+        <location filename="../src/application.cc" line="364"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
         <translation>Impossible de lire le codeplug depuis le fichier &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="216"/>
+        <location filename="../src/application.cc" line="217"/>
         <source>Cannot read codeplug.</source>
         <translation>Impossible de lire le codeplug.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="267"/>
+        <location filename="../src/application.cc" line="268"/>
         <source>Save codeplug</source>
         <translation>Enregistrer le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="268"/>
+        <location filename="../src/application.cc" line="269"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
         <translation>Fichiers Codeplug (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="274"/>
+        <location filename="../src/application.cc" line="275"/>
         <source>Please use new YAML format.</source>
         <translation>Merci d&apos;utiliser le nouveau format YAML.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="275"/>
+        <location filename="../src/application.cc" line="276"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
         <translation>Enregistrer dans l&apos;ancien format de paramétrage tabulaire est désactivé depuis la version 0.9.0. Lire ces fichiers reste possible.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="287"/>
-        <location filename="../src/application.cc" line="324"/>
+        <location filename="../src/application.cc" line="288"/>
+        <location filename="../src/application.cc" line="325"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
         <translation>Impossible d&apos;enregistrer le codeplug dans le fichier &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="296"/>
+        <location filename="../src/application.cc" line="297"/>
         <source>Cannot save codeplug</source>
         <translation>Impossible d&apos;enregistrer le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="297"/>
+        <location filename="../src/application.cc" line="298"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
         <translation>Impossible d&apos;enregistrer le codeplug dans le fichier &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="314"/>
+        <location filename="../src/application.cc" line="315"/>
         <source>Export codeplug</source>
         <translation>Exporter le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="315"/>
+        <location filename="../src/application.cc" line="316"/>
         <source>CHIRP CSV Files (*.csv)</source>
         <translation>Fichiers CSV CHIRP (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="332"/>
+        <location filename="../src/application.cc" line="333"/>
         <source>Cannot export codeplug</source>
         <translation>Impossible d&apos;exporter le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="333"/>
+        <location filename="../src/application.cc" line="334"/>
         <source>Cannot export codeplug to file &apos;%1&apos;:
 %2</source>
         <translation>Impossible d&apos;exporter le codeplug vers le fichier &apos;%1&apos;:
 %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="349"/>
+        <location filename="../src/application.cc" line="350"/>
         <source>Import codeplug</source>
         <translation>Importer un codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="350"/>
+        <location filename="../src/application.cc" line="351"/>
         <source>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</source>
         <translation>Fichiers CSV CHIRP (*.csv);;Fichiers YAML (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="369"/>
-        <location filename="../src/application.cc" line="377"/>
-        <location filename="../src/application.cc" line="383"/>
-        <location filename="../src/application.cc" line="396"/>
+        <location filename="../src/application.cc" line="370"/>
+        <location filename="../src/application.cc" line="378"/>
+        <location filename="../src/application.cc" line="384"/>
+        <location filename="../src/application.cc" line="397"/>
         <source>Cannot import codeplug</source>
         <translation>Impossible d&apos;importer le codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="370"/>
-        <location filename="../src/application.cc" line="378"/>
-        <location filename="../src/application.cc" line="397"/>
+        <location filename="../src/application.cc" line="371"/>
+        <location filename="../src/application.cc" line="379"/>
+        <location filename="../src/application.cc" line="398"/>
         <source>Cannot import codeplug from &apos;%1&apos;: %2</source>
         <translation>Impossible d&apos;importer le codeplug depuis &apos;%1&apos;: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="384"/>
+        <location filename="../src/application.cc" line="385"/>
         <source>Do not know, how to handle file &apos;%1&apos;.</source>
         <translation>Gestion du fichier &apos;%1&apos; inconnue.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="418"/>
+        <location filename="../src/application.cc" line="419"/>
         <source>No matching devices found.</source>
         <translation>Aucune radio correspondante trouvé.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="444"/>
+        <location filename="../src/application.cc" line="445"/>
         <source>Cannot connect to radio</source>
         <translation>Échec de connexion à la radio</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="445"/>
+        <location filename="../src/application.cc" line="446"/>
         <source>Cannot connect to radio: %1</source>
         <translation>Échec de connexion à la radio: %1</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="455"/>
+        <location filename="../src/application.cc" line="456"/>
         <source>Radio found</source>
         <translation>Radio accessible</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="455"/>
+        <location filename="../src/application.cc" line="456"/>
         <source>Found device &apos;%1&apos;.</source>
         <translation>Radio trouvée &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="458"/>
-        <location filename="../src/application.cc" line="474"/>
-        <location filename="../src/application.cc" line="529"/>
-        <location filename="../src/application.cc" line="600"/>
-        <location filename="../src/application.cc" line="643"/>
-        <location filename="../src/application.cc" line="724"/>
-        <source>No radio found</source>
-        <translation>Aucune radio accessible</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="459"/>
@@ -227,99 +217,109 @@
         <location filename="../src/application.cc" line="601"/>
         <location filename="../src/application.cc" line="644"/>
         <location filename="../src/application.cc" line="725"/>
+        <source>No radio found</source>
+        <translation>Aucune radio accessible</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="460"/>
+        <location filename="../src/application.cc" line="476"/>
+        <location filename="../src/application.cc" line="531"/>
+        <location filename="../src/application.cc" line="602"/>
+        <location filename="../src/application.cc" line="645"/>
+        <location filename="../src/application.cc" line="726"/>
         <source>No matching device was found.</source>
         <translation>Aucune radio correspondante trouvée.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="499"/>
+        <location filename="../src/application.cc" line="500"/>
         <source>Verification success</source>
         <translation>Succès de la validation</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="500"/>
+        <location filename="../src/application.cc" line="501"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
         <translation>Le codeplug a été validé avec succès pour la radio &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="544"/>
+        <location filename="../src/application.cc" line="545"/>
         <source>Read ...</source>
         <translation>Lecture …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="554"/>
+        <location filename="../src/application.cc" line="555"/>
         <source>Read error</source>
         <translation>Erreur de lecture</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="573"/>
+        <location filename="../src/application.cc" line="574"/>
         <source>Read complete</source>
         <translation>Lecture terminée</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="629"/>
+        <location filename="../src/application.cc" line="630"/>
         <source>Upload ...</source>
         <translation>Téléversement …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="650"/>
-        <location filename="../src/application.cc" line="660"/>
-        <location filename="../src/application.cc" line="672"/>
+        <location filename="../src/application.cc" line="651"/>
+        <location filename="../src/application.cc" line="661"/>
+        <location filename="../src/application.cc" line="673"/>
         <source>Cannot write call-sign DB.</source>
         <translation>Impossible d&apos;écrire la base d&apos;indicatifs.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="651"/>
+        <location filename="../src/application.cc" line="652"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>La radio &apos;%1&apos; détectée n&apos;accepte pas une base d&apos;indicatifs.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="661"/>
+        <location filename="../src/application.cc" line="662"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
         <translation>La radio &apos;%1&apos; détectée ne gère pas de base d&apos;indicatifs. Cependant, cette fonctionnalité n&apos;est pas encore disponible.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="673"/>
+        <location filename="../src/application.cc" line="674"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
         <translation>QDMR sélectionne les indicatifs à écrire sur la base du DMR ID par défaut de la radio. Aucun ID par défaut de configuré.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="710"/>
+        <location filename="../src/application.cc" line="711"/>
         <source>Write call-sign DB ...</source>
         <translation>Écriture de la base des indicatifs …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="731"/>
-        <location filename="../src/application.cc" line="741"/>
+        <location filename="../src/application.cc" line="732"/>
+        <location filename="../src/application.cc" line="742"/>
         <source>Cannot write satellite config.</source>
         <translation>Échec de l’écriture du paramétrage des satellites.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="732"/>
+        <location filename="../src/application.cc" line="733"/>
         <source>The detected radio &apos;%1&apos; does not support satellite tracking.</source>
         <translation>La radio &apos;%1&apos; détectée ne prend pas en charge le suivi des satellites.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="742"/>
+        <location filename="../src/application.cc" line="743"/>
         <source>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</source>
         <translation>La radio &apos;%1&apos; détectée ne prend pas en charge le suivi des satellites. Cependant, cette fonctionnalité n&apos;est pas encore mise en œuvre.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="764"/>
+        <location filename="../src/application.cc" line="765"/>
         <source>Write satellite config ...</source>
         <translation>Écriture du paramétrage des satellites …</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="783"/>
+        <location filename="../src/application.cc" line="784"/>
         <source>Write error</source>
         <translation>Erreur d&apos;écriture</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="795"/>
+        <location filename="../src/application.cc" line="796"/>
         <source>Write complete</source>
         <translation>Écriture terminée</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="855"/>
+        <location filename="../src/application.cc" line="857"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (raccourci pour %2 %3)</translation>
     </message>
@@ -360,85 +360,90 @@
         <translation type="unfinished">Nom</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="65"/>
+        <location filename="../src/channeldialog.ui" line="61"/>
+        <source>Enter a repater call-sign.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/channeldialog.ui" line="68"/>
         <source>Rx Frequency</source>
         <translation type="unfinished">Fréquence RX</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="75"/>
+        <location filename="../src/channeldialog.ui" line="78"/>
         <source>Tx Frequency</source>
         <translation type="unfinished">Fréquence TX</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="85"/>
+        <location filename="../src/channeldialog.ui" line="88"/>
         <source>Tx Offset</source>
         <translation type="unfinished">Décalage TX</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="137"/>
+        <location filename="../src/channeldialog.ui" line="140"/>
         <source>Power</source>
         <translation type="unfinished">Puissance</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="153"/>
+        <location filename="../src/channeldialog.ui" line="156"/>
         <source>Max</source>
         <translation type="unfinished">Max</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="158"/>
+        <location filename="../src/channeldialog.ui" line="161"/>
         <source>High</source>
         <translation type="unfinished">Haute</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="163"/>
+        <location filename="../src/channeldialog.ui" line="166"/>
         <source>Mid</source>
         <translation type="unfinished">Moyenne</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="168"/>
+        <location filename="../src/channeldialog.ui" line="171"/>
         <source>Low</source>
         <translation type="unfinished">Basse</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="173"/>
+        <location filename="../src/channeldialog.ui" line="176"/>
         <source>Min</source>
         <translation type="unfinished">Min</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="181"/>
-        <location filename="../src/channeldialog.ui" line="218"/>
-        <location filename="../src/channeldialog.ui" line="252"/>
+        <location filename="../src/channeldialog.ui" line="184"/>
+        <location filename="../src/channeldialog.ui" line="221"/>
+        <location filename="../src/channeldialog.ui" line="255"/>
         <source>Default</source>
         <translation type="unfinished">Défaut</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="190"/>
+        <location filename="../src/channeldialog.ui" line="193"/>
         <source>Tx Timeout</source>
         <translation type="unfinished">Anti-bavard</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="205"/>
-        <location filename="../src/channeldialog.ui" line="242"/>
+        <location filename="../src/channeldialog.ui" line="208"/>
+        <location filename="../src/channeldialog.ui" line="245"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="227"/>
+        <location filename="../src/channeldialog.ui" line="230"/>
         <source>VOX Level</source>
         <translation type="unfinished">Niveau VOX</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="261"/>
+        <location filename="../src/channeldialog.ui" line="264"/>
         <source>Rx Only</source>
         <translation type="unfinished">RX Uniquement</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="271"/>
+        <location filename="../src/channeldialog.ui" line="274"/>
         <source>Scan List</source>
         <translation type="unfinished">Liste de recherche</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="301"/>
+        <location filename="../src/channeldialog.ui" line="304"/>
         <source>Extensions</source>
         <translation type="unfinished">Extensions</translation>
     </message>
@@ -3662,7 +3667,7 @@
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.cc" line="461"/>
+        <location filename="../src/settings.cc" line="484"/>
         <source>Warning!</source>
         <translation>Attention&#x202f;!</translation>
     </message>
@@ -3687,50 +3692,42 @@
         <translation>Locator</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="81"/>
+        <location filename="../src/settingsdialog.ui" line="113"/>
         <source>Repeater Info Sources</source>
         <translation>Sources d&apos;informations des relais</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="96"/>
-        <location filename="../src/settingsdialog.ui" line="132"/>
-        <location filename="../src/settingsdialog.ui" line="146"/>
-        <location filename="../src/settingsdialog.ui" line="160"/>
-        <source>enable</source>
-        <translation>activer</translation>
-    </message>
-    <message>
-        <location filename="../src/settingsdialog.ui" line="212"/>
+        <location filename="../src/settingsdialog.ui" line="319"/>
         <source>Radio Programming</source>
         <translation>Programmation de la radio</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="221"/>
+        <location filename="../src/settingsdialog.ui" line="328"/>
         <source>Update codeplug</source>
         <translation>Mise à jour du codeplug</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="228"/>
+        <location filename="../src/settingsdialog.ui" line="335"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Update the codeplug on the radio. If not selected, the codeplug on the radio gets overridden with possibly incomplete default values.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If selected, QDMR downloads the codeplug from the radio and updates only those settings specified. The remaining settings within the radio are not touched (recommended).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mettre à jour le codeplug de la radio. Si aucune sélection de paramètres, le codeplug de la radio est écrasé avec potentiellement des valeurs par défaut incomplètes. &lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Si une sélection de paramètres, QDMR télécharge le codeplug actuel de la radio et met à jour uniquement les paramètres sélectionnés. Les paramètres restant de la radio ne sont pas modifiés (recommandé).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="238"/>
+        <location filename="../src/settingsdialog.ui" line="345"/>
         <source>Auto-enable GPS</source>
         <translation>GPS auto-activable</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="245"/>
+        <location filename="../src/settingsdialog.ui" line="352"/>
         <source>When a GPS or APRS system is defined and used for any channel, the GPS module gets enabled automatically.</source>
         <translation>Lorsqu&apos;un système GPS ou APRS est défini et utilisé pour tout les canaux, le module GPS est activé automatiquement.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="262"/>
+        <location filename="../src/settingsdialog.ui" line="369"/>
         <source>When a roaming zone is defined and used by any channel, the automatic roaming gets enabled.</source>
         <translation>Lorsqu&apos;une zone de roaming est définie et utilisée pour tout les canaux, le roaming automatique est activé.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="255"/>
+        <location filename="../src/settingsdialog.ui" line="362"/>
         <source>Auto-enable roaming</source>
         <translation>Activer automatiquement le roaming</translation>
     </message>
@@ -3740,97 +3737,132 @@
         <translation>Sources de données</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="110"/>
+        <location filename="../src/settingsdialog.ui" line="72"/>
+        <source>Search radius</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="79"/>
+        <source>Some data sources require a search area specified by the location and this radius.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="129"/>
+        <location filename="../src/settingsdialog.ui" line="197"/>
+        <location filename="../src/settingsdialog.ui" line="235"/>
+        <location filename="../src/settingsdialog.ui" line="256"/>
+        <source>Enable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="143"/>
+        <source>Area</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="157"/>
         <source>World</source>
         <translation>Monde</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="115"/>
+        <location filename="../src/settingsdialog.ui" line="162"/>
         <source>North America</source>
         <translation>Amérique du nord</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="171"/>
+        <location filename="../src/settingsdialog.ui" line="170"/>
+        <location filename="../src/settingsdialog.ui" line="211"/>
+        <source>API Token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="183"/>
+        <location filename="../src/settingsdialog.ui" line="221"/>
+        <source>paste token here</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/settingsdialog.ui" line="278"/>
         <source>Programming</source>
         <translation>Programmation</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="183"/>
+        <location filename="../src/settingsdialog.ui" line="290"/>
         <source>Radio Interfaces</source>
         <translation>Interfaces radios</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="189"/>
+        <location filename="../src/settingsdialog.ui" line="296"/>
         <source>disable auto-detect</source>
         <translation>désactiver la détection automatique</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="272"/>
+        <location filename="../src/settingsdialog.ui" line="379"/>
         <source>Ignore verification warnings</source>
         <translation>Ignorer les alertes de vérification</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="279"/>
+        <location filename="../src/settingsdialog.ui" line="386"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As the communication interface to the radio is kept open after verification, time-outs may occur and the code-plug upload may fail when the verification dialog pops up. To prevent this, verification warnings can be ignored, eliminating the time-gap between verification and upload. Verification errors still prevent the upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Comme l&apos;interface de communication avec la radio reste ouverte après la phase de vérification, le délai peut être dépassé et l&apos;écriture du codeplug échouer lorsque le dialogue de vérification s&apos;ouvre. Pour éviter ce comportement, les messages d&apos;information (warnings) de la vérification peuvent être ignorés, supprimant le délai entre la vérification et l&apos;écriture. Les erreurs de vérification continuent à bloquer une écriture de codeplug incorrect.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="289"/>
+        <location filename="../src/settingsdialog.ui" line="396"/>
         <source>Ignore frequency limits</source>
         <translation>Ignorer les limites de fréquences</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="296"/>
+        <location filename="../src/settingsdialog.ui" line="403"/>
         <source>Do not set this option unless you know what you are doing.</source>
         <translation>Ne pas activer cette option à moins de savoir ce que vous faites.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="306"/>
+        <location filename="../src/settingsdialog.ui" line="413"/>
         <source>Update Device Clock</source>
         <translation>Mettre à jour l&apos;heure de la radio</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="329"/>
+        <location filename="../src/settingsdialog.ui" line="436"/>
         <source>Call-Sign DB</source>
         <translation>Base des identifiants</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="335"/>
+        <location filename="../src/settingsdialog.ui" line="442"/>
         <source>Limit number of DB entries</source>
         <translation>Limiter le nombre d&apos;entrées dans la base</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="342"/>
+        <location filename="../src/settingsdialog.ui" line="449"/>
         <source>When enabled, the number of DB entries will be limited. Otherwise the maximum number of entries are generated (device dependent).</source>
         <translation>Lorsque activé, le nombre d&apos;entrées de la base sera limité. Autrement, le maximum d&apos;entrées sera généré (dépendant de la radio).</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="352"/>
+        <location filename="../src/settingsdialog.ui" line="459"/>
         <source>Number of DB entries</source>
         <translation>Nombre d&apos;entrées dans la base</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="365"/>
+        <location filename="../src/settingsdialog.ui" line="472"/>
         <source>Specifies the number of DB entries (if enabled above).</source>
         <translation>Spécifier le nombre d&apos;entrée de la base (si activé au dessus).</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="378"/>
+        <location filename="../src/settingsdialog.ui" line="485"/>
         <source>Select using my DMR ID</source>
         <translation>Sélectionner en utilisant mon ID DMR</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="385"/>
+        <location filename="../src/settingsdialog.ui" line="492"/>
         <source>If enabled, the entries are selected using the users DMR ID.</source>
         <translation>Si activé, les entrées sont sélectionnées en utilisant les IDs DMR des utilisateurs.</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="395"/>
+        <location filename="../src/settingsdialog.ui" line="502"/>
         <source>Select using prefixes</source>
         <translation>Sélectionner en utilisation les préfixes</translation>
     </message>
     <message>
-        <location filename="../src/settingsdialog.ui" line="402"/>
+        <location filename="../src/settingsdialog.ui" line="509"/>
         <source>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</source>
         <translation>Si activé, ces préfixes d&apos;IDs DMR séparés par des virgules sont utilisés pour sélectionner les entrées dans la base des indicatifs.</translation>
     </message>
