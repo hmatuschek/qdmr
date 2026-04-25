@@ -1207,6 +1207,8 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setMaxHeadphoneVolume(ctx.config()->settings()->audio()->maxHeadphoneVolume());
 
   // Encode tone settings
+  enableIdleChannelTone(ctx.config()->settings()->tone()->channelIdle().testAnyFlags(
+    Channel::Type::FM | Channel::Type::DMR));
   setKeyToneLevel(ctx.config()->settings()->tone()->keyToneVolume());
 
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -1247,6 +1249,9 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   ctx.config()->settings()->audio()->setMaxHeadphoneVolume(this->maxHeadphoneVolume());
 
   // Decode tone settings
+  ctx.config()->settings()->tone()->setChannelIdle(
+    idleChannelTone() ? (Channel::Type::DMR | Channel::Type::FM) : Channel::Type::None
+  );
   ctx.config()->settings()->tone()->setKeyToneVolume(keyToneLevel());
 
   // Get or add settings extension
