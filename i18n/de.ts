@@ -362,7 +362,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="61"/>
         <source>Enter a repeater call-sign.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie ein Repeaterrufzeichen ein.</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="68"/>
@@ -419,7 +419,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="193"/>
         <source>Tx Timeout</source>
-        <translation type="unfinished">TX Timeout</translation>
+        <translation>TX Timeout</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="208"/>
@@ -440,12 +440,12 @@
     <message>
         <location filename="../src/channeldialog.ui" line="274"/>
         <source>Scan List</source>
-        <translation type="unfinished">Scanliste</translation>
+        <translation>Scanliste</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="304"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="25"/>
@@ -473,7 +473,7 @@
     <message>
         <location filename="../src/channellistview.cc" line="102"/>
         <source>Select a single channel first</source>
-        <translation>Wählen sie zunächst einen Kanal aus.</translation>
+        <translation>Wählen sie zunächst einen Kanal aus</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="103"/>
@@ -961,7 +961,7 @@
         <location filename="../src/configobjecttableview.cc" line="253"/>
         <location filename="../src/configobjecttableview.cc" line="260"/>
         <source>Cannot move items.</source>
-        <translation>Kann Elemente nicht verschieben</translation>
+        <translation>Kann Elemente nicht verschieben.</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.cc" line="254"/>
@@ -3739,12 +3739,12 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="72"/>
         <source>Search radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Suchradius</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="79"/>
         <source>Some data sources require a search area specified by the location and this radius.</source>
-        <translation type="unfinished"></translation>
+        <translation>Einige Datenquellen beschränken sich auf einen Suchbereich, der durch die Position und diesen Radius bestimmt wird.</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="129"/>
@@ -3752,12 +3752,12 @@
         <location filename="../src/settingsdialog.ui" line="235"/>
         <location filename="../src/settingsdialog.ui" line="256"/>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>Eingeschaltet</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="143"/>
         <source>Area</source>
-        <translation type="unfinished"></translation>
+        <translation>Bereich</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="157"/>
@@ -3773,13 +3773,13 @@
         <location filename="../src/settingsdialog.ui" line="170"/>
         <location filename="../src/settingsdialog.ui" line="211"/>
         <source>API Token</source>
-        <translation type="unfinished"></translation>
+        <translation>API Token</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="183"/>
         <location filename="../src/settingsdialog.ui" line="221"/>
         <source>paste token here</source>
-        <translation type="unfinished"></translation>
+        <translation>Den Token hier einfügen</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="278"/>
