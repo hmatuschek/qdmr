@@ -238,7 +238,7 @@
     <message>
         <location filename="../src/application.cc" line="501"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation>Il codeplug è stato verificato con la radio &apos;%1</translation>
+        <translation type="unfinished">Il codeplug è stato verificato con la radio &apos;%1</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="545"/>
@@ -377,7 +377,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="88"/>
         <source>Tx Offset</source>
-        <translation>Offset Tx</translation>
+        <translation type="unfinished">Offset Tx</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="140"/>
