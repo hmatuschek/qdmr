@@ -228,7 +228,7 @@
     <message>
         <location filename="../src/application.cc" line="501"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation>The codeplug was successfully verified with the radio &apos;%1&apos;</translation>
+        <translation>The codeplug was successfully verified with the radio &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="545"/>
@@ -329,12 +329,12 @@
     <message>
         <location filename="../src/bandwidthselect.cc" line="8"/>
         <source>Narrow (12.5 kHz)</source>
-        <translation type="unfinished">Narrow (12.5 kHz)</translation>
+        <translation>Narrow (12.5 kHz)</translation>
     </message>
     <message>
         <location filename="../src/bandwidthselect.cc" line="9"/>
         <source>Wide (25 kHz)</source>
-        <translation type="unfinished">Wide (25 kHz)</translation>
+        <translation>Wide (25 kHz)</translation>
     </message>
 </context>
 <context>
@@ -347,7 +347,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="23"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="40"/>
@@ -362,7 +362,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="61"/>
         <source>Enter a repater call-sign.</source>
-        <translation type="unfinished"></translation>
+        <translation>Enter a repeater call-sign.</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="68"/>
@@ -377,7 +377,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="88"/>
         <source>Tx Offset</source>
-        <translation>Tx Offset</translation>
+        <translation>TX Offset</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="140"/>
@@ -419,7 +419,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="193"/>
         <source>Tx Timeout</source>
-        <translation type="unfinished">TX Timeout</translation>
+        <translation>TX Timeout</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="208"/>
@@ -440,12 +440,12 @@
     <message>
         <location filename="../src/channeldialog.ui" line="274"/>
         <source>Scan List</source>
-        <translation type="unfinished">Scan List</translation>
+        <translation>Scan List</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="304"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation>Extensions</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="25"/>
@@ -3739,12 +3739,12 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="72"/>
         <source>Search radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Search radius</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="79"/>
         <source>Some data sources require a search area specified by the location and this radius.</source>
-        <translation type="unfinished"></translation>
+        <translation>Some data sources require a search area specified by the location and this radius.</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="129"/>
@@ -3752,12 +3752,12 @@
         <location filename="../src/settingsdialog.ui" line="235"/>
         <location filename="../src/settingsdialog.ui" line="256"/>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>Enable</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="143"/>
         <source>Area</source>
-        <translation type="unfinished"></translation>
+        <translation>Area</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="157"/>
@@ -3773,13 +3773,13 @@
         <location filename="../src/settingsdialog.ui" line="170"/>
         <location filename="../src/settingsdialog.ui" line="211"/>
         <source>API Token</source>
-        <translation type="unfinished"></translation>
+        <translation>API Token</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="183"/>
         <location filename="../src/settingsdialog.ui" line="221"/>
         <source>paste token here</source>
-        <translation type="unfinished"></translation>
+        <translation>paste token here</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="278"/>
