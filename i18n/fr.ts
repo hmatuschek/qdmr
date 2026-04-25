@@ -238,7 +238,7 @@
     <message>
         <location filename="../src/application.cc" line="501"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation type="unfinished">Le codeplug a été validé avec succès pour la radio &apos;%1&apos;</translation>
+        <translation>Le codeplug a été validé avec succès pour la radio &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="545"/>
