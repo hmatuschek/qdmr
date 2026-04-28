@@ -238,7 +238,7 @@
     <message>
         <location filename="../src/application.cc" line="501"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation type="unfinished">Il codeplug è stato verificato con la radio &apos;%1</translation>
+        <translation>Il codeplug è stato verificato con la radio &apos;%1.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="545"/>
@@ -362,7 +362,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="61"/>
         <source>Enter a repeater call-sign.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inserisci il nominativo del ripetitore.</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="68"/>
@@ -377,7 +377,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="88"/>
         <source>Tx Offset</source>
-        <translation type="unfinished">Offset Tx</translation>
+        <translation>Offset TX</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="140"/>
@@ -2479,7 +2479,7 @@
     <message>
         <location filename="../src/mainwindow.ui" line="283"/>
         <source>Shows settings dialog</source>
-        <translation>Mostra la finestra delle impostazioni</translation>
+        <translation>Mostra la finestra delle impostazioni.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="291"/>
@@ -3739,12 +3739,12 @@
     <message>
         <location filename="../src/settingsdialog.ui" line="72"/>
         <source>Search radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Raggio di ricerca</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="79"/>
         <source>Some data sources require a search area specified by the location and this radius.</source>
-        <translation type="unfinished"></translation>
+        <translation>Alcune fonti di dati richiedono un’area di ricerca definita dalla posizione e da questo raggio.</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="129"/>
@@ -3752,12 +3752,12 @@
         <location filename="../src/settingsdialog.ui" line="235"/>
         <location filename="../src/settingsdialog.ui" line="256"/>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>Abilita</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="143"/>
         <source>Area</source>
-        <translation type="unfinished"></translation>
+        <translation>Area</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="157"/>
@@ -3773,13 +3773,13 @@
         <location filename="../src/settingsdialog.ui" line="170"/>
         <location filename="../src/settingsdialog.ui" line="211"/>
         <source>API Token</source>
-        <translation type="unfinished"></translation>
+        <translation>Token API</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="183"/>
         <location filename="../src/settingsdialog.ui" line="221"/>
         <source>paste token here</source>
-        <translation type="unfinished"></translation>
+        <translation>incolla qui il token</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="278"/>
