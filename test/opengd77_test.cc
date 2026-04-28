@@ -339,14 +339,12 @@ OpenGD77Test::testBootMelody() {
           .arg(err.format()).toLocal8Bit().constData());
   }
 
-  QVERIFY(config.settings()->openGD77Extension());
-  QCOMPARE(config.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
+  QCOMPARE(config.settings()->tone()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
 
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
-  QVERIFY(decoded.settings()->openGD77Extension());
-  QCOMPARE(decoded.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
+  QCOMPARE(decoded.settings()->tone()->bootMelody()->toLilypond(), "c4 e g c e g c e g c e g c d e g c1");
 }
 
 
@@ -360,14 +358,12 @@ OpenGD77Test::testBootMelodyPauses() {
           .arg(err.format()).toLocal8Bit().constData());
   }
 
-  QVERIFY(config.settings()->openGD77Extension());
-  config.settings()->openGD77Extension()->bootMelody()->fromLilypond("c4 r16 c4 g4 e4 r4 c16 g16 e16 r16 c4");
+  config.settings()->tone()->bootMelody()->fromLilypond("c4 r16 c4 g4 e4 r4 c16 g16 e16 r16 c4");
 
   if (! encodeDecode(config, decoded, err))
     QFAIL(err.format().toLocal8Bit().constData());
 
-  QVERIFY(decoded.settings()->openGD77Extension());
-  QCOMPARE(decoded.settings()->openGD77Extension()->bootMelody()->toLilypond(), "c4 r16 c4 g e r c16 g e r c4");
+  QCOMPARE(decoded.settings()->tone()->bootMelody()->toLilypond(), "c4 r16 c4 g e r c16 g e r c4");
 }
 
 

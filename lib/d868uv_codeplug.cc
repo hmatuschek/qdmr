@@ -763,13 +763,13 @@ D868UVCodeplug::GeneralSettingsElement::enableCallEndPrompt(bool enable) {
   return setUInt8(Offset::callEndPrompt(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Level
 D868UVCodeplug::GeneralSettingsElement::maxSpeakerVolume() const {
-  return (((unsigned)getUInt8(Offset::maxSpeakerVolume()))*10)/8;
+  return Level::fromValue(getUInt8(Offset::maxSpeakerVolume()), Limit::volume());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setMaxSpeakerVolume(unsigned level) {
-  setUInt8(Offset::maxSpeakerVolume(), (level*8)/10);
+D868UVCodeplug::GeneralSettingsElement::setMaxSpeakerVolume(Level level) {
+  setUInt8(Offset::maxSpeakerVolume(), level.mapTo(Limit::volume()));
 }
 
 bool
@@ -817,13 +817,14 @@ D868UVCodeplug::GeneralSettingsElement::enableDisplayClock(bool enable) {
   setUInt8(Offset::showClock(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
-D868UVCodeplug::GeneralSettingsElement::maxHeadPhoneVolume() const {
-  return (((unsigned)getUInt8(Offset::maxHeadPhoneVolume()))*10)/8;
+Level
+D868UVCodeplug::GeneralSettingsElement::maxHeadphoneVolume() const {
+  return Level::fromValue((unsigned)getUInt8(Offset::maxHeadPhoneVolume()), Limit::volume());
 }
+
 void
-D868UVCodeplug::GeneralSettingsElement::setMaxHeadPhoneVolume(unsigned max) {
-  setUInt8(Offset::maxHeadPhoneVolume(), (max*8)/10);
+D868UVCodeplug::GeneralSettingsElement::setMaxHeadphoneVolume(Level max) {
+  setUInt8(Offset::maxHeadPhoneVolume(), max.mapTo(Limit::volume()));
 }
 
 bool
@@ -1013,15 +1014,15 @@ D868UVCodeplug::GeneralSettingsElement::enableShowCurrentContact(bool enable) {
 
 bool
 D868UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
-  return 0 == keyToneLevel();
+  return keyToneLevel().isNull();
 }
-unsigned
+Level
 D868UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((unsigned)getUInt8(Offset::keyToneLevel()))*10/15;
+  return Level::fromValue(getUInt8(Offset::keyToneLevel()), Limit::keyTone());
 }
 void
-D868UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
-  setUInt8(Offset::keyToneLevel(), level*10/15);
+D868UVCodeplug::GeneralSettingsElement::setKeyToneLevel(Level level) {
+  setUInt8(Offset::keyToneLevel(), level.mapTo(Limit::keyTone()));
 }
 void
 D868UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
@@ -1201,7 +1202,14 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   // Set measurement system based on system locale (0x00==Metric)
   enableGPSUnitsImperial(QLocale::ImperialSystem == QLocale::system().measurementSystem());
   // Set default VOX sensitivity
-  setVOXLevel(ctx.config()->settings()->vox());
+  setVOXLevel(ctx.config()->settings()->audio()->vox());
+  setVOXDelay(ctx.config()->settings()->audio()->voxDelay());
+  setMaxHeadphoneVolume(ctx.config()->settings()->audio()->maxHeadphoneVolume());
+
+  // Encode tone settings
+  enableIdleChannelTone(ctx.config()->settings()->tone()->channelIdle().testAnyFlags(
+    Channel::Type::FM | Channel::Type::DMR));
+  setKeyToneLevel(ctx.config()->settings()->tone()->keyToneVolume());
 
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -1216,13 +1224,8 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
   enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
 
-  // Encode tone settings
-  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
-
   // Encode audio settings
-  setVOXDelay(ext->audioSettings()->voxDelay());
   setVOXSource(ext->audioSettings()->voxSource());
-  setMaxHeadPhoneVolume(ext->audioSettings()->maxHeadPhoneVolume());
 
   // Encode display settings
   setBacklightDuration(ext->displaySettings()->backlightDuration());
@@ -1241,7 +1244,15 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
-  ctx.config()->settings()->setVOX(voxLevel());
+  ctx.config()->settings()->audio()->setVox(voxLevel());
+  ctx.config()->settings()->audio()->setVOXDelay(voxDelay());
+  ctx.config()->settings()->audio()->setMaxHeadphoneVolume(this->maxHeadphoneVolume());
+
+  // Decode tone settings
+  ctx.config()->settings()->tone()->setChannelIdle(
+    idleChannelTone() ? (Channel::Type::DMR | Channel::Type::FM) : Channel::Type::None
+  );
+  ctx.config()->settings()->tone()->setKeyToneVolume(keyToneLevel());
 
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
@@ -1261,13 +1272,8 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
   ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
 
-  // Decode tone settings
-  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
-
   // Decode audio settings
-  ext->audioSettings()->setVOXDelay(voxDelay());
   ext->audioSettings()->setVOXSource(voxSource());
-  ext->audioSettings()->setMaxHeadPhoneVolume(this->maxHeadPhoneVolume());
 
   // Decode display settings
   ext->displaySettings()->enableShowContact(this->showCurrentContact());

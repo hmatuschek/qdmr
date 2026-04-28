@@ -1696,11 +1696,6 @@ bool
 AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  // Set microphone gain
-  // For the 868UV, this setting sets both, FM and DMR mic gain.
-  // For all other devices, there is an additional FM mic gain setting.
-  setDMRMicGain(ctx.config()->settings()->micLevel());
-
   // If auto-enable GPS is enabled
   if (flags.autoEnableGPS()) {
     // Check if GPS is required -> enable
@@ -1713,9 +1708,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       enableGPS(false);
     }
   }
-  // Set default squelch level
-  setSquelchLevelA(ctx.config()->settings()->squelch());
-  setSquelchLevelB(ctx.config()->settings()->squelch());
 
   // Encode boot settings
   setBootDisplay(ctx.config()->settings()->boot()->bootDisplay());
@@ -1744,6 +1736,27 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
       setDefaultChannelBIndex(ctx.config()->settings()->boot()->zoneB()->as<Zone>()->A()->indexOf(
                                 ctx.config()->settings()->boot()->channelB()->as<Channel>()));
   }
+
+  // Handle audio settings:
+  setSquelchLevelA(ctx.config()->settings()->audio()->squelch());
+  setSquelchLevelB(ctx.config()->settings()->audio()->squelch());
+  // Set microphone gain
+  // For the 868UV, this setting sets both, FM and DMR mic gain.
+  // For all other devices, there is an additional FM mic gain setting.
+  setDMRMicGain(ctx.config()->settings()->audio()->micGain());
+  setMaxSpeakerVolume(ctx.config()->settings()->audio()->maxSpeakerVolume());
+
+  // Handle tone settings:
+  enableKeyTone(ctx.config()->settings()->tone()->keyToneEnabled());
+  enableSMSAlert(ctx.config()->settings()->tone()->smsToneEnabled());
+  enableCallAlert(ctx.config()->settings()->tone()->ringtoneEnabled());
+  enableStartupTone(ctx.config()->settings()->tone()->bootToneEnabled());
+  enableDMRTalkPermit(ctx.config()->settings()->tone()->talkPermit().testFlag(Channel::Type::DMR));
+  enableFMTalkPermit(ctx.config()->settings()->tone()->talkPermit().testFlag(Channel::Type::FM));
+  setCallToneMelody(*ctx.config()->settings()->tone()->callStartMelody());
+  setIdleToneMelody(*ctx.config()->settings()->tone()->channelIdleMelody());
+  enableDMRResetTone(ctx.config()->settings()->tone()->callResetEnabled());
+  setResetToneMelody(*ctx.config()->settings()->tone()->callResetMelody());
 
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
@@ -1782,19 +1795,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     setLongPressDuration(ext->keySettings()->longPressDuration());
     enableAutoKeyLock(ext->keySettings()->autoKeyLockEnabled());
 
-    // Encode tone settings
-    enableKeyTone(ext->toneSettings()->keyToneEnabled());
-    enableSMSAlert(ext->toneSettings()->smsAlertEnabled());
-    enableCallAlert(ext->toneSettings()->callAlertEnabled());
-    enableDMRTalkPermit(ext->toneSettings()->talkPermitDigitalEnabled());
-    enableFMTalkPermit(ext->toneSettings()->talkPermitAnalogEnabled());
-    enableDMRResetTone(ext->toneSettings()->digitalResetToneEnabled());
-    enableIdleChannelTone(ext->toneSettings()->dmrIdleChannelToneEnabled());
-    enableStartupTone(ext->toneSettings()->startupToneEnabled());
-    setCallToneMelody(*(ext->toneSettings()->callMelody()));
-    setIdleToneMelody(*(ext->toneSettings()->idleMelody()));
-    setResetToneMelody(*(ext->toneSettings()->resetMelody()));
-
     // Encode display settings
     enableDisplayFrequency(ext->displaySettings()->displayFrequencyEnabled());
     setBrightness(ext->displaySettings()->brightness());
@@ -1808,7 +1808,6 @@ AnytoneCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context 
     // Encode audio settings
     enableRecording(ext->audioSettings()->recordingEnabled());
     enableEnhancedAudio(ext->audioSettings()->enhanceAudioEnabled());
-    setMaxSpeakerVolume(ext->audioSettings()->maxVolume());
 
     // Encode menu settings
     setMenuExitTime(ext->menuSettings()->duration());
@@ -1849,10 +1848,26 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
   Q_UNUSED(err);
 
   // get microphone gain
-  ctx.config()->settings()->setMicLevel(dmrMicGain());
+  ctx.config()->settings()->audio()->setMicGain(dmrMicGain());
+  ctx.config()->settings()->audio()->setMaxSpeakerVolume(this->maxSpeakerVolume());
+
   // D868UV does not support speech synthesis?
-  ctx.config()->settings()->enableSpeech(false);
-  ctx.config()->settings()->setSquelch(std::max(squelchLevelA(), squelchLevelB()));
+  ctx.config()->settings()->audio()->enableSpeechSynthesis(false);
+  ctx.config()->settings()->audio()->setSquelch(std::max(squelchLevelA(), squelchLevelB()));
+
+  // Handle tone settings
+  ctx.config()->settings()->tone()->setKeyToneVolume(
+    this->keyToneEnabled() ? Level::fromValue(5) : Level::null());
+  ctx.config()->settings()->tone()->enableSMSTone(smsAlert());
+  ctx.config()->settings()->tone()->enableRingtone(callAlert());
+  ctx.config()->settings()->tone()->enableBootTone(startupTone());
+  ctx.config()->settings()->tone()->setTalkPermit(
+    (dmrTalkPermit() ? Channel::Type::DMR : Channel::Type::None) |
+    (fmTalkPermit() ? Channel::Type::FM : Channel::Type::None) );
+  callToneMelody(*ctx.config()->settings()->tone()->callStartMelody());
+  idleToneMelody(*ctx.config()->settings()->tone()->channelIdleMelody());
+  ctx.config()->settings()->tone()->enableCallReset(dmrResetTone());
+  resetToneMelody(*ctx.config()->settings()->tone()->callResetMelody());
 
   // Store boot settings
   ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
@@ -1902,19 +1917,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
   ext->keySettings()->setLongPressDuration(longPressDuration());
   ext->keySettings()->enableAutoKeyLock(autoKeyLock());
 
-  // Store tone settings
-  ext->toneSettings()->enableKeyTone(this->keyToneEnabled());
-  ext->toneSettings()->enableSMSAlert(smsAlert());
-  ext->toneSettings()->enableCallAlert(callAlert());
-  ext->toneSettings()->enableTalkPermitDigital(this->dmrTalkPermit());
-  ext->toneSettings()->enableTalkPermitAnalog(this->fmTalkPermit());
-  ext->toneSettings()->enableDigitalResetTone(this->dmrResetTone());
-  ext->toneSettings()->enableDMRIdleChannelTone(this->idleChannelTone());
-  ext->toneSettings()->enableStartupTone(this->startupTone());
-  this->callToneMelody(*(ext->toneSettings()->callMelody()));
-  this->idleToneMelody(*(ext->toneSettings()->idleMelody()));
-  this->resetToneMelody(*(ext->toneSettings()->resetMelody()));
-
   // Store display settings
   ext->displaySettings()->enableDisplayFrequency(displayFrequency());
   ext->displaySettings()->setBrightness(brightness());
@@ -1930,7 +1932,6 @@ AnytoneCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store audio settings
   ext->audioSettings()->enableRecording(recording());
-  ext->audioSettings()->setMaxVolume(this->maxSpeakerVolume());
   ext->audioSettings()->enableEnhanceAudio(this->enhanceAudio());
 
   // Store auto-repeater settings
@@ -2230,8 +2231,8 @@ AnytoneCodeplug::BootSettingsElement::setPassword(const QString &txt) {
 bool
 AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ctx) {
   Q_UNUSED(flags)
-  setIntroLine1(ctx.config()->settings()->introLine1());
-  setIntroLine2(ctx.config()->settings()->introLine2());
+  setIntroLine1(ctx.config()->settings()->boot()->message1());
+  setIntroLine2(ctx.config()->settings()->boot()->message2());
 
   if (ctx.config()->settings()->boot()->bootPasswordEnabled())
     setPassword(ctx.config()->settings()->boot()->bootPassword());
@@ -2243,8 +2244,8 @@ AnytoneCodeplug::BootSettingsElement::fromConfig(const Flags &flags, Context &ct
 
 bool
 AnytoneCodeplug::BootSettingsElement::updateConfig(Context &ctx) {
-  ctx.config()->settings()->setIntroLine1(introLine1());
-  ctx.config()->settings()->setIntroLine2(introLine2());
+  ctx.config()->settings()->boot()->setMessage1(introLine1());
+  ctx.config()->settings()->boot()->setMessage2(introLine2());
 
   ctx.config()->settings()->boot()->setBootPassword(password());
   ctx.config()->settings()->boot()->enableBootPassword(! password().isEmpty());

@@ -91,12 +91,11 @@ bool
 OpenUV380Codeplug::encodeBootSettings(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags);
   // Encode boot melody if set
-  if ((nullptr != ctx.config()->settings()->openGD77Extension())
-      && (! ctx.config()->settings()->openGD77Extension()->bootMelody()->isEmpty())) {
+  if (ctx.config()->settings()->tone()->bootToneEnabled() && !ctx.config()->settings()->tone()->bootMelody()->isEmpty()) {
     AdditionalSettingsElement opt(data(Offset::additionalSettings(), ImageIndex::additionalSettings()));
     if (! flags.updateCodeplug() && ! opt.isValid())
       opt.clear();
-    opt.bootMelody().encode(ctx, ctx.config()->settings()->openGD77Extension()->bootMelody(), err);
+    opt.bootMelody().encode(ctx, ctx.config()->settings()->tone()->bootMelody(), err);
   }
   // Encode other boot settings
   return BootSettingsElement(data(Offset::bootSettings(), ImageIndex::bootSettings()))
@@ -108,9 +107,8 @@ OpenUV380Codeplug::decodeBootSettings(Context &ctx, const ErrorStack &err) {
   // Check if boot melody is encoded
   AdditionalSettingsElement opt(data(Offset::additionalSettings(), ImageIndex::additionalSettings()));
   if (opt.hasSettings(AdditionalSettingsElement::BootMelody)) {
-    auto ext = new OpenGD77SettingsExtension();
-    opt.bootMelody().decode(ctx, ext->bootMelody(), err);
-    ctx.config()->settings()->setOpenGD77Extension(ext);
+    ctx.config()->settings()->tone()->enableBootTone(
+      opt.bootMelody().decode(ctx, ctx.config()->settings()->tone()->bootMelody(), err));
   }
   return BootSettingsElement(data(Offset::bootSettings(), ImageIndex::bootSettings()))
       .decode(ctx, err);

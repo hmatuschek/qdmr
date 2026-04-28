@@ -91,7 +91,7 @@ void
 ConfigTest::testMultipleRadioIDs() {
   ErrorStack err;
   Config multipleRadioIds;
-  if (! multipleRadioIds.readYAML(":/data/anytone_audio_settings_extension.yaml", err)) {
+  if (! multipleRadioIds.readYAML(":/data/audio_settings_extension.yaml", err)) {
     QFAIL(QString("Cannot open codeplug file: %1")
           .arg(err.format()).toStdString().c_str());
   }
@@ -179,6 +179,19 @@ ConfigTest::testGNSSSettings() {
   QCOMPARE(testConfig.settings()->gnss()->fixedPositionEnabled(), true);
   QCOMPARE(testConfig.settings()->gnss()->fixedPositionLocator(), "JO62jl45");
   QCOMPARE(testConfig.settings()->gnss()->systems(), GNSSSettings::System::GPS | GNSSSettings::System::Beidou);
+}
+
+
+void
+ConfigTest::testAudioSettings() {
+  Config config; config.readYAML(":/data/audio_settings_extension.yaml");
+  QCOMPARE(config.settings()->audio()->micGain(), Level::fromValue(3));
+  QCOMPARE(config.settings()->audio()->fmMicGain(), Level::fromValue(6));
+
+  Config copyConfig;
+  QVERIFY(copyConfig.copy(config));
+  QCOMPARE(copyConfig.settings()->audio()->micGain(), config.settings()->audio()->micGain());
+  QCOMPARE(copyConfig.settings()->audio()->fmMicGain(), config.settings()->audio()->fmMicGain());
 }
 
 

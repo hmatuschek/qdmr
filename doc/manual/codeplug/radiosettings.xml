@@ -8,7 +8,7 @@
 
 <para>
   The radio settings section contains all radio-wide settings. For example the microphone level, 
-  boot text etc. For now, there aren't many.
+  boot text etc. For sake of readability, they are organized in groups. E.g., boot options, audio settings, ...
 </para>
 
 <para>
@@ -18,16 +18,12 @@
 <example pgwide="1">
   <title>General radio-wide settings.</title>
   <programlisting language="yaml"><![CDATA[settings:
-  micLevel: 6
-  speech: false
-  introLine1: qDMR
-  introLine2: DM3MAT
-  defaultID: id1 
-  squelch: 1
-  vox: 0
+  defaultID: id1
   power: High
   boot:
     display: Logo
+    introLine1: qDMR
+    introLine2: DM3MAT
     enablePassword: false
     password: 00000815
     defaultChannel: true
@@ -36,6 +32,17 @@
     zoneB: zone1
     channelB: ch2
     allowFactoryReset: true
+  audio:
+    squelch: 1
+    dmrSquelch: none
+    micGain: 6
+    fmMicGain: none
+    m17MicGain: none
+    maxSpeakerVolume: 10
+    maxHeadphoneVolume: 10
+    vox: off
+    voxDelay: 500ms
+    speech: false
   gnss:
     fixedLocationEnabled: false
     fixedLocation: JO62jl45
@@ -68,20 +75,6 @@
 <variablelist>
   <title>Radio-wide Setting Fields</title>
   <varlistentry>
-    <term><token>micLevel</token></term>
-    <listitem>
-      <para>Specifies the microphone amplification. Must be an integer between 1 and 10.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>speech</token></term>
-    <listitem>
-      <para>Enables/disables the speech synthesis. Some radios can announce the current 
-        channel etc. for the visually impaired. To enable that feature (if supported by the radio)
-        set this field to <token>true</token>. Must be a boolean value.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
     <term><token>introLine1</token></term>
     <term><token>introLine2</token></term>
     <listitem>
@@ -96,24 +89,6 @@
       <para>Specifies which radio ID will be used as the default DMR ID (see 
         <xref linkend="cpRadioIDs"/> below). If none is specified, the first 
         defined DMR radio ID will be used.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>squelch</token></term>
-    <listitem>
-      <para>Specifies the default squelch level. This value may be referenced in channels or 
-        represent the radio-wide squelch setting. Any value in [0-10] is valid, where 0 implies 
-        an open squelch (if supported by the radio).
-      </para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term><token>vox</token></term>
-    <listitem>
-      <para>Specifies the default VOX sensitivity. This value may be referenced in channels or 
-        represent the radio-wide VOX sensitivity. Any value in [0-10] is valid here, where 0 
-        disables the VOX.
-      </para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -173,7 +148,88 @@ Some settings relevant for the boot process.
 
 
 <section>
-  <info><title>GNSS settings</title></info>         
+<info><title>Audio settings</title></info>
+
+<para>
+  This section groups all global audio settings. Some of these can be overridden by channel settings.
+</para>
+
+
+<variablelist>
+  <varlistentry>
+    <term><token>squelch</token></term>
+    <listitem>
+      <para>Specifies the default squelch level. This value may be referenced in channels or
+        represent the radio-wide squelch setting. Any value in [0-10] is valid, where 0 implies
+        an open squelch (if supported by the radio).
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>dmrSquelch</token></term>
+    <listitem>
+      <para>
+        Specifies a separate squelch level for DMR channels. If set to <token>none</token>, the default squelch is used.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>micGain</token></term>
+    <listitem>
+      <para>Specifies the microphone amplification. Must be an integer between 1 and 10.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>fmMicGain</token>, <token>m17MicGain</token></term>
+    <listitem>
+      <para>
+        Specifies a separate microphone gain for FM and DMR channels. If set to <token>none</token>, the default mic
+        gain setting will be used.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>maxSpeakerVolume</token>, <token>maxHeadphoneVolume</token></term>
+    <listitem>
+      <para>
+        Specifies the maximum speaker/headphone volume setting. This can be used to limit the maximum volume,
+        when the radio is used indoors.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>vox</token></term>
+    <listitem>
+      <para>Specifies the default VOX sensitivity. This value may be referenced in channels or
+        represent the radio-wide VOX sensitivity. Any value in [0-10] is valid here, where 0
+        disables the VOX.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>voxDelay</token></term>
+    <listitem>
+      <para>
+        Specifies the delay between voice detection and start of transmission.
+      </para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>speech</token></term>
+    <listitem>
+      <para>
+        Enables/disables the speech synthesis. Some radios can announce the current
+        channel etc. for the visually impaired. To enable that feature (if supported by the radio)
+        set this field to <token>true</token>. Must be a boolean value.
+      </para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</section>
+
+
+<section>
+<info><title>GNSS settings</title></info>
 
 <para>
   This section collects some global GNSS settings that many radio support. Especially, it allows to

@@ -17,6 +17,10 @@ class BootSettings: public ConfigExtension
 
   /** The boot display setting. */
   Q_PROPERTY(BootDisplay display READ bootDisplay WRITE setBootDisplay)
+  /** The first boot message line. */
+  Q_PROPERTY(QString message1 READ message1 WRITE setMessage1)
+  /** The second boot message line. */
+  Q_PROPERTY(QString message2 READ message2 WRITE setMessage2)
   /** If @c true, the boot password is enabled. */
   Q_PROPERTY(bool passwordEnabled READ bootPasswordEnabled WRITE enableBootPassword)
   /** Holds the boot password. */
@@ -60,6 +64,17 @@ public:
   BootDisplay bootDisplay() const;
   /** Sets the boot display. */
   void setBootDisplay(BootDisplay mode);
+
+  /** Returns the first boot message line. */
+  const QString &message1() const;
+  /** Sets the first boot message line. */
+  void setMessage1(const QString &value);
+
+  /** Returns the second boot message line. */
+  const QString &message2() const;
+  /** Sets the second boot message line. */
+  void setMessage2(const QString &value);
+
   /** Returns @c true if the boot password is enabled.*/
   bool bootPasswordEnabled() const;
   /** Enables the boot password. */
@@ -89,6 +104,7 @@ public:
 
 protected:
   BootDisplay _bootDisplay;        ///< The boot display property.
+  QString _message1, _message2;    ///< The two boot messages.
   bool _bootPasswordEnabled;       ///< If true, the boot password is enabled.
   QString _bootPassword;           ///< The boot password
   bool _defaultChannel;            ///< Change to the default channel on boot.

@@ -5,6 +5,8 @@
 #include "channel.hh"
 
 #include "bootsettings.hh"
+#include "audiosettings.hh"
+#include "tonesettings.hh"
 #include "gnsssettings.hh"
 #include "dmrsettings.hh"
 #include "radioddity_extensions.hh"
@@ -17,26 +19,18 @@
 class RadioSettings : public ConfigItem
 {
   Q_OBJECT
-  /** The first intro line. */
-  Q_PROPERTY(QString introLine1 READ introLine1 WRITE setIntroLine1)
-  /** The second intro line. */
-  Q_PROPERTY(QString introLine2 READ introLine2 WRITE setIntroLine2)
-  /** The mic amplification level. */
-  Q_PROPERTY(Level micLevel READ micLevel WRITE setMicLevel)
-  /** Speech synthesis flag. */
-  Q_PROPERTY(bool speech READ speech WRITE enableSpeech)
   /** The default channel power */
   Q_PROPERTY(Channel::Power power READ power WRITE setPower)
-  /** The squelch level. */
-  Q_PROPERTY(Level squelch READ squelch WRITE setSquelch)
-  /** The default vox sensitivity */
-  Q_PROPERTY(Level vox READ vox WRITE setVOX)
   /** The default transmit timeout */
   Q_PROPERTY(Interval tot READ tot WRITE setTOT SCRIPTABLE false)
   /** The default DMR radio ID. */
   Q_PROPERTY(DMRRadioIDReference *defaultID READ defaultIdRef)
   /** Common boot settings. */
   Q_PROPERTY(BootSettings* boot READ boot);
+  /** Common audio and tone settings. */
+  Q_PROPERTY(AudioSettings *audio READ audio);
+  /** Common tone settings. */
+  Q_PROPERTY(ToneSettings *tone READ tone);
   /** The GNSS settings. */
   Q_PROPERTY(GNSSSettings *gnss READ gnss);
   /** The common DMR settings. */
@@ -47,8 +41,6 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(RadiodditySettingsExtension * radioddity READ radioddityExtension WRITE setRadioddityExtension)
   /** Settings for AnyTone devices. */
   Q_PROPERTY(AnytoneSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
-  /** Settings for OpenGD77 devices. */
-  Q_PROPERTY(OpenGD77SettingsExtension *openGD77 READ openGD77Extension WRITE setOpenGD77Extension)
 
 public:
   /** Default constructor. */
@@ -60,44 +52,10 @@ public:
   /** Resets the settings. */
   void clear();
 
-  /** Returns the first intro line. */
-  const QString &introLine1() const;
-  /** (Re-)Sets the first intro line. */
-  void setIntroLine1(const QString &line);
-
-  /** Returns the second intro line. */
-  const QString &introLine2() const;
-  /** (Re-)Sets the second intro line. */
-  void setIntroLine2(const QString &line);
-
-  /** Returns the MIC amplification level [1,10]. */
-  Level micLevel() const;
-  /** (Re-)Sets the MIC amplification level [1,10]. */
-  void setMicLevel(Level value);
-
-  /** Returns @c true if the speech synthesis is enabled. */
-  bool speech() const;
-  /** Enables/disables the speech synthesis. */
-  void enableSpeech(bool enabled);
-
-  /** Returns the default squelch level [0-10]. */
-  Level squelch() const;
-  /** Sets the default squelch level. */
-  void setSquelch(Level squelch);
-
   /** Returns the default channel power. */
   Channel::Power power() const;
   /** Sets the default channel power. */
   void setPower(Channel::Power power);
-
-  /** Returns @c true if VOX is disabled by default. */
-  bool voxDisabled() const;
-  /** Returns the default VOX level [0-10], 0=disabled. */
-  Level vox() const;
-  /** Sets the default VOX level [0-10], 0=disabled. */
-  void setVOX(Level level);
-  /** Disables VOX by default. */
-  void disableVOX();
 
   /** Returns @c true if the transmit timeout (TOT) is disabled. */
   bool totDisabled() const;
@@ -117,6 +75,10 @@ public:
 
   /** Returns the boot settings. */
   BootSettings *boot() const;
+  /** Returns the audio/tone settings. */
+  AudioSettings *audio() const;
+  /** Returns the tone settings. */
+  ToneSettings *tone() const;
   /** Returns the GNSS settings. */
   GNSSSettings *gnss() const;
   /** Returns the DMR settings. */
@@ -137,11 +99,6 @@ public:
   /** Sets the AnyTone device specific radio settings. */
   void setAnytoneExtension(AnytoneSettingsExtension *ext);
 
-  /** Returns the OpenGD77 device specific radio settings. */
-  OpenGD77SettingsExtension *openGD77Extension() const;
-  /** Sets the OpenGD77 device specific radio settings. */
-  void setOpenGD77Extension(OpenGD77SettingsExtension *ext);
-
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
@@ -152,26 +109,18 @@ protected slots:
   void onExtensionModified();
 
 protected:
-  /** Holds the first intro line. */
-  QString _introLine1;
-  /** Holds the second intro line. */
-  QString _introLine2;
-  /** Holds the mic amplification level. */
-  Level _micLevel;
-  /** Holds the speech synthesis flag. */
-  bool _speech;
-  /** Holds the global squelch setting. */
-  Level _squelch;
   /** Holds the global power setting. */
   Channel::Power _power;
-  /** Holds the global VOX level. */
-  Level _vox;
   /** Holds the global transmit timeout. */
   Interval _transmitTimeOut;
   /** Reference to the default DMR radio ID. */
   DMRRadioIDReference *_defaultId;
   /** The boot settings. */
   BootSettings *_boot;
+  /** The audio/tone settings. */
+  AudioSettings *_audio;
+  /** The tone settings. */
+  ToneSettings *_tone;
   /** The GNSS settings. */
   GNSSSettings *_gnss;
   /** The DMR settings. */
@@ -182,8 +131,6 @@ protected:
   RadiodditySettingsExtension *_radioddityExtension;
   /** Device specific settings extension for AnyTone devices. */
   AnytoneSettingsExtension *_anytoneExtension;
-  /** Device specific settings for OpenGD77 devices. */
-  OpenGD77SettingsExtension *_openGD77;
 };
 
 #endif // RADIOCONFIG_HH

@@ -40,6 +40,7 @@ private slots:
   void testSettingsDisplayVolumeChangePrompt(); ///< Regression test for #813
   void testRadioLimits(); ///< Regression test for #816
   void testMicGain();
+  void testFixedLocation();
 
 protected:
   Config _micGainConfig;

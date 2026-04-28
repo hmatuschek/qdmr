@@ -611,39 +611,6 @@ D878UVCodeplug::ChannelExtensionElement::fromChannelObj(const Channel *c, Contex
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::FMAPRSFrequencyNamesElement
- * ******************************************************************************************** */
-D878UVCodeplug::FMAPRSFrequencyNamesElement::FMAPRSFrequencyNamesElement(uint8_t *ptr, size_t size)
-  : Element(ptr, size)
-{
-  // pass...
-}
-
-D878UVCodeplug::FMAPRSFrequencyNamesElement::FMAPRSFrequencyNamesElement(uint8_t *ptr)
-  : Element(ptr, size())
-{
-  // pass...
-}
-
-void
-D878UVCodeplug::FMAPRSFrequencyNamesElement::clear() {
-  memset(_data, 0xff, size());
-}
-
-QString
-D878UVCodeplug::FMAPRSFrequencyNamesElement::name(unsigned int n) const {
-  n = std::min(n, 7U);
-  return readASCII(n*Offset::betweenNames(), Limit::nameLength(), 0xff);
-}
-
-void
-D878UVCodeplug::FMAPRSFrequencyNamesElement::setName(unsigned int n, const QString &name) {
-  n = std::min(n, 7U);
-  writeASCII(n*Offset::betweenNames(), name, Limit::nameLength(), 0xff);
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::RoamingChannelElement
  * ******************************************************************************************** */
 D878UVCodeplug::RoamingChannelElement::RoamingChannelElement(uint8_t *ptr, unsigned size)
@@ -1638,15 +1605,15 @@ D878UVCodeplug::GeneralSettingsElement::setAutoRoamPeriod(Interval intv) {
 
 bool
 D878UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
-  return 0 == keyToneLevel();
+  return keyToneLevel().isNull();
 }
-unsigned
+Level
 D878UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((unsigned)getUInt8(Offset::keyToneLevel()))*10/15;
+  return Level::fromValue(getUInt8(Offset::keyToneLevel()), Limit::keyTone());
 }
 void
-D878UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
-  setUInt8(Offset::keyToneLevel(), level*10/15);
+D878UVCodeplug::GeneralSettingsElement::setKeyToneLevel(Level level) {
+  setUInt8(Offset::keyToneLevel(), level.mapTo(Limit::keyTone()));
 }
 void
 D878UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
@@ -2089,6 +2056,11 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
   enableBootReset(ctx.config()->settings()->boot()->resetEnabled());
 
+  // Encode tone settings
+  enableIdleChannelTone(
+    ctx.config()->settings()->tone()->channelIdle().testFlag(Channel::Type::DMR));
+  setKeyToneLevel(ctx.config()->settings()->tone()->keyToneVolume());
+
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
@@ -2119,9 +2091,6 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableKeypadLock(ext->keySettings()->keypadLockEnabled());
   enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
   enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
-
-  // Encode tone settings
-  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
   // Encode audio settings
   setMuteDelay(ext->audioSettings()->muteDelay());
@@ -2193,6 +2162,12 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
 
   ctx.config()->settings()->boot()->enableReset(this->bootReset());
 
+  // Decode tone settings
+  ctx.config()->settings()->tone()->setKeyToneVolume(keyToneLevel());
+  ctx.config()->settings()->tone()->setChannelIdle(
+    idleChannelTone() ? Channel::Type::DMR : Channel::Type::None
+  );
+
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
                                    GNSSSettings::Units::Metric);
@@ -2220,9 +2195,6 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   ext->keySettings()->enableKeypadLock(this->keypadLock());
   ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
   ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
-
-  // Decode tone settings
-  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
 
   // Store audio settings
   ext->audioSettings()->setMuteDelay(this->muteDelay());
@@ -2759,20 +2731,26 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
+  // Encode audio settings
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
+  else
+    setFMMicGain(ctx.config()->settings()->audio()->micGain());
+
+  // Encode tone settings.
+  enableFMIdleTone(ctx.config()->settings()->tone()->channelIdle().testFlag(Channel::Type::FM));
+  setCallEndToneMelody(*ctx.config()->settings()->tone()->callEndMelody());
+
   // Encode GPS settings
   setGNSS(ctx.config()->settings()->gnss()->systems());
 
   enableSendTalkerAlias(ctx.config()->settings()->dmr()->sendTalkerAliasEnabled());
   setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
 
-  if (nullptr == ctx.config()->settings()->anytoneExtension()) {
-    // If there is no extension, reuse DMR mic gain setting
-    setFMMicGain(ctx.config()->settings()->micLevel());
-    return true;
-  }
-
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
+  if (nullptr == ext)
+    return true;
 
   // Encode DMR settings
   setTalkerAliasSource(ext->dmrSettings()->talkerAliasSource());
@@ -2786,14 +2764,6 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Encode tone settings
   enableTOTNotification(ext->toneSettings()->totNotification());
-  enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
-  setCallEndToneMelody(*ext->toneSettings()->callEndMelody());
-
-  // Encode audio settings
-  if (ext->audioSettings()->fmMicGainEnabled())
-    setFMMicGain(ext->audioSettings()->fmMicGain());
-  else
-    setFMMicGain(ctx.config()->settings()->micLevel());
 
   // Encode DMR settings
   setManDialGroupCallHangTime(ext->dmrSettings()->manualGroupCallHangTime());
@@ -2846,6 +2816,13 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   // Store GPS settings
   ctx.config()->settings()->gnss()->setSystems(this->gnss());
 
+  // Store tone settings
+  ctx.config()->settings()->tone()->setChannelIdle(
+    ctx.config()->settings()->tone()->channelIdle()
+      | (fmIdleTone() ? Channel::Type::FM : Channel::Type::None));
+  callEndToneMelody(*ctx.config()->settings()->tone()->callEndMelody());
+
+  // Store DMR settings
   ctx.config()->settings()->dmr()->enableSendTalkerAlias(sendTalkerAlias());
   ctx.config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
 
@@ -2868,14 +2845,6 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store tone settings
   ext->toneSettings()->enableTOTNotification(this->totNotification());
-  ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
-  this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
-
-  // Store FM mic gain separately, if different
-  if (ctx.config()->settings()->micLevel() == fmMicGain())
-    ext->audioSettings()->disableFMMicGain();
-  else
-    ext->audioSettings()->setFMMicGain(fmMicGain());
 
   // Store display settings
   ext->displaySettings()->enableShowColorCode(this->showColorCode());
@@ -2908,6 +2877,12 @@ bool
 D878UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {
   if (! AnytoneCodeplug::ExtendedSettingsElement::linkConfig(ctx, err))
     return false;
+
+  // Store FM mic gain separately, if different
+  if (ctx.config()->settings()->audio()->micGain() == fmMicGain())
+    ctx.config()->settings()->audio()->disableFMMicGain();
+  else
+    ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
 
   // Get or add extension if not present
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -3037,10 +3012,12 @@ D878UVCodeplug::APRSSettingsElement::disableAutoTX() {
   setAutoTXInterval(Interval::fromMilliseconds(0));
 }
 
+
 bool
 D878UVCodeplug::APRSSettingsElement::fixedLocationEnabled() const {
   return getUInt8(Offset::fixedLocation());
 }
+
 QGeoCoordinate
 D878UVCodeplug::APRSSettingsElement::fixedLocation() const {
   double latitude  = getUInt8(Offset::fixedLatDeg()) + double(getUInt8(Offset::fixedLatMin()))/60
@@ -3068,7 +3045,9 @@ D878UVCodeplug::APRSSettingsElement::setFixedLocation(const QGeoCoordinate &loc)
   unsigned lon_deg = int(longitude); longitude -= lon_deg; longitude *= 60;
   unsigned lon_min = int(longitude); longitude -= lon_min; longitude *= 60;
   unsigned lon_sec = int(longitude);
-  unsigned height_ft = int(loc.altitude()*3.281);
+  unsigned height_ft = 0;
+  if (QGeoCoordinate::Coordinate3D == loc.type())
+    height_ft = int(loc.altitude()*3.281);
   setUInt8(Offset::fixedLatDeg(), lat_deg);
   setUInt8(Offset::fixedLatMin(), lat_min);
   setUInt8(Offset::fixedLatSec(), lat_sec);
@@ -3419,7 +3398,7 @@ D878UVCodeplug::APRSSettingsElement::updateConfig(Context &ctx, const ErrorStack
 
 bool
 D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
-    const FMAPRSSystem *sys, Context &ctx, FMAPRSFrequencyNamesElement &names, const ErrorStack &err)
+    const FMAPRSSystem *sys, Context &ctx, const ErrorStack &err)
 {
   Q_UNUSED(ctx)
   clear();
@@ -3428,7 +3407,6 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
                 << "No revert channel defined for APRS system '" << sys->name() <<"'.";
     return false;
   }
-  names.setName(0, sys->name());
   setFMFrequency(0, sys->revertChannel()->txFrequency());
   setTXTone(sys->revertChannel()->txTone());
   setPower(sys->revertChannel()->power());
@@ -3465,19 +3443,15 @@ D878UVCodeplug::APRSSettingsElement::fromFMAPRSSystem(
   for (int i=0; i<ext->frequencies()->count(); i++) {
     setFMFrequency(ctx.index(ext->frequencies()->get(i)),
                    ext->frequencies()->get(i)->as<AnytoneAPRSFrequency>()->frequency());
-    names.setName(ctx.index(ext->frequencies()->get(i)),
-                  ext->frequencies()->get(i)->name());
   }
 
   return true;
 }
 
 FMAPRSSystem *
-D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err) {
+D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
   QString name = QString("APRS %1").arg(destination());
-  if (names.isValid() && (! names.name(0).isEmpty()))
-    name = names.name(0);
   FMAPRSSystem *sys = new FMAPRSSystem(
         name, nullptr,
         destination(), destinationSSID(), source(), sourceSSID(),
@@ -3506,10 +3480,7 @@ D878UVCodeplug::APRSSettingsElement::toFMAPRSSystem(Context &ctx, const FMAPRSFr
       continue;
     auto *f = new AnytoneAPRSFrequency();
     f->setFrequency(fmFrequency(i));
-    QString name = QString("APRS %1").arg(i);
-    if (names.isValid() && (! names.name(i).isEmpty()))
-      name = names.name(i);
-    f->setName(name);
+    f->setName(QString("APRS %1").arg(i));
     ext->frequencies()->add(f);
     ctx.add(f, i);
   }
@@ -3998,9 +3969,6 @@ D878UVCodeplug::allocateUpdated() {
   // allocate APRS RX list
   image(0).addElement(Offset::analogAPRSRXEntries(),
                       Limit::analogAPRSRXEntries()*AnalogAPRSRXEntryElement::size());
-
-  // allocate FM APRS frequency names
-  image(0).addElement(Offset::fmAPRSFrequencyNames(), FMAPRSFrequencyNamesElement::size());
 }
 
 void
@@ -4019,8 +3987,6 @@ D878UVCodeplug::allocateForDecoding() {
   this->allocateRoaming();
   this->allocateAESKeys();
   this->allocateARC4Keys();
-  // allocate FM APRS frequency names
-  image(0).addElement(Offset::fmAPRSFrequencyNames(), FMAPRSFrequencyNamesElement::size());
 }
 
 void
@@ -4312,18 +4278,16 @@ D878UVCodeplug::encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorSt
   // replaces D868UVCodeplug::encodeGPSSystems
 
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
-  FMAPRSFrequencyNamesElement aprsNames(data(Offset::fmAPRSFrequencyNames()));
-
-  if (! aprs.fromConfig(ctx, err)) {
-    errMsg(err) << "Cannot encode global APRS settings.";
-    return false;
-  }
 
   // Encode APRS system (there can only be one)
   if (0 < ctx.count<FMAPRSSystem>()) {
-    aprs.fromFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx, aprsNames, err);
+    aprs.fromFMAPRSSystem(ctx.get<FMAPRSSystem>(0), ctx, err);
     AnalogAPRSMessageElement(data(Offset::analogAPRSMessage()))
         .setMessage(ctx.get<FMAPRSSystem>(0)->message());
+  }
+  if (! aprs.fromConfig(ctx, err)) {
+    errMsg(err) << "Cannot encode global APRS settings.";
+    return false;
   }
 
   // Encode GPS systems
@@ -4347,9 +4311,6 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Before creating any GPS/APRS systems, get global auto TX interval
   APRSSettingsElement aprs(data(Offset::aprsSettings()));
-  FMAPRSFrequencyNamesElement aprsNames(isAllocated(Offset::fmAPRSFrequencyNames()) ?
-                                          data(Offset::fmAPRSFrequencyNames()):
-                                          nullptr);
   AnalogAPRSMessageElement  aprsMessage(data(Offset::analogAPRSMessage()));
 
   if (! aprs.updateConfig(ctx, err)) {
@@ -4359,7 +4320,7 @@ D878UVCodeplug::createGPSSystems(Context &ctx, const ErrorStack &err) {
 
   // Create APRS system (if enabled)
   if (aprs.isValid()) {
-    FMAPRSSystem *sys = aprs.toFMAPRSSystem(ctx, aprsNames, err);
+    FMAPRSSystem *sys = aprs.toFMAPRSSystem(ctx, err);
     if (nullptr == sys) {
       errMsg(err) << "Cannot decode positioning systems.";
       return false;

@@ -391,104 +391,17 @@ class AnytoneToneSettingsExtension: public ConfigItem
   Q_OBJECT
   Q_CLASSINFO("description", "Tone settings for AnyTone devices.")
 
-  Q_CLASSINFO("keyToneDescription", "If true, enables the key tones.")
-  /** The key tone setting. */
-  Q_PROPERTY(bool keyTone READ keyToneEnabled WRITE enableKeyTone)
-
-  Q_CLASSINFO("keyToneLevelDescription", "Specifies the key-tone level, 0=user adjustable.")
-  /** The key tone level setting. */
-  Q_PROPERTY(unsigned int keyToneLevel READ keyToneLevel WRITE setKeyToneLevel)
-
-  Q_CLASSINFO("smsAlertDescription", "Enables/disables the SMS alert tone.")
-  /** If @c true, the SMS alert tone is enabled. */
-  Q_PROPERTY(bool smsAlert READ smsAlertEnabled WRITE enableSMSAlert)
-
-  Q_CLASSINFO("callAlertDescription", "Enables/disables the call alert tone.")
-  /** If @c true, the call alert tone is enabled. */
-  Q_PROPERTY(bool callAlert READ callAlertEnabled WRITE enableCallAlert)
-
-  Q_CLASSINFO("dmrTalkPermitDescription", "Enables/disables the talk-permit tone for DMR channels.")
-  /** If @c true, the DMR talk permit tone is enabled. */
-  Q_PROPERTY(bool dmrTalkPermit READ talkPermitDigitalEnabled WRITE enableTalkPermitDigital)
-
-  Q_CLASSINFO("dmrResetDescription", "Enables/disables the reset tone for DMR channels.")
-  /** If @c true, the DMR reset tone is enabled. */
-  Q_PROPERTY(bool dmrReset READ digitalResetToneEnabled WRITE enableDigitalResetTone)
-
-  Q_CLASSINFO("fmTalkPermitDescription", "Enables/disables the talk-permit tone for FM channels.")
-  /** If @c true, the FM talk permit tone is enabled. */
-  Q_PROPERTY(bool fmTalkPermit READ talkPermitAnalogEnabled WRITE enableTalkPermitAnalog)
-
-  /** If @c true, the idle tone is enabled for DMR channels. */
-  Q_PROPERTY(bool dmrIdle READ dmrIdleChannelToneEnabled WRITE enableDMRIdleChannelTone)
-  /** If @c true, the idle tone is enabled for FM channels. */
-  Q_PROPERTY(bool fmIdle READ fmIdleChannelToneEnabled WRITE enableFMIdleChannelTone)
-  /** If @c true, the startup tone is enabled. */
-  Q_PROPERTY(bool startup READ startupToneEnabled WRITE enableStartupTone)
   /** Enables transmit timeout notification (5s before TOT). */
   Q_PROPERTY(bool tot READ totNotification WRITE enableTOTNotification)
   /** Enables weather alarm tone. */
   Q_PROPERTY(bool wxAlarm READ wxAlarm WRITE enableWXAlarm)
 
-  /** The call melody. */
-  Q_PROPERTY(Melody * callMelody READ callMelody)
-  /** The idle melody. */
-  Q_PROPERTY(Melody * idleMelody READ idleMelody)
-  /** The reset melody. */
-  Q_PROPERTY(Melody * resetMelody READ resetMelody)
-  /** The call-end melody. */
-  Q_PROPERTY(Melody * callEndMelody READ callEndMelody)
 
 public:
   /** Empty constructor. */
   explicit AnytoneToneSettingsExtension(QObject *parent=nullptr);
 
   ConfigItem *clone() const;
-
-  /** Returns @c true if the key tone is enabled. */
-  bool keyToneEnabled() const;
-  /** Enables/disables the key tone. */
-  void enableKeyTone(bool enable);
-
-  /** Returns @c true if SMS alert is enabled. */
-  bool smsAlertEnabled() const;
-  /** Enables/disables SMS alert. */
-  void enableSMSAlert(bool enable);
-
-  /** Returns @c true if call alert is enabled. */
-  bool callAlertEnabled() const;
-  /** Enables/disables call alert. */
-  void enableCallAlert(bool enable);
-
-  /** Returns @c true if the talk permit tone is enabled for digital channels. */
-  bool talkPermitDigitalEnabled() const;
-  /** Enables/disables the talk permit tone for digital channels. */
-  void enableTalkPermitDigital(bool enable);
-
-  /** Returns @c true if the talk permit tone is enabled for digital channels. */
-  bool talkPermitAnalogEnabled() const;
-  /** Enables/disables the talk permit tone for analog channels. */
-  void enableTalkPermitAnalog(bool enable);
-
-  /** Returns @c true if the reset tone is enabled for digital calls. */
-  bool digitalResetToneEnabled() const;
-  /** Enables/disables the reset tone for digital calls. */
-  void enableDigitalResetTone(bool enable);
-
-  /** Returns @c true if the idle channel tone is enabled for DMR channel. */
-  bool dmrIdleChannelToneEnabled() const;
-  /** Enables/disables the idle DMR channel tone. */
-  void enableDMRIdleChannelTone(bool enable);
-
-  /** Returns @c true if the idle channel tone is enabled for FM channel. */
-  bool fmIdleChannelToneEnabled() const;
-  /** Enables/disables the idle FM channel tone. */
-  void enableFMIdleChannelTone(bool enable);
-
-  /** Returns @c true if the startup tone is enabled. */
-  bool startupToneEnabled() const;
-  /** Enables/disables the startup tone. */
-  void enableStartupTone(bool enable);
 
   /** Returns @c true if the transmit timeout notification is enabled (5s before TOT). */
   bool totNotification() const;
@@ -500,38 +413,9 @@ public:
   /** Enables/disables weather alarm. */
   void enableWXAlarm(bool enable);
 
-  /** Returns a reference to the call melody. */
-  Melody *callMelody() const;
-  /** Returns a reference to the idle melody. */
-  Melody *idleMelody() const;
-  /** Returns a reference to the reset melody. */
-  Melody *resetMelody() const;
-  /** Returns a reference to the call-end melody. */
-  Melody *callEndMelody() const;
-
-  /** Returns the key-tone level. */
-  unsigned int keyToneLevel() const;
-  /** Sets the key-tone level. */
-  void setKeyToneLevel(unsigned int level);
-
 protected:
-  bool _keyTone;                   ///< Key tone property.
-  bool _smsAlert;                  ///< SMS alert tone enabled.
-  bool _callAlert;                 ///< Call alert tone enabled.
-  bool _talkPermitDigital;         ///< DMR talk permit tone.
-  bool _talkPermitAnalog;          ///< FM talk permit tone.
-  bool _resetToneDigital;          ///< DMR reset tone.
-  bool _dmrIdleChannelTone;        ///< Idle channel tone (DMR).
-  bool _fmIdleChannelTone;         ///< Idle channel tone (FM).
-  bool _startupTone;               ///< Startup tone enabled.
   bool _totNotification;           ///< TOT notification enabled.
   bool _wxAlarm;                   ///< Weather alarm.
-  Melody *_callMelody;             ///< Call melody.
-  Melody *_idleMelody;             ///< Idle melody.
-  Melody *_resetMelody;            ///< Reset melody.
-  Melody *_callEndMelody;          ///< Call end melody.
-  unsigned int _keyToneLevel;      ///< The level of key-tones, 0=user adjustable.
-
 };
 
 
@@ -815,8 +699,6 @@ class AnytoneAudioSettingsExtension: public ConfigItem
 {
   Q_OBJECT
 
-  /** The VOX delay in ms. */
-  Q_PROPERTY(Interval voxDelay READ voxDelay WRITE setVOXDelay)
   /** The VOX source. */
   Q_PROPERTY(VoxSource voxSource READ voxSource WRITE setVOXSource)
 
@@ -828,14 +710,6 @@ class AnytoneAudioSettingsExtension: public ConfigItem
 
   /** The mute delay in minutes. */
   Q_PROPERTY(Interval muteDelay READ muteDelay WRITE setMuteDelay)
-
-  /** The maximum volume setting [0-10]. */
-  Q_PROPERTY(unsigned int maxVolume READ maxVolume WRITE setMaxVolume)
-  /** The maximum head-phone volume setting [0-10]. */
-  Q_PROPERTY(unsigned int maxHeadPhoneVolume READ maxHeadPhoneVolume WRITE setMaxHeadPhoneVolume)
-
-  /** The FM mic gain [1,10]. */
-  Q_PROPERTY(Level fmMicGain READ fmMicGain WRITE setFMMicGain)
 
   /** The enables speakers. */
   Q_PROPERTY(Speaker speaker READ speaker WRITE setSpeaker)
@@ -875,11 +749,6 @@ public:
 
   ConfigItem *clone() const;
 
-  /** Returns the VOX delay in ms. */
-  Interval voxDelay() const;
-  /** Sets the VOX delay in ms. */
-  void setVOXDelay(Interval ms);
-
   /** Returns the VOX source. */
   VoxSource voxSource() const;
   /** Sets the VOX source. */
@@ -890,15 +759,6 @@ public:
   /** Enables/disables recording. */
   void enableRecording(bool enable);
 
-  /** Returns the maximum volume setting [0-10]. */
-  unsigned int maxVolume() const;
-  /** Sets the maximum volume. */
-  void setMaxVolume(unsigned int vol);
-  /** Returns the maximum head-phone volume setting [0-10]. */
-  unsigned int maxHeadPhoneVolume() const;
-  /** Sets the maximum head-phone volume. */
-  void setMaxHeadPhoneVolume(unsigned int vol);
-
   /** Returns @c true if the audio is "enhanced". */
   bool enhanceAudioEnabled() const;
   /** Enables/disables enhanced audio. */
@@ -908,15 +768,6 @@ public:
   Interval muteDelay() const;
   /** Sets the mute delay. */
   void setMuteDelay(Interval intv);
-
-  /** Returns @c true, if the FM mic gain is set independently. */
-  bool fmMicGainEnabled() const;
-  /** Returns the FM mic gain. */
-  Level fmMicGain() const;
-  /** Sets the FM mic gain. */
-  void setFMMicGain(Level gain);
-  /** Disables the FM mic gain. */
-  void disableFMMicGain();
 
   /** Returns the speaker that are enabled. */
   Speaker speaker() const;
@@ -937,11 +788,8 @@ protected:
   Interval _voxDelay;               ///< VOX delay in ms.
   bool _recording;                  ///< Recording enabled.
   VoxSource _voxSource;             ///< The VOX source.
-  unsigned int _maxVolume;          ///< The maximum volume.
-  unsigned int _maxHeadPhoneVolume; ///< The maximum head-phone volume.
   bool _enhanceAudio;               ///< Enhance audio.
   Interval _muteDelay;              ///< Mute delay in minutes.
-  Level _analogMicGain;             ///< The FM mic gain.
   Speaker _speaker;                 ///< Specifies which speaker are enabled.
   HandsetSpeakerSource _handsetSpeaker; ///< Specifies the handset speaker source.
   HandsetType _handsetType;         ///< Handset type.

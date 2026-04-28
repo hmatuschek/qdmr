@@ -58,6 +58,8 @@ public:
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0030; }
 
+    void clear() override;
+
     /** Returns the channel name. */
     virtual QString name() const;
     /** Sets the channel name. */
@@ -243,6 +245,7 @@ public:
       static constexpr unsigned int rxFrequency() { return 0x0010; }
       static constexpr unsigned int txFrequency() { return 0x0014; }
       static constexpr Bit channelType()          { return {0x0018, 4}; }
+      static constexpr Bit rxOnly()               { return {0x0018, 3}; }
       static constexpr Bit power()                { return {0x0018, 1}; }
       static constexpr Bit loneWorker()           { return {0x0018, 0}; }
       static constexpr Bit bandwidth()            { return {0x0019, 7}; }
@@ -254,7 +257,6 @@ public:
       static constexpr Bit emergencyACK()         { return {0x001b, 6}; }
       static constexpr Bit emergencySystemIndex() { return {0x001b, 0}; }
       static constexpr Bit squelchLevel()         { return {0x001c, 4}; }
-      static constexpr Bit rxOnly()               { return {0x001c, 3}; }
       static constexpr Bit dmrAPRS()              { return {0x001c, 2}; }
       static constexpr Bit privateCallACK()       { return {0x001d, 7}; }
       static constexpr Bit dataACK()              { return {0x001d, 6}; }
@@ -1877,7 +1879,7 @@ public:
     virtual Level voxLevel() const;
     /** Sets the VOX level. */
     virtual void setVOXLevel(Level voxLevel);
-    /** Retruns the VOX delay. */
+    /** Returns the VOX delay. */
     virtual Interval voxDelay() const;
     /** Sets the VOX delay. */
     virtual void setVoxDelay(Interval delay);

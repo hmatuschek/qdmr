@@ -503,7 +503,7 @@ loc2deg(const QString &loc) {
     lon = lon - 180;
     lat = lat - 90;
     // Offset places coordinate in the middle of the square
-    return QGeoCoordinate(lat+dlat/2, lon+dlon/2);
+    return QGeoCoordinate(lat+dlat/2, lon+dlon/2,0);
   }
 
   dlon /= 24; dlat /= 24;

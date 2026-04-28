@@ -21,6 +21,10 @@ DM32UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
   // pass...
 }
 
+void
+DM32UVCodeplug::ChannelElement::clear() {
+  fill(0x00);
+}
 
 QString
 DM32UVCodeplug::ChannelElement::name() const {
@@ -503,6 +507,7 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
 bool
 DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
+  clear();
   setName(channel->name());
   setRXFrequency(channel->rxFrequency());
   if (channel->txFrequency().isZero())
@@ -514,7 +519,7 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
   setPower(channel->power());
   enableRXOnly(channel->rxOnly());
   if (channel->defaultVOX())
-    enableVOX(! ctx.config()->settings()->voxDisabled());
+    enableVOX(ctx.config()->settings()->audio()->voxEnabled());
   else
     enableVOX(! channel->voxDisabled());
 
@@ -531,7 +536,7 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
       case DMRChannel::Admit::Free: setAdmitCriterion(Admit::ChannelFree); break;
       case DMRChannel::Admit::ColorCode: setAdmitCriterion(Admit::ToneOrCCMatch); break;
     }
-    setSquelchLevel(ctx.config()->settings()->squelch());
+    setSquelchLevel(ctx.config()->settings()->audio()->squelch());
     setTimeslot(dmr->timeSlot());
     setColorCode(dmr->colorCode());
     if (dmr->commercialExtension()) {
@@ -568,14 +573,14 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     case FMChannel::Admit::Free: setAdmitCriterion(Admit::ChannelFree); break;
     case FMChannel::Admit::Tone: setAdmitCriterion(Admit::ToneOrCCMatch); break;
     }
-    setSquelchLevel(fm->defaultSquelch() ? ctx.config()->settings()->squelch() : fm->squelch());
+    setSquelchLevel(fm->defaultSquelch() ? ctx.config()->settings()->audio()->squelch() : fm->squelch());
     setRXTone(fm->rxTone());
     setTXTone(fm->txTone());
     enableTalkaround(fm->extended()->talkaround());
   } else if (channel->is<AMChannel>()) {
     auto am = channel->as<AMChannel>();
     clearTXFrequency();
-    setSquelchLevel(am->defaultSquelch() ? ctx.config()->settings()->squelch() : am->squelch());
+    setSquelchLevel(am->defaultSquelch() ? ctx.config()->settings()->audio()->squelch() : am->squelch());
     enableRXOnly(true);
   }
 
@@ -3315,17 +3320,35 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
 
   // Boot settings
   ctx.config()->settings()->boot()->setBootDisplay(bootDisplay());
-  ctx.config()->settings()->setIntroLine1(bootMessage1());
-  ctx.config()->settings()->setIntroLine2(bootMessage2());
+  ctx.config()->settings()->boot()->setMessage1(bootMessage1());
+  ctx.config()->settings()->boot()->setMessage2(bootMessage2());
   ctx.config()->settings()->boot()->enableReset(mcuResetEnabled());
 
-  ctx.config()->settings()->enableSpeech(voicePromptEnabled());
-  ctx.config()->settings()->setVOX(voxLevel());
+  // Audio settings
+  ctx.config()->settings()->audio()->setMicGain(dmrMicLevel());
+  if (dmrMicLevel() != fmMicLevel())
+    ctx.config()->settings()->audio()->setFMMicGain(fmMicLevel());
+  ctx.config()->settings()->audio()->setVOXDelay(voxDelay());
+  ctx.config()->settings()->audio()->enableSpeechSynthesis(voicePromptEnabled());
+  ctx.config()->settings()->audio()->setVox(voxLevel());
+
+  // Tone settings
+  ctx.config()->settings()->tone()->enableSilent(radioSilentEnabled());
+  ctx.config()->settings()->tone()->setKeyToneVolume(
+    keyToneEnabled() ? Level::fromValue(5) : Level::null());
+  ctx.config()->settings()->tone()->enableSMSTone(smsToneEnabled());
+  ctx.config()->settings()->tone()->enableBootTone(bootToneEnabled());
+  ctx.config()->settings()->tone()->enableRingtone(
+    privateCallToneEnabled());
+  ctx.config()->settings()->tone()->setTalkPermit(
+    talkPermitToneEnabled() ? (Channel::Type::FM|Channel::Type::DMR) : Channel::Type::None );
+  ctx.config()->settings()->tone()->setCallEnd(
+    eotToneEnabled() ? (Channel::Type::FM|Channel::Type::DMR) : Channel::Type::None );
+
   if (transmitTimeout().isInfinite())
     ctx.config()->settings()->disableTOT();
   else
     ctx.config()->settings()->setTOT(transmitTimeout());
-  ctx.config()->settings()->setMicLevel(std::max(fmMicLevel(), dmrMicLevel()));
   ctx.config()->smsExtension()->setFormat(smsFormat());
 
   ctx.config()->settings()->gnss()->setSystems(gnss());
@@ -3347,21 +3370,39 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
 
   // boot settings
   setBootDisplay(ctx.config()->settings()->boot()->bootDisplay());
-  setBootMessage1(ctx.config()->settings()->introLine1());
-  setBootMessage2(ctx.config()->settings()->introLine2());
+  setBootMessage1(ctx.config()->settings()->boot()->message1());
+  setBootMessage2(ctx.config()->settings()->boot()->message2());
   enableMCUReset(ctx.config()->settings()->boot()->resetEnabled());
 
-  enableVoicePrompt(ctx.config()->settings()->speech());
-  if (ctx.config()->settings()->voxDisabled())
-    setVOXLevel(Level::null());
+  // audio settings
+  setDMRMicLevel(ctx.config()->settings()->audio()->micGain());
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFMMicLevel(ctx.config()->settings()->audio()->fmMicGain());
   else
-    setVOXLevel(ctx.config()->settings()->vox());
+    setFMMicLevel(ctx.config()->settings()->audio()->micGain());
+  enableVoicePrompt(ctx.config()->settings()->audio()->speechSynthesisEnabled());
+  if (ctx.config()->settings()->audio()->voxEnabled())
+    setVOXLevel(ctx.config()->settings()->audio()->vox());
+  else
+    setVOXLevel(Level::null());
+  setVoxDelay(ctx.config()->settings()->audio()->voxDelay());
+
+  // tone settings
+  enableRadioSilent(ctx.config()->settings()->tone()->silent());
+  enableKeyTone(ctx.config()->settings()->tone()->keyToneEnabled());
+  enableSMSTone(ctx.config()->settings()->tone()->smsToneEnabled());
+  enableBootTone(ctx.config()->settings()->tone()->bootToneEnabled());
+  enablePrivateCallTone(ctx.config()->settings()->tone()->ringtoneEnabled());
+  enableTalkPermitTone(
+    ctx.config()->settings()->tone()->talkPermit().testAnyFlags(
+      Channel::Type::FM | Channel::Type::DMR));
+  enableEOTTone(ctx.config()->settings()->tone()->callEnd().testAnyFlags(
+    Channel::Type::FM | Channel::Type::DMR));
+
   if (ctx.config()->settings()->totDisabled())
     setTransmitTimeout(Interval::infinity());
   else
     setTransmitTimeout(ctx.config()->settings()->tot());
-  setFMMicLevel(ctx.config()->settings()->micLevel());
-  setDMRMicLevel(ctx.config()->settings()->micLevel());
   if (ctx.config()->smsExtension())
     setSMSFormat(ctx.config()->smsExtension()->format());
 

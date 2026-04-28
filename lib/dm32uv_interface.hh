@@ -126,7 +126,7 @@ protected:
     /** Receive response though the given interface. */
     bool receive(DM32UVInterface *dev, const ErrorStack &err=ErrorStack());
     /** Extracts a string from the response payload. */
-    QString string() const;
+    QByteArray string() const;
     /** Extracts the lower memory bound. */
     uint32_t lowerMemoryBound() const;
     /** Extracts the upper memory bound. */
@@ -288,7 +288,7 @@ protected:
   /** Radio info, identifying the radio. */
   RadioInfo _info;
   /** Firmware version string. */
-  QString _firmwareVersion;
+  QByteArray _firmwareVersion;
   /** Codeplug memory range. */
   QPair<uint32_t, uint32_t> _codeplugMemory;
   /** Callsign memory range. */

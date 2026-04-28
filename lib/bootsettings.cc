@@ -2,9 +2,12 @@
 
 
 BootSettings::BootSettings(QObject *parent)
-: ConfigExtension{parent}, _bootDisplay(BootDisplay::Logo), _bootPasswordEnabled(false),
-  _defaultChannel(false), _zoneA(new ZoneReference(this)), _channelA(new ChannelReference(this)),
-  _zoneB(new ZoneReference(this)), _channelB(new ChannelReference(this)), _reset(true)
+: ConfigExtension{parent}, _bootDisplay(BootDisplay::Logo), _message1(), _message2(),
+  _bootPasswordEnabled(false), _bootPassword(),
+  _defaultChannel(false),
+  _zoneA(new ZoneReference(this)), _channelA(new ChannelReference(this)),
+  _zoneB(new ZoneReference(this)), _channelB(new ChannelReference(this)),
+  _reset(true)
 {
   // pass...
 }
@@ -31,6 +34,33 @@ BootSettings::setBootDisplay(BootDisplay mode) {
   if (_bootDisplay == mode)
     return;
   _bootDisplay = mode;
+  emit modified(this);
+}
+
+
+const QString &
+BootSettings::message1() const {
+  return _message1;
+}
+
+void
+BootSettings::setMessage1(const QString &message1) {
+  if (_message1 == message1)
+    return;
+  _message1 = message1;
+  emit modified(this);
+}
+
+const QString &
+BootSettings::message2() const {
+  return _message2;
+}
+
+void
+BootSettings::setMessage2(const QString &message2) {
+  if (_message2 == message2)
+    return;
+  _message2 = message2;
   emit modified(this);
 }
 
