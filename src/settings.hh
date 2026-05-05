@@ -50,6 +50,8 @@ public:
 
   RepeaterBookSource::Region repeaterBookRegion() const;
   void setRepeaterBookRegion(RepeaterBookSource::Region region);
+  QByteArray repeaterBookAPIToken() const;
+  void setRepeaterBookAPIToken(const QByteArray &token);
 
   bool disableAutoDetect() const;
   void setDisableAutoDetect(bool disable);
