@@ -247,6 +247,9 @@ public:
   /** Returns the radio info, after identifying the radio. */
   RadioInfo identifier(const ErrorStack &err=ErrorStack()) override;
 
+  /** Closes the interface. If in program mode, cycles DTR to reset the radio first. */
+  void close() override;
+
   /** Reads the obfuscation address map from the device. */
   bool getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err=ErrorStack(),
                      void (*progress)(unsigned int percent)=nullptr);
