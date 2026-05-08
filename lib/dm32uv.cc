@@ -59,6 +59,15 @@ DM32UV::DM32UV(DM32UVInterface *dev, QObject *parent)
   // pass...
 }
 
+DM32UV::~DM32UV() {
+  if (_dev && _dev->isOpen())
+    _dev->close();
+  if (_dev) {
+    _dev->deleteLater();
+    _dev = nullptr;
+  }
+}
+
 RadioInfo
 DM32UV::defaultRadioInfo() {
   return RadioInfo(

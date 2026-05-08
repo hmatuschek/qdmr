@@ -75,6 +75,8 @@ public:
 public:
   /** Default constructor. */
   explicit DM32UV(DM32UVInterface *device=nullptr, QObject *parent=nullptr);
+  /** Destructor. Closes and frees the device interface. */
+  ~DM32UV();
 
   /** Returns the default radio information. The actual instance may have different properties
    * due to variants of the same radio. */

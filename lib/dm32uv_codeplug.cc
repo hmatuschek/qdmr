@@ -1303,12 +1303,12 @@ DM32UVCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
 
 QString
 DM32UVCodeplug::ZoneElement::name() const {
-  return readASCII(Offset::name(), Limit::nameLength(), 0xff);
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
 }
 
 void
 DM32UVCodeplug::ZoneElement::setName(const QString &name) {
-  return writeASCII(Offset::name(), name, Limit::nameLength(), 0xff);
+  return writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
 }
 
 
