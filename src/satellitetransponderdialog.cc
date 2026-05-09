@@ -1,4 +1,7 @@
 #include "satellitetransponderdialog.hh"
+
+#include <QMessageBox>
+
 #include "ui_satellitetransponderdialog.h"
 
 SatelliteTransponderDialog::SatelliteTransponderDialog(const Satellite &sat, TransponderDatabase &transponder, QWidget *parent)
@@ -7,6 +10,8 @@ SatelliteTransponderDialog::SatelliteTransponderDialog(const Satellite &sat, Tra
   ui->setupUi(this);
   setWindowIcon(QIcon::fromTheme("edit-satellites"));
 
+  ui->name->setText(_satellite.name());
+  ui->idLabel->setText(QString("Norad Id %1").arg(_satellite.id()));
   ui->fmDownlinkFrequency->populate(_satellite.id(), false, Transponder::Mode::FM, transponder);
   ui->fmDownlinkFrequency->setFrequency(_satellite.fmDownlink());
   ui->fmDownlinkTone->setSelectiveCall(_satellite.fmDownlinkTone());
@@ -37,6 +42,12 @@ SatelliteTransponderDialog::satellite() const {
 
 void
 SatelliteTransponderDialog::accept() {
+  if (ui->name->text().simplified().isEmpty()) {
+    QMessageBox::information(nullptr, tr("Invalid name"),
+      tr("Please set a satellite name."));
+    return;
+  }
+  _satellite.setName(ui->name->text().simplified());
   _satellite.setFMUplink(ui->fmUplinkFrequency->frequency());
   _satellite.setFMUplinkTone(ui->fmUplinkTone->selectiveCall());
   _satellite.setFMDownlink(ui->fmDownlinkFrequency->frequency());
