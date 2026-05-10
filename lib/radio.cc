@@ -26,6 +26,7 @@
 #include "d578uv.hh"
 #include "d168uv.hh"
 #include "dmr6x2uv.hh"
+#include "dmr6x2uv2.hh"
 
 #include "logger.hh"
 
@@ -79,7 +80,7 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       } else if ((id.isValid() && (RadioInfo::DMR6X2UV == id.id())) || (force.isValid() && (RadioInfo::DMR6X2UV == force.id()))) {
         return new DMR6X2UV(anytone);
       } else if ((id.isValid() && (RadioInfo::DMR6X2UV2 == id.id())) || (force.isValid() && (RadioInfo::DMR6X2UV2 == force.id()))) {
-        return new DMR6X2UV(anytone);
+        return new DMR6X2UV2(anytone);
       } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
         return new D578UV(anytone);
       } else if (id.isValid()) {
