@@ -29,6 +29,7 @@ Currently, there are only few radios that are supported
   * Anytone AT-D878UVII (since version 0.8.0)
   * Anytone AT-D578UV (since version 0.8.0)
   * Anytone AT-D578UV II (since version 0.13.0)
+  * Anytone AT-D168UV (since version 0.15.0)
   * BTECH DM-1701 / Retevis RT84 (since version 0.10.0)
   * BTECH BF-1801A6 (since version 0.12.0)
   * BTECH DMR-6x2 (since version 0.11.0)
@@ -65,8 +66,8 @@ qdmr or dmrconf.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
 
- * **[Version 0.14.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.14.0)** -- Bugfix release.
- * **[Version 0.14.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.14.0)** -- Added support for Baofeng DM-32UV, added AM channels.
+ * **[Version 0.15.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.15.0)** -- Added support for AnyTone AT-D168UV, added common settings.
+ * **[Version 0.14.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.14.1)** -- Added support for Baofeng DM-32UV, added AM channels.
  * **[Version 0.13.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.3)** -- Added support BTech DMR6X2PRO and OpenUV390.
  * **[Version 0.12.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.3)** -- Added support BTech DR-1801UV (A6, still unstable) and Radioddity GD-73.
  * **[Version 0.11.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.11.3)** -- Added proper support for BTech DMR-6X2UV, device specific settings for AnyTone devices, some bugfixes.
