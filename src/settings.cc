@@ -128,6 +128,16 @@ Settings::setRepeaterBookRegion(RepeaterBookSource::Region region) {
   setValue("repeaterBookRegion", region);
 }
 
+QByteArray
+Settings::repeaterBookAPIToken() const {
+  return value("repeaterSource/repeaterBookAPIToken", QByteArray()).toByteArray();
+}
+void
+Settings::setRepeaterBookAPIToken(const QByteArray &token) {
+  setValue("repeaterSource/repeaterBookAPIToken", token);
+}
+
+
 bool
 Settings::disableAutoDetect() const {
   return value("disableAutoDetect", false).toBool();
@@ -423,6 +433,7 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   case RepeaterBookSource::World: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(0); break;
   case RepeaterBookSource::NorthAmerica: Ui::SettingsDialog::repeaterBookRegion->setCurrentIndex(1); break;
   }
+  Ui::SettingsDialog::repeaterBookAPIToken->setText(QString::fromLatin1(settings.repeaterBookAPIToken()));
 
   Ui::SettingsDialog::repeaterMapEnable->setChecked(settings.repeaterMapSourceEnabled());
   Ui::SettingsDialog::repeatermapAPIToken->setText(settings.repeaterMapAPIToken().toHex());
@@ -518,6 +529,8 @@ SettingsDialog::accept() {
     settings.setRepeaterBookRegion(RepeaterBookSource::World);
   else
     settings.setRepeaterBookRegion(RepeaterBookSource::NorthAmerica);
+  settings.setRepeaterBookAPIToken(Ui::SettingsDialog::repeaterBookAPIToken->text().toLatin1());
+  
   settings.enableRepeaterMapSource(Ui::SettingsDialog::repeaterMapEnable->isChecked());
   settings.setRepeaterMapAPIToken(
     QByteArray::fromHex(Ui::SettingsDialog::repeatermapAPIToken->text().simplified().toLatin1()));

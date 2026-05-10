@@ -88,7 +88,7 @@ Application::Application(int &argc, char *argv[])
   Settings settings;
   // load databases
   _repeater   = new RepeaterDatabase(this);
-  if (settings.repeaterBookSourceEnabled())
+  if (settings.repeaterBookSourceEnabled() && !settings.repeaterBookAPIToken().isEmpty())
     _repeater->addSource(new RepeaterBookSource());
   if (settings.repeaterMapSourceEnabled() && !settings.repeaterMapAPIToken().isEmpty())
     _repeater->addSource(new RepeaterMapSource(settings.repeaterMapAPIToken(),
