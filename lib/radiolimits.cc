@@ -1087,7 +1087,7 @@ bool
 RadioLimits::verifyConfig(const Config *config, RadioLimitContext &context) const {
   if (_betaWarning) {
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg = tr("The support for this radio is still under development. Some features may sill be "
+    msg = tr("The support for this radio is still under development. Some features may still be "
              "missing or are not well tested.");
   }
 
