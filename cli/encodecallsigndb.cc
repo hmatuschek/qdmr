@@ -174,7 +174,7 @@ int encodeCallsignDB(QCommandLineParser &parser, QCoreApplication &app) {
                  << "': " << err.format();
       return -1;
     }
-  } else if ((RadioInfo::D878UVII == radio) || (RadioInfo::D578UV == radio) || (RadioInfo::DMR6X2UV2 == radio)){
+  } else if ((RadioInfo::D878UVII == radio) || (RadioInfo::D578UV == radio) || (RadioInfo::D168UV == radio) || (RadioInfo::DMR6X2UV2 == radio)){
     D878UV2CallsignDB db;
     if (! db.encode(&userdb, selection, err)) {
       logError() << "Cannot encode call-sign DB: " << err.format();

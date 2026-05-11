@@ -30,6 +30,7 @@
 #include "d878uv_codeplug.hh"
 #include "d878uv2_codeplug.hh"
 #include "d578uv_codeplug.hh"
+#include "d168uv_codeplug.hh"
 #include "dmr6x2uv_codeplug.hh"
 #include "dmr6x2uv2_codeplug.hh"
 #include "dr1801uv_codeplug.hh"
@@ -157,6 +158,11 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     } break;
   case RadioInfo::D578UV:
     if (! decode<D578UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
+      return -1;
+    } break;
+  case RadioInfo::D168UV:
+    if (! decode<D168UVCodeplug, DummyFileReader>(config, filename, parser, err)) {
       logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;
