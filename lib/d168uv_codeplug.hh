@@ -59,6 +59,34 @@ public:
   class GeneralSettingsElement: public D878UVCodeplug::GeneralSettingsElement
   {
   protected:
+  protected:
+    /** Device specific key functions. */
+    struct KeyFunction {
+    public:
+      /** Encodes key function. */
+      static uint8_t encode(AnytoneKeySettingsExtension::KeyFunction tone);
+      /** Decodes key function. */
+      static AnytoneKeySettingsExtension::KeyFunction decode(uint8_t code);
+
+    protected:
+      /** Device specific key functions. */
+      typedef enum {
+        Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
+        Encryption = 0x05, Call = 0x06, VOX = 0x07, ToggleVFO = 0x08, SubPTT = 0x09,
+        Scan = 0x0a, WFM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
+        Dial = 0x10, GPSInformation = 0x11, Monitor = 0x12, ToggleMainChannel = 0x13, HotKey1 = 0x14,
+        HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
+        WorkAlone = 0x1a, SkipChannel = 0x1b, DMRMonitor = 0x1c, SubChannel = 0x1d,
+        PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
+        ChannelType = 0x22, Ranging = 0x23, Roaming = 0x24, ChannelRanging = 0x25,
+        MaxVolume = 0x26, Slot = 0x27, APRSType = 0x28, Zone = 0x29, RoamingSet = 0x2a,
+        APRSSet = 0x2b, Mute=0x2c, CtcssDcsSet=0x2d, TBSTSend = 0x2e, Bluetooth = 0x2f,
+        GPS = 0x30, ChannelName = 0x31, CDTScan = 0x32, APRSSend = 0x33, DIMShut = 0x34,
+        GPSRoaming = 0x35, WXAlarm = 0x36, Squelch = 0x37, ChannelSettings = 0x38,
+        SatPredict = 0x39
+      } KeyFunctionCode;
+    };
+
     /** Device specific time zones. */
     struct TimeZone {
     public:
@@ -74,10 +102,51 @@ public:
 
   public:
     /** Constructor. */
-    GeneralSettingsElement(uint8_t *ptr);
+    explicit GeneralSettingsElement(uint8_t *ptr);
 
     QTimeZone gpsTimeZone() const override;
     void setGPSTimeZone(const QTimeZone &zone) override;
+
+    // These function keys are not present
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Short() const override;
+    void setFuncKey1Short(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Short() const override;
+    void setFuncKey2Short(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCShort() const override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey1Long() const override;
+    void setFuncKey1Long(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKey2Long() const override;
+    void setFuncKey2Long(AnytoneKeySettingsExtension::KeyFunction func) override;
+    void setFuncKeyCShort(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const override;
+    void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) override;
+
+    AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const override;
+    void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const override;
+    void setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction func) override;
+
+    /** Returns the function for the very-long press of side key 1. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyAVeryLong() const;
+    /** Sets the function for the very-long press of side key 1. */
+    virtual void setFuncKeyAVeryLong(AnytoneKeySettingsExtension::KeyFunction func);
+    /** Returns the function for the very-long press of side key 2. */
+    virtual AnytoneKeySettingsExtension::KeyFunction funcKeyBVeryLong() const;
+    /** Sets the function for the very-long press of side key 2. */
+    virtual void setFuncKeyBVeryLong(AnytoneKeySettingsExtension::KeyFunction func);
+
+    bool fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) override;
+    bool updateConfig(Context &ctx, const ErrorStack &err) override;
+
+  protected:
+    struct Offset: D878UVCodeplug::GeneralSettingsElement::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int progFuncKeyALong()     { return 0x0012; }
+      static constexpr unsigned int progFuncKeyBLong()     { return 0x0013; }
+      static constexpr unsigned int progFuncKeyAVeryLong() { return 0x0041; }
+      static constexpr unsigned int progFuncKeyBVeryLong() { return 0x0042; }
+      /// @endcond
+    };
   };
 
   /** Represents the extended settings within the D168UV codeplug.
