@@ -151,10 +151,14 @@ class AnytoneKeySettingsExtension: public ConfigItem
   Q_PROPERTY(KeyFunction funcKeyAShort READ funcKeyAShort WRITE setFuncKeyAShort)
   /** Function key A (PF1 below PTT or A on mic), long press function. */
   Q_PROPERTY(KeyFunction funcKeyALong READ funcKeyALong WRITE setFuncKeyALong)
+  /** Function key A (PF1 below PTT or A on mic), very-long press function. */
+  Q_PROPERTY(KeyFunction funcKeyAVeryLong READ funcKeyAVeryLong WRITE setFuncKeyAVeryLong)
   /** Function key B (PF2 second below PTT or B on mic), short press function. */
   Q_PROPERTY(KeyFunction funcKeyBShort READ funcKeyBShort WRITE setFuncKeyBShort)
   /** Function key B (PF2 second below PTT or B on mic), long press function. */
   Q_PROPERTY(KeyFunction funcKeyBLong READ funcKeyBLong WRITE setFuncKeyBLong)
+  /** Function key B (PF2 second below PTT or B on mic), very-long press function. */
+  Q_PROPERTY(KeyFunction funcKeyBVeryLong READ funcKeyBVeryLong WRITE setFuncKeyBVeryLong)
   /** Function key C (PF3 on top or C on mic), short press function. */
   Q_PROPERTY(KeyFunction funcKeyCShort READ funcKeyCShort WRITE setFuncKeyCShort)
   /** Function key C (PF3 on top or B on mic), long press function. */
@@ -202,7 +206,7 @@ public:
     Roaming, ChannelRanging, MaxVolume, Slot, APRSTypeSwitch, Zone, ZoneUp, ZoneDown, Exit, Menu,
     RoamingSet, APRSSet, Mute, MuteA, MuteB, CtcssDcsSet, TBSTSend, Bluetooth, GPS, ChannelName,
     CDTScan, APRSSend, APRSInfo, Speaker, XBandRepeater, SimplexRepeater, GPSRoaming, Squelch,
-    NoiseReductionTX, DIMShut, SatPredict
+    NoiseReductionTX, DIMShut, SatPredict, ChannelSettings, WXAlarm
   };
   Q_ENUM(KeyFunction)
 
@@ -280,6 +284,10 @@ public:
   KeyFunction funcKeyALong() const;
   /** Sets the key function for a long press on the function key A. */
   void setFuncKeyALong(KeyFunction func);
+  /** Returns the key function for a very-long press on the function key A. */
+  KeyFunction funcKeyAVeryLong() const;
+  /** Sets the key function for a very-long press on the function key A. */
+  void setFuncKeyAVeryLong(KeyFunction func);
 
   /** Returns the key function for a short press on the function key B. */
   KeyFunction funcKeyBShort() const;
@@ -289,6 +297,10 @@ public:
   KeyFunction funcKeyBLong() const;
   /** Sets the key function for a long press on the function key B. */
   void setFuncKeyBLong(KeyFunction func);
+  /** Returns the key function for a very-long press on the function key B. */
+  KeyFunction funcKeyBVeryLong() const;
+  /** Sets the key function for a very-long press on the function key B. */
+  void setFuncKeyBVeryLong(KeyFunction func);
 
   /** Returns the key function for a short press on the function key C. */
   KeyFunction funcKeyCShort() const;
@@ -364,8 +376,10 @@ protected:
   KeyFunction _funcKey6Long;           ///< Function of the function key 6, long press.
   KeyFunction _funcKeyAShort;          ///< Function of the function key A, short press.
   KeyFunction _funcKeyALong;           ///< Function of the function key A, long press.
+  KeyFunction _funcKeyAVeryLong;       ///< Function of the function key A, very long press.
   KeyFunction _funcKeyBShort;          ///< Function of the function key B, short press.
   KeyFunction _funcKeyBLong;           ///< Function of the function key B, long press.
+  KeyFunction _funcKeyBVeryLong;       ///< Function of the function key B, very long press.
   KeyFunction _funcKeyCShort;          ///< Function of the function key C, short press.
   KeyFunction _funcKeyCLong;           ///< Function of the function key C, long press.
   KeyFunction _funcKeyDShort;          ///< Function of the function key D, short press.
