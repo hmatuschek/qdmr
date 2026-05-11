@@ -343,8 +343,8 @@ public:
     void enableShowCurrentContact(bool enable) override;
 
     bool keyToneLevelAdjustable() const override;
-    unsigned keyToneLevel() const override;
-    void setKeyToneLevel(unsigned level) override;
+    Level keyToneLevel() const override;
+    void setKeyToneLevel(Level level) override;
     void setKeyToneLevelAdjustable() override;
 
     bool knobLock() const override;

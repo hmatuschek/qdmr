@@ -1,16 +1,17 @@
 #include "repeaterdatabase.hh"
-#include <QJsonDocument>
-#include <QJsonArray>
-#include <QJsonObject>
-#include <QStandardPaths>
-#include <QDir>
-#include <QFile>
-#include <QNetworkReply>
-#include <QtConcurrent>
+
+#include "config.h"
 #include "logger.hh"
 #include "utils.hh"
-
-
+#include <QApplication>
+#include <QDir>
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QNetworkReply>
+#include <QStandardPaths>
+#include <QtConcurrent>
 
 /* ********************************************************************************************* *
  * Helper functions
@@ -307,9 +308,14 @@ RepeaterDatabaseSource::RepeaterDatabaseSource(QObject *parent)
   // pass...
 }
 
+void
+RepeaterDatabaseSource::setSearchRadius(const QGeoCoordinate &position, unsigned int radius) {
+  Q_UNUSED(position); Q_UNUSED(radius);
+}
+
 bool
-RepeaterDatabaseSource::query(const QString &call, const QGeoCoordinate &location) {
-  return this->load(call, location);
+RepeaterDatabaseSource::query(const QString &call) {
+  return this->load(call);
 }
 
 unsigned int
@@ -339,9 +345,12 @@ CachedRepeaterDatabaseSource::CachedRepeaterDatabaseSource(const QString &filena
     return;
   }
 
-  _cacheFile.setFileName(path + "/" + filename);
-  if (_cacheFile.exists() && _cacheFile.isReadable())
-    _parsing = QtConcurrent::run([this](){ QList<RepeaterDatabaseEntry> entries; this->parseCache(entries); return entries; })
+  QFileInfo info(path + "/" + filename);
+  _cacheFile.setFileName(info.absoluteFilePath());
+  if (! info.isFile() || !info.isReadable())
+    return;
+
+  _parsing = QtConcurrent::run([this](){ QList<RepeaterDatabaseEntry> entries; this->parseCache(entries); return entries; })
                  .then([this](const QList<RepeaterDatabaseEntry> &entries) { return this->loadEntries(entries); });
 }
 
@@ -387,7 +396,7 @@ CachedRepeaterDatabaseSource::parseCache(QList<RepeaterDatabaseEntry> &entries) 
     entries.append(entry);
   }
 
-  logDebug() << "Loaded " << _cache.size() << " entries from '" << _cacheFile.fileName() << "'.";
+  logDebug() << "Loaded " << entries.size() << " entries from '" << _cacheFile.fileName() << "'.";
   return true;
 }
 
@@ -448,7 +457,7 @@ CachedRepeaterDatabaseSource::get(unsigned int idx) const {
 }
 
 bool
-CachedRepeaterDatabaseSource::query(const QString &call, const QGeoCoordinate &location) {
+CachedRepeaterDatabaseSource::query(const QString &call) {
   QString query = call.simplified().toUpper();
   QDateTime newest;
   for (const RepeaterDatabaseEntry &entry: _cache) {
@@ -460,7 +469,7 @@ CachedRepeaterDatabaseSource::query(const QString &call, const QGeoCoordinate &l
   if (newest.isValid() && (newest.daysTo(QDateTime::currentDateTime()) <= _maxAge))
     return true;
 
-  return RepeaterDatabaseSource::query(call, location);
+  return RepeaterDatabaseSource::query(call);
 }
 
 
@@ -470,14 +479,14 @@ CachedRepeaterDatabaseSource::query(const QString &call, const QGeoCoordinate &l
  * ********************************************************************************************* */
 DownloadableRepeaterDatabaseSource::DownloadableRepeaterDatabaseSource(
     const QString &filename, const QUrl &source, unsigned int maxAge, QObject *parent)
-  : CachedRepeaterDatabaseSource(filename, parent), _url(source), _maxAge(maxAge), _network(),
-    _currentReply(nullptr)
+  : CachedRepeaterDatabaseSource(filename, parent), _url(source), _maxAge(maxAge),
+    _network(), _currentReply(nullptr)
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(onRequestFinished(QNetworkReply*)));
 
   if (needsUpdate())
-    download();
+    QTimer::singleShot(0, this, &DownloadableRepeaterDatabaseSource::download);
 }
 
 bool
@@ -488,27 +497,42 @@ DownloadableRepeaterDatabaseSource::needsUpdate() const {
 
 
 bool
-DownloadableRepeaterDatabaseSource::load(const QString &call, const QGeoCoordinate &pos) {
-  Q_UNUSED(call); Q_UNUSED(pos);
-  // No action needed
+DownloadableRepeaterDatabaseSource::load(const QString &call) {
+  Q_UNUSED(call);
+  // No action needed, downloads entire dataset.
   return true;
 }
 
 
 void
 DownloadableRepeaterDatabaseSource::download() {
-  // Cancel running requests
+  // If there is already a current request, done.
   if (_currentReply)
-    _currentReply->abort();
+    return;
 
   QNetworkRequest request(_url);
-  request.setHeader(
-        QNetworkRequest::UserAgentHeader,
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/115.0.0.0 Safari/537.36 Edg/114.0.1823.86");
+  if (! prepareRequest(request))
+    return;
 
   logDebug() << "Query " << _url.toString() << "'.";
   _currentReply = _network.get(request);
+}
+
+
+bool
+DownloadableRepeaterDatabaseSource::prepareRequest(QNetworkRequest &request) {
+  if (request.hasRawHeader("X-API-Token") && request.rawHeader("X-API-Token").isEmpty()) {
+    logError() << "An empty API token is set!";
+    return false;
+  }
+
+  if (! request.hasRawHeader("User-Agent")) {
+    request.setHeader(
+          QNetworkRequest::UserAgentHeader,
+          QLatin1String("qdmr/%1 (%2)").arg(VERSION_STRING).arg(QGuiApplication::platformName()));
+  }
+
+  return true;
 }
 
 
@@ -536,9 +560,19 @@ DownloadableRepeaterDatabaseSource::onRequestFinished(QNetworkReply *reply) {
  * Implementation of RepeaterDatabase
  * ********************************************************************************************* */
 RepeaterDatabase::RepeaterDatabase(QObject *parent)
-  : QAbstractListModel{parent}, _sources(), _indices(), _entries()
+  : QAbstractListModel{parent}, _searchPosition(), _searchRadius(0), _sources(), _indices(), _entries()
 {
   // pass...
+}
+
+
+void
+RepeaterDatabase::setSearchRadius(const QGeoCoordinate &position, unsigned int radius) {
+  if ((0 == radius) || !position.isValid())
+    return;
+  for (auto source: _sources) {
+    source->setSearchRadius(position, radius);
+  }
 }
 
 
@@ -614,9 +648,9 @@ RepeaterDatabase::data(const QModelIndex &index, int role) const {
 
 
 bool
-RepeaterDatabase::query(const QString &call, const QGeoCoordinate &pos) {
+RepeaterDatabase::query(const QString &call) {
   for (auto source: _sources) {
-    source->query(call, pos);
+    source->query(call);
   }
   return true;
 }

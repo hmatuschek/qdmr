@@ -740,15 +740,15 @@ DMR6X2UVCodeplug::GeneralSettingsElement::enableShowCurrentContact(bool enable) 
 
 bool
 DMR6X2UVCodeplug::GeneralSettingsElement::keyToneLevelAdjustable() const {
-  return 0 == keyToneLevel();
+  return keyToneLevel().isNull();
 }
-unsigned
+Level
 DMR6X2UVCodeplug::GeneralSettingsElement::keyToneLevel() const {
-  return ((unsigned)getUInt8(Offset::keyToneLevel()))*10/15;
+  return  Level::fromValue(getUInt8(Offset::keyToneLevel()), Limit::keyTone());
 }
 void
-DMR6X2UVCodeplug::GeneralSettingsElement::setKeyToneLevel(unsigned level) {
-  setUInt8(Offset::keyToneLevel(), level*10/15);
+DMR6X2UVCodeplug::GeneralSettingsElement::setKeyToneLevel(Level level) {
+  setUInt8(Offset::keyToneLevel(), level.mapTo(Limit::keyTone()));
 }
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::setKeyToneLevelAdjustable() {
@@ -1040,6 +1040,9 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   setPreWaveDelay(ctx.config()->settings()->dmr()->preamble());
   setSMSFormat(ctx.config()->smsExtension()->format());
 
+  // Encode tone settings
+  setKeyToneLevel(ctx.config()->settings()->tone()->keyToneVolume());
+
   // apply DMR-6X2UV specific settings.
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
   if (nullptr == ext)
@@ -1060,9 +1063,6 @@ DMR6X2UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context
   enableKeypadLock(ext->keySettings()->keypadLockEnabled());
   enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
   enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
-
-  // Encode tone settings
-  setKeyToneLevel(ext->toneSettings()->keyToneLevel());
 
   // Encode display settings
   setCallDisplayColor(ext->displaySettings()->callColor());
@@ -1123,6 +1123,9 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Error
   ctx.config()->settings()->dmr()->setPreamble(this->preWaveDelay());
   ctx.config()->smsExtension()->setFormat(this->smsFormat());
 
+  // Decode tone settings
+  ctx.config()->settings()->tone()->setKeyToneVolume(keyToneLevel());
+
   // Get or add settings extension
   AnytoneSettingsExtension *ext = nullptr;
   if (ctx.config()->settings()->anytoneExtension()) {
@@ -1137,9 +1140,6 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Error
   ext->keySettings()->enableKeypadLock(this->keypadLock());
   ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
   ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
-
-  // Decode tone settings
-  ext->toneSettings()->setKeyToneLevel(keyToneLevel());
 
   // Decode display settings
   ext->displaySettings()->setCallColor(this->callDisplayColor());

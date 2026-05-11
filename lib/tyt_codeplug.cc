@@ -588,7 +588,7 @@ TyTCodeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx) {
   else
     setScanListIndex(0);
   // Enable vox
-  bool defaultVOXEnabled = (chan->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
+  bool defaultVOXEnabled = (chan->defaultVOX() && ctx.config()->settings()->audio()->voxEnabled());
   bool channelVOXEnabled = (! (chan->voxDisabled()||chan->defaultVOX()));
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
   // power setting must be set by specialized element
@@ -1597,15 +1597,21 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   setRadioName(config->settings()->defaultIdRef()->as<DMRRadioID>()->name());
   setDMRId(config->settings()->defaultIdRef()->as<DMRRadioID>()->number());
 
-  setIntroLine1(config->settings()->introLine1());
-  setIntroLine2(config->settings()->introLine2());
-  setVOXSesitivity(config->settings()->vox());
+  setIntroLine1(config->settings()->boot()->message1());
+  setIntroLine2(config->settings()->boot()->message2());
+  setVOXSesitivity(config->settings()->audio()->vox());
 
   setBootDisplay(config->settings()->boot()->bootDisplay());
   if (! config->settings()->boot()->bootPasswordEnabled())
     setPowerOnPassword(0);
   else
     setPowerOnPassword(config->settings()->boot()->bootPassword().toUInt());
+
+  // apply tone settings
+  disableAllTones(config->settings()->tone()->silent());
+  enableTalkPermitToneDigital(config->settings()->tone()->talkPermit().testFlag(Channel::Type::DMR));
+  enableTalkPermitToneAnalog(config->settings()->tone()->talkPermit().testFlag(Channel::Type::FM));
+  setChFreeIndicationTone(config->settings()->tone()->channelIdle().testFlags(Channel::Type::DMR|Channel::Type::FM));
 
   setPrivateCallHangTime(config->settings()->dmr()->privateCallHangTime());
   setGroupCallHangTime(config->settings()->dmr()->groupCallHangTime());
@@ -1614,11 +1620,7 @@ TyTCodeplug::GeneralSettingsElement::fromConfig(const Config *config) {
   if (TyTSettingsExtension *ex = config->settings()->tytExtension()) {
     setMonitorType(ex->monitorType());
     disableAllLEDs(ex->allLEDsDisabled());
-    enableTalkPermitToneDigital(ex->talkPermitToneDigital());
-    enableTalkPermitToneAnalog(ex->talkPermitToneAnalog());
     enablePasswdAndLock(ex->passwordAndLock());
-    setChFreeIndicationTone(ex->channelFreeIndicationTone());
-    disableAllTones(ex->allTonesDisabled());
     setSaveModeRX(ex->powerSaveMode());
     setSavePreamble(ex->wakeupPreamble());
     setLowBatteryInterval(ex->lowBatteryWarnInterval());
@@ -1658,13 +1660,24 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
     logError() << "Cannot add radio DMR ID & cannot set default ID.";
     return false;
   }
-  config->settings()->setIntroLine1(introLine1());
-  config->settings()->setIntroLine2(introLine2());
-  config->settings()->setVOX(voxSesitivity());
 
+  // Store boot settings
   config->settings()->boot()->setBootDisplay(bootDisplay());
+  config->settings()->boot()->setMessage1(introLine1());
+  config->settings()->boot()->setMessage2(introLine2());
   config->settings()->boot()->enableBootPassword(0 != powerOnPassword());
   config->settings()->boot()->setBootPassword(QString::number(powerOnPassword()));
+
+  // Store audio settings
+  config->settings()->audio()->setVox(voxSesitivity());
+
+  // Store tone settings
+  config->settings()->tone()->enableSilent(allTonesDisabled());
+  config->settings()->tone()->setTalkPermit(
+    (talkPermitToneDigital() ? Channel::Type::DMR : Channel::Type::None) |
+    (talkPermitToneAnalog() ? Channel::Type::FM : Channel::Type::None));
+  config->settings()->tone()->setChannelIdle(
+    chFreeIndicationTone() ? (Channel::Type::DMR|Channel::Type::FM) : Channel::Type::None);
 
   config->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
   config->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
@@ -1676,11 +1689,7 @@ TyTCodeplug::GeneralSettingsElement::updateConfig(Config *config) {
 
   ex->setMonitorType(monitorType());
   ex->disableAllLEDs(allLEDsDisabled());
-  ex->enableTalkPermitToneDigital(talkPermitToneDigital());
-  ex->enableTalkPermitToneAnalog(talkPermitToneAnalog());
   ex->enablePasswordAndLock(passwdAndLock());
-  ex->enableChannelFreeIndicationTone(chFreeIndicationTone());
-  ex->disableAllTones(allTonesDisabled());
   ex->enablePowerSaveMode(saveModeRX());
   ex->enableWakeupPreamble(savePreamble());
   ex->setLowBatteryWarnInterval(lowBatteryInterval());

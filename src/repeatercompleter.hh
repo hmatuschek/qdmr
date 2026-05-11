@@ -15,7 +15,7 @@ class RepeaterCompleter: public QCompleter
 public:
   explicit RepeaterCompleter(int minPrefixLength, RepeaterDatabase *repeater, QObject *parent=nullptr);
 
-  QStringList splitPath(const QString &path) const;
+  QStringList splitPath(const QString &path) const override;
 
 protected:
   RepeaterDatabase *_repeaters;
@@ -33,7 +33,7 @@ public:
   explicit NearestRepeaterFilter(RepeaterDatabase *repeater, const QGeoCoordinate &location, QObject *parent=nullptr);
 
 protected:
-  bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
+  bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const override;
 
 protected:
   RepeaterDatabase *_repeater;
@@ -53,7 +53,7 @@ public:
   explicit DMRRepeaterFilter(RepeaterDatabase *repeater, const QGeoCoordinate &location, QObject *parent=nullptr);
 
 protected:
-  bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+  bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 };
 
 
@@ -69,7 +69,7 @@ public:
   explicit FMRepeaterFilter(RepeaterDatabase *repeater, const QGeoCoordinate &location, QObject *parent=nullptr);
 
 protected:
-  bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+  bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
 };
 
 

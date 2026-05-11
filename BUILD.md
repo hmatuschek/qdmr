@@ -15,6 +15,7 @@ The following dependencies are required:
 - `qt6-tools-dev-tools`
 - `qt6-positioning-dev`
 - `qt6-serialport-dev`
+- `qt6-multimedia-dev`
 - `libyaml-cpp-dev`
 - `librsvg2-bin`
 - `libusb-1.0-0-dev`
@@ -31,7 +32,7 @@ Equivalent packages are listed for Fedora, Arch Linux, and macOS.
 sudo apt update
 sudo apt install -y \
   qt6-base-dev qt6-tools-dev qt6-tools-dev-tools \
-  qt6-positioning-dev qt6-serialport-dev \
+  qt6-positioning-dev qt6-serialport-dev qt6-multimedia-dev \
   libyaml-cpp-dev librsvg2-bin libusb-1.0-0-dev \
   build-essential cmake git
 ```
@@ -44,7 +45,7 @@ sudo apt install -y \
 
 ```sh
 sudo dnf install -y \
-  qt6-qtbase-devel qt6-qttools-devel qt6-qtpositioning-devel qt6-qtserialport-devel \
+  qt6-qtbase-devel qt6-qttools-devel qt6-qtpositioning-devel qt6-qtserialport-devel qt6-multimedia-devel\
   yaml-cpp-devel librsvg2-tools libusb1-devel \
   make gcc-c++ cmake git
 ```
@@ -57,7 +58,7 @@ sudo dnf install -y \
 
 ```sh
 sudo pacman -S --needed \
-  qt6-base qt6-tools qt6-positioning qt6-serialport \
+  qt6-base qt6-tools qt6-positioning qt6-serialport qt6-multimedia \
   yaml-cpp librsvg libusb cmake git base-devel
 ```
 

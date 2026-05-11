@@ -226,7 +226,7 @@ UV390Codeplug::ChannelElement::fromChannelObj(const Channel *chan, Context &ctx)
   else
     setPower(chan->power());
   // By default, set to global default value.
-  setSquelch(ctx.config()->settings()->squelch());
+  setSquelch(ctx.config()->settings()->audio()->squelch());
 
   if (auto achan = chan->as<const FMChannel>()) {
     if (! achan->defaultSquelch())
@@ -397,8 +397,8 @@ UV390Codeplug::GeneralSettingsElement::fromConfig(const Config *config) {
     return false;
 
   setTimeZone(QTimeZone::systemTimeZone());
-  setMICLevel(config->settings()->micLevel());
-  enableChannelVoiceAnnounce(config->settings()->speech());
+  setMICLevel(config->settings()->audio()->micGain());
+  enableChannelVoiceAnnounce(config->settings()->audio()->speechSynthesisEnabled());
   return true;
 }
 
@@ -406,8 +406,8 @@ bool
 UV390Codeplug::GeneralSettingsElement::updateConfig(Config *config) {
   if (! DM1701Codeplug::GeneralSettingsElement::updateConfig(config))
     return false;
-  config->settings()->setMicLevel(micLevel());
-  config->settings()->enableSpeech(channelVoiceAnnounce());
+  config->settings()->audio()->setMicGain(micLevel());
+  config->settings()->audio()->enableSpeechSynthesis(channelVoiceAnnounce());
   return true;
 }
 

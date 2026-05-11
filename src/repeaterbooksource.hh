@@ -22,7 +22,7 @@ protected slots:
   void onRequestFinished(QNetworkReply *reply);
 
 protected:
-  bool load(const QString &call, const QGeoCoordinate &pos);
+  bool load(const QString &call) override;
 
 protected:
   QNetworkAccessManager _network;

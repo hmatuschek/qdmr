@@ -25,9 +25,9 @@ DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
   _aprs(nullptr), _roam(nullptr)
 {
   auto app = qobject_cast<Application *>(qApp);
+  auto completer = new RepeaterCompleter(2, app->repeater(), this);
   auto filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
-  auto completer = new RepeaterCompleter(2, app->repeater(), this);
   completer->setModel(filter);
   ui->channelName->setCompleter(completer);
   connect(completer, SIGNAL(activated(const QModelIndex &)),

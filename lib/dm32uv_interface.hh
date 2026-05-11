@@ -126,7 +126,7 @@ protected:
     /** Receive response though the given interface. */
     bool receive(DM32UVInterface *dev, const ErrorStack &err=ErrorStack());
     /** Extracts a string from the response payload. */
-    QString string() const;
+    QByteArray string() const;
     /** Extracts the lower memory bound. */
     uint32_t lowerMemoryBound() const;
     /** Extracts the upper memory bound. */
@@ -247,6 +247,9 @@ public:
   /** Returns the radio info, after identifying the radio. */
   RadioInfo identifier(const ErrorStack &err=ErrorStack()) override;
 
+  /** Closes the interface. If in program mode, cycles DTR to reset the radio first. */
+  void close() override;
+
   /** Reads the obfuscation address map from the device. */
   bool getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err=ErrorStack(),
                      void (*progress)(unsigned int percent)=nullptr);
@@ -288,7 +291,7 @@ protected:
   /** Radio info, identifying the radio. */
   RadioInfo _info;
   /** Firmware version string. */
-  QString _firmwareVersion;
+  QByteArray _firmwareVersion;
   /** Codeplug memory range. */
   QPair<uint32_t, uint32_t> _codeplugMemory;
   /** Callsign memory range. */

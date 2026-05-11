@@ -172,7 +172,7 @@ SelectiveCall::fromBinaryDCS(unsigned int code, bool inverted) {
   unsigned int o=0, e=1;
   while (code) {
     o += (code % 8) * e;
-    e *= 10; code /= 10;
+    e *= 10; code /= 8;
   }
   return SelectiveCall(o, inverted);
 }

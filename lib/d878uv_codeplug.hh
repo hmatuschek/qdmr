@@ -335,14 +335,15 @@ public:
         Off = 0x00, Voltage = 0x01, Power = 0x02, Repeater = 0x03, Reverse = 0x04,
         Encryption = 0x05, Call = 0x06, VOX = 0x07, ToggleVFO = 0x08, SubPTT = 0x09,
         Scan = 0x0a, WFM = 0x0b, Alarm = 0x0c, RecordSwitch = 0x0d, Record = 0x0e, SMS = 0x0f,
-        Dial = 0x10, Monitor = 0x12, ToggleMainChannel = 0x13, HotKey1 = 0x14,
+        Dial = 0x10, GPSInformation = 0x11, Monitor = 0x12, ToggleMainChannel = 0x13, HotKey1 = 0x14,
         HotKey2 = 0x15, HotKey3 = 0x16, HotKey4 = 0x17, HotKey5 = 0x18, HotKey6 = 0x19,
         WorkAlone = 0x1a, SkipChannel = 0x1b, DMRMonitor = 0x1c, SubChannel = 0x1d,
         PriorityZone = 0x1e, VFOScan = 0x1f, MICSoundQuality = 0x20, LastCallReply = 0x21,
-        ChannelType = 0x22, Roaming = 0x24, ChannelRanging = 0x25, MaxVolume = 0x26, Slot = 0x27,
-        APRSType = 0x28, Zone = 0x29, RoamingSet = 0x2a, APRSSet = 0x2b, Mute=0x2c,
-        CtcssDcsSet=0x2d, TBSTSend = 0x2e, Bluetooth = 0x2f, GPS = 0x30,
-        ChannelName = 0x31, CDTScan = 0x32, APRSSend = 0x33, APRSInfo = 0x34
+        ChannelType = 0x22, Ranging = 0x23, Roaming = 0x24, ChannelRanging = 0x25,
+        MaxVolume = 0x26, Slot = 0x27, APRSType = 0x28, Zone = 0x29, RoamingSet = 0x2a,
+        APRSSet = 0x2b, Mute=0x2c, CtcssDcsSet=0x2d, TBSTSend = 0x2e, Bluetooth = 0x2f,
+        GPS = 0x30, ChannelName = 0x31, CDTScan = 0x32, APRSSend = 0x33, APRSInfo = 0x34,
+        GPSRoaming = 0x35, DIMShut = 0x36, Squelch = 0x38
       } KeyFunctionCode;
     };
 
@@ -629,8 +630,8 @@ public:
     virtual void setAutoRoamPeriod(Interval min);
 
     bool keyToneLevelAdjustable() const override;
-    unsigned keyToneLevel() const override;
-    void setKeyToneLevel(unsigned level) override;
+    Level keyToneLevel() const override;
+    void setKeyToneLevel(Level level) override;
     void setKeyToneLevelAdjustable() override;
 
     AnytoneDisplaySettingsExtension::Color callDisplayColor() const override;
@@ -1156,43 +1157,6 @@ public:
   };
 
 
-  /** Implements some storage to hold the names for the FM APRS frequencies. */
-  class FMAPRSFrequencyNamesElement: public Element
-  {
-  protected:
-    /** Hidden constructor. */
-    FMAPRSFrequencyNamesElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Constructor. */
-    explicit FMAPRSFrequencyNamesElement(uint8_t *ptr);
-
-    /** The size of the element. */
-    static constexpr unsigned int size() { return 0x0080; }
-
-    void clear();
-
-    /** Returns the n-th name. The 0-th name, is the name of the FM APRS system. */
-    virtual QString name(unsigned int n) const;
-    /** Sets the n-th name. The 0-th name, is the name of the FM APRS system. */
-    virtual void setName(unsigned int n, const QString &name);
-
-  public:
-    /** Some limits for the element. */
-    struct Limit {
-      static constexpr unsigned int nameLength() { return 16; }       ///< Maximum name length.
-    };
-
-  protected:
-    /** Some internal offsets within the element. */
-    struct Offset {
-      /// @cond DO_NOT_DOCUMENT
-      static constexpr unsigned int betweenNames() { return 0x0010; }
-      /// @endcond
-    };
-  };
-
-
   /** Represents the APRS settings within the binary D878UV codeplug.
    *
    * Memory layout of APRS settings (size 0x00f0 bytes):
@@ -1396,11 +1360,9 @@ public:
 
     /** Configures this APRS system from the given generic config. */
     virtual bool fromFMAPRSSystem(const FMAPRSSystem *sys, Context &ctx,
-                                  FMAPRSFrequencyNamesElement &names,
                                   const ErrorStack &err=ErrorStack());
     /** Constructs a generic APRS system configuration from this APRS system. */
-    virtual FMAPRSSystem *toFMAPRSSystem(
-        Context &ctx, const FMAPRSFrequencyNamesElement &names, const ErrorStack &err=ErrorStack());
+    virtual FMAPRSSystem *toFMAPRSSystem(Context &ctx, const ErrorStack &err=ErrorStack());
     /** Links the transmit channel within the generic APRS system based on the transmit frequency
      * defined within this APRS system. */
     virtual bool linkFMAPRSSystem(FMAPRSSystem *sys, Context &ctx);
@@ -2043,7 +2005,7 @@ protected:
     static constexpr unsigned int aprsSettings()                { return 0x02501000; }
     static constexpr unsigned int analogAPRSMessage()           { return 0x02501200; }
     static constexpr unsigned int analogAPRSRXEntries()         { return 0x02501800; }
-    static constexpr unsigned int fmAPRSFrequencyNames()        { return 0x02502000; }
+    //static constexpr unsigned int fmAPRSFrequencyNames()        { return 0x02502000; }
     static constexpr unsigned int hiddenZoneBitmap()            { return 0x024c1360; }
     static constexpr unsigned int roamingChannelBitmap()        { return 0x01042000; }
     static constexpr unsigned int roamingChannels()             { return 0x01040000; }

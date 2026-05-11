@@ -30,7 +30,7 @@ FMChannelDialog::FMChannelDialog(Config *config, QWidget *parent)
           this, &FMChannelDialog::onRepeaterSelected);
 
   ui->rightForm->addRow(tr("Squelch"),
-                        _squelch = new ChannelSquelchEdit(config->settings()->squelch()));
+                        _squelch = new ChannelSquelchEdit(config->settings()->audio()->squelch()));
   ui->rightForm->addRow(tr("Tx Admit"),
                         _admit = new FMAdmitSelect());
   ui->rightForm->addRow(tr("Rx Tone"),

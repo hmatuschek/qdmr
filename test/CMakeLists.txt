@@ -80,6 +80,9 @@ target_link_libraries(d878uv2_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioni
 qt_add_executable(d578uv_test d578uv_test.cc d578uv_test.hh ${TESTDATA})
 target_link_libraries(d578uv_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
 
+qt_add_executable(d168uv_test d168uv_test.cc d168uv_test.hh ${TESTDATA})
+target_link_libraries(d168uv_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
+
 
 # Unit tests for Baofeng devices
 qt_add_executable(dmr6x2uv_test dmr6x2uv_test.cc dmr6x2uv_test.hh ${TESTDATA})

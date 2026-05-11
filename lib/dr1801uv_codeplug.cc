@@ -1271,6 +1271,7 @@ DR1801UVCodeplug::SettingsElement::setPowerSaveMode(PowerSaveMode mode) {
   setUInt8(Offset::powerSaveMode(), (uint8_t) mode);
 }
 
+
 Level
 DR1801UVCodeplug::SettingsElement::voxSensitivity() const {
   if (0x00 == getUInt8(Offset::voxEnabled())) {
@@ -1278,6 +1279,7 @@ DR1801UVCodeplug::SettingsElement::voxSensitivity() const {
   }
   return Level::fromValue(getUInt8(Offset::voxSensitivity()), Limit::vox());
 }
+
 void
 DR1801UVCodeplug::SettingsElement::setVOXSensitivity(Level sens) {
   if (sens.isNull()) {
@@ -1287,14 +1289,20 @@ DR1801UVCodeplug::SettingsElement::setVOXSensitivity(Level sens) {
     setUInt8(Offset::voxSensitivity(), sens.mapTo(Limit::vox()));
   }
 }
-unsigned int
+
+
+Interval
 DR1801UVCodeplug::SettingsElement::voxDelay() const {
-  return getUInt8(Offset::voxDelay())*500;
+  return Interval::fromMilliseconds(getUInt8(Offset::voxDelay())*500);
 }
+
 void
-DR1801UVCodeplug::SettingsElement::setVOXDelay(unsigned int ms) {
-  setUInt8(Offset::voxDelay(), ms/500);
+DR1801UVCodeplug::SettingsElement::setVOXDelay(Interval delay) {
+  if (! delay.isFinite())
+    setUInt8(Offset::voxDelay(), 0);
+  setUInt8(Offset::voxDelay(), delay.milliseconds()/500);
 }
+
 
 bool
 DR1801UVCodeplug::SettingsElement::encryptionEnabled() const {
@@ -1626,12 +1634,17 @@ DR1801UVCodeplug::SettingsElement::decode(Config *config, const ErrorStack &err)
   config->settings()->setDefaultId(config->radioIDs()->get(idx)->as<DMRRadioID>());
 
   // Handle VOX settings.
-  config->settings()->setVOX(voxSensitivity());
+  config->settings()->audio()->setVox(voxSensitivity());
+  config->settings()->audio()->setVOXDelay(voxDelay());
+
+  // Handle tone settings
+  config->settings()->tone()->enableRingtone(RingTone::Off != ringTone());
+  config->settings()->tone()->enableSMSTone(messageToneEnabled());
 
   // Handle boot settings
   config->settings()->boot()->setBootDisplay(bootScreen());
-  config->settings()->setIntroLine1(bootLine1());
-  config->settings()->setIntroLine2(bootLine2());
+  config->settings()->boot()->setMessage1(bootLine1());
+  config->settings()->boot()->setMessage2(bootLine2());
   config->settings()->boot()->enableBootPassword(bootPasswordEnabled());
   config->settings()->boot()->setBootPassword(bootPassword());
 
@@ -1649,12 +1662,17 @@ DR1801UVCodeplug::SettingsElement::encode(Config *config, const ErrorStack &err)
   setRadioName(id->name());
   setDMRID(id->number());
 
-  setVOXSensitivity(config->settings()->vox());
+  setVOXSensitivity(config->settings()->audio()->vox());
+  setVOXDelay(config->settings()->audio()->voxDelay());
+
+  // Handle tone settings
+  setRingTone(config->settings()->tone()->ringtoneEnabled() ? RingTone::RingTone1 : RingTone::Off);
+  enableMessageTone(config->settings()->tone()->smsToneEnabled());
 
   // Encode boot settings
   setBootScreen(config->settings()->boot()->bootDisplay());
-  setBootLine1(config->settings()->introLine1());
-  setBootLine2(config->settings()->introLine2());
+  setBootLine1(config->settings()->boot()->message1());
+  setBootLine2(config->settings()->boot()->message2());
   if (config->settings()->boot()->bootPasswordEnabled())
     setBootPassword(config->settings()->boot()->bootPassword());
   else

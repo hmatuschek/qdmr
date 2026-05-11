@@ -381,8 +381,8 @@ public:
     bool callEndPrompt() const override;
     void enableCallEndPrompt(bool enable) override;
 
-    unsigned maxSpeakerVolume() const override;
-    void setMaxSpeakerVolume(unsigned level) override;
+    Level maxSpeakerVolume() const override;
+    void setMaxSpeakerVolume(Level level) override;
 
     /** Returns @c true remote stun/kill is enabled. */
     virtual bool remoteStunKill() const;

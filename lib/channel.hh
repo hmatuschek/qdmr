@@ -78,6 +78,14 @@ public:
   };
   Q_ENUM(OffsetShift)
 
+  /** Options for type selection flags. */
+  enum class Type {
+    None=0, DMR=1, M17=2, FM=4, AM=8, Analog=FM|AM, Digital=DMR|M17, All=Analog|Digital
+  };
+  Q_ENUM(Type);
+  Q_DECLARE_FLAGS(Types, Type);
+  Q_FLAGS(Types);
+
 protected:
   /** Hidden constructor.
    * Constructs a new empty channel. */
@@ -226,7 +234,7 @@ public:
   /** Returns the squelch level [1,10]. */
   Level squelch() const;
   /** (Re-)Sets the squelch level [0,10]. 0 Disables squelch (on some radios). */
-    bool setSquelch(Level squelch);
+  bool setSquelch(Level squelch);
   /** Disables the quelch. */
   void disableSquelch();
   /** Sets the squelch to the global default value. */
@@ -697,5 +705,7 @@ public:
   ConfigItem *allocateChild(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorStack &err=ErrorStack());
 };
 
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(Channel::Types)
 
 #endif // CHANNEL_HH

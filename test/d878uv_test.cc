@@ -32,7 +32,7 @@ D878UVTest::initTestCase() {
   UnitTestBase::initTestCase();
 
   ErrorStack err;
-  if (! _micGainConfig.readYAML(":/data/anytone_audio_settings_extension.yaml", err)) {
+  if (! _micGainConfig.readYAML(":/data/audio_settings_extension.yaml", err)) {
     QFAIL(QString("Cannot open codeplug file: %1")
           .arg(err.format()).toStdString().c_str());
   }
@@ -68,22 +68,10 @@ D878UVTest::testBasicConfigDecoding() {
 
 void
 D878UVTest::testAnalogMicGain() {
-  ErrorStack err;
-  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
-  D878UVCodeplug codeplug;
-  if (! codeplug.encode(&_micGainConfig, flags, err)) {
-    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-
   Config config;
-  if (! codeplug.decode(&config, err)) {
-    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
-          .arg(err.format()).toStdString().c_str());
-  }
-
-  QVERIFY(config.settings()->anytoneExtension()->audioSettings()->fmMicGainEnabled());
-  QCOMPARE(config.settings()->anytoneExtension()->audioSettings()->fmMicGain(), Level::fromValue(5));
+  encodeDecode(_micGainConfig, config);
+  QVERIFY(config.settings()->audio()->fmMicGainEnabled());
+  QCOMPARE(config.settings()->audio()->fmMicGain(), Level::fromValue(5));
 }
 
 void
@@ -607,12 +595,25 @@ D878UVTest::testMicGain() {
   Config copy, config; config.copy(_basicConfig);
   QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
   for (auto pair: pairs) {
-    config.settings()->setMicLevel(Level::fromValue(pair.first));
+    config.settings()->audio()->setMicGain(Level::fromValue(pair.first));
     encodeDecode(config, copy);
-    QCOMPARE(copy.settings()->micLevel(), Level::fromValue(pair.second));
+    QCOMPARE(copy.settings()->audio()->micGain(), Level::fromValue(pair.second));
   }
 }
 
+
+void
+D878UVTest::testFixedLocation() {
+  ErrorStack err;
+  Config decoded, config; config.copy(_basicConfig);
+
+  config.settings()->gnss()->setFixedPositionLocator("JO62kk45");
+  config.settings()->gnss()->enableFixedPosition(true);
+  encodeDecode(config, decoded);
+
+  QVERIFY(decoded.settings()->gnss()->fixedPositionEnabled());
+  QCOMPARE(decoded.settings()->gnss()->fixedPositionLocator(), QString("JO62kk45"));
+}
 
 
 QTEST_GUILESS_MAIN(D878UVTest)

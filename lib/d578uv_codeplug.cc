@@ -893,13 +893,13 @@ D578UVCodeplug::GeneralSettingsElement::enableCallEndPrompt(bool enable) {
   return setUInt8(Offset::callEndPrompt(), (enable ? 0x01 : 0x00));
 }
 
-unsigned
+Level
 D578UVCodeplug::GeneralSettingsElement::maxSpeakerVolume() const {
-  return (((unsigned)getUInt8(Offset::maxSpeakerVolume()))*10)/8;
+  return Level::fromValue(getUInt8(Offset::maxSpeakerVolume()), Limit::volume());
 }
 void
-D578UVCodeplug::GeneralSettingsElement::setMaxSpeakerVolume(unsigned level) {
-  setUInt8(Offset::maxSpeakerVolume(), (level*8)/10);
+D578UVCodeplug::GeneralSettingsElement::setMaxSpeakerVolume(Level level) {
+  setUInt8(Offset::maxSpeakerVolume(), level.mapTo(Limit::volume()));
 }
 
 bool
@@ -1861,12 +1861,17 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
+  // Encode tone settings
+  enableIdleChannelTone(
+    ctx.config()->settings()->tone()->channelIdle().testFlag(Channel::Type::DMR));
+
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
 
   // Set measurement system based on system locale (0x00==Metric)
   enableGPSUnitsImperial(GNSSSettings::Units::Archaic == ctx.config()->settings()->gnss()->units());
 
+  // DMR settings
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
   setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
   setSMSFormat(ctx.config()->smsExtension()->format());
@@ -1968,10 +1973,17 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
 
   ctx.config()->settings()->setTOT(transmitTimeout());
 
+  // decode tone settings
+  ctx.config()->settings()->tone()->setChannelIdle(
+    idleChannelTone() ? Channel::Type::DMR : Channel::Type::None
+  );
+
+  // decode GNSS settings
   ctx.config()->settings()->gnss()->setUnits(
         this->gpsUnitsImperial() ? GNSSSettings::Units::Archaic :
                                    GNSSSettings::Units::Metric);
 
+  // decode DMR settings
   ctx.config()->settings()->dmr()->setGroupCallHangTime(this->groupCallHangTime());
   ctx.config()->settings()->dmr()->setPrivateCallHangTime(this->privateCallHangTime());
   ctx.config()->smsExtension()->setFormat(this->smsFormat());
@@ -2510,7 +2522,7 @@ D578UVCodeplug::ExtendedSettingsElement::enableShowChannelType(bool enable) {
 
 bool
 D578UVCodeplug::ExtendedSettingsElement::fmIdleTone() const {
-  return 0x00 != getUInt8(Offset::fmIdleTone());
+  return 0x01 == getUInt8(Offset::fmIdleTone());
 }
 
 void
@@ -2951,16 +2963,22 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
+  // Encode tone settings
+  enableFMIdleTone(ctx.config()->settings()->tone()->channelIdle().testFlag(Channel::Type::FM));
+  setCallEndToneMelody(*ctx.config()->settings()->tone()->callEndMelody());
+
   // Encode GPS settings
   setGNSS(ctx.config()->settings()->gnss()->systems());
+  // Encode audio settings
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
+  else
+    setFMMicGain(ctx.config()->settings()->audio()->micGain());
 
   setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
 
-  if (nullptr == ctx.config()->settings()->anytoneExtension()) {
-    // If there is no extension, reuse DMR mic gain setting
-    setFMMicGain(ctx.config()->settings()->micLevel());
+  if (nullptr == ctx.config()->settings()->anytoneExtension())
     return true;
-  }
 
   // Get extension
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
@@ -2983,14 +3001,8 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
 
   // Encode tone settings
   enableTOTNotification(ext->toneSettings()->totNotification());
-  enableFMIdleTone(ext->toneSettings()->fmIdleChannelToneEnabled());
-  setCallEndToneMelody(*ext->toneSettings()->callEndMelody());
 
   // Encode audio settings
-  if (ext->audioSettings()->fmMicGainEnabled())
-    setFMMicGain(ext->audioSettings()->fmMicGain());
-  else
-    setFMMicGain(ctx.config()->settings()->micLevel());
   setSpeaker(ext->audioSettings()->speaker());
   setMicSpeakerSource(ext->audioSettings()->handsetSpeaker());
   setMicType(ext->audioSettings()->handsetType());
@@ -3053,6 +3065,19 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
   // Store GPS settings
   ctx.config()->settings()->gnss()->setSystems(this->gnss());
 
+  // Store audio settings
+  if (ctx.config()->settings()->audio()->micGain() == fmMicGain())
+    ctx.config()->settings()->audio()->disableFMMicGain();
+  else
+    ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
+
+  // Store tone settings
+  ctx.config()->settings()->tone()->setChannelIdle(
+    ctx.config()->settings()->tone()->channelIdle()
+      | (fmIdleTone() ? Channel::Type::FM : Channel::Type::None));
+  this->callEndToneMelody(*ctx.config()->settings()->tone()->callEndMelody());
+
+  // Store DMR settings
   ctx.config()->config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
 
   // Get or add extension if not present
@@ -3080,14 +3105,8 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
   // Store tone settings
   ext->toneSettings()->enableTOTNotification(this->totNotification());
-  ext->toneSettings()->enableFMIdleChannelTone(this->fmIdleTone());
-  this->callEndToneMelody(*ext->toneSettings()->callEndMelody());
 
   // Store FM mic gain separately, if different
-  if (ctx.config()->settings()->micLevel() == fmMicGain())
-    ext->audioSettings()->disableFMMicGain();
-  else
-    ext->audioSettings()->setFMMicGain(fmMicGain());
   ext->audioSettings()->setSpeaker(speaker());
   ext->audioSettings()->setHandsetSpeaker(micSpeakerSource());
   ext->audioSettings()->setHandsetType(micType());

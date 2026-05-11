@@ -9,7 +9,7 @@ AMChannelDialog::AMChannelDialog(Config *config, QWidget *parent)
   : ChannelDialog(config, parent), _clone(nullptr), _orig(nullptr), _squelch(nullptr)
 {
   ui->rightForm->addRow(tr("Squelch"),
-    _squelch = new ChannelSquelchEdit(_config->settings()->squelch()));
+    _squelch = new ChannelSquelchEdit(_config->settings()->audio()->squelch()));
 }
 
 void

@@ -4,13 +4,18 @@
 
 
 RadioSettings::RadioSettings(QObject *parent)
-  : ConfigItem(parent), _introLine1(""), _introLine2(""), _micLevel(Level::fromValue(3)), _speech(false),
-    _squelch(Level::fromValue(1)), _power(Channel::Power::High), _vox(Level::null()),
+  : ConfigItem(parent),
+    _power(Channel::Power::High),
     _transmitTimeOut(Interval::infinity()), _defaultId(new DMRRadioIDReference(this)),
-    _boot(new BootSettings(this)), _gnss(new GNSSSettings(this)),
-    _dmr(new DMRSettings(this)), _tytExtension(nullptr), _radioddityExtension(nullptr),
-    _anytoneExtension(nullptr), _openGD77(nullptr)
+    _boot(new BootSettings(this)), _audio(new AudioSettings(this)),
+    _tone(new ToneSettings(this)),
+    _gnss(new GNSSSettings(this)), _dmr(new DMRSettings(this)),
+    _tytExtension(nullptr), _radioddityExtension(nullptr),
+    _anytoneExtension(nullptr)
 {
+  connect(_boot, &BootSettings::modified, this, &RadioSettings::modified);
+  connect(_audio, &AudioSettings::modified, this, &RadioSettings::modified);
+  connect(_tone, &ToneSettings::modified, this, &RadioSettings::modified);
   connect(_gnss, &GNSSSettings::modified, this, &RadioSettings::modified);
   connect(_dmr, &DMRSettings::modified, this, &RadioSettings::modified);
 }
@@ -20,8 +25,6 @@ RadioSettings::copy(const ConfigItem &other) {
   const RadioSettings *set = other.as<RadioSettings>();
   if ((nullptr==set) || (!ConfigItem::copy(other)))
     return false;
-  if (set->voxDisabled())
-    disableVOX();
   if (set->totDisabled())
     disableTOT();
   return true;
@@ -41,13 +44,7 @@ void
 RadioSettings::clear() {
   ConfigItem::clear();
 
-  _introLine1.clear();
-  _introLine2.clear();
-  _micLevel = Level::fromValue(3);
-  _speech = false;
-  _squelch = Level::fromValue(1);
   _power = Channel::Power::High;
-  disableVOX();
   disableTOT();
   defaultIdRef()->clear();
 
@@ -55,60 +52,6 @@ RadioSettings::clear() {
   setTyTExtension(nullptr);
   setRadioddityExtension(nullptr);
   setAnytoneExtension(nullptr);
-}
-
-const QString &
-RadioSettings::introLine1() const {
-  return _introLine1;
-}
-void
-RadioSettings::setIntroLine1(const QString &line) {
-  _introLine1 = line;
-  emit modified(this);
-}
-
-const QString &
-RadioSettings::introLine2() const {
-  return _introLine2;
-}
-void
-RadioSettings::setIntroLine2(const QString &line) {
-  _introLine2 = line;
-  emit modified(this);
-}
-
-Level
-RadioSettings::micLevel() const {
-  return _micLevel;
-}
-void
-RadioSettings::setMicLevel(Level value) {
-  if (value.isInvalid() || value.isNull())
-    value = Level::fromValue(1);
-  if (_micLevel == value)
-    return;
-  _micLevel = value;
-  emit modified(this);
-}
-
-bool
-RadioSettings::speech() const {
-  return _speech;
-}
-void
-RadioSettings::enableSpeech(bool enabled) {
-  _speech = enabled;
-  emit modified(this);
-}
-
-Level
-RadioSettings::squelch() const {
-  return _squelch;
-}
-void
-RadioSettings::setSquelch(Level squelch) {
-  _squelch = squelch;
-  emit modified(this);
 }
 
 Channel::Power
@@ -119,26 +62,6 @@ void
 RadioSettings::setPower(Channel::Power power) {
   _power = power;
   emit modified(this);
-}
-
-bool
-RadioSettings::voxDisabled() const {
-  return _vox.isNull();
-}
-Level
-RadioSettings::vox() const {
-  return _vox;
-}
-void
-RadioSettings::setVOX(Level level) {
-  if (_vox == level)
-    return;
-  _vox = level;
-  emit modified(this);
-}
-void
-RadioSettings::disableVOX() {
-  setVOX(Level::null());
 }
 
 
@@ -184,6 +107,16 @@ RadioSettings::setDefaultId(DMRRadioID *id) {
 BootSettings *
 RadioSettings::boot() const {
   return _boot;
+}
+
+AudioSettings *
+RadioSettings::audio() const {
+  return _audio;
+}
+
+ToneSettings *
+RadioSettings::tone() const {
+  return _tone;
 }
 
 GNSSSettings *
@@ -256,26 +189,6 @@ RadioSettings::setAnytoneExtension(AnytoneSettingsExtension *ext) {
 }
 
 
-OpenGD77SettingsExtension *
-RadioSettings::openGD77Extension() const {
-  return _openGD77;
-}
-
-void
-RadioSettings::setOpenGD77Extension(OpenGD77SettingsExtension *ext) {
-  if (_openGD77) {
-    disconnect(_openGD77, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
-    _openGD77->deleteLater();
-  }
-  _openGD77 = ext;
-  if (_openGD77) {
-    _openGD77->setParent(this);
-    connect(_openGD77, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
-  }
-  emit modified(this);
-}
-
-
 void
 RadioSettings::onExtensionModified() {
   emit modified(this);
@@ -303,6 +216,22 @@ RadioSettings::parse(const YAML::Node &node, ConfigItem::Context &ctx, const Err
       setTOT(to);
   }
 
+  /// @todo Remove with 0.17.0. Only parse "old" global settings, will be serialized in boot and audio sections.
+  if (Level micLevel; node["micLevel"] && node["micLevel"].IsScalar()
+    && micLevel.parse(QString::fromStdString(node["micLevel"].as<std::string>())))
+    audio()->setMicGain(micLevel);
+  if (node["speech"] && node["speech"].IsScalar())
+    audio()->enableSpeechSynthesis("true" == node["speech"].as<std::string>());
+  if (Level squelch; node["squelch"] && node["squelch"].IsScalar()
+    && squelch.parse(QString::fromStdString(node["squelch"].as<std::string>())))
+    audio()->setSquelch(squelch);
+  if (Level vox; node["vox"] && node["vox"].IsScalar()
+    && vox.parse(QString::fromStdString(node["vox"].as<std::string>())))
+    audio()->setVox(vox);
+  if (node["introLine1"] && node["introLine1"].IsScalar())
+    boot()->setMessage1(QString::fromStdString(node["introLine1"].as<std::string>()));
+  if (node["introLine2"] && node["introLine2"].IsScalar())
+    boot()->setMessage2(QString::fromStdString(node["introLine2"].as<std::string>()));
   return ConfigItem::parse(node, ctx, err);
 }
 

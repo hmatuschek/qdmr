@@ -105,32 +105,14 @@ class RadioddityToneSettingsExtension: public ConfigItem
   Q_PROPERTY(Interval lowBatteryWarnInterval READ lowBatteryWarnInterval WRITE setLowBatteryWarnInterval)
   /** Returns the low-battery warning volume [1,10]. (GD-73 only)*/
   Q_PROPERTY(bool lowBatteryWarnVolume READ lowBatteryWarnVolume WRITE setLowBatteryWarnVolume)
-  /** If @c true, the key tones are enabled. */
-  Q_PROPERTY(bool keyTone READ keyTone WRITE enableKeyTone)
-  /** Returns the key-tone volume. */
-  Q_PROPERTY(bool keyToneVolume READ keyToneVolume WRITE setKeyToneVolume)
   /** The call-alert duration in seconds. */
   Q_PROPERTY(Interval callAlertDuration READ callAlertDuration WRITE setCallAlertDuration)
-  /** If @c true the reset tone is enabled. */
-  Q_PROPERTY(bool resetTone READ resetTone WRITE enableResetTone)
   /** @c true, the unknown number tone is enabled. */
   Q_PROPERTY(bool unknownNumberTone READ unknownNumberTone WRITE enableUnknownNumberTone)
   /** The ARTS tone mode. */
   Q_PROPERTY(ARTSTone artsToneMode READ artsToneMode WRITE setARTSToneMode)
-  /** If @c true, the talk permit tone is enabled for digital channels. */
-  Q_PROPERTY(bool digitalTalkPermitTone READ digitalTalkPermitTone WRITE enableDigitalTalkPermitTone)
-  /** If @c true, the talk permit tone is enabled for analog channels. */
-  Q_PROPERTY(bool analogTalkPermitTone READ analogTalkPermitTone WRITE enableAnalogTalkPermitTone)
   /** If @c true, the self-test tone is enabled. */
   Q_PROPERTY(bool selftestTone READ selftestTone WRITE enableSelftestTone)
-  /** If @c true, the frequency indication tone is enabled. */
-  Q_PROPERTY(bool channelFreeIndicationTone READ channelFreeIndicationTone WRITE enableChannelFreeIndicationTone)
-  /** If @c true, all tones are disabled. */
-  Q_PROPERTY(bool allTonesDisabled READ allTonesDisabled WRITE disableAllTones)
-  /** If @c true, the TX exit tone is enabled. */
-  Q_PROPERTY(bool txExitTone READ txExitTone WRITE enableTXExitTone)
-  /** Sets the FM mic gain (GD-73 only). */
-  Q_PROPERTY(Level fmMicGain READ fmMicGain WRITE setFMMicGain);
 
 public:
   /** Possible ARTS tone settings. */
@@ -160,24 +142,10 @@ public:
   /** Sets the volume of the low-battery warning tone [1,10]. */
   void setLowBatteryWarnVolume(unsigned int);
 
-  /** Returns @c true, if the key tones are enabled. */
-  bool keyTone() const;
-  /** Enables/disables key tones. */
-  void enableKeyTone(bool enable);
-  /** Returns the key-tone volume. */
-  unsigned int keyToneVolume() const;
-  /** Sets the key-tone volume. */
-  void setKeyToneVolume(unsigned int volume);
-
   /** Returns the call-alert duration in seconds. */
   Interval callAlertDuration() const;
   /** Sets the call-allert duration in seconds. */
   void setCallAlertDuration(Interval sec);
-
-  /** Returns @c true if the reset tone is enabled. */
-  bool resetTone() const;
-  /** Enables/disables reset tone. */
-  void enableResetTone(bool enable);
 
   /** Returns @c true if the unknown number tone is enabled. */
   bool unknownNumberTone() const;
@@ -189,39 +157,10 @@ public:
   /** Sets the ARTS tone mode. */
   void setARTSToneMode(ARTSTone mode);
 
-  /** Returns @c true if the digital channel talk permit tone is enabled. */
-  bool digitalTalkPermitTone() const;
-  /** Enables/disables digital channel talk permit tone. */
-  void enableDigitalTalkPermitTone(bool enable);
-  /** Returns @c true if the analog channel talk permit tone is enabled. */
-  bool analogTalkPermitTone() const;
-  /** Enables/disables analog channel talk permit tone. */
-  void enableAnalogTalkPermitTone(bool enable);
-
   /** Returns @c true if the self-test tone is enabled. */
   bool selftestTone() const;
   /** Enables/disables self-test tone. */
   void enableSelftestTone(bool enable);
-
-  /** Returns @c true if the channel-free indication tone is enabled. */
-  bool channelFreeIndicationTone() const;
-  /** Enables/disables the channel free indication tone. */
-  void enableChannelFreeIndicationTone(bool enable);
-
-  /** Returns @c true if all tones are disabled. */
-  bool allTonesDisabled() const;
-  /** Disables/enables all tones. */
-  void disableAllTones(bool disable);
-
-  /** Returns @c true if the TX exit tone is enabled. */
-  bool txExitTone() const;
-  /** Enables/disables TX exit tone. */
-  void enableTXExitTone(bool enable);
-
-  /** Returns the FM mic gain [1,10]. */
-  Level fmMicGain() const;
-  /** Sets the FM mic gain [1,10]. */
-  void setFMMicGain(Level gain);
 
 protected:
   /** If @c true, a low-battery charge is indicated by a warning. */
@@ -232,30 +171,12 @@ protected:
   unsigned int _lowBatteryWarnVolume;
   /** Holds the call alert duration in seconds. */
   Interval _callAlertDuration;
-  /** If @c true the reset tone is enabled. */
-  bool _resetTone;
   /** If @c true, the unknown number tone is enabled. */
   bool _unknownNumberTone;
   /** Holds the ARTS tone mode. */
   ARTSTone _artsToneMode;
-  /** If @c true, the talk permit tone is enabled for digital channels. */
-  bool _digitalTalkPermitTone;
-  /** If @c true, the talk permit tone is enabled for analog channels. */
-  bool _analogTalkPermitTone;
   /** If @c true, the self-test tone is enabled. */
   bool _selftestTone;
-  /** If @c true, the channel free indication tone is enabled. */
-  bool _channelFreeIndicationTone;
-  /** If @c true, all tones are disabled. */
-  bool _disableAllTones;
-  /** If @c true, the TX exit tone is enabled. */
-  bool _txExitTone;
-  /** If @c true, the key-tones are enabled. */
-  bool _keyTone;
-  /** Holds the key-tone volume [1,10]. */
-  unsigned int _keyToneVolume;
-  /** The FM mic gain. */
-  Level _fmMicGain;
 };
 
 /** Represents the boot settings for Radioddity devices.

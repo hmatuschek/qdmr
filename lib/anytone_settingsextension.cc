@@ -1265,17 +1265,8 @@ AnytoneKeySettingsExtension::enableForcedKeyLock(bool enable) {
  * Implementation of AnytoneToneSettingsExtension
  * ********************************************************************************************* */
 AnytoneToneSettingsExtension::AnytoneToneSettingsExtension(QObject *parent)
-  : ConfigItem(parent), _keyTone(false), _smsAlert(false), _callAlert(false),
-    _talkPermitDigital(false), _talkPermitAnalog(false), _resetToneDigital(false),
-    _dmrIdleChannelTone(false), _fmIdleChannelTone(false), _startupTone(false),
-    _totNotification(false), _wxAlarm(false),
-    _callMelody(new Melody(100, this)), _idleMelody(new Melody(100, this)),
-    _resetMelody(new Melody(100, this)), _callEndMelody(new Melody(100, this)),
-    _keyToneLevel(0)
+  : ConfigItem(parent), _totNotification(false), _wxAlarm(false)
 {
-  connect(_callMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
-  connect(_idleMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
-  connect(_resetMelody, &Melody::modified, this, &AnytoneToneSettingsExtension::modified);
 }
 
 ConfigItem *
@@ -1288,118 +1279,12 @@ AnytoneToneSettingsExtension::clone() const {
   return ext;
 }
 
-bool
-AnytoneToneSettingsExtension::keyToneEnabled() const {
-  return _keyTone;
-}
-void
-AnytoneToneSettingsExtension::enableKeyTone(bool enable) {
-  if (_keyTone==enable)
-    return;
-  _keyTone = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::smsAlertEnabled() const {
-  return _smsAlert;
-}
-void
-AnytoneToneSettingsExtension::enableSMSAlert(bool enable) {
-  if (_smsAlert == enable)
-    return;
-  _smsAlert = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::callAlertEnabled() const {
-  return _callAlert;
-}
-void
-AnytoneToneSettingsExtension::enableCallAlert(bool enable) {
-  if (_callAlert == enable)
-    return;
-  _callAlert = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::talkPermitDigitalEnabled() const {
-  return _talkPermitDigital;
-}
-void
-AnytoneToneSettingsExtension::enableTalkPermitDigital(bool enable) {
-  if (_talkPermitDigital == enable)
-    return;
-  _talkPermitDigital = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::talkPermitAnalogEnabled() const {
-  return _talkPermitAnalog;
-}
-void
-AnytoneToneSettingsExtension::enableTalkPermitAnalog(bool enable) {
-  if (_talkPermitAnalog == enable)
-    return;
-  _talkPermitAnalog = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::digitalResetToneEnabled() const {
-  return _resetToneDigital;
-}
-void
-AnytoneToneSettingsExtension::enableDigitalResetTone(bool enable) {
-  if (_resetToneDigital == enable)
-    return;
-  _resetToneDigital = enable;
-  emit modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::dmrIdleChannelToneEnabled() const {
-  return _dmrIdleChannelTone;
-}
-void
-AnytoneToneSettingsExtension::enableDMRIdleChannelTone(bool enable) {
-  if (_dmrIdleChannelTone == enable)
-    return;
-  _dmrIdleChannelTone = enable;
-  return modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::fmIdleChannelToneEnabled() const {
-  return _fmIdleChannelTone;
-}
-void
-AnytoneToneSettingsExtension::enableFMIdleChannelTone(bool enable) {
-  if (_fmIdleChannelTone == enable)
-    return;
-  _fmIdleChannelTone = enable;
-  return modified(this);
-}
-
-bool
-AnytoneToneSettingsExtension::startupToneEnabled() const {
-  return _startupTone;
-}
-void
-AnytoneToneSettingsExtension::enableStartupTone(bool enable) {
-  if (_startupTone == enable)
-    return;
-  _startupTone = enable;
-  return modified(this);
-}
 
 bool
 AnytoneToneSettingsExtension::totNotification() const {
   return _totNotification;
 }
+
 void
 AnytoneToneSettingsExtension::enableTOTNotification(bool enable) {
   if (enable == _totNotification)
@@ -1407,6 +1292,7 @@ AnytoneToneSettingsExtension::enableTOTNotification(bool enable) {
   _totNotification = enable;
   emit modified(this);
 }
+
 
 bool
 AnytoneToneSettingsExtension::wxAlarm() const {
@@ -1420,34 +1306,6 @@ AnytoneToneSettingsExtension::enableWXAlarm(bool enable) {
   emit modified(this);
 }
 
-Melody *
-AnytoneToneSettingsExtension::callMelody() const {
-  return _callMelody;
-}
-Melody *
-AnytoneToneSettingsExtension::idleMelody() const {
-  return _idleMelody;
-}
-Melody *
-AnytoneToneSettingsExtension::resetMelody() const {
-  return _resetMelody;
-}
-Melody *
-AnytoneToneSettingsExtension::callEndMelody() const {
-  return _callEndMelody;
-}
-
-unsigned int
-AnytoneToneSettingsExtension::keyToneLevel() const {
-  return _keyToneLevel;
-}
-void
-AnytoneToneSettingsExtension::setKeyToneLevel(unsigned int level) {
-  if (_keyToneLevel == level)
-    return;
-  _keyToneLevel = level;
-  emit modified(this);
-}
 
 
 /* ********************************************************************************************* *
@@ -1815,8 +1673,8 @@ AnytoneDisplaySettingsExtension::enableCustomChannelBackground(bool enable) {
  * ********************************************************************************************* */
 AnytoneAudioSettingsExtension::AnytoneAudioSettingsExtension(QObject *parent)
   : ConfigItem(parent),  _voxDelay(), _recording(false), _voxSource(VoxSource::Both),
-  _maxVolume(3), _maxHeadPhoneVolume(3), _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1)),
-  _analogMicGain(Level::invalid()), _speaker(Speaker::Radio), _handsetSpeaker(HandsetSpeakerSource::MainChannel),
+  _enhanceAudio(true), _muteDelay(Interval::fromMinutes(1)),
+  _speaker(Speaker::Radio), _handsetSpeaker(HandsetSpeakerSource::MainChannel),
   _handsetType(HandsetType::Anytone)
 {
   // pass...
@@ -1830,18 +1688,6 @@ AnytoneAudioSettingsExtension::clone() const {
     return nullptr;
   }
   return ext;
-}
-
-Interval
-AnytoneAudioSettingsExtension::voxDelay() const {
-  return _voxDelay;
-}
-void
-AnytoneAudioSettingsExtension::setVOXDelay(Interval ms) {
-  if (_voxDelay == ms)
-    return;
-  _voxDelay = ms;
-  emit modified(this);
 }
 
 bool
@@ -1868,29 +1714,6 @@ AnytoneAudioSettingsExtension::setVOXSource(VoxSource source) {
   emit modified(this);
 }
 
-unsigned int
-AnytoneAudioSettingsExtension::maxVolume() const {
-  return _maxVolume;
-}
-void
-AnytoneAudioSettingsExtension::setMaxVolume(unsigned int vol) {
-  if (_maxVolume == vol)
-    return;
-  _maxVolume = vol;
-  emit modified(this);
-}
-unsigned int
-AnytoneAudioSettingsExtension::maxHeadPhoneVolume() const {
-  return _maxHeadPhoneVolume;
-}
-void
-AnytoneAudioSettingsExtension::setMaxHeadPhoneVolume(unsigned int vol) {
-  if (_maxHeadPhoneVolume == vol)
-    return;
-  _maxHeadPhoneVolume = vol;
-  emit modified(this);
-}
-
 bool
 AnytoneAudioSettingsExtension::enhanceAudioEnabled() const {
   return _enhanceAudio;
@@ -1913,26 +1736,6 @@ AnytoneAudioSettingsExtension::setMuteDelay(Interval intv) {
     return;
   _muteDelay = intv;
   emit modified(this);
-}
-
-bool
-AnytoneAudioSettingsExtension::fmMicGainEnabled() const {
-  return _analogMicGain.isFinite();
-}
-Level
-AnytoneAudioSettingsExtension::fmMicGain() const {
-  return _analogMicGain;
-}
-void
-AnytoneAudioSettingsExtension::setFMMicGain(Level gain) {
-  if (_analogMicGain == gain)
-    return;
-  _analogMicGain = gain;
-  emit modified(this);
-}
-void
-AnytoneAudioSettingsExtension::disableFMMicGain() {
-  _analogMicGain = Level::invalid();
 }
 
 

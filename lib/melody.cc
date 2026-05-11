@@ -264,7 +264,7 @@ Melody::Note::toLilypond(Duration currentDuration) const {
 
 QPair<double, unsigned int>
 Melody::Note::toTone(unsigned int bpm) const {
-  static const unsigned int bar = (4*60000)/bpm;
+  unsigned int bar = (4*60000)/bpm;
   unsigned int dur = bar;
 
   if (Duration::Whole == duration) {

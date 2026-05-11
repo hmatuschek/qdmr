@@ -369,9 +369,9 @@ D868UVETest::testMicGain() {
   Config copy, config; config.copy(_basicConfig);
   QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
   for (auto pair: pairs) {
-    config.settings()->setMicLevel(Level::fromValue(pair.first));
+    config.settings()->audio()->setMicGain(Level::fromValue(pair.first));
     encodeDecode(config, copy);
-    QCOMPARE(copy.settings()->micLevel().value(), Level::fromValue(pair.second).value());
+    QCOMPARE(copy.settings()->audio()->micGain().value(), Level::fromValue(pair.second).value());
   }
 }
 

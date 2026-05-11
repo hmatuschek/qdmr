@@ -139,9 +139,9 @@ DM32UVInterface::ValueResponse::receive(DM32UVInterface *dev, const ErrorStack &
   return dev->receive(data, this->length, TIMEOUT, err);
 }
 
-QString
+QByteArray
 DM32UVInterface::ValueResponse::string() const {
-  return QString::fromLatin1(QByteArray((const char *)payload,length));
+  return {reinterpret_cast<const char *>(payload), length};
 }
 
 uint32_t
@@ -279,9 +279,10 @@ DM32UVInterface::DM32UVInterface(const USBDeviceDescriptor &descr,
   else if (QSerialPort::NoError != QSerialPort::error())
     _state = State::Error;
 
-  if (! request_identifier(err))
+  if (request_identifier(err))
+    _state = State::SystemInfo;
+  else
     _state = State::Error;
-  _state = State::SystemInfo;
 }
 
 
@@ -289,12 +290,28 @@ RadioInfo
 DM32UVInterface::identifier(const ErrorStack &err) {
   // If not yet requested -> request info
   if ((State::Open == _state) && (! _info.isValid())) {
-    if (! request_identifier(err))
+    if (request_identifier(err))
+      _state = State::SystemInfo;
+    else
       _state = State::Error;
-    _state = State::SystemInfo;
   }
   // return it.
   return _info;
+}
+
+
+void
+DM32UVInterface::close() {
+  if (! isOpen())
+    return;
+  if (State::Program == _state || State::SystemInfo == _state) {
+    // No explicit "exit programming mode" command exists in the protocol.
+    // Cycle DTR low so the radio's USB-serial adapter resets the device.
+    setDataTerminalReady(false);
+    QThread::msleep(500);
+  }
+  USBSerial::close();
+  _state = State::Closed;
 }
 
 
@@ -322,13 +339,11 @@ DM32UVInterface::getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err, v
     // Unpack prefix
     uint8_t prefix = (uint8_t)mapRes.payload()[0];
     // If prefix is invalid -> do not map
-    if ((0x00 == prefix) || (0xff == prefix)) {
-      logDebug() << "Address " << Qt::hex << addr << "h unallocated.";
+    if ((0x00 == prefix) || (0xff == prefix))
       continue;
-    }
     // add to address map
     uint32_t vaddr = ((uint32_t)prefix) << 12;
-    logDebug() << "Map " << Qt::hex << addr << "h -> " << vaddr << "h.";
+    //logDebug() << "Map " << Qt::hex << addr << "h -> " << vaddr << "h.";
     map.map(addr, vaddr);
     // Signal progress
     if (progress) progress((100*addr)/_codeplugMemory.second);
@@ -479,12 +494,23 @@ DM32UVInterface::DM32UVInterface::request_identifier(const ErrorStack &err) {
     return false;
   }
 
-  QThread::msleep(100);
+  // Try up to 3 times: the CH340 adapter may need a moment after port open before
+  // the radio firmware is ready to respond to PSEARCH.
   DeviceDetectionRequest devDetReq;
   DeviceDetectionResponse devDetRes;
-  if (! sendReceive(devDetReq, devDetRes, err)) {
-    errMsg(err) << "Cannot identify device.";
-    return false;
+  bool identified = false;
+  for (int attempt = 0; attempt < 3 && !identified; attempt++) {
+    QThread::msleep(500);
+    this->clear(QSerialPort::Input);
+    ErrorStack attemptErr;
+    if (sendReceive(devDetReq, devDetRes, attemptErr)) {
+      identified = true;
+    } else if (attempt < 2) {
+      logDebug() << "Detection attempt " << (attempt+1) << " failed, retrying...";
+    } else {
+      errMsg(err) << "Cannot identify device.";
+      return false;
+    }
   }
 
   logDebug() << "Got " << devDetRes.identifier() << ".";
@@ -562,6 +588,11 @@ DM32UVInterface::enter_program_mode(const ErrorStack &err) {
     return false;
   }
 
+  if (_firmwareVersion.isEmpty() && !DM32UV::supportedFirmwareVersions().contains(_firmwareVersion)) {
+    logWarn() << "Firmware version " << _firmwareVersion << " is currently not supported by qdmr. "
+              << "Supported versions: " << DM32UV::supportedFirmwareVersions().values().join(", ") << ".";
+  }
+
   EnterProgramModeRequest progReq;
   ACKResponse progRes;
   if (! sendReceive(progReq, progRes, err)) {
@@ -589,9 +620,7 @@ DM32UVInterface::enter_program_mode(const ErrorStack &err) {
 
 bool
 DM32UVInterface::send(const char *data, qint64 n, int timeout, const ErrorStack &err) {
-  Q_UNUSED(timeout)
-
-  logDebug() << "Send " << QByteArray(data, n).toHex(' ') << ".";
+  //logDebug() << "Send " << QByteArray(data, n).toHex(' ') << ".";
   while (n) {
     auto k = QSerialPort::write(data, n);
     if (0 > k) {
@@ -600,6 +629,12 @@ DM32UVInterface::send(const char *data, qint64 n, int timeout, const ErrorStack 
       return false;
     }
     n -= k; data += k;
+  }
+
+  if (! waitForBytesWritten(timeout)) {
+    errMsg(err) << "QSerialPort: " << errorString();
+    errMsg(err) << "Timed out waiting for bytes to be written.";
+    return false;
   }
 
   return true;

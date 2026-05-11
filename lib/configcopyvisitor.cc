@@ -18,7 +18,7 @@ ConfigCloneVisitor::ConfigCloneVisitor(QHash<ConfigObject *, ConfigObject *> &ma
 
 bool
 ConfigCloneVisitor::processProperty(ConfigItem *item, const QMetaProperty &prop, const ErrorStack &err) {
-  if (prop.isEnumType() || (QMetaType::Bool == prop.typeId())
+  if (prop.isFlagType() || prop.isEnumType() || (QMetaType::Bool == prop.typeId())
       || (QMetaType::Int == prop.typeId()) || (QMetaType::UInt == prop.typeId())
       || (QMetaType::Double == prop.typeId()) || (QMetaType::QString == prop.typeId())
       || (QMetaType::fromType<Frequency>() == prop.metaType())

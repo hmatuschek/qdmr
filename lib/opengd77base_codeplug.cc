@@ -663,7 +663,7 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
   setTransmitTimeout(c->timeout());
 
   // Enable vox
-  bool defaultVOXEnabled = (c->defaultVOX() && (!ctx.config()->settings()->voxDisabled()));
+  bool defaultVOXEnabled = (c->defaultVOX() && ctx.config()->settings()->audio()->voxEnabled());
   bool channelVOXEnabled = (! (c->voxDisabled()||c->defaultVOX()));
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
 
@@ -1560,16 +1560,16 @@ OpenGD77BaseCodeplug::BootSettingsElement::setLine2(const QString &text) {
 bool
 OpenGD77BaseCodeplug::BootSettingsElement::encode(const Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  setLine1(ctx.config()->settings()->introLine1());
-  setLine2(ctx.config()->settings()->introLine2());
+  setLine1(ctx.config()->settings()->boot()->message1());
+  setLine2(ctx.config()->settings()->boot()->message2());
   return true;
 }
 
 bool
 OpenGD77BaseCodeplug::BootSettingsElement::decode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err)
-  ctx.config()->settings()->setIntroLine1(line1());
-  ctx.config()->settings()->setIntroLine2(line2());
+  ctx.config()->settings()->boot()->setMessage1(line1());
+  ctx.config()->settings()->boot()->setMessage2(line2());
   return true;
 }
 

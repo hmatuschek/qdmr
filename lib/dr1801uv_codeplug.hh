@@ -829,9 +829,9 @@ public:
      * 0 means VOX off. */
     virtual void setVOXSensitivity(Level sens);
     /** Returns the VOX delay in ms. */
-    virtual unsigned int voxDelay() const;
+    virtual Interval voxDelay() const;
     /** Sets the VOX delay in ms. */
-    virtual void setVOXDelay(unsigned int ms);
+    virtual void setVOXDelay(Interval ms);
 
     /** Returns @c true if encryption is enabled. */
     virtual bool encryptionEnabled() const;

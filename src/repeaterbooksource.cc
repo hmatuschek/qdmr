@@ -26,9 +26,7 @@ RepeaterBookSource::RepeaterBookSource(QObject *parent)
 
 
 bool
-RepeaterBookSource::load(const QString &queryCall, const QGeoCoordinate &pos) {
-  Q_UNUSED(pos);
-
+RepeaterBookSource::load(const QString &queryCall) {
   // Cancel running requests
   if (_currentReply)
     _currentReply->abort();
@@ -50,7 +48,12 @@ RepeaterBookSource::load(const QString &queryCall, const QGeoCoordinate &pos) {
   url.setQuery(query);
   QNetworkRequest request(url);
   request.setHeader(QNetworkRequest::UserAgentHeader,
-                    "qdmr " VERSION_STRING " https://dm3mat.darc.de/qdmr/");
+                    "qdmr/1.0 (https://dm3mat.de/software/qdmr/;dm3mat@darc.de)");
+  if (Settings().repeaterBookAPIToken().isEmpty()) {
+    logWarn() << "Cannot request repeater from repeaterbook.com, personal API token needed.";
+    return false;
+  }
+  request.setRawHeader("X-RB-App-Token", Settings().repeaterBookAPIToken());
   logDebug() << "Query RepeaterBook at " << url.toString()
              << " as '" << request.header(QNetworkRequest::UserAgentHeader).toString() << "'.";
 

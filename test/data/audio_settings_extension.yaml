@@ -1,5 +1,5 @@
 ---
-version: 0.11.0
+version: 0.15.0
 settings:
   introLine1: DM3MAT
   introLine2: qDMR
@@ -10,10 +10,8 @@ settings:
   vox: 0
   tot: 0
   defaultID: id1
-  anytone:
-    audioSettings:
-      enableFMMicGain: true
-      fmMicGain: 6  # Must differ from settings->micLevel
+  audio:
+    fmMicGain: 6  # Must differ from settings->micLevel
 
 radioIDs:
   - dmr: {id: id1, name: DM3MAT, number: 2621370}

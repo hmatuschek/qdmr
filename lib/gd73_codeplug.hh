@@ -320,9 +320,9 @@ public:
     /** Enables/disables the key tones. */
     void enableKeyTone(bool enable);
     /** Returns the key-tone volume [0-13]. */
-    unsigned int keyToneVolume() const;
+    Level keyToneVolume() const;
     /** Sets the key-tone volume. */
-    void setKeyToneVolume(unsigned int vol);
+    void setKeyToneVolume(Level vol);
     /** Returns @c true if the low-battery warn tone is enabled. */
     bool lowBatteryToneEnabled() const;
     /** Enables/disables the low-battery warn tone. */
@@ -393,7 +393,7 @@ public:
       /** Maximum length of the boot text lines. */
       static constexpr unsigned int bootTextLine() { return 16; }
       /** Value range for tone-volumes. */
-      static constexpr IntRange toneVolume() { return IntRange{0,13}; }
+      static constexpr Range<unsigned int> toneVolume() { return {0,13}; }
       /** Long-press duration range. */
       static constexpr TimeRange longPressDuration() {
         return TimeRange{Interval::fromSeconds(0), Interval::fromSeconds(31)};

@@ -21,6 +21,7 @@ private slots:
   void testChannelDataACK(); // Regression test for #813
   void testSettingsDisplayVolumeChangePrompt(); // Regression test for #813
   void testSettingsRoamingNotificationCount(); // Regression test for #813
+  void testIdleToneEnable(); // Regression test for #911
 
 protected:
   void encodeDecode(Config &input, Config &ouput);

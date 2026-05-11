@@ -75,6 +75,8 @@ public:
 public:
   /** Default constructor. */
   explicit DM32UV(DM32UVInterface *device=nullptr, QObject *parent=nullptr);
+  /** Destructor. Closes and frees the device interface. */
+  ~DM32UV();
 
   /** Returns the default radio information. The actual instance may have different properties
    * due to variants of the same radio. */
@@ -92,6 +94,10 @@ public:
   bool startUploadCallsignDB(UserDatabase *db, const CallsignDB::Flags &selection, const ErrorStack &err) override;
   bool startUploadSatelliteConfig(SatelliteDatabase *db, const TransferFlags &flags, const ErrorStack &err) override;
 
+
+public:
+  /** Returns a set of supported firmware versions. */
+  static inline QSet<QByteArray> supportedFirmwareVersions() { return {"DM32.01.L01.048"}; }
 
 public:
   /** Some constants. */

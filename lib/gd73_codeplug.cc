@@ -405,17 +405,19 @@ bool
 GD73Codeplug::SettingsElement::keyToneEnabled() const {
   return 0x00 != getUInt8(Offset::keyToneEnable());
 }
+
 void
 GD73Codeplug::SettingsElement::enableKeyTone(bool enable) {
   setUInt8(Offset::keyToneEnable(), enable ? 0x01 : 0x00);
 }
-unsigned int
+
+Level
 GD73Codeplug::SettingsElement::keyToneVolume() const {
-  return getUInt8(Offset::keyToneVolume());
+  return Level::fromValue(getUInt8(Offset::keyToneVolume()), Limit::toneVolume());
 }
 void
-GD73Codeplug::SettingsElement::setKeyToneVolume(unsigned int vol) {
-  setUInt8(Offset::keyToneVolume(), Limit::toneVolume().map(vol));
+GD73Codeplug::SettingsElement::setKeyToneVolume(Level vol) {
+  setUInt8(Offset::keyToneVolume(), vol.mapTo(Limit::toneVolume()));
 }
 
 bool
@@ -432,7 +434,7 @@ GD73Codeplug::SettingsElement::lowBatteryToneVolume() const {
 }
 void
 GD73Codeplug::SettingsElement::setLowBatteryToneVolume(unsigned int vol) {
-  setUInt8(Offset::lowBatToneVolume(), Limit::toneVolume().map(vol));
+  setUInt8(Offset::lowBatToneVolume(), Level::fromValue(vol).mapTo(Limit::toneVolume()));
 }
 
 Interval
@@ -493,11 +495,17 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ctx.add(radioID, 0);
 
   // Apply settings
-  ctx.config()->settings()->setIntroLine1(bootTextLine1());
-  ctx.config()->settings()->setIntroLine2(bootTextLine2());
-  ctx.config()->settings()->setMicLevel(dmrMicGain());
-  ctx.config()->settings()->setSquelch(squelch());
-  ctx.config()->settings()->setVOX(vox());
+  ctx.config()->settings()->boot()->setMessage1(bootTextLine1());
+  ctx.config()->settings()->boot()->setMessage2(bootTextLine2());
+  // Audio settings
+  ctx.config()->settings()->audio()->setMicGain(dmrMicGain());
+  if (dmrMicGain() == fmMicGain())
+    ctx.config()->settings()->audio()->disableFMMicGain();
+  else
+    ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
+  ctx.config()->settings()->audio()->setSquelch(squelch());
+  ctx.config()->settings()->audio()->setVox(vox());
+
   if (! totIsSet())
     ctx.config()->settings()->disableTOT();
   else
@@ -506,6 +514,11 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ctx.config()->settings()->boot()->setBootDisplay(bootDisplayMode());
   ctx.config()->settings()->boot()->enableBootPassword(readLockEnabled());
   ctx.config()->settings()->boot()->setBootPassword(readLockPin());
+
+  if (! keyToneEnabled())
+    ctx.config()->settings()->tone()->disableKeyTone();
+  else
+    ctx.config()->settings()->tone()->setKeyToneVolume(keyToneVolume());
 
   // Get/add radioddity settings extension
   RadiodditySettingsExtension *ext = ctx.config()->settings()->radioddityExtension();
@@ -530,9 +543,6 @@ GD73Codeplug::SettingsElement::updateConfig(Context &ctx, const ErrorStack &err)
   ext->buttons()->setFuncKey2Short(keyFunctionShortPressP2());
   ext->buttons()->setFuncKey2Long(keyFunctionLongPressP2());
 
-  ext->tone()->setFMMicGain(fmMicGain());
-  ext->tone()->enableKeyTone(keyToneEnabled());
-  ext->tone()->setKeyToneVolume(keyToneVolume());
   ext->tone()->enableLowBatteryWarn(lowBatteryToneEnabled());
   ext->tone()->setLowBatteryWarnVolume(lowBatteryToneVolume());
 
@@ -558,12 +568,20 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setName(ctx.config()->settings()->defaultId()->name());
 
   // Apply settings
-  setBootTextLine1(ctx.config()->settings()->introLine1());
-  setBootTextLine2(ctx.config()->settings()->introLine2());
-  setDMRMicGain(ctx.config()->settings()->micLevel());
-  setFMMicGain(ctx.config()->settings()->micLevel());
-  setSquelch(ctx.config()->settings()->squelch());
-  setVOX(ctx.config()->settings()->vox());
+  setBootTextLine1(ctx.config()->settings()->boot()->message1());
+  setBootTextLine2(ctx.config()->settings()->boot()->message2());
+
+  setDMRMicGain(ctx.config()->settings()->audio()->micGain());
+  setFMMicGain(ctx.config()->settings()->audio()->micGain());
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFMMicGain(ctx.config()->settings()->audio()->fmMicGain());
+  setSquelch(ctx.config()->settings()->audio()->squelch());
+  setVOX(ctx.config()->settings()->audio()->vox());
+
+  enableKeyTone(ctx.config()->settings()->tone()->keyToneEnabled());
+  if (ctx.config()->settings()->tone()->keyToneEnabled())
+    setKeyToneVolume(ctx.config()->settings()->tone()->keyToneVolume());
+
   if (ctx.config()->settings()->totDisabled())
     clearTOT();
   else
@@ -600,9 +618,6 @@ GD73Codeplug::SettingsElement::encode(Context &ctx, const ErrorStack &err) {
   setKeyFunctionShortPressP2(ext->buttons()->funcKey2Short());
   setKeyFunctionLongPressP2(ext->buttons()->funcKey2Long());
 
-  setFMMicGain(ext->tone()->fmMicGain());
-  enableKeyTone(ext->tone()->keyTone());
-  setKeyToneVolume(ext->tone()->keyToneVolume());
   enableLowBatteryTone(ext->tone()->lowBatteryWarn());
   setLowBatteryToneVolume(ext->tone()->lowBatteryWarnVolume());
 

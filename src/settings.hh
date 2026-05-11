@@ -31,21 +31,30 @@ public:
   QString locator() const;
   void setLocator(const QString &locator);
   QGeoCoordinate position() const;
-
-  bool disableAutoDetect() const;
-  void setDisableAutoDetect(bool disable);
+  int repeaterSearchRadius() const;
+  void setRepeaterSearchRadius(int radius);
 
   bool repeaterBookSourceEnabled() const;
   void enableRepeaterBookSource(bool enable);
+
   bool repeaterMapSourceEnabled() const;
   void enableRepeaterMapSource(bool enable);
+  QByteArray repeaterMapAPIToken() const;
+  void setRepeaterMapAPIToken(const QByteArray &token);
+
   bool hearhamSourceEnabled() const;
   void enableHearhamSource(bool enable);
+
   bool radioIdRepeaterSourceEnabled() const;
   void enableRadioIdRepeaterSource(bool enable);
 
   RepeaterBookSource::Region repeaterBookRegion() const;
   void setRepeaterBookRegion(RepeaterBookSource::Region region);
+  QByteArray repeaterBookAPIToken() const;
+  void setRepeaterBookAPIToken(const QByteArray &token);
+
+  bool disableAutoDetect() const;
+  void setDisableAutoDetect(bool disable);
 
   bool updateCodeplug() const;
   void setUpdateCodeplug(bool update);
