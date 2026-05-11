@@ -812,6 +812,14 @@
     </message>
 </context>
 <context>
+    <name>ChannelTypeSelectionDialog</name>
+    <message>
+        <location filename="../src/channel_type_edit.cc" line="53"/>
+        <source>Select channel types</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ConfigMergeDialog</name>
     <message>
         <location filename="../src/configmergedialog.ui" line="17"/>
@@ -2033,118 +2041,273 @@
 <context>
     <name>GeneralSettingsView</name>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="22"/>
+        <location filename="../src/generalsettingsview.ui" line="26"/>
         <source>Boot Settings</source>
         <translation>Параметры загрузки</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="28"/>
+        <location filename="../src/generalsettingsview.ui" line="34"/>
         <source>Intro Line 1</source>
         <translation type="unfinished">Intro Line 1</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="35"/>
+        <location filename="../src/generalsettingsview.ui" line="41"/>
         <source>First greeting line (if supported by the radio).</source>
         <translation type="unfinished">First greeting line (if supported by the radio).</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="38"/>
+        <location filename="../src/generalsettingsview.ui" line="44"/>
         <source>Intro line 1</source>
         <translation type="unfinished">Intro line 1</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="45"/>
+        <location filename="../src/generalsettingsview.ui" line="51"/>
         <source>Intro Line 2</source>
         <translation type="unfinished">Intro Line 2</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="52"/>
+        <location filename="../src/generalsettingsview.ui" line="58"/>
         <source>Second greeting line (if supported by the radio).</source>
         <translation type="unfinished">Second greeting line (if supported by the radio).</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="58"/>
+        <location filename="../src/generalsettingsview.ui" line="64"/>
         <source>Intro line 2</source>
         <translation type="unfinished">Intro line 2</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="68"/>
+        <location filename="../src/generalsettingsview.ui" line="77"/>
         <source>Audio Settings</source>
         <translation>Аудио</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="74"/>
-        <source>MIC Amp.</source>
-        <translation>Усиление МК</translation>
+        <location filename="../src/generalsettingsview.ui" line="85"/>
+        <source>Default Microphone Amplification</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="91"/>
+        <location filename="../src/generalsettingsview.ui" line="92"/>
+        <source>Specifies the default (DMR) microphone amplifiction level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="105"/>
+        <source>FM Microphone Amplifiction</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="112"/>
+        <source>default</source>
+        <extracomment>Special value indicating, that the global default mic gain should be used.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="122"/>
+        <source>Default Squelch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="129"/>
+        <location filename="../src/generalsettingsview.ui" line="157"/>
+        <source>open</source>
+        <extracomment>Special value for the squelch setting, disabling/opening the squelch.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="142"/>
+        <source>DMR Squelch</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="167"/>
+        <source>Disables a separate squelch level for DMR. Uses the default one.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="170"/>
+        <source>Default</source>
+        <extracomment>Label for a checkbox that disables a separate DMR squelch setting. The default squelch is then used.</extracomment>
+        <translation type="unfinished">По умолчанию</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="179"/>
+        <source>VOX Sensitivity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="186"/>
+        <source>Specifies the VOX sensitivity.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="199"/>
+        <source>VOX Delay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="206"/>
+        <source>Specifies the delay between voice detection and transmission. E.g. 500 ms.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="213"/>
+        <source>Maximum Speaker Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="220"/>
+        <source>Limits the maximum speaker volume.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="236"/>
+        <source>Maximum Headphone Volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="243"/>
+        <source>Limits the maximum headphone volume.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="279"/>
+        <source>Tone Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="287"/>
+        <source>Disable all</source>
+        <extracomment>Label for a checkbox disabling all tones.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="294"/>
+        <source>Disables all tones.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="304"/>
+        <source>Key tone volume</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="311"/>
+        <source>off</source>
+        <extracomment>Special value of a spin box indicating that keytones are disabled.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="321"/>
+        <source>SMS tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="328"/>
+        <source>Enables a tone on SMS reception.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="338"/>
+        <source>Ringtone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="345"/>
+        <source>Enables the ringtone on incoming private calls.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="355"/>
+        <source>Talk permit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="368"/>
+        <source>Boot melody</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="383"/>
+        <location filename="../src/generalsettingsview.ui" line="492"/>
+        <source>Enabled</source>
+        <extracomment>Label for a checkbox, enabling the boot melody
+----------
+Label for a checkbox enabling the call-reset tone.</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="399"/>
+        <source>Call Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="412"/>
+        <source>Call End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="425"/>
+        <source>Channel Idle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="435"/>
+        <source>Call Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="507"/>
+        <source>Default Values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="259"/>
         <source>Speech Synthesis</source>
         <translation>Синтез речи</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="108"/>
-        <source>Channel Default Values</source>
-        <translation>Значения канала по умолчанию</translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="114"/>
+        <location filename="../src/generalsettingsview.ui" line="515"/>
         <source>Power</source>
         <translation>Мощность</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="122"/>
+        <location filename="../src/generalsettingsview.ui" line="523"/>
         <source>Max</source>
         <translation>Макс.</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="127"/>
+        <location filename="../src/generalsettingsview.ui" line="528"/>
         <source>High</source>
         <translation>Высокая</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="132"/>
+        <location filename="../src/generalsettingsview.ui" line="533"/>
         <source>Mid</source>
         <translation>Средняя</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="137"/>
+        <location filename="../src/generalsettingsview.ui" line="538"/>
         <source>Low</source>
         <translation>Низкая</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="142"/>
+        <location filename="../src/generalsettingsview.ui" line="543"/>
         <source>Min</source>
         <translation>Мин.</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="150"/>
-        <source>Squelch</source>
-        <translation>Шумоподавитель</translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="157"/>
-        <source>Open</source>
-        <translation>Открыть</translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="167"/>
+        <location filename="../src/generalsettingsview.ui" line="551"/>
         <source>Transmit Timeout</source>
         <translation>Таймаут передачи</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="174"/>
-        <location filename="../src/generalsettingsview.ui" line="194"/>
+        <location filename="../src/generalsettingsview.ui" line="189"/>
+        <location filename="../src/generalsettingsview.ui" line="558"/>
         <source>Off</source>
         <translation>Выкл.</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="187"/>
-        <source>VOX Level</source>
-        <translation type="unfinished">VOX Level</translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="211"/>
+        <location filename="../src/generalsettingsview.ui" line="577"/>
         <source>Extensions</source>
         <translation>Расширения</translation>
     </message>
@@ -2650,6 +2813,26 @@
         <location filename="../src/mainwindow.cc" line="146"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>В текущем кодплаге есть несохранённые изменения. Они будут потеряны, если продолжить.</translation>
+    </message>
+</context>
+<context>
+    <name>MelodyEdit</name>
+    <message>
+        <location filename="../src/melody_edit.cc" line="16"/>
+        <source>bpm</source>
+        <comment>Beats per minute. Unit in a spin box.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/melody_edit.cc" line="17"/>
+        <source>Specify the melody in Lilypond format.</source>
+        <comment>Tooltip for a melody entry field.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/melody_edit.cc" line="23"/>
+        <source>Melody</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3435,48 +3618,68 @@
         <translation type="unfinished">Edit Satellite Transponder</translation>
     </message>
     <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="20"/>
+        <source>Satellite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/satellitetransponderdialog.ui" line="26"/>
+        <source>Satellite Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="55"/>
         <source>FM Voice Transponder</source>
         <translation type="unfinished">FM Voice Transponder</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="32"/>
-        <location filename="../src/satellitetransponderdialog.ui" line="105"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="61"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="134"/>
         <source>Uplink Frequency</source>
         <translation type="unfinished">Uplink Frequency</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="42"/>
-        <location filename="../src/satellitetransponderdialog.ui" line="121"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="71"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="150"/>
         <source>Uplink Tone</source>
         <translation type="unfinished">Uplink Tone</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="58"/>
-        <location filename="../src/satellitetransponderdialog.ui" line="143"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="87"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="172"/>
         <source>Downlink Frequency</source>
         <translation type="unfinished">Downlink Frequency</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="68"/>
-        <location filename="../src/satellitetransponderdialog.ui" line="159"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="97"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="188"/>
         <source>Downlink Tone</source>
         <translation type="unfinished">Downlink Tone</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="93"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="122"/>
         <source>APRS Transponder</source>
         <translation type="unfinished">APRS Transponder</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="184"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="213"/>
         <source>Beacon</source>
         <translation type="unfinished">Beacon</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="196"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="225"/>
         <source>Beacon Frequency</source>
         <translation type="unfinished">Beacon Frequency</translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.cc" line="46"/>
+        <source>Invalid name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.cc" line="47"/>
+        <source>Please set a satellite name.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3667,7 +3870,7 @@
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.cc" line="484"/>
+        <location filename="../src/settings.cc" line="495"/>
         <source>Warning!</source>
         <translation>Внимание!</translation>
     </message>
