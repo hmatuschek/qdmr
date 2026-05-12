@@ -739,7 +739,7 @@ RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
       return true;
 
     auto &msg = context.newMessage(RadioLimitIssue::Warning);
-    msg << "Property '" << prop.name() << "' must refer to an instances of "
+    msg << "Property '" << prop.name() << "' must refer to an instance of "
         << QStringList(_types.begin(), _types.end()).join(", ") << ".";
 
     return true;
@@ -747,7 +747,7 @@ RadioLimitObjRef::verify(const ConfigItem *item, const QMetaProperty &prop, Radi
 
   if (! validType(ref->as<ConfigObject>()->metaObject())) {
     auto &msg = context.newMessage(RadioLimitIssue::Critical);
-    msg << "Property '" << prop.name() << "' must refer to an instances of "
+    msg << "Property '" << prop.name() << "' must refer to an instance of "
         << QStringList(_types.begin(), _types.end()).join(", ") << ".";
     return false;
   }
