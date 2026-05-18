@@ -747,7 +747,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="486"/>
         <source>RX Group List</source>
-        <translation>Liste Groupes RX</translation>
+        <translation type="unfinished">Liste Groupes RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="487"/>
@@ -1034,7 +1034,7 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation>Sélectionner la classe de l&apos;objet à créer</translation>
+        <translation type="unfinished">Sélectionner la classe de l&apos;objet à créer</translation>
     </message>
 </context>
 <context>
@@ -1112,7 +1112,7 @@
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
         <source>Delete contact button</source>
-        <translation>Bouton de suppression de contact</translation>
+        <translation type="unfinished">Bouton de suppression de contact</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
@@ -3080,7 +3080,7 @@
     <message>
         <location filename="../src/releasenotes.cc" line="59"/>
         <source>qDMR was updated to version %1</source>
-        <translation>qdmr est mis à jour vers la version %1</translation>
+        <translation type="unfinished">qdmr est mis à jour vers la version %1</translation>
     </message>
 </context>
 <context>
