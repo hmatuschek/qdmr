@@ -287,7 +287,7 @@ C7000Device::sendRecv(const Packet &request, Packet &response, const ErrorStack 
     errMsg(err) << "Cannot send command to device: " << libusb_error_name(ret) << ".";
     return false;
   }
-  QObject().thread()->usleep(1000);
+  QObject().thread()->msleep(100);
 
   unsigned int retry_count = 0;
 retry_receive:
