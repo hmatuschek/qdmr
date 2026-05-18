@@ -142,6 +142,10 @@ signals:
   /** Gets emitted, once an entry gets updated or is added.
    * @warning This signal may originate in a separate thread.*/
   void updated(const RepeaterDatabaseEntry &entry);
+  /** Gets emitted on some download progress. */
+  void progress(unsigned int progress);
+  /** Gets emitted on download/update errors. */
+  void error(const QString &message);
 
 protected:
   /** Needs to be implemented to query new entries. */
@@ -233,10 +237,11 @@ public:
   int rowCount(const QModelIndex &parent = QModelIndex()) const;
   QVariant data(const QModelIndex &index, int role) const;
 
+signals:
+  void error(const QString &message);
 
 protected slots:
   void merge(const RepeaterDatabaseEntry &entry);
-
 
 protected:
   QGeoCoordinate _searchPosition;

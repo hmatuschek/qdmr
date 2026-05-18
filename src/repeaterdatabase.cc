@@ -484,7 +484,6 @@ DownloadableRepeaterDatabaseSource::DownloadableRepeaterDatabaseSource(
 {
   connect(&_network, SIGNAL(finished(QNetworkReply*)),
           this, SLOT(onRequestFinished(QNetworkReply*)));
-
   if (needsUpdate())
     QTimer::singleShot(0, this, &DownloadableRepeaterDatabaseSource::download);
 }
@@ -540,6 +539,8 @@ void
 DownloadableRepeaterDatabaseSource::onRequestFinished(QNetworkReply *reply) {
   if (reply->error()) {
     logError() << "Cannot download repeater list: " << reply->errorString();
+    emit error(tr("Cannot download repeater list from '%1': %2")
+      .arg(_url.toString()).arg(reply->errorString()));
     reply->deleteLater();
     _currentReply = nullptr;
     return;
@@ -589,6 +590,9 @@ RepeaterDatabase::addSource(RepeaterDatabaseSource *source) {
   source->setParent(this);
   connect(source, &RepeaterDatabaseSource::updated,
           this, &RepeaterDatabase::merge,
+          Qt::QueuedConnection);
+  connect(source, &RepeaterDatabaseSource::error,
+          this, &RepeaterDatabase::error,
           Qt::QueuedConnection);
 }
 
