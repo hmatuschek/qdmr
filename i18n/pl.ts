@@ -746,7 +746,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="486"/>
         <source>RX Group List</source>
-        <translation>Lista grupy</translation>
+        <translation type="unfinished">Lista grupy</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="487"/>
