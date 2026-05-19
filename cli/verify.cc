@@ -19,11 +19,26 @@
 #include "gd77.hh"
 #include "opengd77.hh"
 #include "openuv380.hh"
+#include "dr1801uv.hh"
+#include "dm32uv.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
 #include "d878uv2.hh"
 #include "d578uv.hh"
+#include "d168uv.hh"
 
+template <class Radio>
+bool verify(Config &config, RadioLimitContext &ctx) {
+  Radio radio; ErrorStack err;
+  Config *intermediate = radio.codeplug().preprocess(&config, err);
+  if (nullptr == intermediate) {
+    logError() << "Cannot pre-process codeplug: " << err.format();
+    return false;
+  }
+  radio.limits().verifyConfig(intermediate, ctx);
+  delete intermediate;
+  return true;
+}
 
 int verify(QCommandLineParser &parser, QCoreApplication &app)
 {
@@ -73,130 +88,23 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
 
 
   RadioLimitContext ctx;
-  RadioInfo::Radio radio = RadioInfo::byKey(parser.value("radio").toLower()).id();
-  switch (radio) {
-  case RadioInfo::RD5R: {
-    RD5R radio; ErrorStack err;
-    Config *intermediate = radio.codeplug().preprocess(&config, err);
-    if (nullptr == intermediate) {
-      logError() << "Cannot pre-process codeplug: " << err.format();
-      return -1;
-    }
-    radio.limits().verifyConfig(intermediate, ctx);
-    delete intermediate;
-    } break;
-  case RadioInfo::UV390: {
-      UV390 radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::MD2017: {
-      MD2017 radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::DM1701: {
-      DM1701 radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::GD73: {
-      GD73 radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::GD77: {
-      GD77 radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::OpenGD77: {
-      OpenGD77 radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::OpenUV380: {
-      OpenUV380 radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::D868UV: {
-      D868UV radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::D878UV: {
-      D878UV radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::D878UVII: {
-      D878UV2 radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
-  case RadioInfo::D578UV: {
-      D578UV radio; ErrorStack err;
-      Config *intermediate = radio.codeplug().preprocess(&config, err);
-      if (nullptr == intermediate) {
-        logError() << "Cannot pre-process codeplug: " << err.format();
-        return -1;
-      }
-      radio.limits().verifyConfig(intermediate, ctx);
-      delete intermediate;
-    } break;
+  switch (RadioInfo::byKey(parser.value("radio").toLower()).id()) {
+  case RadioInfo::RD5R: if (! verify<RD5R>(config, ctx)) return -1; break;
+  case RadioInfo::UV390: if (! verify<UV390>(config, ctx)) return -1; break;
+  case RadioInfo::MD2017: if (! verify<MD2017>(config, ctx)) return -1; break;
+  case RadioInfo::DM1701: if (! verify<DM1701>(config, ctx)) return -1; break;
+  case RadioInfo::GD73: if (! verify<GD73>(config, ctx)) return -1; break;
+  case RadioInfo::GD77: if (! verify<GD77>(config, ctx)) return -1; break;
+  case RadioInfo::OpenGD77: if (! verify<OpenGD77>(config, ctx)) return -1; break;
+  case RadioInfo::OpenUV380: if (! verify<OpenUV380>(config, ctx)) return -1; break;
+  case RadioInfo::DM32UV: if (! verify<DM32UV>(config, ctx)) return -1; break;
+  case RadioInfo::DR1801UV: if (! verify<DR1801UV>(config, ctx)) return -1; break;
+  case RadioInfo::D868UV: if (! verify<D878UV>(config, ctx)) return -1; break;
+  case RadioInfo::D878UV: if (! verify<D878UV>(config, ctx)) return -1; break;
+  case RadioInfo::D878UVII: if (! verify<D878UV2>(config, ctx)) return -1; break;
+  case RadioInfo::D578UV: if (! verify<D578UV>(config, ctx)) return -1; break;
   default:
-    logError() << "Cannot verify code-plug against unknown radio '" << radio << "'.";
+    logError() << "Cannot verify code-plug against unknown radio '" << parser.value("radio").toLower() << "'.";
     return -1;
   }
 
