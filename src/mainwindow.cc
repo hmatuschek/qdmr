@@ -131,7 +131,7 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   _extensionView->setObject(config, config);
   ui->tabs->addTab(_extensionView, tr("Extensions"));
 
-  restoreGeometry(settings.mainWindowState());
+  restoreGeometry(settings.windowState(objectName()));
 
   connect(config, &ConfigItem::modified, [this, config]() {
     this->setWindowModified(config->isModified());
@@ -150,6 +150,6 @@ MainWindow::closeEvent(QCloseEvent *event) {
     return;
   }
 
-  Settings().setMainWindowState(saveGeometry());
+  Settings().setWindowState(objectName(), saveGeometry());
   event->accept();
 }
