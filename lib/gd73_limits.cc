@@ -79,8 +79,8 @@ GD73Limits::GD73Limits(QObject *parent)
           { FMChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, GD73Codeplug::ChannelElement::Limit::nameLength(), RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencyRaster({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, Frequency::fromkHz(12.5), RadioLimitIssue::Severity::Critical)},
-              {"txFrequency", new RadioLimitFrequencyRaster({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, Frequency::fromkHz(12.5), RadioLimitIssue::Severity::Critical)},
+              {"rxFrequency", new RadioLimitFrequencyRaster({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, Frequency::fromHz(1250), RadioLimitIssue::Severity::Critical)},
+              {"txFrequency", new RadioLimitFrequencyRaster({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, Frequency::fromHz(1250), RadioLimitIssue::Severity::Critical)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
@@ -103,8 +103,8 @@ GD73Limits::GD73Limits(QObject *parent)
           { DMRChannel::staticMetaObject,
             new RadioLimitObject {
               {"name", new RadioLimitString(1, GD73Codeplug::ChannelElement::Limit::nameLength(), RadioLimitString::Unicode)},
-              {"rxFrequency", new RadioLimitFrequencyRaster({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, Frequency::fromkHz(12.5), RadioLimitIssue::Severity::Critical)},
-              {"txFrequency", new RadioLimitFrequencyRaster({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, Frequency::fromkHz(12.5), RadioLimitIssue::Severity::Critical)},
+              {"rxFrequency", new RadioLimitFrequencyRaster({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, Frequency::fromHz(1250), RadioLimitIssue::Severity::Critical)},
+              {"txFrequency", new RadioLimitFrequencyRaster({{Frequency::fromMHz(400.), Frequency::fromMHz(470.)}}, Frequency::fromHz(1250), RadioLimitIssue::Severity::Critical)},
               {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
