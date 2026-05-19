@@ -103,6 +103,7 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
   case RadioInfo::D878UV: if (! verify<D878UV>(config, ctx)) return -1; break;
   case RadioInfo::D878UVII: if (! verify<D878UV2>(config, ctx)) return -1; break;
   case RadioInfo::D578UV: if (! verify<D578UV>(config, ctx)) return -1; break;
+  case RadioInfo::D168UV: if (! verify<D168UV>(config, ctx)) return -1; break;
   default:
     logError() << "Cannot verify code-plug against unknown radio '" << parser.value("radio").toLower() << "'.";
     return -1;
