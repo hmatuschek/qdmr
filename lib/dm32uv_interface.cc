@@ -274,10 +274,14 @@ DM32UVInterface::DM32UVInterface(const USBDeviceDescriptor &descr,
                                  const ErrorStack &err, QObject *parent)
   : USBSerial{descr, QSerialPort::Baud115200, err, parent}, _state(State::Closed), _info()
 {
-  if (isOpen())
+  if (isOpen()) {
     _state = State::Open;
-  else if (QSerialPort::NoError != QSerialPort::error())
+    setFlowControl(QSerialPort::NoFlowControl);
+    setRequestToSend(false);
+    setDataTerminalReady(true);
+  } else if (QSerialPort::NoError != QSerialPort::error()) {
     _state = State::Error;
+  }
 
   if (request_identifier(err))
     _state = State::SystemInfo;
