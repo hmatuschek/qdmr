@@ -11,7 +11,7 @@
 #include "tyt_interface.hh"
 #include "dr1801uv_interface.hh"
 #include "c7000device.hh"
-
+#include "dm32uv_interface.hh"
 
 /* ********************************************************************************************* *
  * Implementation of USBDeviceHandle
@@ -318,6 +318,7 @@ USBDeviceDescriptor::detect(bool saveOnly) {
   res.append(TyTInterface::detect(saveOnly));
   res.append(DR1801UVInterface::detect(saveOnly));
   res.append(C7000Device::detect(saveOnly));
+  res.append(DM32UVInterface::detect(saveOnly));
   return res;
 }
 
