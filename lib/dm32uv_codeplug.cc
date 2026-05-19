@@ -319,6 +319,27 @@ DM32UVCodeplug::ChannelElement::setColorCode(unsigned int cc) {
 
 
 bool
+DM32UVCodeplug::ChannelElement::hasKeyIndex() const {
+  return 0 != getUInt8(Offset::keyIndex());
+}
+
+unsigned int
+DM32UVCodeplug::ChannelElement::keyIndex() const {
+  return getUInt8(Offset::keyIndex())-1;
+}
+
+void
+DM32UVCodeplug::ChannelElement::setKeyIndex(unsigned int idx) {
+  setUInt8(Offset::keyIndex(), idx+1);
+}
+
+void
+DM32UVCodeplug::ChannelElement::clearKeyIndex() {
+  setUInt8(Offset::keyIndex(), 0);
+}
+
+
+bool
 DM32UVCodeplug::ChannelElement::encryptionEnabled() const {
   return getBit(Offset::encryptionEnable());
 }
@@ -498,6 +519,18 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
     if (dmrAPRSEnabled() && ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
       dmr->setAPRS(ctx.get<DMRAPRSSystem>(dmrAPRSChannelIndex()));
     }
+
+    // Link encryption key if enabled
+    if (encryptionEnabled() && hasKeyIndex()) {
+      if (ctx.has<EncryptionKey>(keyIndex())) {
+        if (nullptr == dmr->commercialExtension())
+          dmr->setCommercialExtension(new CommercialChannelExtension());
+        dmr->commercialExtension()->setEncryptionKey(ctx.get<EncryptionKey>(keyIndex()));
+      } else {
+        logWarn() << "Cannot link encryption key with index " << keyIndex()
+                  << " to channel '" << name() << "': key not found!";
+      }
+    }
   }    
 
   return true;
@@ -541,9 +574,8 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     setColorCode(dmr->colorCode());
     if (dmr->commercialExtension()) {
       enableEncryption(! dmr->commercialExtension()->encryptionKeyRef()->isNull());
-      if (! dmr->commercialExtension()->encryptionKeyRef()->isNull()) {
-        // reverse engineer encryption key index!
-      }
+      if (! dmr->commercialExtension()->encryptionKeyRef()->isNull())
+        setKeyIndex(ctx.index(dmr->commercialExtension()->encryptionKey()));
     }
     clearGroupListIndex();
     if (! dmr->groupListRef()->isNull()) {
@@ -4091,6 +4123,10 @@ DM32UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err
 bool
 DM32UVCodeplug::decode(Config *config, const ErrorStack &err) {
   Context ctx(config);
+  ctx.remTable(&BasicEncryptionKey::staticMetaObject, true);
+  ctx.remTable(&ARC4EncryptionKey::staticMetaObject, true);
+  ctx.remTable(&AESEncryptionKey::staticMetaObject, true);
+  ctx.addTable(&EncryptionKey::staticMetaObject);
 
   if (! decodeElements(ctx, err)) {
     errMsg(err) << "Cannot decode elements.";
