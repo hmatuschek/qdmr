@@ -16,11 +16,9 @@ class ZoneDialog: public QDialog, private Ui::ZoneDialog
 public:
 	ZoneDialog(Config *config, QWidget *parent=nullptr);
 	ZoneDialog(Config *config, Zone *zone, QWidget *parent=nullptr);
+  ~ZoneDialog();
 
 	Zone *zone();
-
-protected:
-  void closeEvent(QCloseEvent *event);
 
 protected slots:
 	void onAddChannelA();

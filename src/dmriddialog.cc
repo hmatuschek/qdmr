@@ -35,13 +35,8 @@ DMRIDDialog::construct() {
   restoreGeometry(Settings().windowState(objectName()));
 }
 
-void
-DMRIDDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
-}
-
 DMRIDDialog::~DMRIDDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 

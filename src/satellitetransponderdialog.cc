@@ -36,13 +36,8 @@ SatelliteTransponderDialog::SatelliteTransponderDialog(const Satellite &sat, Tra
 }
 
 SatelliteTransponderDialog::~SatelliteTransponderDialog() {
-  delete ui;
-}
-
-void
-SatelliteTransponderDialog::closeEvent(QCloseEvent *event) {
   Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
+  delete ui;
 }
 
 const Satellite &

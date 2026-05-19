@@ -19,9 +19,6 @@ public:
 
   RadioInfo radioInfo() const;
 
-protected:
-  void closeEvent(QCloseEvent *event);
-
 private:
   Ui::RadioSelectionDialog *ui;
   QList<RadioInfo> _radios;

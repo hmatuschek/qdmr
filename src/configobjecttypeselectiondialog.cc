@@ -28,14 +28,9 @@ ConfigObjectTypeSelectionDialog::ConfigObjectTypeSelectionDialog(
   restoreGeometry(Settings().windowState(objectName()));
 }
 
-void
-ConfigObjectTypeSelectionDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
-}
-
 ConfigObjectTypeSelectionDialog::~ConfigObjectTypeSelectionDialog()
 {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 

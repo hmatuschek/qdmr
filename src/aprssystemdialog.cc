@@ -117,6 +117,7 @@ APRSSystemDialog::APRSSystemDialog(Config *config, FMAPRSSystem *aprs, QWidget *
 }
 
 APRSSystemDialog::~APRSSystemDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 
@@ -170,11 +171,6 @@ APRSSystemDialog::construct() {
   restoreGeometry(Settings().windowState(objectName()));
 }
 
-void
-APRSSystemDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
-}
 
 FMAPRSSystem *
 APRSSystemDialog::aprsSystem() {

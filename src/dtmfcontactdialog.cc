@@ -25,6 +25,7 @@ DTMFContactDialog::DTMFContactDialog(DTMFContact *contact, Config *context, QWid
 }
 
 DTMFContactDialog::~DTMFContactDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 
@@ -42,12 +43,6 @@ DTMFContactDialog::construct() {
   ui->extensionView->setObject(_myContact, _config);
 
   restoreGeometry(Settings().windowState(objectName()));
-}
-
-void
-DTMFContactDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
 }
 
 DTMFContact *

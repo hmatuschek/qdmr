@@ -70,8 +70,8 @@ DMRContactDialog::DMRContactDialog(DMRContact *contact, UserDatabase *users,
   construct();
 }
 
-DMRContactDialog::~DMRContactDialog()
-{
+DMRContactDialog::~DMRContactDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 
@@ -109,12 +109,6 @@ DMRContactDialog::construct() {
   restoreGeometry(Settings().windowState(objectName()));
 }
 
-
-void
-DMRContactDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
-}
 
 void
 DMRContactDialog::onTypeChanged(int idx) {

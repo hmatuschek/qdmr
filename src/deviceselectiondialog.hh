@@ -18,9 +18,6 @@ public:
 
   USBDeviceDescriptor device() const;
 
-protected:
-  void closeEvent(QCloseEvent *event);
-
 protected slots:
   void onDeviceSelected(int idx);
 

@@ -22,9 +22,6 @@ public:
 
   RoamingChannel *channel();
 
-protected:
-  void closeEvent(QCloseEvent *event);
-
 protected slots:
   void construct();
   void onOverrideTimeSlotToggled(bool override);

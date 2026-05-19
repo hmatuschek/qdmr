@@ -207,7 +207,7 @@ Application::loadCodeplug() {
   QString filename = QFileDialog::getOpenFileName(
         nullptr, tr("Open codeplug"),
         settings.lastDirectory().absolutePath(),
-        tr("Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)"));
+        tr("Codeplug Files (*.yaml *.yml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)"));
   if (filename.isEmpty())
     return;
 

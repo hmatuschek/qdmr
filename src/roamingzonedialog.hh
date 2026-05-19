@@ -14,11 +14,9 @@ class RoamingZoneDialog : public QDialog, private Ui_RoamingZoneDialog
 public:
   explicit RoamingZoneDialog(Config *config, QWidget *parent = nullptr);
   RoamingZoneDialog(Config *config, RoamingZone *zone, QWidget *parent=nullptr);
+  ~RoamingZoneDialog();
 
   RoamingZone *zone();
-
-protected:
-  void closeEvent(QCloseEvent *event);
 
 protected slots:
   void construct();

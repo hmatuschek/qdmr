@@ -26,13 +26,8 @@ DeviceSelectionDialog::DeviceSelectionDialog(const QList<USBDeviceDescriptor> &i
 }
 
 DeviceSelectionDialog::~DeviceSelectionDialog() {
-  delete ui;
-}
-
-void
-DeviceSelectionDialog::closeEvent(QCloseEvent *event) {
   Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
+  delete ui;
 }
 
 USBDeviceDescriptor

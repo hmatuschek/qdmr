@@ -22,14 +22,8 @@ RadioSelectionDialog::RadioSelectionDialog(const USBDeviceDescriptor &device, QW
   restoreGeometry(Settings().windowState(objectName()));
 }
 
-void
-RadioSelectionDialog::closeEvent(QCloseEvent *event) {
+RadioSelectionDialog::~RadioSelectionDialog() {
   Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
-}
-
-RadioSelectionDialog::~RadioSelectionDialog()
-{
   delete ui;
 }
 

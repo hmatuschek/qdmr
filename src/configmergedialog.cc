@@ -47,13 +47,8 @@ ConfigMergeDialog::ConfigMergeDialog(QWidget *parent) :
   restoreGeometry(Settings().windowState(objectName()));
 }
 
-void
-ConfigMergeDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
-}
-
 ConfigMergeDialog::~ConfigMergeDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 

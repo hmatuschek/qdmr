@@ -26,6 +26,10 @@ ScanListDialog::ScanListDialog(Config *config, QWidget *parent)
   construct();
 }
 
+ScanListDialog::~ScanListDialog() {
+  Settings().setWindowState(this->objectName(), this->saveGeometry());
+}
+
 void
 ScanListDialog::construct() {
   setupUi(this);
@@ -66,12 +70,6 @@ ScanListDialog::construct() {
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
   restoreGeometry(Settings().windowState(objectName()));
-}
-
-void
-ScanListDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(this->objectName(), this->saveGeometry());
-  QDialog::closeEvent(event);
 }
 
 void

@@ -478,11 +478,11 @@ SettingsDialog::SettingsDialog(QWidget *parent)
   restoreGeometry(Settings().windowState(objectName()));
 }
 
-void
-SettingsDialog::closeEvent(QCloseEvent *event) {
+
+SettingsDialog::~SettingsDialog() {
   Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
 }
+
 
 bool
 SettingsDialog::systemLocationEnabled() const {

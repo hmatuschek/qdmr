@@ -132,12 +132,11 @@ class SettingsDialog: public QDialog, private Ui::SettingsDialog
 
 public:
   explicit SettingsDialog(QWidget *parent=nullptr);
+  ~SettingsDialog();
 
   bool systemLocationEnabled() const;
   QString locator() const;
 
-protected:
-  void closeEvent(QCloseEvent *event);
 
 public slots:
   void accept();

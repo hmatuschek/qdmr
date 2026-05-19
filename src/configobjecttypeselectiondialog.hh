@@ -17,9 +17,6 @@ public:
 
   const QMetaObject &selectedType() const;
 
-protected:
-  void closeEvent(QCloseEvent *event);
-
 protected slots:
   void onSelectionChanged(int currentIndex);
 

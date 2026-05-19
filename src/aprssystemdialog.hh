@@ -22,7 +22,6 @@ public:
   FMAPRSSystem *aprsSystem();
 
 protected:
-  void closeEvent(QCloseEvent *event);
   void construct();
   QIcon aprsIcon(FMAPRSSystem::Icon icon);
 

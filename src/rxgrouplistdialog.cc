@@ -28,6 +28,10 @@ RXGroupListDialog::RXGroupListDialog(Config *config, RXGroupList *list, QWidget 
   construct();
 }
 
+RXGroupListDialog::~RXGroupListDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
+}
+
 RXGroupList *
 RXGroupListDialog::groupList() {
   _myGroupList->setName(groupListName->text().simplified());
@@ -63,12 +67,6 @@ RXGroupListDialog::construct() {
   restoreGeometry(Settings().windowState(objectName()));
 }
 
-
-void
-RXGroupListDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
-}
 
 void
 RXGroupListDialog::onAddGroup() {

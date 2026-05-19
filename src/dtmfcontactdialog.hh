@@ -23,7 +23,6 @@ public:
 
 protected:
   void construct();
-  void closeEvent(QCloseEvent *event);
 
 private:
   DTMFContact *_myContact;

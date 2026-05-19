@@ -30,6 +30,7 @@ RoamingChannelDialog::RoamingChannelDialog(Config *config, RoamingChannel *chann
 }
 
 RoamingChannelDialog::~RoamingChannelDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 
@@ -65,12 +66,6 @@ RoamingChannelDialog::construct() {
           this, SLOT(onOverrideColorCodeToggled(bool)));
 
   restoreGeometry(Settings().windowState(objectName()));
-}
-
-void
-RoamingChannelDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
 }
 
 void

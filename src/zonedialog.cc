@@ -55,11 +55,8 @@ ZoneDialog::construct() {
   restoreGeometry(Settings().windowState(objectName()));
 }
 
-
-void
-ZoneDialog::closeEvent(QCloseEvent *event) {
+ZoneDialog::~ZoneDialog() {
   Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
 }
 
 void

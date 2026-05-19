@@ -69,8 +69,6 @@ VerifyDialog::VerifyDialog(const RadioLimitContext &issues, bool upload, QWidget
 }
 
 
-void
-VerifyDialog::closeEvent(QCloseEvent *event) {
+VerifyDialog::~VerifyDialog() {
   Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
 }

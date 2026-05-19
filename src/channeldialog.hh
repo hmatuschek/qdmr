@@ -21,9 +21,6 @@ public:
 
   void setChannel(Channel *mychannel);
 
-protected:
-  void closeEvent(QCloseEvent *event);
-
 public slots:
   void accept() override;
 

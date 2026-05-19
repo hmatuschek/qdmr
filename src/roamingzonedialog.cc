@@ -27,6 +27,9 @@ RoamingZoneDialog::RoamingZoneDialog(Config *config, RoamingZone *zone, QWidget 
   construct();
 }
 
+RoamingZoneDialog::~RoamingZoneDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
+}
 
 void
 RoamingZoneDialog::construct() {
@@ -44,12 +47,6 @@ RoamingZoneDialog::construct() {
   connect(rem, SIGNAL(clicked(bool)), this, SLOT(onRemChannel()));
 
   restoreGeometry(Settings().windowState(objectName()));
-}
-
-void
-RoamingZoneDialog::closeEvent(QCloseEvent *event) {
-  Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
 }
 
 void

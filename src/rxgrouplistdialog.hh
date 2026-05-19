@@ -20,6 +20,7 @@ class RXGroupListDialog: public QDialog, private Ui::GroupListDialog
 public:
 	explicit RXGroupListDialog(Config *config, QWidget *parent=nullptr);
 	RXGroupListDialog(Config *config, RXGroupList *list, QWidget *parent=nullptr);
+  ~RXGroupListDialog();
 
 	RXGroupList *groupList();
 
@@ -29,7 +30,6 @@ protected slots:
 
 protected:
 	void construct();
-  void closeEvent(QCloseEvent *event);
 
 protected:
 	Config *_config;

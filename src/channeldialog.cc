@@ -66,13 +66,8 @@ ChannelDialog::ChannelDialog(Config *config, QWidget *parent)
 
 
 ChannelDialog::~ChannelDialog() {
-  delete ui;
-}
-
-void
-ChannelDialog::closeEvent(QCloseEvent *event) {
   Settings().setWindowState(objectName(), saveGeometry());
-  QDialog::closeEvent(event);
+  delete ui;
 }
 
 
