@@ -746,7 +746,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="486"/>
         <source>RX Group List</source>
-        <translation>Grupplistan</translation>
+        <translation type="unfinished">Grupplistan</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="487"/>
@@ -1041,7 +1041,7 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation>Välj objektklassen som ska skapas</translation>
+        <translation type="unfinished">Välj objektklassen som ska skapas</translation>
     </message>
 </context>
 <context>
@@ -1119,7 +1119,7 @@
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
         <source>Delete contact button</source>
-        <translation>Ta bort kontakt-knappen</translation>
+        <translation type="unfinished">Ta bort kontakt-knappen</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
@@ -3263,7 +3263,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/releasenotes.cc" line="59"/>
         <source>qDMR was updated to version %1</source>
-        <translation>qdmr uppdaterades till version %1</translation>
+        <translation type="unfinished">qdmr uppdaterades till version %1</translation>
     </message>
 </context>
 <context>

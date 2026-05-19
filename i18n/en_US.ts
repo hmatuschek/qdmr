@@ -742,7 +742,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="486"/>
         <source>RX Group List</source>
-        <translation>RX Group List</translation>
+        <translation>Group List</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="487"/>
@@ -1042,7 +1042,7 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation>Select the class of object to create</translation>
+        <translation>Select the class of object to create.</translation>
     </message>
 </context>
 <context>
@@ -1120,7 +1120,7 @@
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
         <source>Delete contact button</source>
-        <translation>Delete contact button</translation>
+        <translation>Delete contact button.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
@@ -1949,7 +1949,7 @@
     <message>
         <location filename="../src/fmchanneldialog.cc" line="32"/>
         <source>Squelch</source>
-        <translation type="unfinished">Squelch</translation>
+        <translation>Squelch</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="34"/>
@@ -2469,7 +2469,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/m17contactdialog.ui" line="86"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation>Extensions</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.cc" line="49"/>
@@ -3263,7 +3263,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/releasenotes.cc" line="59"/>
         <source>qDMR was updated to version %1</source>
-        <translation>qdmr was updated to version %1</translation>
+        <translation>qdmr was updated to version %1.</translation>
     </message>
 </context>
 <context>

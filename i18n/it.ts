@@ -747,7 +747,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="486"/>
         <source>RX Group List</source>
-        <translation>Lista gruppi RX</translation>
+        <translation type="unfinished">Lista gruppi RX</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="487"/>
@@ -1042,7 +1042,7 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation>Selezionare la classe dell&apos;oggetto da creare</translation>
+        <translation type="unfinished">Selezionare la classe dell&apos;oggetto da creare</translation>
     </message>
 </context>
 <context>
@@ -1120,7 +1120,7 @@
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
         <source>Delete contact button</source>
-        <translation>Pulsante elimina contatto</translation>
+        <translation type="unfinished">Pulsante elimina contatto</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
@@ -2591,7 +2591,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.ui" line="225"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verifies the current codeplug with connected radios.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verifica il codeplug corrente con le radio collegate.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>Verifica il codeplug corrente con le radio collegate.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="228"/>
@@ -3263,7 +3263,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/releasenotes.cc" line="59"/>
         <source>qDMR was updated to version %1</source>
-        <translation>qdmr è stato aggiornato alla versione %1</translation>
+        <translation type="unfinished">qdmr è stato aggiornato alla versione %1</translation>
     </message>
 </context>
 <context>
