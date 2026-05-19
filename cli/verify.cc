@@ -6,26 +6,29 @@
 #include <QTextStream>
 #include <iostream>
 
-#include "logger.hh"
 #include "config.hh"
 #include "csvreader.hh"
-#include "dfufile.hh"
-#include "radiolimits.hh"
-#include "rd5r.hh"
-#include "uv390.hh"
-#include "md2017.hh"
-#include "dm1701.hh"
-#include "gd73.hh"
-#include "gd77.hh"
-#include "opengd77.hh"
-#include "openuv380.hh"
-#include "dr1801uv.hh"
-#include "dm32uv.hh"
+#include "d168uv.hh"
+#include "d578uv.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
 #include "d878uv2.hh"
-#include "d578uv.hh"
-#include "d168uv.hh"
+#include "dfufile.hh"
+#include "dm1701.hh"
+#include "dm32uv.hh"
+#include "dmr6x2uv.hh"
+#include "dmr6x2uv2.hh"
+#include "dr1801uv.hh"
+#include "gd73.hh"
+#include "gd77.hh"
+#include "logger.hh"
+#include "md2017.hh"
+#include "md390.hh"
+#include "opengd77.hh"
+#include "openuv380.hh"
+#include "radiolimits.hh"
+#include "rd5r.hh"
+#include "uv390.hh"
 
 template <class Radio>
 bool verify(Config &config, RadioLimitContext &ctx) {
@@ -90,20 +93,23 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
   RadioLimitContext ctx;
   switch (RadioInfo::byKey(parser.value("radio").toLower()).id()) {
   case RadioInfo::RD5R: if (! verify<RD5R>(config, ctx)) return -1; break;
+  case RadioInfo::MD390: if (! verify<MD390>(config, ctx)) return -1; break;
   case RadioInfo::UV390: if (! verify<UV390>(config, ctx)) return -1; break;
   case RadioInfo::MD2017: if (! verify<MD2017>(config, ctx)) return -1; break;
-  case RadioInfo::DM1701: if (! verify<DM1701>(config, ctx)) return -1; break;
   case RadioInfo::GD73: if (! verify<GD73>(config, ctx)) return -1; break;
   case RadioInfo::GD77: if (! verify<GD77>(config, ctx)) return -1; break;
   case RadioInfo::OpenGD77: if (! verify<OpenGD77>(config, ctx)) return -1; break;
   case RadioInfo::OpenUV380: if (! verify<OpenUV380>(config, ctx)) return -1; break;
-  case RadioInfo::DM32UV: if (! verify<DM32UV>(config, ctx)) return -1; break;
+  case RadioInfo::DM1701: if (! verify<DM1701>(config, ctx)) return -1; break;
   case RadioInfo::DR1801UV: if (! verify<DR1801UV>(config, ctx)) return -1; break;
-  case RadioInfo::D868UV: if (! verify<D878UV>(config, ctx)) return -1; break;
+  case RadioInfo::DM32UV: if (! verify<DM32UV>(config, ctx)) return -1; break;
+  case RadioInfo::D868UV: if (! verify<D868UV>(config, ctx)) return -1; break;
   case RadioInfo::D878UV: if (! verify<D878UV>(config, ctx)) return -1; break;
   case RadioInfo::D878UVII: if (! verify<D878UV2>(config, ctx)) return -1; break;
   case RadioInfo::D578UV: if (! verify<D578UV>(config, ctx)) return -1; break;
   case RadioInfo::D168UV: if (! verify<D168UV>(config, ctx)) return -1; break;
+  case RadioInfo::DMR6X2UV: if (! verify<DMR6X2UV>(config, ctx)) return -1; break;
+  case RadioInfo::DMR6X2UV2: if (! verify<DMR6X2UV2>(config, ctx)) return -1; break;
   default:
     logError() << "Cannot verify code-plug against unknown radio '" << parser.value("radio").toLower() << "'.";
     return -1;
