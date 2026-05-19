@@ -375,6 +375,33 @@ public:
       return getTable(&T::staticMetaObject).indices.size();
     }
 
+    /** Returns a reference to the object table. */
+    template <class T>
+    const QHash<ConfigItem*, unsigned> &objects() {
+      return getTable(&T::staticMetaObject).objects;
+    }
+
+    /** Returns a reference to the index table. */
+    template <class T>
+    const QHash<ConfigItem*, unsigned> &indices() {
+      return getTable(&T::staticMetaObject).indices;
+    }
+
+    /** Search for an item of type T or a type derived from it, satisfying the given condition.
+     * Returns null otherwise. */
+    template <class T>
+    T* find(std::function<bool(T*)> test) {
+      if (! hasTable(&T::staticMetaObject))
+        return nullptr;
+      for (auto item: getTable(&T::staticMetaObject).indices.keys()) {
+        if (nullptr == qobject_cast<T*>(item))
+          continue;
+        if (test(qobject_cast<T*>(item)))
+          return qobject_cast<T*>(item);
+      }
+      return nullptr;
+    }
+
   protected:
     /** Internal used table type to associate objects and indices. */
     class Table {

@@ -1065,13 +1065,12 @@ DM32UVCodeplug::GroupListElement::link(RXGroupList *gl, Context &ctx, const Erro
   for (unsigned int i=0; i<Limit::contacts(); i++) {
     if (! validId(i))
       continue;
-    DMRContact* contact = nullptr;
-    for (unsigned int j=0; j<ctx.count<DigitalContact>(); j++) {
-      if (id(i) == ctx.get<DMRContact>(j)->number()) {
-        contact = ctx.get<DMRContact>(j);
-        break;
-      }
-    }
+    DMRContact* contact = qobject_cast<DMRContact*>(
+      ctx.find<DigitalContact>([this, i](DigitalContact *item) {
+        if (nullptr == qobject_cast<DMRContact*>(item))
+          return false;
+        return this->id(i) == qobject_cast<DMRContact*>(item)->number();
+      }));
     if (nullptr == contact) {
       contact = new DMRContact(DMRContact::GroupCall, "Group Call", id(i));
       ctx.config()->contacts()->add(contact);
@@ -2032,11 +2031,12 @@ DM32UVCodeplug::RoamingZoneElement::decode(Context &ctx, const ErrorStack &err) 
 
 bool
 DM32UVCodeplug::RoamingZoneElement::link(RoamingZone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
   for (unsigned int i=0; i<count(); i++) {
     if (! ctx.has<RoamingChannel>(channelIndex(i))) {
-      errMsg(err) << "Cannot resolve " << i << "-th channel index " << channelIndex(i)
-                  << ": Not defined.";
-      return false;
+      logWarn() << "Cannot resolve " << i << "-th roaming channel index " << channelIndex(i)
+                << ": Not defined.";
+      continue;
     }
     zone->addChannel(ctx.get<RoamingChannel>(channelIndex(i)));
   }
@@ -3594,13 +3594,12 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  DMRContact *cont = nullptr;
-  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
-    if (destinationId() == ctx.get<DMRContact>(i)->number()) {
-      cont = ctx.get<DMRContact>(i);
-      break;
-    }
-  }
+  auto cont = qobject_cast<DMRContact *>(
+    ctx.find<DigitalContact>([this](DigitalContact *item) {
+      if (nullptr == qobject_cast<DMRContact*>(item))
+        return false;
+      return this->destinationId() == qobject_cast<DMRContact*>(item)->number();
+    }));
   if (nullptr == cont) {
     cont = new DMRContact(callType(), "DMR APRS Contact", destinationId());
     ctx.config()->contacts()->add(cont);
@@ -4428,7 +4427,7 @@ DM32UVCodeplug::decodeContacts(Context &ctx, const ErrorStack &err) {
     auto contact = ContactElement(data(addr)).decode(ctx, err);
     logDebug() << "Decoded contact '" << contact->name()
                << "' (" << contact->number() << ") at index " << i << ".";
-    ctx.add(contact, c++);
+    ctx.add(contact, i); c++;
     ctx.config()->contacts()->add(contact);
   }
 
