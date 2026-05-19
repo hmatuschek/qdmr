@@ -397,6 +397,30 @@ protected:
 };
 
 
+/** Specialization checking if frequencies lay on a fixed raster.
+ * @ingroup limits */
+class RadioLimitFrequencyRaster: public RadioLimitFrequencies
+{
+  Q_OBJECT
+
+public:
+  /** Empty constructor. */
+  explicit RadioLimitFrequencyRaster(RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                                     QObject *parent=nullptr);
+  /** Constructor from initializer list. */
+  RadioLimitFrequencyRaster(const RangeList &ranges,
+                            const Frequency &raster,
+                            RadioLimitIssue::Severity severity=RadioLimitIssue::Severity::Warning,
+                            QObject *parent=nullptr);
+
+  bool verify(const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const override;
+
+protected:
+  /** Offset between channels. */
+  Frequency _raster;
+};
+
+
 /** Specialization for transmit frequency limits.
  * The verification is only performed if the channel is not "RX Only".
  * @ingroup limits */

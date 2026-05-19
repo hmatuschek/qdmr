@@ -403,5 +403,16 @@ GD73Test::testSquelchEcoding() {
 }
 
 
+void
+GD73Test::testFrequencyRaster() {
+  Config config; config.copy(_basicConfig);
+  // Set RX frequency outside 12.5kHz raster.
+  config.channelList()->channel(0)->setRXFrequency(Frequency::fromMHz(144.0123));
+
+  RadioLimitContext ctx;
+  QVERIFY(GD73Limits().verifyConfig(&_basicConfig, ctx));
+  QVERIFY(!GD73Limits().verifyConfig(&config, ctx));
+}
+
 QTEST_GUILESS_MAIN(GD73Test)
 

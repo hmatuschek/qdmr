@@ -488,6 +488,50 @@ RadioLimitFrequencies::verify(const ConfigItem *item, const QMetaProperty &prop,
 }
 
 
+
+/* ********************************************************************************************* *
+ * Implementation of RadioLimitFrequencyRaster
+ * ********************************************************************************************* */
+RadioLimitFrequencyRaster::RadioLimitFrequencyRaster(
+  RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitFrequencies(severity, parent)
+{
+  // pass...
+}
+
+RadioLimitFrequencyRaster::RadioLimitFrequencyRaster(
+  const RangeList &ranges, const Frequency &raster,
+  RadioLimitIssue::Severity severity, QObject *parent)
+  : RadioLimitFrequencies(ranges, severity, parent), _raster(raster)
+{
+  // pass...
+}
+
+bool
+RadioLimitFrequencyRaster::verify(
+  const ConfigItem *item, const QMetaProperty &prop, RadioLimitContext &context) const
+{
+  if (context.ignoreFrequencyLimits())
+    return true;
+
+  if (! RadioLimitFrequencies::verify(item, prop, context))
+    return false;
+
+  auto value = prop.read(item).value<Frequency>();
+  foreach (const FrequencyRange &range, _frequencyRanges) {
+    if (! range.contains(value))
+      continue;
+    FrequencyOffset offset = value-range.lower;
+    if (0 == (offset.inHz() % _raster.inHz()))
+      return true;
+  }
+
+  auto &msg = context.newMessage(RadioLimitIssue::Warning);
+  msg << "The frequency " << value.format() << " does not lay on a " << _raster.format()
+      << "-raster.";
+  return (_severity < RadioLimitIssue::Severity::Critical);
+}
+
 /* ********************************************************************************************* *
  * Implementation of RadioLimitTransmitFrequencies
  * ********************************************************************************************* */
