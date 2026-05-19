@@ -1145,7 +1145,7 @@ DM32UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err
       errMsg(err) << "Cannot decode " << i << "-th group list.";
       return false;
     }
-    ctx.add(gl, c++);
+    ctx.add(gl, i); c++;
     ctx.config()->rxGroupLists()->add(gl);
   }
 
@@ -1154,10 +1154,10 @@ DM32UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err
 
 bool
 DM32UVCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) {
-  for (unsigned int i=0,c=0; i<Limit::groupLists(); i++) {
+  for (unsigned int i=0; i<Limit::groupLists(); i++) {
     if (! bitmap().isEncoded(i))
       continue;
-    auto gl = ctx.get<RXGroupList>(c++);
+    auto gl = ctx.get<RXGroupList>(i);
     if (! groupList(i).link(gl, ctx, err)) {
       errMsg(err) << "Cannot link " << i << "-th group list.";
       return false;
