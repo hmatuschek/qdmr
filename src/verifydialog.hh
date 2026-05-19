@@ -14,6 +14,9 @@ public:
 
 public:
   explicit VerifyDialog(const RadioLimitContext &ctx, bool upload, QWidget *parent = nullptr);
+
+protected:
+  void closeEvent(QCloseEvent *event);
 };
 
 #endif // VERIFYDIALOG_HH

@@ -3,6 +3,7 @@
 #include "application.hh"
 #include <QPushButton>
 #include <QLabel>
+#include "settings.hh"
 
 
 VerifyDialog::VerifyDialog(const RadioLimitContext &issues, bool upload, QWidget *parent)
@@ -63,4 +64,13 @@ VerifyDialog::VerifyDialog(const RadioLimitContext &issues, bool upload, QWidget
     ignore->setEnabled(valid);
     uploadMessage->setVisible(! valid);
   }
+
+  restoreGeometry(Settings().windowState(objectName()));
+}
+
+
+void
+VerifyDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
 }

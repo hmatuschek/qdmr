@@ -13,7 +13,7 @@
 class Config;
 
 
-class RXGroupListDialog: public QDialog, private Ui::RXGroupListDialog
+class RXGroupListDialog: public QDialog, private Ui::GroupListDialog
 {
 	Q_OBJECT
 
@@ -29,6 +29,7 @@ protected slots:
 
 protected:
 	void construct();
+  void closeEvent(QCloseEvent *event);
 
 protected:
 	Config *_config;

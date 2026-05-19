@@ -6,7 +6,7 @@
 #include "config.hh"
 
 namespace Ui {
-  class aprssystemdialog;
+  class APRSSystemDialog;
 }
 
 class APRSSystemDialog : public QDialog
@@ -22,6 +22,7 @@ public:
   FMAPRSSystem *aprsSystem();
 
 protected:
+  void closeEvent(QCloseEvent *event);
   void construct();
   QIcon aprsIcon(FMAPRSSystem::Icon icon);
 
@@ -31,7 +32,7 @@ protected:
   FMAPRSSystem *_aprs;
 
 private:
-  Ui::aprssystemdialog *ui;
+  Ui::APRSSystemDialog *ui;
   QImage _icons0;
 };
 

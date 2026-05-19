@@ -21,6 +21,7 @@ public:
 
 protected:
   void construct();
+  void closeEvent(QCloseEvent *event);
 
 private:
   Ui::DMRIDDialog *ui;

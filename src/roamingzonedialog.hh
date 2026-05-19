@@ -17,6 +17,9 @@ public:
 
   RoamingZone *zone();
 
+protected:
+  void closeEvent(QCloseEvent *event);
+
 protected slots:
   void construct();
 

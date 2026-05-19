@@ -64,6 +64,14 @@ ScanListDialog::construct() {
   connect(remChannel, SIGNAL(clicked()), this, SLOT(onRemChannel()));
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+  restoreGeometry(Settings().windowState(objectName()));
+}
+
+void
+ScanListDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(this->objectName(), this->saveGeometry());
+  QDialog::closeEvent(event);
 }
 
 void

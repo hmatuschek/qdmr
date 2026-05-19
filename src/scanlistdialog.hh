@@ -25,6 +25,7 @@ protected slots:
 
 protected:
 	void construct();
+  void closeEvent(QCloseEvent *event);
 
 protected:
 	Config *_config;

@@ -31,6 +31,14 @@ DMRIDDialog::construct() {
 
   ui->extensionView->setObjectName("dmrRadioIdExtension");
   ui->extensionView->setObject(_myID, _config);
+
+  restoreGeometry(Settings().windowState(objectName()));
+}
+
+void
+DMRIDDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
 }
 
 DMRIDDialog::~DMRIDDialog() {

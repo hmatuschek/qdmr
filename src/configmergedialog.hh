@@ -19,6 +19,9 @@ public:
   ConfigMergeVisitor::ItemStrategy itemStrategy() const;
   ConfigMergeVisitor::SetStrategy setStrategy() const;
 
+protected:
+  void closeEvent(QCloseEvent *event);
+
 private slots:
   void onItemStrategySelected(int idx);
   void onSetStrategySelected(int idx);

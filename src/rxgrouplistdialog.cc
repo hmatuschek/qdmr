@@ -59,8 +59,16 @@ RXGroupListDialog::construct() {
 
   extensionView->setObjectName("groupListExtension");
   extensionView->setObject(_myGroupList, _config);
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
+
+void
+RXGroupListDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
+}
 
 void
 RXGroupListDialog::onAddGroup() {

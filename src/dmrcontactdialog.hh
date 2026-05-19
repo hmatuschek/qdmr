@@ -31,6 +31,7 @@ protected slots:
   void onCompleterActivated(const QModelIndex &idx);
 
 protected:
+  void closeEvent(QCloseEvent *event) override;
   void construct();
 
 private:

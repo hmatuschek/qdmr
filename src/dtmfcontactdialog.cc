@@ -40,6 +40,14 @@ DTMFContactDialog::construct() {
 
   ui->extensionView->setObjectName("dtmfContactExtension");
   ui->extensionView->setObject(_myContact, _config);
+
+  restoreGeometry(Settings().windowState(objectName()));
+}
+
+void
+DTMFContactDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
 }
 
 DTMFContact *

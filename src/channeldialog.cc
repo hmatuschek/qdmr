@@ -3,7 +3,7 @@
 #include "settings.hh"
 #include "application.hh"
 #include "ui_channeldialog.h"
-
+#include <QCloseEvent>
 
 
 ChannelDialog::ChannelDialog(Config *config, QWidget *parent)
@@ -60,11 +60,19 @@ ChannelDialog::ChannelDialog(Config *config, QWidget *parent)
 
   connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &ChannelDialog::accept);
   connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &ChannelDialog::reject);
+
+  restoreGeometry(settings.windowState(objectName()));
 }
 
 
 ChannelDialog::~ChannelDialog() {
   delete ui;
+}
+
+void
+ChannelDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
 }
 
 

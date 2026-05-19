@@ -19,6 +19,9 @@ public:
 
   const Satellite &satellite() const;
 
+protected:
+  void closeEvent(QCloseEvent *event) override;
+
 public slots:
   void accept() override;
 

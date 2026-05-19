@@ -51,6 +51,15 @@ ZoneDialog::construct() {
   connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
   connect(zoneHint, SIGNAL(linkActivated(QString)), this, SLOT(onHideZoneHint()));
+
+  restoreGeometry(Settings().windowState(objectName()));
+}
+
+
+void
+ZoneDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
 }
 
 void

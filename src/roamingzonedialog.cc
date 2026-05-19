@@ -42,8 +42,15 @@ RoamingZoneDialog::construct() {
   connect(addRoam, SIGNAL(clicked(bool)), this, SLOT(onAddRoamingChannel()));
   connect(addDMR, SIGNAL(clicked(bool)), this, SLOT(onAddDMRChannel()));
   connect(rem, SIGNAL(clicked(bool)), this, SLOT(onRemChannel()));
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
+void
+RoamingZoneDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
+}
 
 void
 RoamingZoneDialog::onAddDMRChannel() {

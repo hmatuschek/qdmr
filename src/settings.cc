@@ -351,13 +351,19 @@ Settings::setConfigMergeSetStrategy(ConfigMergeVisitor::SetStrategy strategy) {
   setValue("configMergeSetStrategy", (uint)strategy);
 }
 
+
 QByteArray
-Settings::mainWindowState() const {
-  return value("mainWindowState", QByteArray()).toByteArray();
+Settings::windowState(const QString &objName) const {
+  if (objName.isEmpty())
+    return QByteArray();
+  return value(QString("windowState/%1").arg(objName), QByteArray()).toByteArray();
 }
+
 void
-Settings::setMainWindowState(const QByteArray &state) {
-  setValue("mainWindowState", state);
+Settings::setWindowState(const QString &objName, const QByteArray &state) {
+  if (objName.isEmpty())
+    return;
+  setValue(QString("windowState/%1").arg(objName), state);
 }
 
 QByteArray
@@ -468,6 +474,14 @@ SettingsDialog::SettingsDialog(QWidget *parent)
 
   connect(Ui::SettingsDialog::dbLimitEnable, SIGNAL(toggled(bool)), this, SLOT(onDBLimitToggled(bool)));
   connect(Ui::SettingsDialog::useUserId, SIGNAL(toggled(bool)), this, SLOT(onUseUserDMRIdToggled(bool)));
+
+  restoreGeometry(Settings().windowState(objectName()));
+}
+
+void
+SettingsDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
 }
 
 bool

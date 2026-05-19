@@ -43,7 +43,7 @@ SatelliteDatabaseDialog::SatelliteDatabaseDialog(SatelliteDatabase *db, QWidget 
   // Beacon
   //ui->satellitesView->setItemDelegateForColumn(10, new TransponderFrequencyDelegate(false, Transponder::Mode::CW));
 
-  this->restoreGeometry(Settings().headerState(objectName()));
+  this->restoreGeometry(Settings().windowState(objectName()));
   ui->satellitesView->horizontalHeader()->restoreState(
         Settings().headerState(ui->satellitesView->objectName()));
 }
@@ -52,7 +52,7 @@ SatelliteDatabaseDialog::SatelliteDatabaseDialog(SatelliteDatabase *db, QWidget 
 SatelliteDatabaseDialog::~SatelliteDatabaseDialog()
 {
   Settings settings;
-  settings.setHeaderState(this->objectName(), this->saveGeometry());
+  settings.setWindowState(this->objectName(), this->saveGeometry());
   settings.setHeaderState(ui->satellitesView->objectName(),
                           ui->satellitesView->horizontalHeader()->saveState());
 

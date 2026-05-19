@@ -3,13 +3,17 @@
 #include "ui_channeldialog.h"
 #include "squelchedit.hh"
 #include "config.hh"
+#include "settings.hh"
 
 
 AMChannelDialog::AMChannelDialog(Config *config, QWidget *parent)
   : ChannelDialog(config, parent), _clone(nullptr), _orig(nullptr), _squelch(nullptr)
 {
+  setObjectName("AMChannelDialog");
   ui->rightForm->addRow(tr("Squelch"),
     _squelch = new ChannelSquelchEdit(_config->settings()->audio()->squelch()));
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
 void

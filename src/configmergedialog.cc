@@ -2,6 +2,7 @@
 #include "ui_configmergedialog.h"
 #include "configmergevisitor.hh"
 #include "settings.hh"
+#include <QCloseEvent>
 
 
 ConfigMergeDialog::ConfigMergeDialog(QWidget *parent) :
@@ -42,6 +43,14 @@ ConfigMergeDialog::ConfigMergeDialog(QWidget *parent) :
           this, SLOT(onSetStrategySelected(int)));
   connect(ui->buttonBox, SIGNAL(accepted()), SLOT(accept()));
   connect(ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
+
+  restoreGeometry(Settings().windowState(objectName()));
+}
+
+void
+ConfigMergeDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
 }
 
 ConfigMergeDialog::~ConfigMergeDialog() {

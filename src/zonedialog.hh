@@ -19,6 +19,9 @@ public:
 
 	Zone *zone();
 
+protected:
+  void closeEvent(QCloseEvent *event);
+
 protected slots:
 	void onAddChannelA();
 	void onRemChannelA();

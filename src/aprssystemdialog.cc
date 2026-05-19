@@ -1,6 +1,7 @@
 #include "aprssystemdialog.hh"
 #include "ui_aprssystemdialog.h"
 #include "settings.hh"
+#include <QCloseEvent>
 
 
 static QVector<QPair<FMAPRSSystem::Icon, QString>> aprsIconTable{
@@ -97,7 +98,7 @@ static QVector<QPair<FMAPRSSystem::Icon, QString>> aprsIconTable{
 
 APRSSystemDialog::APRSSystemDialog(Config *config, QWidget *parent)
   : QDialog(parent), _config(config), _myAPRS(new FMAPRSSystem()), _aprs(nullptr),
-    ui(new Ui::aprssystemdialog), _icons0(":/icons/aprs/table0.png")
+    ui(new Ui::APRSSystemDialog), _icons0(":/icons/aprs/table0.png")
 {
   setWindowTitle(tr("Create APRS system"));
   construct();
@@ -105,7 +106,7 @@ APRSSystemDialog::APRSSystemDialog(Config *config, QWidget *parent)
 
 APRSSystemDialog::APRSSystemDialog(Config *config, FMAPRSSystem *aprs, QWidget *parent)
   : QDialog(parent), _config(config), _myAPRS(new FMAPRSSystem()), _aprs(aprs),
-    ui(new Ui::aprssystemdialog), _icons0(":/icons/aprs/table0.png")
+    ui(new Ui::APRSSystemDialog), _icons0(":/icons/aprs/table0.png")
 {
   setWindowTitle(tr("Edit APRS system"));
 
@@ -165,6 +166,14 @@ APRSSystemDialog::construct() {
 
   ui->extensionView->setObjectName("aprsSystemExtension");
   ui->extensionView->setObject(_myAPRS, _config);
+
+  restoreGeometry(Settings().windowState(objectName()));
+}
+
+void
+APRSSystemDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
 }
 
 FMAPRSSystem *
