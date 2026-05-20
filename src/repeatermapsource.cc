@@ -42,7 +42,7 @@ RepeaterMapSource::prepareRequest(QNetworkRequest &request) {
     QUrl url(request.url());
     QUrlQuery query(url);
     logDebug() << "Get repeater near " << _searchPosition.toString()
-    << " (radius " << _searchRadius << "km) from repeatermap.de";
+               << " (radius " << _searchRadius << "km) from repeatermap.de";
     query.addQueryItem("lat", QString::number(_searchPosition.latitude()));
     query.addQueryItem("lon", QString::number(_searchPosition.longitude()));
     query.addQueryItem("radius", QString::number(_searchRadius));

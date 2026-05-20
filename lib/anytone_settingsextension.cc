@@ -896,7 +896,9 @@ AnytoneKeySettingsExtension::AnytoneKeySettingsExtension(QObject *parent)
     _funcKey5Short(KeyFunction::Reverse), _funcKey5Long(KeyFunction::Dial),
     _funcKey6Short(KeyFunction::Encryption), _funcKey6Long(KeyFunction::Off),
     _funcKeyAShort(KeyFunction::Off), _funcKeyALong(KeyFunction::Encryption),
+    _funcKeyAVeryLong(KeyFunction::Off),
     _funcKeyBShort(KeyFunction::Voltage), _funcKeyBLong(KeyFunction::Call),
+    _funcKeyBVeryLong(KeyFunction::Off),
     _funcKeyCShort(KeyFunction::Power), _funcKeyCLong(KeyFunction::VOX),
     _funcKeyDShort(KeyFunction::Off), _funcKeyDLong(KeyFunction::Off),
     _funcKnobShort(KeyFunction::Off), _funcKnobLong(KeyFunction::Off),
@@ -1078,6 +1080,21 @@ AnytoneKeySettingsExtension::setFuncKeyALong(KeyFunction func) {
   emit modified(this);
 }
 
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyAVeryLong() const {
+  return _funcKeyAVeryLong;
+}
+
+void
+AnytoneKeySettingsExtension::setFuncKeyAVeryLong(KeyFunction func) {
+  if (_funcKeyAVeryLong == func)
+    return;
+  _funcKeyAVeryLong = func;
+  emit modified(this);
+}
+
+
 AnytoneKeySettingsExtension::KeyFunction
 AnytoneKeySettingsExtension::funcKeyBShort() const {
   return _funcKeyBShort;
@@ -1100,6 +1117,20 @@ AnytoneKeySettingsExtension::setFuncKeyBLong(KeyFunction func) {
   _funcKeyBLong = func;
   emit modified(this);
 }
+
+AnytoneKeySettingsExtension::KeyFunction
+AnytoneKeySettingsExtension::funcKeyBVeryLong() const {
+  return _funcKeyBVeryLong;
+}
+
+void
+AnytoneKeySettingsExtension::setFuncKeyBVeryLong(KeyFunction func) {
+  if (_funcKeyBVeryLong == func)
+    return;
+  _funcKeyBVeryLong = func;
+  emit modified(this);
+}
+
 
 AnytoneKeySettingsExtension::KeyFunction
 AnytoneKeySettingsExtension::funcKeyCShort() const {

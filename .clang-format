@@ -92,7 +92,7 @@ BraceWrapping:
   AfterFunction:   false
   AfterNamespace:  false
   AfterObjCDeclaration: false
-  AfterStruct:     true
+  AfterStruct:     false
   AfterUnion:      false
   BeforeCatch:     false
   BeforeElse:      false

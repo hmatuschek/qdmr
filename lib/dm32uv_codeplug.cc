@@ -319,6 +319,27 @@ DM32UVCodeplug::ChannelElement::setColorCode(unsigned int cc) {
 
 
 bool
+DM32UVCodeplug::ChannelElement::hasKeyIndex() const {
+  return 0 != getUInt8(Offset::keyIndex());
+}
+
+unsigned int
+DM32UVCodeplug::ChannelElement::keyIndex() const {
+  return getUInt8(Offset::keyIndex())-1;
+}
+
+void
+DM32UVCodeplug::ChannelElement::setKeyIndex(unsigned int idx) {
+  setUInt8(Offset::keyIndex(), idx+1);
+}
+
+void
+DM32UVCodeplug::ChannelElement::clearKeyIndex() {
+  setUInt8(Offset::keyIndex(), 0);
+}
+
+
+bool
 DM32UVCodeplug::ChannelElement::encryptionEnabled() const {
   return getBit(Offset::encryptionEnable());
 }
@@ -498,6 +519,18 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
     if (dmrAPRSEnabled() && ctx.has<DMRAPRSSystem>(dmrAPRSChannelIndex())) {
       dmr->setAPRS(ctx.get<DMRAPRSSystem>(dmrAPRSChannelIndex()));
     }
+
+    // Link encryption key if enabled
+    if (encryptionEnabled() && hasKeyIndex()) {
+      if (ctx.has<EncryptionKey>(keyIndex())) {
+        if (nullptr == dmr->commercialExtension())
+          dmr->setCommercialExtension(new CommercialChannelExtension());
+        dmr->commercialExtension()->setEncryptionKey(ctx.get<EncryptionKey>(keyIndex()));
+      } else {
+        logWarn() << "Cannot link encryption key with index " << keyIndex()
+                  << " to channel '" << name() << "': key not found!";
+      }
+    }
   }    
 
   return true;
@@ -541,9 +574,8 @@ DM32UVCodeplug::ChannelElement::encode(const Channel *channel, Context &ctx, con
     setColorCode(dmr->colorCode());
     if (dmr->commercialExtension()) {
       enableEncryption(! dmr->commercialExtension()->encryptionKeyRef()->isNull());
-      if (! dmr->commercialExtension()->encryptionKeyRef()->isNull()) {
-        // reverse engineer encryption key index!
-      }
+      if (! dmr->commercialExtension()->encryptionKeyRef()->isNull())
+        setKeyIndex(ctx.index(dmr->commercialExtension()->encryptionKey()));
     }
     clearGroupListIndex();
     if (! dmr->groupListRef()->isNull()) {
@@ -1065,13 +1097,12 @@ DM32UVCodeplug::GroupListElement::link(RXGroupList *gl, Context &ctx, const Erro
   for (unsigned int i=0; i<Limit::contacts(); i++) {
     if (! validId(i))
       continue;
-    DMRContact* contact = nullptr;
-    for (unsigned int j=0; j<ctx.count<DigitalContact>(); j++) {
-      if (id(i) == ctx.get<DMRContact>(j)->number()) {
-        contact = ctx.get<DMRContact>(j);
-        break;
-      }
-    }
+    DMRContact* contact = qobject_cast<DMRContact*>(
+      ctx.find<DigitalContact>([this, i](DigitalContact *item) {
+        if (nullptr == qobject_cast<DMRContact*>(item))
+          return false;
+        return this->id(i) == qobject_cast<DMRContact*>(item)->number();
+      }));
     if (nullptr == contact) {
       contact = new DMRContact(DMRContact::GroupCall, "Group Call", id(i));
       ctx.config()->contacts()->add(contact);
@@ -1146,7 +1177,7 @@ DM32UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err
       errMsg(err) << "Cannot decode " << i << "-th group list.";
       return false;
     }
-    ctx.add(gl, c++);
+    ctx.add(gl, i); c++;
     ctx.config()->rxGroupLists()->add(gl);
   }
 
@@ -1155,10 +1186,10 @@ DM32UVCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err
 
 bool
 DM32UVCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) {
-  for (unsigned int i=0,c=0; i<Limit::groupLists(); i++) {
+  for (unsigned int i=0; i<Limit::groupLists(); i++) {
     if (! bitmap().isEncoded(i))
       continue;
-    auto gl = ctx.get<RXGroupList>(c++);
+    auto gl = ctx.get<RXGroupList>(i);
     if (! groupList(i).link(gl, ctx, err)) {
       errMsg(err) << "Cannot link " << i << "-th group list.";
       return false;
@@ -2032,11 +2063,12 @@ DM32UVCodeplug::RoamingZoneElement::decode(Context &ctx, const ErrorStack &err) 
 
 bool
 DM32UVCodeplug::RoamingZoneElement::link(RoamingZone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
   for (unsigned int i=0; i<count(); i++) {
     if (! ctx.has<RoamingChannel>(channelIndex(i))) {
-      errMsg(err) << "Cannot resolve " << i << "-th channel index " << channelIndex(i)
-                  << ": Not defined.";
-      return false;
+      logWarn() << "Cannot resolve " << i << "-th roaming channel index " << channelIndex(i)
+                << ": Not defined.";
+      continue;
     }
     zone->addChannel(ctx.get<RoamingChannel>(channelIndex(i)));
   }
@@ -3594,13 +3626,12 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
-  DMRContact *cont = nullptr;
-  for (unsigned int i=0; i<ctx.count<DigitalContact>(); i++) {
-    if (destinationId() == ctx.get<DMRContact>(i)->number()) {
-      cont = ctx.get<DMRContact>(i);
-      break;
-    }
-  }
+  auto cont = qobject_cast<DMRContact *>(
+    ctx.find<DigitalContact>([this](DigitalContact *item) {
+      if (nullptr == qobject_cast<DMRContact*>(item))
+        return false;
+      return this->destinationId() == qobject_cast<DMRContact*>(item)->number();
+    }));
   if (nullptr == cont) {
     cont = new DMRContact(callType(), "DMR APRS Contact", destinationId());
     ctx.config()->contacts()->add(cont);
@@ -4092,6 +4123,10 @@ DM32UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err
 bool
 DM32UVCodeplug::decode(Config *config, const ErrorStack &err) {
   Context ctx(config);
+  ctx.remTable(&BasicEncryptionKey::staticMetaObject, true);
+  ctx.remTable(&ARC4EncryptionKey::staticMetaObject, true);
+  ctx.remTable(&AESEncryptionKey::staticMetaObject, true);
+  ctx.addTable(&EncryptionKey::staticMetaObject);
 
   if (! decodeElements(ctx, err)) {
     errMsg(err) << "Cannot decode elements.";
@@ -4428,7 +4463,7 @@ DM32UVCodeplug::decodeContacts(Context &ctx, const ErrorStack &err) {
     auto contact = ContactElement(data(addr)).decode(ctx, err);
     logDebug() << "Decoded contact '" << contact->name()
                << "' (" << contact->number() << ") at index " << i << ".";
-    ctx.add(contact, c++);
+    ctx.add(contact, i); c++;
     ctx.config()->contacts()->add(contact);
   }
 

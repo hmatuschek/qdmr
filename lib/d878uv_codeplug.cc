@@ -2893,26 +2893,26 @@ D878UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorSta
 
   if (hasAutoRepeaterVHF2OffsetIndex()) {
     if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterVHF2OffsetIndex())) {
-      errMsg(err) << "Cannot link AnyTone settings extension: "
-                     "second auto-repeater VHF offset index "
-                  << this->autoRepeaterVHF2OffsetIndex() << " not defined.";
-      return false;
+      logWarn() << "Cannot link AnyTone settings extension: "
+                   "second auto-repeater VHF offset index "
+                << this->autoRepeaterVHF2OffsetIndex() << " not defined.";
+    } else {
+      ext->autoRepeaterSettings()->vhf2Ref()->set(
+            ctx.get<AnytoneAutoRepeaterOffset>(
+              this->autoRepeaterVHF2OffsetIndex()));
     }
-    ext->autoRepeaterSettings()->vhf2Ref()->set(
-          ctx.get<AnytoneAutoRepeaterOffset>(
-            this->autoRepeaterVHF2OffsetIndex()));
   }
 
   if (hasAutoRepeaterUHF2OffsetIndex()) {
     if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterUHF2OffsetIndex())) {
-      errMsg(err) << "Cannot link AnyTone settings extension: "
-                     "second auto-repeater UHF offset index "
-                  << this->autoRepeaterUHF2OffsetIndex() << " not defined.";
-      return false;
+      logWarn() << "Cannot link AnyTone settings extension: "
+                   "second auto-repeater UHF offset index "
+                << this->autoRepeaterUHF2OffsetIndex() << " not defined.";
+    } else {
+      ext->autoRepeaterSettings()->uhf2Ref()->set(
+            ctx.get<AnytoneAutoRepeaterOffset>(
+              this->autoRepeaterUHF2OffsetIndex()));
     }
-    ext->autoRepeaterSettings()->uhf2Ref()->set(
-          ctx.get<AnytoneAutoRepeaterOffset>(
-            this->autoRepeaterUHF2OffsetIndex()));
   }
 
   return true;

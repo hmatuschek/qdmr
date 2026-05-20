@@ -71,19 +71,19 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       RadioInfo id = anytone->identifier(err);
       if ((id.isValid() && (RadioInfo::D868UVE == id.id())) || (force.isValid() && (RadioInfo::D868UVE == force.id()))) {
         return new D868UV(anytone);
-      } else if ((id.isValid() && (RadioInfo::D878UV == id.id())) || (force.isValid() && (RadioInfo::D878UV == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::D878UV == id.id())) || (force.isValid() && (RadioInfo::D878UV == force.id()))) {
         return new D878UV(anytone);
-      } else if ((id.isValid() && (RadioInfo::D878UVII == id.id())) || (force.isValid() && (RadioInfo::D878UVII == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::D878UVII == id.id())) || (force.isValid() && (RadioInfo::D878UVII == force.id()))) {
         return new D878UV2(anytone);
-      } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
         return new D578UV(anytone);
-      } else if ((id.isValid() && (RadioInfo::DMR6X2UV == id.id())) || (force.isValid() && (RadioInfo::DMR6X2UV == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::DMR6X2UV == id.id())) || (force.isValid() && (RadioInfo::DMR6X2UV == force.id()))) {
         return new DMR6X2UV(anytone);
-      } else if ((id.isValid() && (RadioInfo::DMR6X2UV2 == id.id())) || (force.isValid() && (RadioInfo::DMR6X2UV2 == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::DMR6X2UV2 == id.id())) || (force.isValid() && (RadioInfo::DMR6X2UV2 == force.id()))) {
         return new DMR6X2UV2(anytone);
-      } else if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
         return new D578UV(anytone);
-      } else if (id.isValid()) {
+      } if (id.isValid()) {
         errMsg(err) << tr("Unhandled device %1 '%2'. Device known but not implemented yet.")
                        .arg(id.manufacturer())
                        .arg(id.name());
@@ -101,9 +101,9 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       RadioInfo id = anytone->identifier(err);
       if ((id.isValid() && (RadioInfo::D578UV == id.id())) || (force.isValid() && (RadioInfo::D578UV == force.id()))) {
         return new D578UV(anytone);
-      } else if ((id.isValid() && (RadioInfo::D168UV == id.id())) || (force.isValid() && (RadioInfo::D168UV == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::D168UV == id.id())) || (force.isValid() && (RadioInfo::D168UV == force.id()))) {
         return new D168UV(anytone);
-      } else if (id.isValid()) {
+      } if (id.isValid()) {
         errMsg(err) << tr("Unhandled device %1 '%2'. Device known but not implemented yet.")
                        .arg(id.manufacturer())
                        .arg(id.name());
@@ -121,11 +121,13 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       RadioInfo id = ogd77->identifier();
       if ((id.isValid() && (RadioInfo::OpenGD77 == id.id())) || (force.isValid() && (RadioInfo::OpenGD77 == force.id()))) {
         return new OpenGD77(ogd77);
-      } else if ((id.isValid() && (RadioInfo::OpenUV380 == id.id())) || (force.isValid() && (RadioInfo::OpenUV380 == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::OpenUV380 == id.id())) || (force.isValid() && (RadioInfo::OpenUV380 == force.id()))) {
         return new OpenUV380(ogd77);
-      } else {
+      } if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Cannot identify device.";
       }
       ogd77->close();
       ogd77->deleteLater();
@@ -139,9 +141,11 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       if ((id.isValid() && (RadioInfo::OpenRTX == id.id())) || (force.isValid() && (RadioInfo::OpenRTX == force.id()))) {
         logInfo() << "Yah!";
         return nullptr; //new OpenRTX(rtxIf);
-      } else {
+      } if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
         << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Cannot identify device.";
       }
       rtxIf->close();
       rtxIf->deleteLater();
@@ -154,16 +158,18 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       RadioInfo id = dfu->identifier();
       if ((id.isValid() && (RadioInfo::MD390 == id.id())) || (force.isValid() && (RadioInfo::MD390 == force.id()))) {
         return new MD390(dfu);
-      } else if ((id.isValid() && (RadioInfo::UV390 == id.id())) || (force.isValid() && (RadioInfo::UV390 == force.id()))) {
+      }  if ((id.isValid() && (RadioInfo::UV390 == id.id())) || (force.isValid() && (RadioInfo::UV390 == force.id()))) {
         return new UV390(dfu);
-      } else if ((id.isValid() && (RadioInfo::MD2017 == id.id())) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::MD2017 == id.id())) || (force.isValid() && (RadioInfo::MD2017 == force.id()))) {
         return new MD2017(dfu);
-      } else if ((id.isValid() && (RadioInfo::DM1701 == id.id())) || (force.isValid() && (RadioInfo::DM1701 == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::DM1701 == id.id())) || (force.isValid() && (RadioInfo::DM1701 == force.id()))) {
         logDebug() << "Create DM-1701 radio object.";
         return new DM1701(dfu);
-      } else {
+      } if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Cannot identify device.";
       }
       dfu->close();
       dfu->deleteLater();
@@ -176,9 +182,9 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       RadioInfo id = hid->identifier();
       if ((id.isValid() && (RadioInfo::RD5R == id.id())) || (force.isValid() && (RadioInfo::RD5R == force.id()))) {
         return new RD5R(hid);
-      } else if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
+      } if ((id.isValid() && (RadioInfo::GD77 == id.id())) || (force.isValid() && (RadioInfo::GD77 == force.id()))) {
         return new GD77(hid);
-      } else if (id.isValid()) {
+      } if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
       } else {
@@ -196,7 +202,7 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       RadioInfo id = dif->identifier(err);
       if (id.isValid() && (RadioInfo::DR1801UV == id.id())) {
         return new DR1801UV(dif);
-      } else if (id.isValid()) {
+      } if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
       } else {
@@ -214,9 +220,11 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       if ((id.isValid() && (RadioInfo::GD73 == id.id())) ||
           (force.isValid() && (RadioInfo::GD73 == force.id()))) {
         return new GD73(gdif);
-      } else {
+      } if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
                     << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Cannot identify device.";
       }
       gdif->close();
       gdif->deleteLater();
@@ -231,9 +239,11 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
         errMsg(err) << "Cannot identify device.";
       } else if (RadioInfo::DM32UV == id.id()) {
         return new DM32UV(dm32if);
-      } else {
+      } else if (id.isValid()) {
         errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
         << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Cannot identify device.";
       }
       dm32if->close();
       dm32if->deleteLater();

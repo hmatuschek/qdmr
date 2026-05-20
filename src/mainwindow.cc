@@ -95,6 +95,10 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   }, Qt::QueuedConnection);
   ui->actionUploadCallsignDB->setEnabled(app->user()->ready());
 
+  connect(app->repeater(), &RepeaterDatabase::error, this, [this](const QString &msg) {
+    this->ui->statusbar->showMessage(msg);
+  }, Qt::QueuedConnection);
+
   connect(ui->actionEditSatellites, SIGNAL(triggered()), app, SLOT(editSatellites()));
   connect(ui->actionDetectDevice, SIGNAL(triggered()), app, SLOT(detectRadio()));
   connect(ui->actionVerifyCodeplug, SIGNAL(triggered()), app, SLOT(verifyCodeplug()));
