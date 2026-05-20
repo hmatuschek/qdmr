@@ -75,6 +75,8 @@ qt6_add_executable(qdmr WIN32
 		channel_type_edit.hh
         melody_player.cc
         melody_player.hh
+        task_progress_view.cc
+        task_progress_view.hh
 )
 
 #

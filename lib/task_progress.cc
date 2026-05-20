@@ -51,6 +51,6 @@ DownloadTaskProgress::DownloadTaskProgress(const QString &label, QNetworkReply *
     if (reply->error() != QNetworkReply::NoError)
       this->finish(false, tr("Download failed."));
     else
-      this->finish(true, tr("Download complete"));W
+      this->finish(true, tr("Download complete"));
   });
 }
