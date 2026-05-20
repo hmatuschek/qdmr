@@ -1425,6 +1425,14 @@
     </message>
 </context>
 <context>
+    <name>DownloadableRepeaterDatabaseSource</name>
+    <message>
+        <location filename="../src/repeaterdatabase.cc" line="542"/>
+        <source>Cannot download repeater list from &apos;%1&apos;: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ErrorMessageView</name>
     <message>
         <location filename="../src/errormessageview.cc" line="12"/>
@@ -2635,7 +2643,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="280"/>
-        <location filename="../src/mainwindow.cc" line="107"/>
+        <location filename="../src/mainwindow.cc" line="111"/>
         <source>Settings</source>
         <translation>Paramètres</translation>
     </message>
@@ -2755,62 +2763,62 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation>Éléments orbitaux mis à jour et chargés.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="111"/>
+        <location filename="../src/mainwindow.cc" line="115"/>
         <source>Radio IDs</source>
         <translation>IDs de la radio</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="113"/>
+        <location filename="../src/mainwindow.cc" line="117"/>
         <source>Contacts</source>
         <translation>Contacts</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="115"/>
+        <location filename="../src/mainwindow.cc" line="119"/>
         <source>Group Lists</source>
         <translation>Listes de groupes</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="117"/>
+        <location filename="../src/mainwindow.cc" line="121"/>
         <source>Channels</source>
         <translation>Canaux</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="119"/>
+        <location filename="../src/mainwindow.cc" line="123"/>
         <source>Zones</source>
         <translation>Zones</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="121"/>
+        <location filename="../src/mainwindow.cc" line="125"/>
         <source>Scan Lists</source>
         <translation>Listes de recherche</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="123"/>
+        <location filename="../src/mainwindow.cc" line="127"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="125"/>
+        <location filename="../src/mainwindow.cc" line="129"/>
         <source>Roaming Channels</source>
         <translation>Canaux de roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="128"/>
+        <location filename="../src/mainwindow.cc" line="132"/>
         <source>Roaming Zones</source>
         <translation>Zones de roaming</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="132"/>
+        <location filename="../src/mainwindow.cc" line="136"/>
         <source>Extensions</source>
         <translation>Extensions</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="145"/>
+        <location filename="../src/mainwindow.cc" line="149"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Modifications au codeplug non sauvegardées.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="146"/>
+        <location filename="../src/mainwindow.cc" line="150"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>Modifications au codeplug non sauvegardées. Ces modifications seront perdues si vous continuez.</translation>
     </message>
@@ -3264,6 +3272,14 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/releasenotes.cc" line="59"/>
         <source>qDMR was updated to version %1</source>
         <translation type="unfinished">qdmr est mis à jour vers la version %1</translation>
+    </message>
+</context>
+<context>
+    <name>RepeaterBookSource</name>
+    <message>
+        <location filename="../src/repeaterbooksource.cc" line="70"/>
+        <source>Cannot query repeaterbook.com: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4075,7 +4091,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ouvert</translation>
     </message>
     <message>
         <location filename="../src/squelchedit.ui" line="45"/>
