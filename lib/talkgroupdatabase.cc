@@ -62,7 +62,10 @@ void
 TalkGroupDatabase::download() {
   QUrl url("https://api.brandmeister.network/v2/talkgroup/");
   QNetworkRequest request(url);
-  _network.get(request);
+  auto reply = _network.get(request);
+  // just forward the signal
+  connect(reply, &QNetworkReply::downloadProgress,
+    this, &TalkGroupDatabase::downloadProgress);
 }
 
 void
