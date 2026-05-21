@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
   parser.addHelpOption();
   parser.addVersionOption();
   parser.addPositionalArgument("codeplug", QCoreApplication::translate("main", "Codeplug file to load."));
-  parser.addOption({"loglevel", QCoreApplication::translate("main", "Specifies applications log-level to stdout. Must be one of `debug`, `info`, `warning`, `error` or `fatal`."), "loglevel", "info"});
+  parser.addOption({"loglevel", QCoreApplication::translate("main", "Specifies applications log-level to stdout. Must be one of `trace`, `debug`, `info`, `warning`, `error` or `fatal`."), "loglevel", "info"});
   parser.parse(app.arguments());
 
   // Handle args (if there are some)
@@ -34,15 +34,18 @@ int main(int argc, char *argv[])
   }
 
   if (parser.isSet("loglevel")) {
-    if ("debug" == parser.value("loglevel")) {
+    QString lvl = parser.value("loglevel").toLower();
+    if ("trace" == lvl) {
+      handler->setMinLevel(LogMessage::Level::TRACE);
+    } else if ("debug" == lvl) {
       handler->setMinLevel(LogMessage::Level::DEBUG);
-    } else if ("info" == parser.value("loglevel")) {
+    } else if ("info" == lvl) {
       handler->setMinLevel(LogMessage::Level::INFO);
-    } else if ("warning" == parser.value("loglevel")) {
+    } else if ("warning" == lvl) {
       handler->setMinLevel(LogMessage::Level::WARNING);
-    } else if ("error" == parser.value("loglevel")) {
+    } else if ("error" == lvl) {
       handler->setMinLevel(LogMessage::Level::ERROR);
-    } else if ("fatal" == parser.value("loglevel")) {
+    } else if ("fatal" == lvl) {
       handler->setMinLevel(LogMessage::Level::FATAL);
     }
   }
