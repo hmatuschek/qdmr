@@ -497,7 +497,10 @@ OpenGD77Interface::readEEPROM(uint32_t addr, uint8_t *data, uint16_t len, const 
     return false;
   }
 
-  memcpy(data, resp.data, qFromBigEndian(resp.length));
+  uint16_t respLen = qFromBigEndian(resp.length);
+  memcpy(data, resp.data, respLen);
+  logTrace() << "EEPROM read 0x" << QString::number(addr, 16) << " (" << respLen
+             << " bytes): " << QByteArray((const char *)data, respLen).toHex(' ');
   return true;
 }
 
@@ -583,7 +586,10 @@ OpenGD77Interface::readFlash(uint32_t addr, uint8_t *data, uint16_t len, const E
     return false;
   }
 
-  memcpy(data, resp.data, qFromBigEndian(resp.length));
+  uint16_t respLen = qFromBigEndian(resp.length);
+  memcpy(data, resp.data, respLen);
+  logTrace() << "FLASH read 0x" << QString::number(addr, 16) << " (" << respLen
+             << " bytes): " << QByteArray((const char *)data, respLen).toHex(' ');
   return true;
 }
 

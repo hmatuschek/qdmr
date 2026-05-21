@@ -8,6 +8,8 @@
 #include <QList>
 #include <QMutex>
 
+/** Constructs a trace message. */
+#define logTrace() LogMessage(LogMessage::TRACE, __FILE__, __LINE__)
 /** Constructs a debug message. */
 #define logDebug() LogMessage(LogMessage::DEBUG, __FILE__, __LINE__)
 /** Constructs an info message. */
@@ -34,6 +36,7 @@ class LogMessage: public QTextStream
 public:
   /** Possible log-levels. */
   typedef enum {
+    TRACE,    ///< Level for very verbose trace messages (e.g. raw IO dumps). Not shown unless requested.
     DEBUG,    ///< Level for debug messages. Will not be shown to the user unless requested.
     INFO,     ///< Level for informative messages. Will not be shown to the user unless requested.
     WARNING,  ///< Level for warning messages.
