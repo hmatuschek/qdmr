@@ -30,6 +30,8 @@ class OpenGD77ChannelExtension: public ConfigExtension
   Q_PROPERTY(bool beep READ beep WRITE enableBeep)
   /** The power save enable flag. */
   Q_PROPERTY(bool powerSave READ powerSave WRITE enablePowerSave)
+  /** If @c true, the fixed location is used for the APRS report instead of GPS. */
+  Q_PROPERTY(bool locationEnabled READ locationEnabled WRITE enableLocation)
   /** Sets a fixed location for the APRS report. */
   Q_PROPERTY(QString location READ locator WRITE setLocator)
   /** Sets the talker alias for timeslot 1. */
