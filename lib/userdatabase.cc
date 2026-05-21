@@ -213,7 +213,8 @@ void
 UserDatabase::download() {
   QUrl url("https://database.radioid.net/static/users.json");
   QNetworkRequest request(url);
-  _network.get(request);
+  auto reply = _network.get(request);
+  connect(reply, &QNetworkReply::downloadProgress, this, &UserDatabase::downloadProgress);
 }
 
 void

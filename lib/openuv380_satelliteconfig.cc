@@ -1,5 +1,6 @@
 #include "openuv380_satelliteconfig.hh"
 #include "errorstack.hh"
+#include "logger.hh"
 
 
 OpenUV380SatelliteConfig::OpenUV380SatelliteConfig(QObject *parent)
@@ -25,8 +26,24 @@ bool
 OpenUV380SatelliteConfig::encode(SatelliteDatabase *db, const ErrorStack &err) {
   OpenGD77BaseCodeplug::AdditionalSettingsElement settings(data(Offset::satellites(), FLASH));
   if (! settings.isValid()) {
-    errMsg(err) << "Cannot encode satellite config for OpenUV380: Invalid settings element.";
-    return false;
+    QString magic = settings.magic();
+    unsigned int version = settings.version();
+    // Only refuse when a real "OpenGD77" header is present with an unknown
+    // version: that's a newer firmware format we must not trash. Anything else
+    // (virgin flash 0xff, leftovers from a previous firmware, factory garbage)
+    // is fair game — the firmware itself ignores the region without the magic.
+    if (magic == "OpenGD77") {
+      errMsg(err) << "Refusing to overwrite OpenGD77 additional-settings region: "
+                  << "version " << version << " is not supported (expected 1). "
+                  << "The radio firmware may be newer than this qdmr build.";
+      return false;
+    }
+    logDebug() << "OpenUV380 additional-settings region at 0x"
+               << QString::number(Offset::satellites(), 16)
+               << " has no valid header (magic='" << magic
+               << "', version=" << version << "). "
+               << "Initializing OpenGD77 settings header.";
+    settings.clear();
   }
 
   OpenGD77BaseCodeplug::SatelliteBankElement bank = settings.satellites();
