@@ -2,6 +2,10 @@
 
 #include <QNetworkReply>
 
+#include "radio.hh"
+#include "radio.hh"
+
+
 
 /* ********************************************************************************************** *
  * TaskProgress
@@ -52,5 +56,32 @@ DownloadTaskProgress::DownloadTaskProgress(const QString &label, QNetworkReply *
       this->finish(false, tr("Download failed."));
     else
       this->finish(true, tr("Download complete"));
+  });
+}
+
+
+
+/* ********************************************************************************************** *
+ * RadioTransferTaskProgress
+ * ********************************************************************************************** */
+RadioTransferTaskProgress::RadioTransferTaskProgress(const QString &label, Radio *radio, QObject *parent)
+  : TaskProgress{label, parent} {
+  connect(radio, &Radio::downloadProgress, this, &TaskProgress::progress);
+  connect(radio, &Radio::downloadError, [this](Radio *radio) {
+    Q_UNUSED(radio);
+    finish(false, tr("Read failed."));
+  });
+  connect(radio, &Radio::downloadFinished, [this](Radio *radio) {
+    Q_UNUSED(radio);
+    finish(true, tr("Read complete."));
+  });
+  connect(radio, &Radio::uploadProgress, this, &TaskProgress::progress);
+  connect(radio, &Radio::uploadError, [this](Radio *radio) {
+    Q_UNUSED(radio);
+    finish(false, tr("Write failed."));
+  });
+  connect(radio, &Radio::uploadComplete, [this](Radio *radio) {
+    Q_UNUSED(radio);
+    finish(true, tr("Write complete."));
   });
 }

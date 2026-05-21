@@ -5,6 +5,7 @@
 #include <QTimer>
 
 class QNetworkReply;
+class Radio;
 
 
 /** Represents the current progress of a task. */
@@ -48,6 +49,16 @@ class DownloadTaskProgress: public TaskProgress
 
 public:
   DownloadTaskProgress(const QString &label, QNetworkReply *reply, QObject *parent = nullptr);
+};
+
+
+/** A radio transfer task progress. */
+class RadioTransferTaskProgress: public TaskProgress
+{
+  Q_OBJECT
+
+public:
+  RadioTransferTaskProgress(const QString &label, Radio *radio, QObject *parent = nullptr);
 };
 
 #endif //QDMR_TASK_PROGRESS_HH
