@@ -629,7 +629,8 @@ DM32UVCodeplug::ChannelElement::decodeSelectiveCall(uint16_t code) {
   code &= 0x3fff;
 
   if (0 == type) {
-    return SelectiveCall(double((code>>8)&0xf)*10 + double((code>>4)&0xf)*1 + double(code & 0xf)/10);
+    return SelectiveCall(double((code>>12)&0xf)*100 + double((code>>8)&0xf)*10
+      + double((code>>4)&0xf)*1 + double(code & 0xf)/10);
   } else if ((1 == type) || (2 == type)) {
     return SelectiveCall(code, 2 == type);
   }
@@ -642,7 +643,9 @@ DM32UVCodeplug::ChannelElement::encodeSelectiveCall(const SelectiveCall &tone) {
   if (! tone.isValid())
     return 0xffff;
   if (tone.isCTCSS())
-    return (((tone.mHz()/10000) % 10) << 8) | (((tone.mHz()/1000) % 10) << 4) | ((tone.mHz()/100) % 10);
+    return (((tone.mHz()/100000) % 10) << 12)
+      | (((tone.mHz()/10000) % 10) << 8)
+      | (((tone.mHz()/1000) % 10) << 4) | ((tone.mHz()/100) % 10);
   if (tone.isDCS())
     return ((tone.isInverted() ? 2 : 1) << 14) | tone.octalCode();
   return 0xffff;
