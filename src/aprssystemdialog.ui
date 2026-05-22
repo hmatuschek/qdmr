@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>aprssystemdialog</class>
- <widget class="QDialog" name="aprssystemdialog">
+ <class>APRSSystemDialog</class>
+ <widget class="QDialog" name="APRSSystemDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>569</width>
-    <height>431</height>
+    <height>474</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -197,10 +197,10 @@
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
-      <enum>Qt::Horizontal</enum>
+      <enum>Qt::Orientation::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
      </property>
     </widget>
    </item>
@@ -219,7 +219,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>aprssystemdialog</receiver>
+   <receiver>APRSSystemDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -235,7 +235,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>aprssystemdialog</receiver>
+   <receiver>APRSSystemDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

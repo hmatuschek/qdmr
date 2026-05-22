@@ -15,11 +15,11 @@ SatelliteSelectionDialog::SatelliteSelectionDialog(OrbitalElementsDatabase *db, 
   ui->satellites->hideColumn(2);
 
   SearchPopup::attach(ui->satellites);
-  this->restoreGeometry(Settings().headerState(objectName()));
+  this->restoreGeometry(Settings().windowState(objectName()));
 }
 
 SatelliteSelectionDialog::~SatelliteSelectionDialog() {
-  Settings().setHeaderState(this->objectName(), this->saveGeometry());
+  Settings().setWindowState(this->objectName(), this->saveGeometry());
   delete ui;
 }
 

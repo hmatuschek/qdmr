@@ -70,8 +70,8 @@ DMRContactDialog::DMRContactDialog(DMRContact *contact, UserDatabase *users,
   construct();
 }
 
-DMRContactDialog::~DMRContactDialog()
-{
+DMRContactDialog::~DMRContactDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 
@@ -105,7 +105,10 @@ DMRContactDialog::construct() {
   connect(ui->typeComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onTypeChanged(int)));
   connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
+
 
 void
 DMRContactDialog::onTypeChanged(int idx) {

@@ -37,6 +37,12 @@
            </item>
            <item row="0" column="1">
             <widget class="QLineEdit" name="introLine1">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>First greeting line (if supported by the radio).</string>
              </property>
@@ -54,6 +60,12 @@
            </item>
            <item row="1" column="1">
             <widget class="QLineEdit" name="introLine2">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Second greeting line (if supported by the radio).</string>
              </property>
@@ -88,6 +100,12 @@
            </item>
            <item row="0" column="1">
             <widget class="QSpinBox" name="mic">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Specifies the default (DMR) microphone amplifiction level.</string>
              </property>
@@ -108,6 +126,12 @@
            </item>
            <item row="1" column="1">
             <widget class="QSpinBox" name="fmMicGain">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="specialValueText">
               <string extracomment="Special value indicating, that the global default mic gain should be used.">default</string>
              </property>
@@ -125,6 +149,12 @@
            </item>
            <item row="2" column="1">
             <widget class="QSpinBox" name="squelch">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="specialValueText">
               <string extracomment="Special value for the squelch setting, disabling/opening the squelch.">open</string>
              </property>
@@ -148,7 +178,7 @@
              <item>
               <widget class="QSpinBox" name="dmrSquelch">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -163,6 +193,12 @@
              </item>
              <item>
               <widget class="QCheckBox" name="dmrSquelchDefault">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="toolTip">
                 <string>Disables a separate squelch level for DMR. Uses the default one.</string>
                </property>
@@ -182,6 +218,12 @@
            </item>
            <item row="4" column="1">
             <widget class="QSpinBox" name="voxValue">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Specifies the VOX sensitivity.</string>
              </property>
@@ -202,6 +244,12 @@
            </item>
            <item row="5" column="1">
             <widget class="QLineEdit" name="voxDelay">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Specifies the delay between voice detection and transmission. E.g. 500 ms.</string>
              </property>
@@ -216,6 +264,12 @@
            </item>
            <item row="6" column="1">
             <widget class="QSpinBox" name="maxSpeakerVolume">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Limits the maximum speaker volume.</string>
              </property>
@@ -239,6 +293,12 @@
            </item>
            <item row="7" column="1">
             <widget class="QSpinBox" name="maxHeadphoneVolume">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Limits the maximum headphone volume.</string>
              </property>
@@ -262,6 +322,12 @@
            </item>
            <item row="8" column="1">
             <widget class="QCheckBox" name="speech">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="text">
               <string/>
              </property>
@@ -290,6 +356,12 @@
            </item>
            <item row="0" column="1">
             <widget class="QCheckBox" name="disableAllTones">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Disables all tones.</string>
              </property>
@@ -307,6 +379,12 @@
            </item>
            <item row="1" column="1">
             <widget class="QSpinBox" name="keyToneVolume">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="specialValueText">
               <string extracomment="Special value of a spin box indicating that keytones are disabled.">off</string>
              </property>
@@ -324,6 +402,12 @@
            </item>
            <item row="2" column="1">
             <widget class="QCheckBox" name="smsTone">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Enables a tone on SMS reception.</string>
              </property>
@@ -341,6 +425,12 @@
            </item>
            <item row="3" column="1">
             <widget class="QCheckBox" name="ringtone">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="toolTip">
               <string>Enables the ringtone on incoming private calls.</string>
              </property>
@@ -379,6 +469,12 @@
             <layout class="QVBoxLayout" name="bootMelodyLayout">
              <item>
               <widget class="QCheckBox" name="bootMelodyEnable">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string extracomment="Label for a checkbox, enabling the boot melody">Enabled</string>
                </property>
@@ -488,6 +584,12 @@
              </property>
              <item>
               <widget class="QCheckBox" name="callResetEnable">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
                <property name="text">
                 <string extracomment="Label for a checkbox enabling the call-reset tone.">Enabled</string>
                </property>
@@ -518,6 +620,12 @@
            </item>
            <item row="0" column="1">
             <widget class="QComboBox" name="powerValue">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <item>
               <property name="text">
                <string>Max</string>
@@ -554,6 +662,12 @@
            </item>
            <item row="1" column="1">
             <widget class="QSpinBox" name="totValue">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="specialValueText">
               <string>Off</string>
              </property>
