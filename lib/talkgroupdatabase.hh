@@ -3,6 +3,8 @@
 
 #include <QAbstractTableModel>
 #include <QNetworkAccessManager>
+class TaskProgress;
+
 
 /** Downloads, periodically updates and provides a list of talk group IDs and their names.
  *
@@ -55,12 +57,10 @@ signals:
   void loaded();
   /** Gets emitted if the loading of the talk group database fails. */
   void error(const QString &msg);
-  /** Gets emitted on download progress. */
-  void downloadProgress(qint64 loaded, qint64 total);
 
 public slots:
   /** Starts the download of the talk group database. */
-  void download();
+  TaskProgress *download();
 
 private slots:
   /** Gets called whenever the download is complete. */

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "logger.hh"
 #include <cmath>
+#include "task_progress.hh"
 
 
 /* ********************************************************************************************* *
@@ -209,12 +210,12 @@ UserDatabase::sortUsers(const QSet<unsigned> &ids) {
   });
 }
 
-void
+TaskProgress *
 UserDatabase::download() {
   QUrl url("https://database.radioid.net/static/users.json");
   QNetworkRequest request(url);
   auto reply = _network.get(request);
-  connect(reply, &QNetworkReply::downloadProgress, this, &UserDatabase::downloadProgress);
+  return new DownloadTaskProgress(tr("Download call-sign db"), reply);
 }
 
 void
