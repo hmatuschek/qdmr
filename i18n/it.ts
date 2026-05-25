@@ -1042,7 +1042,7 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation type="unfinished">Selezionare la classe dell&apos;oggetto da creare</translation>
+        <translation>Selezionare la classe dell&apos;oggetto da creare.</translation>
     </message>
 </context>
 <context>
@@ -1120,7 +1120,7 @@
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
         <source>Delete contact button</source>
-        <translation type="unfinished">Pulsante elimina contatto</translation>
+        <translation>Pulsante elimina contatto.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
@@ -3263,7 +3263,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/releasenotes.cc" line="59"/>
         <source>qDMR was updated to version %1</source>
-        <translation type="unfinished">qdmr è stato aggiornato alla versione %1</translation>
+        <translation>qdmr è stato aggiornato alla versione %1.</translation>
     </message>
 </context>
 <context>
