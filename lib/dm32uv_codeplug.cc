@@ -625,6 +625,7 @@ DM32UVCodeplug::ChannelElement::decodeSelectiveCall(uint16_t code) {
   if (0xffff == code)
     return SelectiveCall();
 
+  logTrace() << "Selective Call word: " << Qt::hex << code;
   uint8_t type = code >> 14;
   code &= 0x3fff;
 
