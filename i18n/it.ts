@@ -2135,7 +2135,7 @@
         <location filename="../src/generalsettingsview.ui" line="170"/>
         <source>Default</source>
         <extracomment>Label for a checkbox that disables a separate DMR squelch setting. The default squelch is then used.</extracomment>
-        <translation type="unfinished">Predefinito/a</translation>
+        <translation>Predefinito</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="179"/>
