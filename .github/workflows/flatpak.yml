@@ -4,6 +4,15 @@ on:
     
 name: Flatpak
 
+# 发布工作流需要写入 Release 产物，遵循最小权限原则
+permissions:
+  contents: write
+
+# 同一分支有新提交时取消旧构建，避免资源浪费
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   flatpak:
     name: "Flatpak"
@@ -13,13 +22,15 @@ jobs:
       options: --privileged
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true
     - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
         bundle: qdmr.flatpak
         manifest-path: de.darc.dm3mat.qdmr.yaml
         cache-key: flatpak-builder-${{ github.sha }}
     - name: upload linux artifact
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       if: ${{startsWith(github.ref, 'refs/tags/') }}
       with:
           files: qdmr-x86_64.flatpak.zip 

@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [ "master", "devel" ]
 
+# 遵循最小权限原则，仅需读取仓库内容
+permissions:
+  contents: read
+
+# 同一分支有新提交时取消旧构建，避免资源浪费
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
@@ -18,7 +27,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
 
     - name: Update APT
       run: sudo apt-get update
@@ -39,5 +50,6 @@ jobs:
       working-directory: ${{github.workspace}}/build
       # Execute tests defined by the CMake configuration.
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}}
+      # --output-on-failure: 测试失败时输出详细日志，便于定位失败用例
+      run: ctest -C ${{env.BUILD_TYPE}} --output-on-failure
 

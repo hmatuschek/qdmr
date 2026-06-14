@@ -2,9 +2,18 @@ name: build-linux-clang-14
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "devel" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "master", "devel" ]
+
+# 遵循最小权限原则，仅需读取仓库内容
+permissions:
+  contents: read
+
+# 同一分支有新提交时取消旧构建，避免资源浪费
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -20,7 +29,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
+      with:
+        submodules: true
 
     - name: Update APT
       run: sudo apt-get update
