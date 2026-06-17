@@ -152,7 +152,8 @@
         <location filename="../src/application.cc" line="334"/>
         <source>Cannot export codeplug to file &apos;%1&apos;:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation>无法将信道配置导出到文件 &apos;%1&apos;：
+%2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="350"/>
@@ -815,7 +816,7 @@
     <message>
         <location filename="../src/channel_type_edit.cc" line="53"/>
         <source>Select channel types</source>
-        <translation type="unfinished"></translation>
+        <translation>选择信道类型</translation>
     </message>
 </context>
 <context>
@@ -1428,7 +1429,7 @@
     <message>
         <location filename="../src/repeaterdatabase.cc" line="542"/>
         <source>Cannot download repeater list from &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>无法从 &apos;%1&apos; 下载中继台列表：%2</translation>
     </message>
 </context>
 <context>
@@ -1620,7 +1621,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="32"/>
         <source>Fire</source>
-        <translation>消防</translation>
+        <translation>Fire</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="33"/>
@@ -2090,148 +2091,148 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="85"/>
         <source>Default Microphone Amplification</source>
-        <translation type="unfinished"></translation>
+        <translation>默认麦克风放大率</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="92"/>
         <source>Specifies the default (DMR) microphone amplifiction level.</source>
-        <translation type="unfinished"></translation>
+        <translation>指定默认 (DMR) 麦克风放大级别。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="105"/>
         <source>FM Microphone Amplifiction</source>
-        <translation type="unfinished"></translation>
+        <translation>FM 麦克风放大率</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="112"/>
         <source>default</source>
         <extracomment>Special value indicating, that the global default mic gain should be used.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>特殊值，指示应使用全局默认麦克风增益。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="122"/>
         <source>Default Squelch</source>
-        <translation type="unfinished"></translation>
+        <translation>默认静噪</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="129"/>
         <location filename="../src/generalsettingsview.ui" line="157"/>
         <source>open</source>
         <extracomment>Special value for the squelch setting, disabling/opening the squelch.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>静噪设置的特殊值，用于禁用/打开静噪。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="142"/>
         <source>DMR Squelch</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR 静噪</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="167"/>
         <source>Disables a separate squelch level for DMR. Uses the default one.</source>
-        <translation type="unfinished"></translation>
+        <translation>禁用 DMR 的独立静噪级别。使用默认级别。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="170"/>
         <source>Default</source>
         <extracomment>Label for a checkbox that disables a separate DMR squelch setting. The default squelch is then used.</extracomment>
-        <translation type="unfinished">Default</translation>
+        <translation>默认</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="179"/>
         <source>VOX Sensitivity</source>
-        <translation type="unfinished"></translation>
+        <translation>VOX 灵敏度</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="186"/>
         <source>Specifies the VOX sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>指定 VOX 灵敏度。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="199"/>
         <source>VOX Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>VOX 延迟</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="206"/>
         <source>Specifies the delay between voice detection and transmission. E.g. 500 ms.</source>
-        <translation type="unfinished"></translation>
+        <translation>指定语音检测与传输之间的延迟。例如：500 毫秒。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="213"/>
         <source>Maximum Speaker Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>最大扬声器音量</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="220"/>
         <source>Limits the maximum speaker volume.</source>
-        <translation type="unfinished"></translation>
+        <translation>限制最大扬声器音量。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="236"/>
         <source>Maximum Headphone Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>最大耳机音量</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="243"/>
         <source>Limits the maximum headphone volume.</source>
-        <translation type="unfinished"></translation>
+        <translation>限制最大耳机音量。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="279"/>
         <source>Tone Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>提示音设置</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="287"/>
         <source>Disable all</source>
         <extracomment>Label for a checkbox disabling all tones.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>全部禁用</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="294"/>
         <source>Disables all tones.</source>
-        <translation type="unfinished"></translation>
+        <translation>禁用所有提示音。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="304"/>
         <source>Key tone volume</source>
-        <translation type="unfinished"></translation>
+        <translation>按键音量</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="311"/>
         <source>off</source>
         <extracomment>Special value of a spin box indicating that keytones are disabled.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>关</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="321"/>
         <source>SMS tone</source>
-        <translation type="unfinished"></translation>
+        <translation>短信提示音</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="328"/>
         <source>Enables a tone on SMS reception.</source>
-        <translation type="unfinished"></translation>
+        <translation>接收到短信时启用提示音。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="338"/>
         <source>Ringtone</source>
-        <translation type="unfinished"></translation>
+        <translation>铃声</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="345"/>
         <source>Enables the ringtone on incoming private calls.</source>
-        <translation type="unfinished"></translation>
+        <translation>来电私密呼叫时启用铃声。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="355"/>
         <source>Talk permit</source>
-        <translation type="unfinished"></translation>
+        <translation>通话许可音</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="368"/>
         <source>Boot melody</source>
-        <translation type="unfinished"></translation>
+        <translation>开机旋律</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="383"/>
@@ -2240,32 +2241,32 @@
         <extracomment>Label for a checkbox, enabling the boot melody
 ----------
 Label for a checkbox enabling the call-reset tone.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>启用</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="399"/>
         <source>Call Start</source>
-        <translation type="unfinished"></translation>
+        <translation>通话开始</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="412"/>
         <source>Call End</source>
-        <translation type="unfinished"></translation>
+        <translation>通话结束</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="425"/>
         <source>Channel Idle</source>
-        <translation type="unfinished"></translation>
+        <translation>信道空闲</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="435"/>
         <source>Call Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>通话重置</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="507"/>
         <source>Default Values</source>
-        <translation type="unfinished"></translation>
+        <translation>默认值</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="259"/>
@@ -2828,18 +2829,18 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/melody_edit.cc" line="16"/>
         <source>bpm</source>
         <comment>Beats per minute. Unit in a spin box.</comment>
-        <translation type="unfinished"></translation>
+        <translation>拍/分钟</translation>
     </message>
     <message>
         <location filename="../src/melody_edit.cc" line="17"/>
         <source>Specify the melody in Lilypond format.</source>
         <comment>Tooltip for a melody entry field.</comment>
-        <translation type="unfinished"></translation>
+        <translation>以 Lilypond 格式指定旋律。</translation>
     </message>
     <message>
         <location filename="../src/melody_edit.cc" line="23"/>
         <source>Melody</source>
-        <translation type="unfinished"></translation>
+        <translation>旋律</translation>
     </message>
 </context>
 <context>
@@ -3208,7 +3209,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/configitemwrapper.cc" line="998"/>
         <source>[None]</source>
-        <translation>[无]</translation>
+        <translation>[None]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="1013"/>
@@ -3250,19 +3251,22 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/releasenotes.cc" line="31"/>
         <source>Cannot download release notes from https://github.com/hmatuschek/qdmr
 	 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>无法从 https://github.com/hmatuschek/qdmr 下载更新说明
+	%1</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="43"/>
         <source>Cannot read release notes from https://github.com/hmatuschek/qdmr
 	Release is not a JSON object!</source>
-        <translation type="unfinished"></translation>
+        <translation>无法从 https://github.com/hmatuschek/qdmr 读取更新说明
+	发布版本不是 JSON 对象！</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="48"/>
         <source>Cannot read release notes from https://github.com/hmatuschek/qdmr
 	Release does not contain a release note.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法从 https://github.com/hmatuschek/qdmr 读取发布说明
+	发布版本未包含发布说明。</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="59"/>
@@ -3275,7 +3279,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/repeaterbooksource.cc" line="70"/>
         <source>Cannot query repeaterbook.com: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>无法查询 repeaterbook.com：%1</translation>
     </message>
 </context>
 <context>
@@ -3632,12 +3636,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="20"/>
         <source>Satellite</source>
-        <translation type="unfinished"></translation>
+        <translation>卫星</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="26"/>
         <source>Satellite Name</source>
-        <translation type="unfinished"></translation>
+        <translation>卫星名称</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="55"/>
@@ -3686,12 +3690,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/satellitetransponderdialog.cc" line="46"/>
         <source>Invalid name</source>
-        <translation type="unfinished"></translation>
+        <translation>无效名称</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.cc" line="47"/>
         <source>Please set a satellite name.</source>
-        <translation type="unfinished"></translation>
+        <translation>请设置卫星名称。</translation>
     </message>
 </context>
 <context>
