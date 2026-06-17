@@ -14,7 +14,7 @@
     <message>
         <location filename="../src/aprsselect.cc" line="44"/>
         <source>[None]</source>
-        <translation type="unfinished">[None]</translation>
+        <translation>[None]</translation>
     </message>
 </context>
 <context>
@@ -357,7 +357,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="48"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="61"/>
@@ -367,12 +367,12 @@
     <message>
         <location filename="../src/channeldialog.ui" line="68"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished">RX Frequency</translation>
+        <translation>RX Frequency</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="78"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished">TX Frequency</translation>
+        <translation>TX Frequency</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="88"/>
@@ -382,12 +382,12 @@
     <message>
         <location filename="../src/channeldialog.ui" line="140"/>
         <source>Power</source>
-        <translation type="unfinished">Power</translation>
+        <translation>Power</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="156"/>
         <source>Max</source>
-        <translation type="unfinished">Max</translation>
+        <translation>Max</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="161"/>
