@@ -145,7 +145,7 @@
     <message>
         <location filename="../src/application.cc" line="210"/>
         <source>Codeplug Files (*.yaml *.yml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Codeplug Dateien (*.yaml *.yml);;Codeplug Dateien, altes Format (*.conf *.csv *.txt);;Alle Dateien (*)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="217"/>
@@ -2838,12 +2838,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.cc" line="77"/>
         <source>Download call-sign DB ... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Rufeichendatenbank herunterladen … %1%</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="79"/>
         <source>Download call-sign DB ... (%1MB)</source>
-        <translation type="unfinished"></translation>
+        <translation>Rufeichendatenbank herunterladen … (%1MB)</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="84"/>
@@ -2858,12 +2858,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.cc" line="91"/>
         <source>Download talkgroup DB ... %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprechgruppendatenbank herunterladen … %1%</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="93"/>
         <source>Download talkgroup DB ... (%1MB)</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprechgruppendatenbank herunterladen … (%1 MB)</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="99"/>
@@ -4355,7 +4355,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/main.cc" line="26"/>
         <source>Specifies applications log-level to stdout. Must be one of `trace`, `debug`, `info`, `warning`, `error` or `fatal`.</source>
-        <translation type="unfinished"></translation>
+        <translation>Setzt das Loglevel nach stderr. Muss `trace`, `debug`, `info`, `warning`, `error` oder `fatal` sein.</translation>
     </message>
 </context>
 </TS>
