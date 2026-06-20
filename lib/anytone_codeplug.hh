@@ -1439,6 +1439,22 @@ public:
   };
 
 
+  /** Encodes the bitmap, indicating which zone is hidden. */
+  class HiddenZoneBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    HiddenZoneBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    HiddenZoneBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
+
   /** Represents the base class of the boot settings for all AnyTone codeplug.
    *
    * Memory layout of encoded boot settings (size 0x0030):
