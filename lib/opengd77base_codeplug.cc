@@ -1197,7 +1197,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const FMAPRSSystem *sys, const
     return true;
   // If there is a OpenGD77 settings extension:
   enableTransmitQSY(sys->openGD77Extension()->transmitQSY());
-
+  setBaudRate(300 == sys->openGD77Extension()->baudRate() ? BaudRate::Baud300 : BaudRate::Baud1200);
   return true;
 }
 
@@ -1227,6 +1227,7 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
   if (nullptr == sys->openGD77Extension())
     sys->setOpenGD77Extension(new OpenGD77FMAPRSSystemExtension());
   sys->openGD77Extension()->enableTransmitQSY(transmitQSY());
+  sys->openGD77Extension()->setBaudRate(BaudRate::Baud300 == baudRate() ? 300 : 1200);
 
   return sys;
 }

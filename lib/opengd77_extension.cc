@@ -158,7 +158,7 @@ OpenGD77ContactExtension::setTimeSlotOverride(TimeSlotOverride ts) {
  * Implementation of OpenGD77FMAPRSSystemExtension
  * ******************************************************************************************** */
 OpenGD77FMAPRSSystemExtension::OpenGD77FMAPRSSystemExtension(QObject *parent)
-  : ConfigExtension(parent), _transmitQSY(false)
+  : ConfigExtension(parent), _transmitQSY(false), _baudRate(1200)
 {
   // pass...
 }
@@ -184,6 +184,19 @@ OpenGD77FMAPRSSystemExtension::enableTransmitQSY(bool enable) {
   if (_transmitQSY == enable)
     return;
   _transmitQSY = enable;
+  emit modified(this);
+}
+
+unsigned int
+OpenGD77FMAPRSSystemExtension::baudRate() const {
+  return _baudRate;
+}
+
+void
+OpenGD77FMAPRSSystemExtension::setBaudRate(unsigned int baudRate) {
+  if (_baudRate == baudRate)
+    return;
+  _baudRate = baudRate;
   emit modified(this);
 }
 
