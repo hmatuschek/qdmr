@@ -4,7 +4,7 @@
 <context>
     <name>AMChannelDialog</name>
     <message>
-        <location filename="../src/amchanneldialog.cc" line="11"/>
+        <location filename="../src/amchanneldialog.cc" line="13"/>
         <source>Squelch</source>
         <translation type="unfinished">Squelch</translation>
     </message>
@@ -20,19 +20,74 @@
 <context>
     <name>APRSSystemDialog</name>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="102"/>
+        <location filename="../src/aprssystemdialog.cc" line="103"/>
         <source>Create APRS system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="110"/>
+        <location filename="../src/aprssystemdialog.cc" line="111"/>
         <source>Edit APRS system</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="133"/>
+        <location filename="../src/aprssystemdialog.cc" line="135"/>
         <source>[Selected]</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="20"/>
+        <source>Edit APRS System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="30"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="42"/>
+        <source>Name</source>
+        <translation type="unfinished">Naam</translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="52"/>
+        <source>Channel</source>
+        <translation type="unfinished">Kanaal</translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="62"/>
+        <source>Source</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="100"/>
+        <source>Destination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="138"/>
+        <source>Path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="145"/>
+        <source>Icon</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="152"/>
+        <source>Update period [s]</source>
+        <translation type="unfinished">Updateperiode [s]</translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="159"/>
+        <source>Message</source>
+        <translation type="unfinished">Bericht</translation>
+    </message>
+    <message>
+        <location filename="../src/aprssystemdialog.ui" line="192"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensies</translation>
     </message>
 </context>
 <context>
@@ -73,11 +128,6 @@
         <translation>Open codeplug</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="210"/>
-        <source>Codeplug Files (*.yaml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/application.cc" line="287"/>
         <location filename="../src/application.cc" line="324"/>
         <location filename="../src/application.cc" line="363"/>
@@ -90,6 +140,11 @@
         <location filename="../src/application.cc" line="251"/>
         <location filename="../src/application.cc" line="364"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="210"/>
+        <source>Codeplug Files (*.yaml *.yml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -344,105 +399,105 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="23"/>
+        <location filename="../src/channeldialog.ui" line="26"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="40"/>
+        <location filename="../src/channeldialog.ui" line="49"/>
         <source>Basic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="48"/>
+        <location filename="../src/channeldialog.ui" line="57"/>
         <source>Name</source>
         <translation type="unfinished">Naam</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="61"/>
+        <location filename="../src/channeldialog.ui" line="76"/>
         <source>Enter a repeater call-sign.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="68"/>
+        <location filename="../src/channeldialog.ui" line="83"/>
         <source>Rx Frequency</source>
         <translation type="unfinished">RX Frequentie</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="78"/>
+        <location filename="../src/channeldialog.ui" line="100"/>
         <source>Tx Frequency</source>
         <translation type="unfinished">TX Frequentie</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="88"/>
+        <location filename="../src/channeldialog.ui" line="117"/>
         <source>Tx Offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="140"/>
+        <location filename="../src/channeldialog.ui" line="175"/>
         <source>Power</source>
         <translation type="unfinished">Vermogen</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="156"/>
+        <location filename="../src/channeldialog.ui" line="191"/>
         <source>Max</source>
         <translation type="unfinished">Max</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="161"/>
+        <location filename="../src/channeldialog.ui" line="196"/>
         <source>High</source>
         <translation type="unfinished">Hoog</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="166"/>
+        <location filename="../src/channeldialog.ui" line="201"/>
         <source>Mid</source>
         <translation type="unfinished">Middel</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="171"/>
+        <location filename="../src/channeldialog.ui" line="206"/>
         <source>Low</source>
         <translation type="unfinished">Laag</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="176"/>
+        <location filename="../src/channeldialog.ui" line="211"/>
         <source>Min</source>
         <translation type="unfinished">Min</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="184"/>
-        <location filename="../src/channeldialog.ui" line="221"/>
-        <location filename="../src/channeldialog.ui" line="255"/>
+        <location filename="../src/channeldialog.ui" line="225"/>
+        <location filename="../src/channeldialog.ui" line="268"/>
+        <location filename="../src/channeldialog.ui" line="308"/>
         <source>Default</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="193"/>
+        <location filename="../src/channeldialog.ui" line="234"/>
         <source>Tx Timeout</source>
         <translation type="unfinished">TX Timeout</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="208"/>
-        <location filename="../src/channeldialog.ui" line="245"/>
+        <location filename="../src/channeldialog.ui" line="249"/>
+        <location filename="../src/channeldialog.ui" line="292"/>
         <source>Off</source>
         <translation type="unfinished">Uit</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="230"/>
+        <location filename="../src/channeldialog.ui" line="277"/>
         <source>VOX Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="264"/>
+        <location filename="../src/channeldialog.ui" line="317"/>
         <source>Rx Only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="274"/>
+        <location filename="../src/channeldialog.ui" line="334"/>
         <source>Scan List</source>
         <translation type="unfinished">Scan Lijst</translation>
     </message>
     <message>
-        <location filename="../src/channeldialog.ui" line="304"/>
+        <location filename="../src/channeldialog.ui" line="364"/>
         <source>Extensions</source>
         <translation type="unfinished">Extensies</translation>
     </message>
@@ -874,37 +929,37 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configmergedialog.cc" line="71"/>
+        <location filename="../src/configmergedialog.cc" line="75"/>
         <source>Ignores any duplicate item.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configmergedialog.cc" line="74"/>
+        <location filename="../src/configmergedialog.cc" line="78"/>
         <source>Replaces any duplicate item with the imported one.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configmergedialog.cc" line="77"/>
+        <location filename="../src/configmergedialog.cc" line="81"/>
         <source>Imports any duplicate item with a modified name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configmergedialog.cc" line="89"/>
+        <location filename="../src/configmergedialog.cc" line="93"/>
         <source>Ignores any duplicate set.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configmergedialog.cc" line="92"/>
+        <location filename="../src/configmergedialog.cc" line="96"/>
         <source>Replaces any duplicate set with the imported one.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configmergedialog.cc" line="95"/>
+        <location filename="../src/configmergedialog.cc" line="99"/>
         <source>Imports any duplicate set with a modified name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configmergedialog.cc" line="98"/>
+        <location filename="../src/configmergedialog.cc" line="102"/>
         <source>Merges duplicate sets.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -912,22 +967,22 @@
 <context>
     <name>ConfigObjectListView</name>
     <message>
-        <location filename="../src/configobjectlistview.cc" line="72"/>
-        <location filename="../src/configobjectlistview.cc" line="94"/>
-        <location filename="../src/configobjectlistview.cc" line="118"/>
-        <location filename="../src/configobjectlistview.cc" line="141"/>
-        <location filename="../src/configobjectlistview.cc" line="165"/>
-        <location filename="../src/configobjectlistview.cc" line="188"/>
+        <location filename="../src/configobjectlistview.cc" line="75"/>
+        <location filename="../src/configobjectlistview.cc" line="97"/>
+        <location filename="../src/configobjectlistview.cc" line="121"/>
+        <location filename="../src/configobjectlistview.cc" line="144"/>
+        <location filename="../src/configobjectlistview.cc" line="168"/>
+        <location filename="../src/configobjectlistview.cc" line="191"/>
         <source>Cannot move items.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configobjectlistview.cc" line="73"/>
-        <location filename="../src/configobjectlistview.cc" line="95"/>
-        <location filename="../src/configobjectlistview.cc" line="119"/>
-        <location filename="../src/configobjectlistview.cc" line="142"/>
-        <location filename="../src/configobjectlistview.cc" line="166"/>
-        <location filename="../src/configobjectlistview.cc" line="189"/>
+        <location filename="../src/configobjectlistview.cc" line="76"/>
+        <location filename="../src/configobjectlistview.cc" line="98"/>
+        <location filename="../src/configobjectlistview.cc" line="122"/>
+        <location filename="../src/configobjectlistview.cc" line="145"/>
+        <location filename="../src/configobjectlistview.cc" line="169"/>
+        <location filename="../src/configobjectlistview.cc" line="192"/>
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -965,18 +1020,18 @@
 <context>
     <name>ConfigObjectTableView</name>
     <message>
-        <location filename="../src/configobjecttableview.cc" line="253"/>
-        <location filename="../src/configobjecttableview.cc" line="260"/>
+        <location filename="../src/configobjecttableview.cc" line="255"/>
+        <location filename="../src/configobjecttableview.cc" line="262"/>
         <source>Cannot move items.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.cc" line="254"/>
+        <location filename="../src/configobjecttableview.cc" line="256"/>
         <source>Cannot move items: You have to select at least one item first.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configobjecttableview.cc" line="261"/>
+        <location filename="../src/configobjecttableview.cc" line="263"/>
         <source>Cannot move items as long as there is some filter or sorting applied.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1024,12 +1079,12 @@
 <context>
     <name>ConfigObjectTypeSelectionDialog</name>
     <message>
-        <location filename="../src/configobjecttypeselectiondialog.cc" line="44"/>
+        <location filename="../src/configobjecttypeselectiondialog.cc" line="49"/>
         <source>An instance of %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/configobjecttypeselectiondialog.cc" line="55"/>
+        <location filename="../src/configobjecttypeselectiondialog.cc" line="60"/>
         <source>&lt;p&gt;%1&lt;p&gt;&lt;p style=&quot;margin-left:10px;&quot;&gt;%2&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1235,42 +1290,42 @@
 <context>
     <name>DMRChannelDialog</name>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="36"/>
+        <location filename="../src/dmrchanneldialog.cc" line="37"/>
         <source>Radio Id</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="38"/>
+        <location filename="../src/dmrchanneldialog.cc" line="39"/>
         <source>Tx Admit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="40"/>
+        <location filename="../src/dmrchanneldialog.cc" line="41"/>
         <source>Color-code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="43"/>
+        <location filename="../src/dmrchanneldialog.cc" line="44"/>
         <source>Time-slot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="45"/>
+        <location filename="../src/dmrchanneldialog.cc" line="46"/>
         <source>Group list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="47"/>
+        <location filename="../src/dmrchanneldialog.cc" line="48"/>
         <source>Tx Contact</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="49"/>
+        <location filename="../src/dmrchanneldialog.cc" line="50"/>
         <source>APRS</source>
         <translation type="unfinished">APRS</translation>
     </message>
     <message>
-        <location filename="../src/dmrchanneldialog.cc" line="51"/>
+        <location filename="../src/dmrchanneldialog.cc" line="52"/>
         <source>Roaming zone</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1336,7 +1391,7 @@
 <context>
     <name>DMRContactSelect</name>
     <message>
-        <location filename="../src/dmrcontactdialog.cc" line="181"/>
+        <location filename="../src/dmrcontactdialog.cc" line="184"/>
         <source>[None]</source>
         <translation type="unfinished">[Geen]</translation>
     </message>
@@ -1493,442 +1548,442 @@
 <context>
     <name>FMAPRSSystem</name>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="7"/>
+        <location filename="../src/aprssystemdialog.cc" line="8"/>
         <source>[None]</source>
         <translation type="unfinished">[Geen]</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="8"/>
+        <location filename="../src/aprssystemdialog.cc" line="9"/>
         <source>Police station</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="9"/>
+        <location filename="../src/aprssystemdialog.cc" line="10"/>
         <source>Digipeater</source>
         <translation type="unfinished">Digipeater</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="10"/>
+        <location filename="../src/aprssystemdialog.cc" line="11"/>
         <source>Phone</source>
         <translation type="unfinished">Telefoon</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="11"/>
+        <location filename="../src/aprssystemdialog.cc" line="12"/>
         <source>DX cluster</source>
         <translation type="unfinished">DX cluster</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="12"/>
+        <location filename="../src/aprssystemdialog.cc" line="13"/>
         <source>HF gateway</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="13"/>
+        <location filename="../src/aprssystemdialog.cc" line="14"/>
         <source>Plane small</source>
         <translation type="unfinished">Vliegtuig klein</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="14"/>
+        <location filename="../src/aprssystemdialog.cc" line="15"/>
         <source>Mobile Satellite station</source>
         <translation type="unfinished">Mobiel satelliet station</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="15"/>
+        <location filename="../src/aprssystemdialog.cc" line="16"/>
         <source>Wheel Chair</source>
         <translation type="unfinished">Rolstoel</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="16"/>
+        <location filename="../src/aprssystemdialog.cc" line="17"/>
         <source>Snowmobile</source>
         <translation type="unfinished">Sneeuwscooter</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="17"/>
+        <location filename="../src/aprssystemdialog.cc" line="18"/>
         <source>Red cross</source>
         <translation type="unfinished">Rode kruis</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="18"/>
+        <location filename="../src/aprssystemdialog.cc" line="19"/>
         <source>Boy scout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="19"/>
+        <location filename="../src/aprssystemdialog.cc" line="20"/>
         <source>Home</source>
         <translation type="unfinished">Thuis</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="20"/>
+        <location filename="../src/aprssystemdialog.cc" line="21"/>
         <source>X</source>
         <translation type="unfinished">X</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="21"/>
+        <location filename="../src/aprssystemdialog.cc" line="22"/>
         <source>Red dot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="22"/>
+        <location filename="../src/aprssystemdialog.cc" line="23"/>
         <source>Circle 0</source>
         <translation type="unfinished">Cirkel 0</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="23"/>
+        <location filename="../src/aprssystemdialog.cc" line="24"/>
         <source>Circle 1</source>
         <translation type="unfinished">Cirkel 1</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="24"/>
+        <location filename="../src/aprssystemdialog.cc" line="25"/>
         <source>Circle 2</source>
         <translation type="unfinished">Cirkel 2</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="25"/>
+        <location filename="../src/aprssystemdialog.cc" line="26"/>
         <source>Circle 3</source>
         <translation type="unfinished">Cirkel 3</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="26"/>
+        <location filename="../src/aprssystemdialog.cc" line="27"/>
         <source>Circle 4</source>
         <translation type="unfinished">Cirkel 4</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="27"/>
+        <location filename="../src/aprssystemdialog.cc" line="28"/>
         <source>Circle 5</source>
         <translation type="unfinished">Cirkel 5</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="28"/>
+        <location filename="../src/aprssystemdialog.cc" line="29"/>
         <source>Circle 6</source>
         <translation type="unfinished">Cirkel 6</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="29"/>
+        <location filename="../src/aprssystemdialog.cc" line="30"/>
         <source>Circle 7</source>
         <translation type="unfinished">Cirkel 7</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="30"/>
+        <location filename="../src/aprssystemdialog.cc" line="31"/>
         <source>Circle 8</source>
         <translation type="unfinished">Cirkel 8</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="31"/>
+        <location filename="../src/aprssystemdialog.cc" line="32"/>
         <source>Circle 9</source>
         <translation type="unfinished">Cirkel 9</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="32"/>
+        <location filename="../src/aprssystemdialog.cc" line="33"/>
         <source>Fire</source>
         <translation type="unfinished">Vuur</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="33"/>
+        <location filename="../src/aprssystemdialog.cc" line="34"/>
         <source>Campground</source>
         <translation type="unfinished">Kampeerterrein</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="34"/>
+        <location filename="../src/aprssystemdialog.cc" line="35"/>
         <source>Motorcycle</source>
         <translation type="unfinished">Motorfiets</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="35"/>
+        <location filename="../src/aprssystemdialog.cc" line="36"/>
         <source>Rail engine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="36"/>
+        <location filename="../src/aprssystemdialog.cc" line="37"/>
         <source>Car</source>
         <translation type="unfinished">Auto</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="37"/>
+        <location filename="../src/aprssystemdialog.cc" line="38"/>
         <source>File server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="38"/>
+        <location filename="../src/aprssystemdialog.cc" line="39"/>
         <source>HC Future</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="39"/>
+        <location filename="../src/aprssystemdialog.cc" line="40"/>
         <source>Aid station</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="40"/>
+        <location filename="../src/aprssystemdialog.cc" line="41"/>
         <source>BBS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="41"/>
+        <location filename="../src/aprssystemdialog.cc" line="42"/>
         <source>Canoe</source>
         <translation type="unfinished">Kano</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="42"/>
+        <location filename="../src/aprssystemdialog.cc" line="43"/>
         <source>Eyeball</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="43"/>
+        <location filename="../src/aprssystemdialog.cc" line="44"/>
         <source>Tractor</source>
         <translation type="unfinished">Trekker</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="44"/>
+        <location filename="../src/aprssystemdialog.cc" line="45"/>
         <source>Grid Square</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="45"/>
+        <location filename="../src/aprssystemdialog.cc" line="46"/>
         <source>Hotel</source>
         <translation type="unfinished">Hotel</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="46"/>
+        <location filename="../src/aprssystemdialog.cc" line="47"/>
         <source>TCP/IP</source>
         <translation type="unfinished">TCP/IP</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="47"/>
+        <location filename="../src/aprssystemdialog.cc" line="48"/>
         <source>School</source>
         <translation type="unfinished">School</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="48"/>
+        <location filename="../src/aprssystemdialog.cc" line="49"/>
         <source>Logon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="49"/>
+        <location filename="../src/aprssystemdialog.cc" line="50"/>
         <source>MacOS</source>
         <translation type="unfinished">MacOS</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="50"/>
+        <location filename="../src/aprssystemdialog.cc" line="51"/>
         <source>NTS station</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="51"/>
+        <location filename="../src/aprssystemdialog.cc" line="52"/>
         <source>Balloon</source>
         <translation type="unfinished">Ballon</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="52"/>
+        <location filename="../src/aprssystemdialog.cc" line="53"/>
         <source>Police car</source>
         <translation type="unfinished">Politie auto</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="53"/>
+        <location filename="../src/aprssystemdialog.cc" line="54"/>
         <source>TBD</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="54"/>
+        <location filename="../src/aprssystemdialog.cc" line="55"/>
         <source>RV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="55"/>
+        <location filename="../src/aprssystemdialog.cc" line="56"/>
         <source>Shuttle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="56"/>
+        <location filename="../src/aprssystemdialog.cc" line="57"/>
         <source>SSTV</source>
         <translation type="unfinished">SSTV</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="57"/>
+        <location filename="../src/aprssystemdialog.cc" line="58"/>
         <source>Bus</source>
         <translation type="unfinished">Bus</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="58"/>
+        <location filename="../src/aprssystemdialog.cc" line="59"/>
         <source>ATV</source>
         <translation type="unfinished">ATV</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="59"/>
+        <location filename="../src/aprssystemdialog.cc" line="60"/>
         <source>Weather service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="60"/>
+        <location filename="../src/aprssystemdialog.cc" line="61"/>
         <source>Helo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="61"/>
+        <location filename="../src/aprssystemdialog.cc" line="62"/>
         <source>Yacht</source>
         <translation type="unfinished">Jacht</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="62"/>
+        <location filename="../src/aprssystemdialog.cc" line="63"/>
         <source>MS Windows</source>
         <translation type="unfinished">MS Windows</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="63"/>
+        <location filename="../src/aprssystemdialog.cc" line="64"/>
         <source>Jogger</source>
         <translation type="unfinished">Jogger</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="64"/>
+        <location filename="../src/aprssystemdialog.cc" line="65"/>
         <source>Triangle</source>
         <translation type="unfinished">Driehoek</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="65"/>
+        <location filename="../src/aprssystemdialog.cc" line="66"/>
         <source>PBBS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="66"/>
+        <location filename="../src/aprssystemdialog.cc" line="67"/>
         <source>Plane large</source>
         <translation type="unfinished">Vliegtuig groot</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="67"/>
+        <location filename="../src/aprssystemdialog.cc" line="68"/>
         <source>Weather station</source>
         <translation type="unfinished">Weerstation</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="68"/>
+        <location filename="../src/aprssystemdialog.cc" line="69"/>
         <source>Dish antenna</source>
         <translation type="unfinished">Schotelantenne</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="69"/>
+        <location filename="../src/aprssystemdialog.cc" line="70"/>
         <source>Ambulance</source>
         <translation type="unfinished">Ambulance</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="70"/>
+        <location filename="../src/aprssystemdialog.cc" line="71"/>
         <source>Bike</source>
         <translation type="unfinished">Fiets</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="71"/>
+        <location filename="../src/aprssystemdialog.cc" line="72"/>
         <source>ICP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="72"/>
+        <location filename="../src/aprssystemdialog.cc" line="73"/>
         <source>Fire station</source>
         <translation type="unfinished">Brandweerkazerne</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="73"/>
+        <location filename="../src/aprssystemdialog.cc" line="74"/>
         <source>Horse</source>
         <translation type="unfinished">Paard</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="74"/>
+        <location filename="../src/aprssystemdialog.cc" line="75"/>
         <source>Fire truck</source>
         <translation type="unfinished">Brandweerauto</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="75"/>
+        <location filename="../src/aprssystemdialog.cc" line="76"/>
         <source>Glider</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="76"/>
+        <location filename="../src/aprssystemdialog.cc" line="77"/>
         <source>Hospital</source>
         <translation type="unfinished">Ziekenhuis</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="77"/>
+        <location filename="../src/aprssystemdialog.cc" line="78"/>
         <source>IOTA</source>
         <translation type="unfinished">IOTA</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="78"/>
+        <location filename="../src/aprssystemdialog.cc" line="79"/>
         <source>Jeep</source>
         <translation type="unfinished">Jeep</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="79"/>
+        <location filename="../src/aprssystemdialog.cc" line="80"/>
         <source>Truck small</source>
         <translation type="unfinished">Vrachtwagen klein</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="80"/>
+        <location filename="../src/aprssystemdialog.cc" line="81"/>
         <source>Laptop</source>
         <translation type="unfinished">Laptop</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="81"/>
+        <location filename="../src/aprssystemdialog.cc" line="82"/>
         <source>Mic-E</source>
         <translation type="unfinished">Mic-E</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="82"/>
+        <location filename="../src/aprssystemdialog.cc" line="83"/>
         <source>Node</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="83"/>
+        <location filename="../src/aprssystemdialog.cc" line="84"/>
         <source>EOC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="84"/>
+        <location filename="../src/aprssystemdialog.cc" line="85"/>
         <source>Rover</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="85"/>
+        <location filename="../src/aprssystemdialog.cc" line="86"/>
         <source>Grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="86"/>
+        <location filename="../src/aprssystemdialog.cc" line="87"/>
         <source>Antenna</source>
         <translation type="unfinished">Antenne</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="87"/>
+        <location filename="../src/aprssystemdialog.cc" line="88"/>
         <source>Power boat</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="88"/>
+        <location filename="../src/aprssystemdialog.cc" line="89"/>
         <source>Truck stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="89"/>
+        <location filename="../src/aprssystemdialog.cc" line="90"/>
         <source>Truck large</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="90"/>
+        <location filename="../src/aprssystemdialog.cc" line="91"/>
         <source>Van</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="91"/>
+        <location filename="../src/aprssystemdialog.cc" line="92"/>
         <source>Water</source>
         <translation type="unfinished">Water</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="92"/>
+        <location filename="../src/aprssystemdialog.cc" line="93"/>
         <source>XAPRS</source>
         <translation type="unfinished">XAPRS</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="93"/>
+        <location filename="../src/aprssystemdialog.cc" line="94"/>
         <source>Yagi</source>
         <translation type="unfinished">Yagi</translation>
     </message>
     <message>
-        <location filename="../src/aprssystemdialog.cc" line="94"/>
+        <location filename="../src/aprssystemdialog.cc" line="95"/>
         <source>Shelter</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1954,32 +2009,32 @@
 <context>
     <name>FMChannelDialog</name>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="32"/>
+        <location filename="../src/fmchanneldialog.cc" line="34"/>
         <source>Squelch</source>
         <translation type="unfinished">Squelch</translation>
     </message>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="34"/>
+        <location filename="../src/fmchanneldialog.cc" line="36"/>
         <source>Tx Admit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="36"/>
+        <location filename="../src/fmchanneldialog.cc" line="38"/>
         <source>Rx Tone</source>
         <translation type="unfinished">RX Toon</translation>
     </message>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="38"/>
+        <location filename="../src/fmchanneldialog.cc" line="40"/>
         <source>Tx Tone</source>
         <translation type="unfinished">TX Toon</translation>
     </message>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="40"/>
+        <location filename="../src/fmchanneldialog.cc" line="42"/>
         <source>Bandwidth</source>
         <translation type="unfinished">Bandbreedte</translation>
     </message>
     <message>
-        <location filename="../src/fmchanneldialog.cc" line="42"/>
+        <location filename="../src/fmchanneldialog.cc" line="44"/>
         <source>APRS</source>
         <translation type="unfinished">APRS</translation>
     </message>
@@ -2058,184 +2113,184 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="41"/>
+        <location filename="../src/generalsettingsview.ui" line="47"/>
         <source>First greeting line (if supported by the radio).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="44"/>
+        <location filename="../src/generalsettingsview.ui" line="50"/>
         <source>Intro line 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="51"/>
+        <location filename="../src/generalsettingsview.ui" line="57"/>
         <source>Intro Line 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="58"/>
+        <location filename="../src/generalsettingsview.ui" line="70"/>
         <source>Second greeting line (if supported by the radio).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="64"/>
+        <location filename="../src/generalsettingsview.ui" line="76"/>
         <source>Intro line 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="77"/>
+        <location filename="../src/generalsettingsview.ui" line="89"/>
         <source>Audio Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="85"/>
+        <location filename="../src/generalsettingsview.ui" line="97"/>
         <source>Default Microphone Amplification</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="92"/>
+        <location filename="../src/generalsettingsview.ui" line="110"/>
         <source>Specifies the default (DMR) microphone amplifiction level.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="105"/>
+        <location filename="../src/generalsettingsview.ui" line="123"/>
         <source>FM Microphone Amplifiction</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="112"/>
+        <location filename="../src/generalsettingsview.ui" line="136"/>
         <source>default</source>
         <extracomment>Special value indicating, that the global default mic gain should be used.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="122"/>
+        <location filename="../src/generalsettingsview.ui" line="146"/>
         <source>Default Squelch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="129"/>
-        <location filename="../src/generalsettingsview.ui" line="157"/>
+        <location filename="../src/generalsettingsview.ui" line="159"/>
+        <location filename="../src/generalsettingsview.ui" line="187"/>
         <source>open</source>
         <extracomment>Special value for the squelch setting, disabling/opening the squelch.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="142"/>
+        <location filename="../src/generalsettingsview.ui" line="172"/>
         <source>DMR Squelch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="167"/>
+        <location filename="../src/generalsettingsview.ui" line="203"/>
         <source>Disables a separate squelch level for DMR. Uses the default one.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="170"/>
+        <location filename="../src/generalsettingsview.ui" line="206"/>
         <source>Default</source>
         <extracomment>Label for a checkbox that disables a separate DMR squelch setting. The default squelch is then used.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="179"/>
+        <location filename="../src/generalsettingsview.ui" line="215"/>
         <source>VOX Sensitivity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="186"/>
+        <location filename="../src/generalsettingsview.ui" line="228"/>
         <source>Specifies the VOX sensitivity.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="199"/>
+        <location filename="../src/generalsettingsview.ui" line="241"/>
         <source>VOX Delay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="206"/>
+        <location filename="../src/generalsettingsview.ui" line="254"/>
         <source>Specifies the delay between voice detection and transmission. E.g. 500 ms.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="213"/>
+        <location filename="../src/generalsettingsview.ui" line="261"/>
         <source>Maximum Speaker Volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="220"/>
+        <location filename="../src/generalsettingsview.ui" line="274"/>
         <source>Limits the maximum speaker volume.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="236"/>
+        <location filename="../src/generalsettingsview.ui" line="290"/>
         <source>Maximum Headphone Volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="243"/>
+        <location filename="../src/generalsettingsview.ui" line="303"/>
         <source>Limits the maximum headphone volume.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="279"/>
+        <location filename="../src/generalsettingsview.ui" line="345"/>
         <source>Tone Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="287"/>
+        <location filename="../src/generalsettingsview.ui" line="353"/>
         <source>Disable all</source>
         <extracomment>Label for a checkbox disabling all tones.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="294"/>
+        <location filename="../src/generalsettingsview.ui" line="366"/>
         <source>Disables all tones.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="304"/>
+        <location filename="../src/generalsettingsview.ui" line="376"/>
         <source>Key tone volume</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="311"/>
+        <location filename="../src/generalsettingsview.ui" line="389"/>
         <source>off</source>
         <extracomment>Special value of a spin box indicating that keytones are disabled.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="321"/>
+        <location filename="../src/generalsettingsview.ui" line="399"/>
         <source>SMS tone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="328"/>
+        <location filename="../src/generalsettingsview.ui" line="412"/>
         <source>Enables a tone on SMS reception.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="338"/>
+        <location filename="../src/generalsettingsview.ui" line="422"/>
         <source>Ringtone</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="345"/>
+        <location filename="../src/generalsettingsview.ui" line="435"/>
         <source>Enables the ringtone on incoming private calls.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="355"/>
+        <location filename="../src/generalsettingsview.ui" line="445"/>
         <source>Talk permit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="368"/>
+        <location filename="../src/generalsettingsview.ui" line="458"/>
         <source>Boot melody</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="383"/>
-        <location filename="../src/generalsettingsview.ui" line="492"/>
+        <location filename="../src/generalsettingsview.ui" line="479"/>
+        <location filename="../src/generalsettingsview.ui" line="594"/>
         <source>Enabled</source>
         <extracomment>Label for a checkbox, enabling the boot melody
 ----------
@@ -2243,80 +2298,118 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="399"/>
+        <location filename="../src/generalsettingsview.ui" line="495"/>
         <source>Call Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="412"/>
+        <location filename="../src/generalsettingsview.ui" line="508"/>
         <source>Call End</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="425"/>
+        <location filename="../src/generalsettingsview.ui" line="521"/>
         <source>Channel Idle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="435"/>
+        <location filename="../src/generalsettingsview.ui" line="531"/>
         <source>Call Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="507"/>
+        <location filename="../src/generalsettingsview.ui" line="609"/>
         <source>Default Values</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="259"/>
+        <location filename="../src/generalsettingsview.ui" line="319"/>
         <source>Speech Synthesis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="515"/>
+        <location filename="../src/generalsettingsview.ui" line="617"/>
         <source>Power</source>
         <translation>Vermogen</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="523"/>
+        <location filename="../src/generalsettingsview.ui" line="631"/>
         <source>Max</source>
         <translation>Max</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="528"/>
+        <location filename="../src/generalsettingsview.ui" line="636"/>
         <source>High</source>
         <translation>Hoog</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="533"/>
+        <location filename="../src/generalsettingsview.ui" line="641"/>
         <source>Mid</source>
         <translation>Middel</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="538"/>
+        <location filename="../src/generalsettingsview.ui" line="646"/>
         <source>Low</source>
         <translation>Laag</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="543"/>
+        <location filename="../src/generalsettingsview.ui" line="651"/>
         <source>Min</source>
         <translation>Min</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="551"/>
+        <location filename="../src/generalsettingsview.ui" line="659"/>
         <source>Transmit Timeout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="189"/>
-        <location filename="../src/generalsettingsview.ui" line="558"/>
+        <location filename="../src/generalsettingsview.ui" line="231"/>
+        <location filename="../src/generalsettingsview.ui" line="672"/>
         <source>Off</source>
         <translation>Uit</translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="577"/>
+        <location filename="../src/generalsettingsview.ui" line="691"/>
         <source>Extensions</source>
         <translation>Extensies</translation>
+    </message>
+</context>
+<context>
+    <name>GroupListDialog</name>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="30"/>
+        <source>Basic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="38"/>
+        <source>Name</source>
+        <translation type="unfinished">Naam</translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="65"/>
+        <source>Add Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="68"/>
+        <source>Alt++</source>
+        <translation type="unfinished">Alt++</translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="75"/>
+        <source>Remove Contact</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="78"/>
+        <source>Alt+-</source>
+        <translation type="unfinished">Alt+-</translation>
+    </message>
+    <message>
+        <location filename="../src/rxgrouplistdialog.ui" line="88"/>
+        <source>Extensions</source>
+        <translation type="unfinished">Extensies</translation>
     </message>
 </context>
 <context>
@@ -2387,22 +2480,22 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
 <context>
     <name>M17ChannelDialog</name>
     <message>
-        <location filename="../src/m17channeldialog.cc" line="47"/>
+        <location filename="../src/m17channeldialog.cc" line="50"/>
         <source>Channel mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/m17channeldialog.cc" line="49"/>
+        <location filename="../src/m17channeldialog.cc" line="52"/>
         <source>Access number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/m17channeldialog.cc" line="52"/>
+        <location filename="../src/m17channeldialog.cc" line="55"/>
         <source>Tx contact</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/m17channeldialog.cc" line="54"/>
+        <location filename="../src/m17channeldialog.cc" line="57"/>
         <source>Send position</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2410,17 +2503,17 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
 <context>
     <name>M17ChannelModeSelect</name>
     <message>
-        <location filename="../src/m17channeldialog.cc" line="15"/>
+        <location filename="../src/m17channeldialog.cc" line="16"/>
         <source>Voice</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/m17channeldialog.cc" line="16"/>
+        <location filename="../src/m17channeldialog.cc" line="17"/>
         <source>Data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/m17channeldialog.cc" line="17"/>
+        <location filename="../src/m17channeldialog.cc" line="18"/>
         <source>Voice + Data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2487,7 +2580,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
 <context>
     <name>M17ContactSelect</name>
     <message>
-        <location filename="../src/m17contactdialog.cc" line="94"/>
+        <location filename="../src/m17contactdialog.cc" line="102"/>
         <source>[None]</source>
         <translation type="unfinished">[Geen]</translation>
     </message>
@@ -2642,7 +2735,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="280"/>
-        <location filename="../src/mainwindow.cc" line="111"/>
+        <location filename="../src/mainwindow.cc" line="124"/>
         <source>Settings</source>
         <translation>Instellingen</translation>
     </message>
@@ -2742,82 +2835,102 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="78"/>
+        <location filename="../src/mainwindow.cc" line="77"/>
+        <source>Download call-sign DB ... %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="79"/>
+        <source>Download call-sign DB ... (%1MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="84"/>
         <source>Cannot update talkgroup DB: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="81"/>
+        <location filename="../src/mainwindow.cc" line="87"/>
         <source>Talkgroup database updated &amp; loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="86"/>
+        <location filename="../src/mainwindow.cc" line="91"/>
+        <source>Download talkgroup DB ... %1%</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="93"/>
+        <source>Download talkgroup DB ... (%1MB)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cc" line="99"/>
         <source>Cannot update orbital elements: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="89"/>
+        <location filename="../src/mainwindow.cc" line="102"/>
         <source>Orbital elements updated &amp; loaded.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="115"/>
+        <location filename="../src/mainwindow.cc" line="128"/>
         <source>Radio IDs</source>
         <translation type="unfinished">Radio IDs</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="117"/>
+        <location filename="../src/mainwindow.cc" line="130"/>
         <source>Contacts</source>
         <translation type="unfinished">Contacten</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="119"/>
+        <location filename="../src/mainwindow.cc" line="132"/>
         <source>Group Lists</source>
         <translation type="unfinished">Groepenlijst</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="121"/>
+        <location filename="../src/mainwindow.cc" line="134"/>
         <source>Channels</source>
         <translation type="unfinished">Kanalen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="123"/>
+        <location filename="../src/mainwindow.cc" line="136"/>
         <source>Zones</source>
         <translation type="unfinished">Zones</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="125"/>
+        <location filename="../src/mainwindow.cc" line="138"/>
         <source>Scan Lists</source>
         <translation type="unfinished">Scan Lijsten</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="127"/>
+        <location filename="../src/mainwindow.cc" line="140"/>
         <source>GPS/APRS</source>
         <translation type="unfinished">GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="129"/>
+        <location filename="../src/mainwindow.cc" line="142"/>
         <source>Roaming Channels</source>
         <translation type="unfinished">Roaming Kanalen</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="132"/>
+        <location filename="../src/mainwindow.cc" line="145"/>
         <source>Roaming Zones</source>
         <translation type="unfinished">Roaming Zones</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="136"/>
+        <location filename="../src/mainwindow.cc" line="149"/>
         <source>Extensions</source>
         <translation type="unfinished">Extensies</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="149"/>
+        <location filename="../src/mainwindow.cc" line="162"/>
         <source>Unsaved changes to codeplug.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="150"/>
+        <location filename="../src/mainwindow.cc" line="163"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3092,7 +3205,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../src/rxgrouplistdialog.cc" line="126"/>
+        <location filename="../src/rxgrouplistdialog.cc" line="132"/>
         <source>[None]</source>
         <translation>[Geen]</translation>
     </message>
@@ -3110,49 +3223,14 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.cc" line="82"/>
+        <location filename="../src/rxgrouplistdialog.cc" line="88"/>
         <source>Cannot remove group call</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/rxgrouplistdialog.cc" line="83"/>
+        <location filename="../src/rxgrouplistdialog.cc" line="89"/>
         <source>Cannot remove group call: You have to select at least one group call first.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="30"/>
-        <source>Basic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="38"/>
-        <source>Name</source>
-        <translation type="unfinished">Naam</translation>
-    </message>
-    <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="65"/>
-        <source>Add Contact</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="68"/>
-        <source>Alt++</source>
-        <translation type="unfinished">Alt++</translation>
-    </message>
-    <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="75"/>
-        <source>Remove Contact</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="78"/>
-        <source>Alt+-</source>
-        <translation type="unfinished">Alt+-</translation>
-    </message>
-    <message>
-        <location filename="../src/rxgrouplistdialog.ui" line="88"/>
-        <source>Extensions</source>
-        <translation type="unfinished">Extensies</translation>
     </message>
 </context>
 <context>
@@ -3312,22 +3390,22 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.cc" line="37"/>
+        <location filename="../src/roamingchanneldialog.cc" line="40"/>
         <source>Edit roaming channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.cc" line="39"/>
+        <location filename="../src/roamingchanneldialog.cc" line="42"/>
         <source>Create roaming channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.cc" line="46"/>
+        <location filename="../src/roamingchanneldialog.cc" line="49"/>
         <source>TS 1</source>
         <translation type="unfinished">TS 1</translation>
     </message>
     <message>
-        <location filename="../src/roamingchanneldialog.cc" line="47"/>
+        <location filename="../src/roamingchanneldialog.cc" line="50"/>
         <source>TS 2</source>
         <translation type="unfinished">TS 2</translation>
     </message>
@@ -3459,12 +3537,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="83"/>
+        <location filename="../src/roamingzonedialog.cc" line="87"/>
         <source>Cannot remove channels.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="84"/>
+        <location filename="../src/roamingzonedialog.cc" line="88"/>
         <source>Cannot remove channels. Select at least one channel first.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3585,12 +3663,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
 <context>
     <name>RoamingZoneSelect</name>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="121"/>
+        <location filename="../src/roamingzonedialog.cc" line="125"/>
         <source>[None]</source>
         <translation type="unfinished">[Geen]</translation>
     </message>
     <message>
-        <location filename="../src/roamingzonedialog.cc" line="122"/>
+        <location filename="../src/roamingzonedialog.cc" line="126"/>
         <source>[Default]</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3684,12 +3762,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.cc" line="46"/>
+        <location filename="../src/satellitetransponderdialog.cc" line="51"/>
         <source>Invalid name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.cc" line="47"/>
+        <location filename="../src/satellitetransponderdialog.cc" line="52"/>
         <source>Please set a satellite name.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3758,20 +3836,20 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.cc" line="34"/>
-        <location filename="../src/scanlistdialog.cc" line="36"/>
+        <location filename="../src/scanlistdialog.cc" line="38"/>
+        <location filename="../src/scanlistdialog.cc" line="40"/>
         <source>[None]</source>
         <translation type="unfinished">[Geen]</translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.cc" line="35"/>
-        <location filename="../src/scanlistdialog.cc" line="37"/>
         <location filename="../src/scanlistdialog.cc" line="39"/>
+        <location filename="../src/scanlistdialog.cc" line="41"/>
+        <location filename="../src/scanlistdialog.cc" line="43"/>
         <source>[Selected]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/scanlistdialog.cc" line="38"/>
+        <location filename="../src/scanlistdialog.cc" line="42"/>
         <source>[Last]</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3882,7 +3960,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
 <context>
     <name>SettingsDialog</name>
     <message>
-        <location filename="../src/settings.cc" line="495"/>
+        <location filename="../src/settings.cc" line="509"/>
         <source>Warning!</source>
         <translation>Waarschuwing!</translation>
     </message>
@@ -4190,14 +4268,14 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.cc" line="73"/>
-        <location filename="../src/zonedialog.cc" line="104"/>
+        <location filename="../src/zonedialog.cc" line="79"/>
+        <location filename="../src/zonedialog.cc" line="110"/>
         <source>Cannot remove channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/zonedialog.cc" line="74"/>
-        <location filename="../src/zonedialog.cc" line="105"/>
+        <location filename="../src/zonedialog.cc" line="80"/>
+        <location filename="../src/zonedialog.cc" line="111"/>
         <source>Select at least one channel first.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4264,64 +4342,6 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     </message>
 </context>
 <context>
-    <name>aprssystemdialog</name>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="20"/>
-        <source>Edit APRS System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="30"/>
-        <source>Basic</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="42"/>
-        <source>Name</source>
-        <translation>Naam</translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="52"/>
-        <source>Channel</source>
-        <translation>Kanaal</translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="62"/>
-        <source>Source</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="100"/>
-        <source>Destination</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="138"/>
-        <source>Path</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="145"/>
-        <source>Icon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="152"/>
-        <source>Update period [s]</source>
-        <translation type="unfinished">Updateperiode [s]</translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="159"/>
-        <source>Message</source>
-        <translation type="unfinished">Bericht</translation>
-    </message>
-    <message>
-        <location filename="../src/aprssystemdialog.ui" line="192"/>
-        <source>Extensions</source>
-        <translation>Extensies</translation>
-    </message>
-</context>
-<context>
     <name>main</name>
     <message>
         <location filename="../src/main.cc" line="25"/>
@@ -4330,7 +4350,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     </message>
     <message>
         <location filename="../src/main.cc" line="26"/>
-        <source>Specifies applications log-level to stdout. Must be one of `debug`, `info`, `warning`, `error` or `fatal`.</source>
+        <source>Specifies applications log-level to stdout. Must be one of `trace`, `debug`, `info`, `warning`, `error` or `fatal`.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
