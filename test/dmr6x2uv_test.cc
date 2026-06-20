@@ -262,6 +262,24 @@ DMR6X2UVTest::testMicGain() {
 }
 
 
+void
+DMR6X2UVTest::testHiddenZone() {
+  ErrorStack err;
+  Config decoded, config;
+  if (! config.readYAML(":/data/anytone_hidden_zones.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  encodeDecode(config, decoded);
+
+  QCOMPARE(decoded.zones()->count(), 1);
+  QVERIFY(decoded.zones()->zone(0)->anytoneExtension());
+  QVERIFY(decoded.zones()->zone(0)->anytoneExtension()->hidden());
+}
+
+
+
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)
 
