@@ -871,7 +871,7 @@
     <message>
         <location filename="../src/channel_type_edit.cc" line="53"/>
         <source>Select channel types</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanaltypen auswählen</translation>
     </message>
 </context>
 <context>
@@ -1484,7 +1484,7 @@
     <message>
         <location filename="../src/repeaterdatabase.cc" line="542"/>
         <source>Cannot download repeater list from &apos;%1&apos;: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann Repeaterliste nicht von &apos;%1&apos; herunterladen: %2</translation>
     </message>
 </context>
 <context>
@@ -2146,45 +2146,45 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="97"/>
         <source>Default Microphone Amplification</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardmikrofonverstärkung</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="110"/>
         <source>Specifies the default (DMR) microphone amplifiction level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Legt die Standardmikrogfonverstärkung (für DMR) fest.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="123"/>
         <source>FM Microphone Amplifiction</source>
-        <translation type="unfinished"></translation>
+        <translation>FM Mikrofonverstärkung</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="136"/>
         <source>default</source>
         <extracomment>Special value indicating, that the global default mic gain should be used.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="146"/>
         <source>Default Squelch</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardrauschsperre</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="159"/>
         <location filename="../src/generalsettingsview.ui" line="187"/>
         <source>open</source>
         <extracomment>Special value for the squelch setting, disabling/opening the squelch.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>offen</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="172"/>
         <source>DMR Squelch</source>
-        <translation type="unfinished"></translation>
+        <translation>DMR Rauschsperre</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="203"/>
         <source>Disables a separate squelch level for DMR. Uses the default one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Deaktiviert die separate DMR Rauschsperre und verwendet die Standardrauschsperre.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="206"/>
@@ -2195,99 +2195,99 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="215"/>
         <source>VOX Sensitivity</source>
-        <translation type="unfinished"></translation>
+        <translation>VOX Empfindlichkeit</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="228"/>
         <source>Specifies the VOX sensitivity.</source>
-        <translation type="unfinished"></translation>
+        <translation>Legt die VOX Empfindlichkeit fest.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="241"/>
         <source>VOX Delay</source>
-        <translation type="unfinished"></translation>
+        <translation>VOX Verzögerung</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="254"/>
         <source>Specifies the delay between voice detection and transmission. E.g. 500 ms.</source>
-        <translation type="unfinished"></translation>
+        <translation>Legt die Verzögerung zwischen Sprachdetektion und Aussendung fest. Z.B., 500ms.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="261"/>
         <source>Maximum Speaker Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximale Lautsprecherlautstärke</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="274"/>
         <source>Limits the maximum speaker volume.</source>
-        <translation type="unfinished"></translation>
+        <translation>Limitiert die maximale Lautsprecherlautstärke.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="290"/>
         <source>Maximum Headphone Volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Maximale Kopfhörerlautstärke</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="303"/>
         <source>Limits the maximum headphone volume.</source>
-        <translation type="unfinished"></translation>
+        <translation>Limitiert die maximale Kopfhörerlautstärke.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="345"/>
         <source>Tone Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Toneinstellungen</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="353"/>
         <source>Disable all</source>
         <extracomment>Label for a checkbox disabling all tones.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Alle aus</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="366"/>
         <source>Disables all tones.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schaltet alle Töne aus.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="376"/>
         <source>Key tone volume</source>
-        <translation type="unfinished"></translation>
+        <translation>Tastentonlautstärke</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="389"/>
         <source>off</source>
         <extracomment>Special value of a spin box indicating that keytones are disabled.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>aus</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="399"/>
         <source>SMS tone</source>
-        <translation type="unfinished"></translation>
+        <translation>SMS-Ton</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="412"/>
         <source>Enables a tone on SMS reception.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schaltet den SMS-Empfangston ein.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="422"/>
         <source>Ringtone</source>
-        <translation type="unfinished"></translation>
+        <translation>Klingelton</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="435"/>
         <source>Enables the ringtone on incoming private calls.</source>
-        <translation type="unfinished"></translation>
+        <translation>Schaltet den Klingelton für eingehende Direktrufe ein.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="445"/>
         <source>Talk permit</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprechberechtigung</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="458"/>
         <source>Boot melody</source>
-        <translation type="unfinished"></translation>
+        <translation>Startmelodie</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="479"/>
@@ -2296,32 +2296,32 @@
         <extracomment>Label for a checkbox, enabling the boot melody
 ----------
 Label for a checkbox enabling the call-reset tone.</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Ein</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="495"/>
         <source>Call Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Rufbeginn</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="508"/>
         <source>Call End</source>
-        <translation type="unfinished"></translation>
+        <translation>Rufende</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="521"/>
         <source>Channel Idle</source>
-        <translation type="unfinished"></translation>
+        <translation>Kanal frei</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="531"/>
         <source>Call Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Ruf zurückgesetzt</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="609"/>
         <source>Default Values</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardwerte</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="319"/>
@@ -2942,18 +2942,18 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/melody_edit.cc" line="16"/>
         <source>bpm</source>
         <comment>Beats per minute. Unit in a spin box.</comment>
-        <translation type="unfinished"></translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../src/melody_edit.cc" line="17"/>
         <source>Specify the melody in Lilypond format.</source>
         <comment>Tooltip for a melody entry field.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie eine Melodie im Lilypondformat an.</translation>
     </message>
     <message>
         <location filename="../src/melody_edit.cc" line="23"/>
         <source>Melody</source>
-        <translation type="unfinished"></translation>
+        <translation>Melodie</translation>
     </message>
 </context>
 <context>
@@ -3357,7 +3357,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/repeaterbooksource.cc" line="70"/>
         <source>Cannot query repeaterbook.com: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Kann repeaterbook.com nicht abfragen: %1</translation>
     </message>
 </context>
 <context>
@@ -3714,12 +3714,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="20"/>
         <source>Satellite</source>
-        <translation type="unfinished"></translation>
+        <translation>Satellit</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="26"/>
         <source>Satellite Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Satellitenname</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="55"/>
@@ -3768,12 +3768,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/satellitetransponderdialog.cc" line="51"/>
         <source>Invalid name</source>
-        <translation type="unfinished"></translation>
+        <translation>Ungültiger Name</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.cc" line="52"/>
         <source>Please set a satellite name.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitte geben Sie einen Satellitennamen an.</translation>
     </message>
 </context>
 <context>
