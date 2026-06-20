@@ -1072,7 +1072,7 @@ public:
     /** Some limits. */
     struct Limit: Element::Limit {
       /** Maximum number of scan lists. */
-      static constexpr unsigned int scanLists()   { return 32; }
+      static constexpr unsigned int scanLists()   { return 31; }
     };
 
     /** Some internal offsets. */
