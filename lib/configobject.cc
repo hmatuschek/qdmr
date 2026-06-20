@@ -501,7 +501,8 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
                                   prop.name(), QVariant::fromValue(obj)).toStdString());
         node[prop.name()] = tag;
         continue;
-      } else if (! context.contains(obj)) {
+      }
+      if (! context.contains(obj)) {
         errMsg(err) << "Cannot reference object of type " << obj->metaObject()->className()
                     << " object not labeled.";
         return false;
@@ -513,6 +514,15 @@ ConfigItem::populate(YAML::Node &node, const Context &context, const ErrorStack 
       list.SetStyle(YAML::EmitterStyle::Flow);
       for (int i=0; i<refs->count(); i++) {
         ConfigObject *obj = refs->get(i);
+        // Handle tags
+        if (context.hasTag(prop.enclosingMetaObject()->className(),
+                   prop.name(), QVariant::fromValue(obj))) {
+          YAML::Node tag(YAML::NodeType::Scalar);
+          tag.SetTag(context.getTag(prop.enclosingMetaObject()->className(),
+                                    prop.name(), QVariant::fromValue(obj)).toStdString());
+          list.push_back(tag);
+          continue;
+        }
         if (! context.contains(obj)) {
           errMsg(err) << "Cannot reference object of type " << obj->metaObject()->className()
                       << " object not labeled.";
