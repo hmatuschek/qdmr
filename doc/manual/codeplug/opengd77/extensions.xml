@@ -16,5 +16,6 @@
 
 <xi:include href="channel.xml"/>
 <xi:include href="contact.xml"/>
+<xi:include href="aprs.xml"/>
 
 </section>
