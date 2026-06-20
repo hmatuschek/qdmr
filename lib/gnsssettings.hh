@@ -41,6 +41,8 @@ public:
 
   ConfigItem *clone() const override;
 
+  /** Returns @c true, if the fixed position is valid and either explicitly enabled
+   * or the GNSSs flags are set to fixed. */
   bool fixedPositionEnabled() const;
   void enableFixedPosition(bool use);
 

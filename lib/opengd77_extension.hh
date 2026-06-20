@@ -71,10 +71,6 @@ public:
   /** Enables power save for this channel. */
   void enablePowerSave(bool enable);
 
-  /** Returns @c true if the fixed location is enabled. */
-  bool locationEnabled() const;
-  /** Enables the fixed location. */
-  void enableLocation(bool enable);
   /** Returns the fixed location for this channel. */
   const QGeoCoordinate &location() const;
   /** Returns the fixed location for this channel. */
@@ -103,8 +99,6 @@ protected:
   bool _beep;
   /** Holds the power-save flag. */
   bool _powerSave;
-  /** If @c true, fixed location is used. */
-  bool _locationEnabled;
   /** Holds the fixed location. */
   QGeoCoordinate _location;
   /** Holds the talker alias setting for timeslot 1. */

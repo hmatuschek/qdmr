@@ -66,20 +66,6 @@ OpenGD77ChannelExtension::enablePowerSave(bool enable) {
 }
 
 
-bool
-OpenGD77ChannelExtension::locationEnabled() const {
-  return _locationEnabled;
-}
-
-void
-OpenGD77ChannelExtension::enableLocation(bool enable) {
-  if (_locationEnabled == enable)
-    return;
-  _locationEnabled = enable;
-  emit modified(this);
-}
-
-
 const QGeoCoordinate &
 OpenGD77ChannelExtension::location() const {
   return _location;
