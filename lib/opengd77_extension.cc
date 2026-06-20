@@ -152,3 +152,38 @@ OpenGD77ContactExtension::setTimeSlotOverride(TimeSlotOverride ts) {
   _timeSlotOverride = ts;
 }
 
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77FMAPRSSystemExtension
+ * ******************************************************************************************** */
+OpenGD77FMAPRSSystemExtension::OpenGD77FMAPRSSystemExtension(QObject *parent)
+  : ConfigExtension(parent), _transmitQSY(false)
+{
+  // pass...
+}
+
+ConfigItem *
+OpenGD77FMAPRSSystemExtension::clone() const {
+  auto ex = new OpenGD77FMAPRSSystemExtension();
+  if (! ex->copy(*this)) {
+    ex->deleteLater();
+    return nullptr;
+  }
+  return ex;
+}
+
+
+bool
+OpenGD77FMAPRSSystemExtension::transmitQSY() const {
+  return _transmitQSY;
+}
+
+void
+OpenGD77FMAPRSSystemExtension::enableTransmitQSY(bool enable) {
+  if (_transmitQSY == enable)
+    return;
+  _transmitQSY = enable;
+  emit modified(this);
+}
+

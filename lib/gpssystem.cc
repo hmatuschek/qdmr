@@ -242,7 +242,7 @@ FMAPRSSystem::FMAPRSSystem(const QString &name, FMChannel *channel, const QStrin
                        const Interval &period, QObject *parent)
   : PositionReportingSystem(name, period, parent), _channel(), _destination(dest), _destSSID(destSSID),
     _source(src), _srcSSID(srcSSID), _path(path), _icon(icon), _message(message),
-    _anytone(nullptr)
+    _anytone(nullptr), _opengd77(nullptr)
 {
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _channel.allow(SelectedChannel::get()->metaObject());
@@ -272,7 +272,7 @@ FMAPRSSystem::copy(const ConfigItem &other) {
 
 ConfigItem *
 FMAPRSSystem::clone() const {
-  FMAPRSSystem *sys = new FMAPRSSystem();
+  auto sys = new FMAPRSSystem();
   if (! sys->copy(*this)) {
     sys->deleteLater();
     return nullptr;
@@ -413,6 +413,24 @@ FMAPRSSystem::setAnytoneExtension(AnytoneFMAPRSSettingsExtension *ext) {
     _anytone = ext;
     ext->setParent(this);
     connect(ext, SIGNAL(modified(ConfigItem *)), this, SIGNAL(modified(ConfigItem *)));
+  }
+}
+
+
+OpenGD77FMAPRSSystemExtension *
+FMAPRSSystem::openGD77Extension() const {
+  return _opengd77;
+}
+void
+FMAPRSSystem::setOpenGD77Extension(OpenGD77FMAPRSSystemExtension *ext) {
+  if (_opengd77) {
+    _opengd77->deleteLater();
+    _opengd77 = nullptr;
+  }
+  if (ext) {
+    _opengd77 = ext;
+    ext->setParent(this);
+    connect(ext, &OpenGD77FMAPRSSystemExtension::modified, this, &FMAPRSSystem::modified);
   }
 }
 
