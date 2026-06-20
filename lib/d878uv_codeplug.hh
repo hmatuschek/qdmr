@@ -1813,21 +1813,6 @@ public:
   };
 
 
-  /** Encodes the bitmap, indicating which zone is hidden. */
-  class HiddenZoneBitmapElement: public BitmapElement
-  {
-  protected:
-    /** Hidden constructor. */
-    HiddenZoneBitmapElement(uint8_t *ptr, size_t size);
-
-  public:
-    /** Constructor. */
-    HiddenZoneBitmapElement(uint8_t *ptr);
-
-    /** The size of the element. */
-    static constexpr unsigned int size() { return 0x0020; }
-  };
-
   /** Encodes some information about the radio and firmware.
    *
    * Binary encoding of the info, size 0x0100 bytes:

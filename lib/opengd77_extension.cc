@@ -66,20 +66,6 @@ OpenGD77ChannelExtension::enablePowerSave(bool enable) {
 }
 
 
-bool
-OpenGD77ChannelExtension::locationEnabled() const {
-  return _locationEnabled;
-}
-
-void
-OpenGD77ChannelExtension::enableLocation(bool enable) {
-  if (_locationEnabled == enable)
-    return;
-  _locationEnabled = enable;
-  emit modified(this);
-}
-
-
 const QGeoCoordinate &
 OpenGD77ChannelExtension::location() const {
   return _location;
@@ -150,5 +136,53 @@ OpenGD77ContactExtension::timeSlotOverride() const {
 void
 OpenGD77ContactExtension::setTimeSlotOverride(TimeSlotOverride ts) {
   _timeSlotOverride = ts;
+}
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of OpenGD77FMAPRSSystemExtension
+ * ******************************************************************************************** */
+OpenGD77FMAPRSSystemExtension::OpenGD77FMAPRSSystemExtension(QObject *parent)
+  : ConfigExtension(parent), _transmitQSY(false), _baudRate(1200)
+{
+  // pass...
+}
+
+ConfigItem *
+OpenGD77FMAPRSSystemExtension::clone() const {
+  auto ex = new OpenGD77FMAPRSSystemExtension();
+  if (! ex->copy(*this)) {
+    ex->deleteLater();
+    return nullptr;
+  }
+  return ex;
+}
+
+
+bool
+OpenGD77FMAPRSSystemExtension::transmitQSY() const {
+  return _transmitQSY;
+}
+
+void
+OpenGD77FMAPRSSystemExtension::enableTransmitQSY(bool enable) {
+  if (_transmitQSY == enable)
+    return;
+  _transmitQSY = enable;
+  emit modified(this);
+}
+
+unsigned int
+OpenGD77FMAPRSSystemExtension::baudRate() const {
+  return _baudRate;
+}
+
+void
+OpenGD77FMAPRSSystemExtension::setBaudRate(unsigned int baudRate) {
+  if (_baudRate == baudRate)
+    return;
+  _baudRate = baudRate;
+  emit modified(this);
 }
 

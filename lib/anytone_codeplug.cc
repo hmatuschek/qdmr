@@ -2159,6 +2159,24 @@ AnytoneCodeplug::ZoneBitmapElement::ZoneBitmapElement(uint8_t *ptr)
 }
 
 
+
+/* ******************************************************************************************** *
+ * Implementation of AnytoneCodeplug::HiddenZoneBitmapElement
+ * ******************************************************************************************** */
+AnytoneCodeplug::HiddenZoneBitmapElement::HiddenZoneBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::HiddenZoneBitmapElement::HiddenZoneBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, HiddenZoneBitmapElement::size())
+{
+  // pass...
+}
+
+
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::BootSettingsElement
  * ********************************************************************************************* */

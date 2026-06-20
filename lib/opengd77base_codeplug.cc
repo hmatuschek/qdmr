@@ -594,8 +594,8 @@ OpenGD77BaseCodeplug::ChannelElement::decode(Codeplug::Context &ctx, const Error
   ch->openGD77ChannelExtension()->enableScanAllSkip(skipScan());
   ch->openGD77ChannelExtension()->enableBeep(beep());
   ch->openGD77ChannelExtension()->enablePowerSave(powerSave());
-  ch->openGD77ChannelExtension()->enableLocation(fixedPositionEnabled());
-  ch->openGD77ChannelExtension()->setLocation(fixedPosition());
+  if (fixedPositionEnabled())
+    ch->openGD77ChannelExtension()->setLocation(fixedPosition());
   ch->openGD77ChannelExtension()->setTalkerAliasTS1(aliasTimeSlot1());
   ch->openGD77ChannelExtension()->setTalkerAliasTS2(aliasTimeSlot2());
 
@@ -667,6 +667,11 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
   bool channelVOXEnabled = (! (c->voxDisabled()||c->defaultVOX()));
   enableVOX(defaultVOXEnabled || channelVOXEnabled);
 
+  // Handle global fixed location, this might be overridden by the channel extension.
+  setFixedPosition(ctx.config()->settings()->gnss()->fixedPosition());
+  // Enable fixed position for channel only, if enabled globally.
+  enableFixedPosition(ctx.config()->settings()->gnss()->fixedPositionEnabled());
+
   if (c->is<FMChannel>()) {
     const FMChannel *ac = c->as<const FMChannel>();
     setMode(MODE_ANALOG);
@@ -703,7 +708,7 @@ OpenGD77BaseCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, con
   enableBeep(c->openGD77ChannelExtension()->beep());
   enablePowerSave(c->openGD77ChannelExtension()->powerSave());
   setFixedPosition(c->openGD77ChannelExtension()->location());
-  enableFixedPosition(c->openGD77ChannelExtension()->locationEnabled());
+  enableFixedPosition(c->openGD77ChannelExtension()->location().isValid());
 
   setAliasTimeSlot1(c->openGD77ChannelExtension()->talkerAliasTS1());
   setAliasTimeSlot2(c->openGD77ChannelExtension()->talkerAliasTS2());
@@ -1055,6 +1060,17 @@ OpenGD77BaseCodeplug::APRSSettingsElement::setPositionPrecision(PositionPrecisio
 
 
 bool
+OpenGD77BaseCodeplug::APRSSettingsElement::transmitQSY() const {
+  return getBit(Offset::transmitQSY());
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::enableTransmitQSY(bool enable) {
+  setBit(Offset::transmitQSY(), enable);
+}
+
+
+bool
 OpenGD77BaseCodeplug::APRSSettingsElement::hasVia1() const {
   return ! via1Call().isEmpty();
 }
@@ -1182,6 +1198,11 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const FMAPRSSystem *sys, const
     setFMFrequency(sys->revertChannel()->txFrequency());
   }
 
+  if (! sys->openGD77Extension())
+    return true;
+  // If there is a OpenGD77 settings extension:
+  enableTransmitQSY(sys->openGD77Extension()->transmitQSY());
+  setBaudRate(300 == sys->openGD77Extension()->baudRate() ? BaudRate::Baud300 : BaudRate::Baud1200);
   return true;
 }
 
@@ -1207,8 +1228,15 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
   sys->setIcon(icon());
   sys->setMessage(comment());
 
+  // Handle OpenGD77 extension.
+  if (nullptr == sys->openGD77Extension())
+    sys->setOpenGD77Extension(new OpenGD77FMAPRSSystemExtension());
+  sys->openGD77Extension()->enableTransmitQSY(transmitQSY());
+  sys->openGD77Extension()->setBaudRate(BaudRate::Baud300 == baudRate() ? 300 : 1200);
+
   return sys;
 }
+
 
 bool
 OpenGD77BaseCodeplug::APRSSettingsElement::link(FMAPRSSystem *sys, const Context &ctx, const ErrorStack &err) {
