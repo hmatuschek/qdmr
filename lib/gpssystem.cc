@@ -223,7 +223,7 @@ DMRAPRSSystem::serialize(const Context &context, const ErrorStack &err) {
 FMAPRSSystem::FMAPRSSystem(QObject *parent)
   : PositionReportingSystem(parent), _channel(), _destination(), _destSSID(0),
     _source(), _srcSSID(0), _path(), _icon(Icon::None), _message(),
-    _anytone(nullptr)
+    _anytone(nullptr), _opengd77(nullptr)
 {
   // Allow revert channel to take a reference to the SelectedChannel singleton
   _channel.allow(SelectedChannel::get()->metaObject());

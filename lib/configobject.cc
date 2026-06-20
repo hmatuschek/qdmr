@@ -784,10 +784,10 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
       QGeoCoordinate value = node[prop.name()].as<QGeoCoordinate>(QGeoCoordinate());
       qDebug() << "Write to property" << prop.name() << "value" << value;
       prop.write(this, QVariant::fromValue(value));
-    } else if (prop.read(this).value<ConfigObjectReference *>()) {
+    } else if (prop.read(this).isValid() && prop.read(this).value<ConfigObjectReference *>()) {
       // references are linked later
       continue;
-    } else if (prop.read(this).value<ConfigObjectRefList *>()) {
+    } else if (prop.read(this).isValid() && prop.read(this).value<ConfigObjectRefList *>()) {
       // reference lists are linked later
       continue;
     } else if (propIsInstance<ConfigItem>(prop)) {
@@ -830,7 +830,7 @@ ConfigItem::parse(const YAML::Node &node, ConfigItem::Context &ctx, const ErrorS
           obj->deleteLater();
         return false;
       }
-    } else if (prop.read(this).value<ConfigObjectList *>()) {
+    } else if (prop.read(this).isValid() && prop.read(this).value<ConfigObjectList *>()) {
       if ((!node[prop.name()]) || node[prop.name()].IsNull())
         continue;
       // check type
