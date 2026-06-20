@@ -66,6 +66,7 @@ qdmr or dmrconf.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
 
+ * **[Version 0.15.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.15.1)** -- Bugfix release.
  * **[Version 0.15.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.15.0)** -- Added support for AnyTone AT-D168UV, added common settings.
  * **[Version 0.14.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.14.1)** -- Added support for Baofeng DM-32UV, added AM channels.
  * **[Version 0.13.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.3)** -- Added support BTech DMR6X2PRO and OpenUV390.

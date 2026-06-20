@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<section xml:id="extOpenGD77APRS"
+         xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
+    <info>
+        <title>FM APRS extension</title>
+    </info>
+
+    <para>
+        This extensions allows to specify some attributes for FM APRS settings specific to radios running the OpenGD77
+        firmware.
+    </para>
+
+    <example>
+        <title></title>
+        <programlisting><![CDATA[positioning:
+  - aprs:
+    name: APRS
+    # ...
+    opengd77:
+      transmitQSY: false
+      baud: 1200
+]]></programlisting>
+    </example>
+
+    <para>
+        The OpenGD77 extension is a mapping named <token>opengd77</token>. It contains the
+        device specific settings for that APRS system.
+    </para>
+
+
+    <section>
+        <info>
+            <title>FM APRS attributes</title>
+        </info>
+
+        <para>
+            For now, there are only two attributes affecting the behavior of the APRS system.
+        </para>
+
+        <variablelist>
+            <title>APRS extension fields</title>
+            <varlistentry>
+                <term><token>transmitQSY</token></term>
+                <listitem>
+                    <para>
+                        If enabled, OpenGD77 will append the current frequency to the APRS message.
+                    </para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term><token></token></term>
+                <listitem>
+                    <para>
+                        Sets the baud rate for the ARPS transmission. This can either be <token>1200</token> or
+                        <token>300</token>. The former is the default and used on VHF. The latter is used on HF.
+                    </para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
+
+</section>
