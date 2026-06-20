@@ -3787,22 +3787,6 @@ D878UVCodeplug::ARC4EncryptionKeyBitmapElement::ARC4EncryptionKeyBitmapElement(u
 
 
 /* ******************************************************************************************** *
- * Implementation of D878UVCodeplug::HiddenZoneBitmapElement
- * ******************************************************************************************** */
-D878UVCodeplug::HiddenZoneBitmapElement::HiddenZoneBitmapElement(uint8_t *ptr, size_t size)
-  : BitmapElement(ptr, size)
-{
-  // pass...
-}
-
-D878UVCodeplug::HiddenZoneBitmapElement::HiddenZoneBitmapElement(uint8_t *ptr)
-  : BitmapElement(ptr, HiddenZoneBitmapElement::size())
-{
-  // pass...
-}
-
-
-/* ******************************************************************************************** *
  * Implementation of D878UVCodeplug::RadioInfoElement
  * ******************************************************************************************** */
 D878UVCodeplug::RadioInfoElement::RadioInfoElement(uint8_t *ptr, unsigned size)
