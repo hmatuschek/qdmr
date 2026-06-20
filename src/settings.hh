@@ -112,8 +112,8 @@ public:
   ConfigMergeVisitor::SetStrategy configMergeSetStrategy() const;
   void setConfigMergeSetStrategy(ConfigMergeVisitor::SetStrategy strategy);
 
-  QByteArray mainWindowState() const;
-  void setMainWindowState(const QByteArray &state);
+  QByteArray windowState(const QString &objName) const;
+  void setWindowState(const QString &objName, const QByteArray &state);
 
   QByteArray headerState(const QString &objName) const;
   void setHeaderState(const QString &objName, const QByteArray &state);
@@ -132,9 +132,11 @@ class SettingsDialog: public QDialog, private Ui::SettingsDialog
 
 public:
   explicit SettingsDialog(QWidget *parent=nullptr);
+  ~SettingsDialog();
 
   bool systemLocationEnabled() const;
   QString locator() const;
+
 
 public slots:
   void accept();

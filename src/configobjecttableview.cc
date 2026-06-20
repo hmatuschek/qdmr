@@ -2,7 +2,6 @@
 #include "ui_configobjecttableview.h"
 #include "searchpopup.hh"
 #include <QMessageBox>
-#include <QSortFilterProxyModel>
 #include "settings.hh"
 
 
@@ -63,6 +62,7 @@ ConfigObjectTableView::ConfigObjectTableView(QWidget *parent)
 }
 
 ConfigObjectTableView::~ConfigObjectTableView() {
+  Settings().setHeaderState(objectName(), ui->tableView->horizontalHeader()->saveState());
   delete ui;
 }
 
@@ -85,6 +85,8 @@ ConfigObjectTableView::setModel(GenericTableWrapper *model) {
     if (selectionModel)
       selectionModel->deleteLater();
   }
+
+  Settings().setHeaderState(objectName(), ui->tableView->horizontalHeader()->saveState());
 }
 
 

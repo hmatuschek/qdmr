@@ -2,6 +2,9 @@
 #include "ui_configobjectlistview.h"
 #include "searchpopup.hh"
 #include <QMessageBox>
+#include "settings.hh"
+#include <QListView>
+
 
 inline QPair<int, int>
 getSelectionRowRange(const QModelIndexList &indices) {

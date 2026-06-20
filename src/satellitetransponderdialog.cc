@@ -1,8 +1,11 @@
 #include "satellitetransponderdialog.hh"
 
 #include <QMessageBox>
+#include "settings.hh"
 
 #include "ui_satellitetransponderdialog.h"
+
+
 
 SatelliteTransponderDialog::SatelliteTransponderDialog(const Satellite &sat, TransponderDatabase &transponder, QWidget *parent)
   : QDialog(parent) , ui(new Ui::SatelliteTransponderDialog), _satellite(sat)
@@ -28,12 +31,14 @@ SatelliteTransponderDialog::SatelliteTransponderDialog(const Satellite &sat, Tra
 
   ui->beaconFrequency->populate(_satellite.id(), false, Transponder::Mode::CW, transponder);
   ui->beaconFrequency->setFrequency(_satellite.beacon());
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
 SatelliteTransponderDialog::~SatelliteTransponderDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
-
 
 const Satellite &
 SatelliteTransponderDialog::satellite() const {

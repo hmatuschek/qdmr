@@ -31,9 +31,12 @@ DMRIDDialog::construct() {
 
   ui->extensionView->setObjectName("dmrRadioIdExtension");
   ui->extensionView->setObject(_myID, _config);
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
 DMRIDDialog::~DMRIDDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 

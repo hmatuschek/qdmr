@@ -55,6 +55,8 @@ signals:
   void loaded();
   /** Gets emitted if the loading of the talk group database fails. */
   void error(const QString &msg);
+  /** Gets emitted on download progress. */
+  void downloadProgress(qint64 loaded, qint64 total);
 
 public slots:
   /** Starts the download of the talk group database. */

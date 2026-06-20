@@ -1,5 +1,7 @@
 #include "flageditdialog.hh"
 #include "ui_flageditdialog.h"
+#include "settings.hh"
+
 
 FlagEditDialog::FlagEditDialog(QMetaEnum metaFlag, QWidget *parent)
   : QDialog(parent), ui(new Ui::FlagEditDialog), _metaFlag(metaFlag)
@@ -12,8 +14,14 @@ FlagEditDialog::FlagEditDialog(QMetaEnum metaFlag, QWidget *parent)
     item->setData(Qt::UserRole, QByteArray(metaFlag.key(i)));
     ui->list->addItem(item);
   }
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
+void
+FlagEditDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
+}
 
 int
 FlagEditDialog::value() const {
