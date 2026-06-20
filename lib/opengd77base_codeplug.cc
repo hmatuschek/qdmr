@@ -1060,6 +1060,17 @@ OpenGD77BaseCodeplug::APRSSettingsElement::setPositionPrecision(PositionPrecisio
 
 
 bool
+OpenGD77BaseCodeplug::APRSSettingsElement::transmitQSY() const {
+  return getBit(Offset::transmitQSY());
+}
+
+void
+OpenGD77BaseCodeplug::APRSSettingsElement::enableTransmitQSY(bool enable) {
+  setBit(Offset::transmitQSY(), enable);
+}
+
+
+bool
 OpenGD77BaseCodeplug::APRSSettingsElement::hasVia1() const {
   return ! via1Call().isEmpty();
 }
@@ -1187,6 +1198,11 @@ OpenGD77BaseCodeplug::APRSSettingsElement::encode(const FMAPRSSystem *sys, const
     setFMFrequency(sys->revertChannel()->txFrequency());
   }
 
+  if (! sys->openGD77Extension())
+    return true;
+  // If there is a OpenGD77 settings extension:
+  enableTransmitQSY(sys->openGD77Extension()->transmitQSY());
+  setBaudRate(300 == sys->openGD77Extension()->baudRate() ? BaudRate::Baud300 : BaudRate::Baud1200);
   return true;
 }
 
@@ -1212,8 +1228,15 @@ OpenGD77BaseCodeplug::APRSSettingsElement::decode(const Context &ctx, const Erro
   sys->setIcon(icon());
   sys->setMessage(comment());
 
+  // Handle OpenGD77 extension.
+  if (nullptr == sys->openGD77Extension())
+    sys->setOpenGD77Extension(new OpenGD77FMAPRSSystemExtension());
+  sys->openGD77Extension()->enableTransmitQSY(transmitQSY());
+  sys->openGD77Extension()->setBaudRate(BaudRate::Baud300 == baudRate() ? 300 : 1200);
+
   return sys;
 }
+
 
 bool
 OpenGD77BaseCodeplug::APRSSettingsElement::link(FMAPRSSystem *sys, const Context &ctx, const ErrorStack &err) {

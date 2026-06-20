@@ -155,4 +155,48 @@ protected:
 };
 
 
+/** Implements the FM-APRS extensions for the OpenGD77 radios.
+ * @since 0.15.2
+ * @ingroup ogd77ex */
+class OpenGD77FMAPRSSystemExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("description", "FM APRS settings for OpenGD77 radios.")
+  Q_CLASSINFO("longDescription", "This extension implements all FM APRS settings specific to radios "
+              "running the OpenGD77 firmware.")
+
+  Q_CLASSINFO("transmitQSYDescription", "Adds the channel frequency to APRS message.")
+  Q_CLASSINFO("transmitQSYLongDescription", "If enabled, the current frequency gets added to the APRS message.")
+  /** Transmit QSY flag. */
+  Q_PROPERTY(bool transmitQSY READ transmitQSY WRITE enableTransmitQSY)
+
+  Q_CLASSINFO("baudDescription", "Specifies the baud rate.")
+  /** Baud rate settings. */
+  Q_PROPERTY(unsigned int baud READ baudRate WRITE setBaudRate)
+
+public:
+  /** Constructor. */
+  Q_INVOKABLE explicit OpenGD77FMAPRSSystemExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const override;
+
+  /** Returns @c true if transmit QSY is enabled. */
+  bool transmitQSY() const;
+  /** Enables/disables transmit QSY. */
+  void enableTransmitQSY(bool enable);
+
+  /** Returns the baud rate. */
+  unsigned int baudRate() const;
+  /** Sets the baud rate. */
+  void setBaudRate(unsigned int baudRate);
+
+protected:
+  /** Hold the transmit QSY flag. */
+  bool _transmitQSY;
+  /** Holds the baud rate. */
+  unsigned int _baudRate;
+};
+
+
 #endif // OPENGD77EXTENSION_HH
