@@ -26,6 +26,7 @@ public:
 protected:
   /** Assembles the GUI, populates elements. */
   void construct();
+  void closeEvent(QCloseEvent *event);
 
 protected slots:
   void onBroadcastToggled(bool enable);

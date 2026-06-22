@@ -2000,44 +2000,23 @@ AnytoneCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, C
   // Link repeater offsets
   if (this->hasAutoRepeaterOffsetFrequencyIndexVHF()) {
     if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF())) {
-      errMsg(err) << "Cannot link auto-repeater offset for VHF, index "
-                  << this->autoRepeaterOffsetFrequencyIndexVHF() << " not defined.";
-      return false;
+      logWarn() << "Cannot link auto-repeater offset for VHF, index "
+                << this->autoRepeaterOffsetFrequencyIndexVHF() << " not defined.";
+    } else {
+      ext->autoRepeaterSettings()->vhfRef()->set(
+            ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF()));
     }
-    ext->autoRepeaterSettings()->vhfRef()->set(
-          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF()));
   }
 
   if (this->hasAutoRepeaterOffsetFrequencyIndexUHF()) {
     if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF())) {
-      errMsg(err) << "Cannot link auto-repeater offset for UHF, index "
-                  << this->autoRepeaterOffsetFrequencyIndexUHF() << " not defined.";
-      return false;
+      logWarn() << "Cannot link auto-repeater offset for UHF, index "
+                << this->autoRepeaterOffsetFrequencyIndexUHF() << " not defined.";
+    } else {
+      ext->autoRepeaterSettings()->uhfRef()->set(
+            ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF()));
     }
-    ext->autoRepeaterSettings()->uhfRef()->set(
-          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF()));
   }
-
-  // Link auto-repeater
-  if (hasAutoRepeaterOffsetFrequencyIndexVHF()) {
-    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF())) {
-      errMsg(err) << "Cannot link auto-repeater offset frequency for VHF, index "
-                  << this->autoRepeaterOffsetFrequencyIndexVHF() << " not defined.";
-      return false;
-    }
-    ext->autoRepeaterSettings()->vhfRef()->set(
-          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexVHF()));
-  }
-  if (hasAutoRepeaterOffsetFrequencyIndexUHF()) {
-    if (! ctx.has<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF())) {
-      errMsg(err) << "Cannot link auto-repeater offset frequency for UHF, index "
-                  << this->autoRepeaterOffsetFrequencyIndexUHF() << " not defined.";
-      return false;
-    }
-    ext->autoRepeaterSettings()->uhfRef()->set(
-          ctx.get<AnytoneAutoRepeaterOffset>(this->autoRepeaterOffsetFrequencyIndexUHF()));
-  }
-
 
   return true;
 }
@@ -2178,6 +2157,24 @@ AnytoneCodeplug::ZoneBitmapElement::ZoneBitmapElement(uint8_t *ptr)
 {
   // pass...
 }
+
+
+
+/* ******************************************************************************************** *
+ * Implementation of AnytoneCodeplug::HiddenZoneBitmapElement
+ * ******************************************************************************************** */
+AnytoneCodeplug::HiddenZoneBitmapElement::HiddenZoneBitmapElement(uint8_t *ptr, size_t size)
+  : BitmapElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::HiddenZoneBitmapElement::HiddenZoneBitmapElement(uint8_t *ptr)
+  : BitmapElement(ptr, HiddenZoneBitmapElement::size())
+{
+  // pass...
+}
+
 
 
 /* ********************************************************************************************* *

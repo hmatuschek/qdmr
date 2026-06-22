@@ -66,7 +66,8 @@ RepeaterBookSource::load(const QString &queryCall) {
 void
 RepeaterBookSource::onRequestFinished(QNetworkReply *reply) {
   if (reply->error()) {
-    logError() << "Cannot download repeater list: " << reply->errorString();
+    logError() << "Cannot query repeaterbook.com: " << reply->errorString();
+    emit error(tr("Cannot query repeaterbook.com: %1").arg(reply->errorString()));
     reply->deleteLater();
     _currentReply = nullptr;
     return;

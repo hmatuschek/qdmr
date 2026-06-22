@@ -24,6 +24,7 @@ DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
   _colorcode(nullptr), _timeSlot(nullptr), _groupList(nullptr), _contact(nullptr),
   _aprs(nullptr), _roam(nullptr)
 {
+  setObjectName("DMRChannelDialog");
   auto app = qobject_cast<Application *>(qApp);
   auto completer = new RepeaterCompleter(2, app->repeater(), this);
   auto filter = new DMRRepeaterFilter(app->repeater(), app->position(), this);
@@ -50,6 +51,8 @@ DMRChannelDialog::DMRChannelDialog(Config *config, QWidget *parent)
                         _aprs = new APRSSelect(config));
   ui->rightForm->addRow(tr("Roaming zone"),
                         _roam = new RoamingZoneSelect(config));
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
 

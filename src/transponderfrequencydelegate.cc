@@ -1,4 +1,7 @@
 #include "transponderfrequencydelegate.hh"
+
+#include <QLineEdit>
+
 #include "satellitedatabase.hh"
 
 
@@ -9,6 +12,9 @@ TransponderFrequencyEditor::TransponderFrequencyEditor(QWidget *parent)
   : QComboBox(parent)
 {
   setEditable(true);
+  setInsertPolicy(NoInsert);
+  connect(this->lineEdit(), &QLineEdit::editingFinished,
+    this, &TransponderFrequencyEditor::onFrequencyEdited);
 }
 
 
@@ -17,6 +23,7 @@ TransponderFrequencyEditor::TransponderFrequencyEditor(unsigned int satId, bool 
   : QComboBox(parent)
 {
   setEditable(true);
+  setInsertPolicy(NoInsert);
   populate(satId, uplink, mode, transponder);
 }
 
@@ -47,14 +54,34 @@ TransponderFrequencyEditor::setFrequency(const Frequency &current) {
   for (int i=0; i<count(); i++) {
     if (itemData(i).value<Frequency>() == current) {
       setCurrentIndex(i);
-      break;
+      return;
     }
   }
+  // Not in transponder list: add
+  int idx = count();
+  addItem(current.format(), QVariant::fromValue(current));
+  setCurrentIndex(idx);
 }
 
 Frequency
 TransponderFrequencyEditor::frequency() const {
-  return currentData().value<Frequency>();
+  if (currentData().isValid())
+    return currentData().value<Frequency>();
+  Frequency ret; ret.parse(currentText());
+  return ret;
+}
+
+void
+TransponderFrequencyEditor::onFrequencyEdited() {
+  Frequency freq;
+  if (! freq.parse(this->lineEdit()->text()))
+    return;
+  int idx = this->findData(QVariant::fromValue(freq));
+  if (0 > idx) {
+    idx = count();
+    addItem(freq.format(), QVariant::fromValue(freq));
+  }
+  setCurrentIndex(idx);
 }
 
 

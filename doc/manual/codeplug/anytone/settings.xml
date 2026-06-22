@@ -688,6 +688,14 @@
     <listitem><para>Starts the prediction of passes of programmed satellites. Applicable to
       <productname>DMR-6X2</productname>.</para></listitem>
   </varlistentry>
+  <varlistentry>
+    <term><token>ChannelSettings</token></term>
+    <listitem><para>Opens the channel settings menu.</para></listitem>
+  </varlistentry>
+  <varlistentry>
+    <term><token>WXAlert</token></term>
+    <listitem><para>Shows some weather alarm related stuff. Only present in US models.</para></listitem>
+  </varlistentry>
 </variablelist>
 
 <para>
@@ -711,22 +719,24 @@
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term><token>funcKeyAShort</token>, <token>funcKeyALong</token></term>
+    <term><token>funcKeyAShort</token>, <token>funcKeyALong</token>, <token>funcKeyAVeryLong</token></term>
     <listitem>
       <para>
         Specifies the functions associated with the programmable function key <keycap>PF1</keycap> or 
         <keycap>A</keycap>. This button is located right below the PTT button (on handheld radios) 
-        or labeled <keycap>A</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
+        or labeled <keycap>A</keycap> on the hand microphone (<productname>AT-D578UV</productname>). The very-long press
+        key function is only available on the <productname>AT-D168UV</productname>.
       </para>
     </listitem>
   </varlistentry>
     <varlistentry>
-    <term><token>funcKeyBShort</token>, <token>funcKeyBLong</token></term>
+    <term><token>funcKeyBShort</token>, <token>funcKeyBLong</token>, <token>funcKeyBVeryLong</token></term>
     <listitem>
       <para>
         Specifies the functions associated with the programmable function key <keycap>PF2</keycap> or 
         <keycap>B</keycap>. This button is the second one below the PTT button (on handheld radios) 
-        or labeled <keycap>B</keycap> on the hand microphone (<productname>AT-D578UV</productname>).
+        or labeled <keycap>B</keycap> on the hand microphone (<productname>AT-D578UV</productname>). The very-long press
+        key function is only available on the <productname>AT-D168UV</productname>.
       </para>
     </listitem>
   </varlistentry>

@@ -19,6 +19,9 @@ public:
   int value() const;
   void setValue(int value);
 
+protected:
+  void closeEvent(QCloseEvent *event);
+
 private:
   Ui::FlagEditDialog *ui;
   QMetaEnum _metaFlag;

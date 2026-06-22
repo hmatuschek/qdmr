@@ -72,6 +72,12 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   QObject::connect(app->user(), &UserDatabase::loaded, this, [this]() {
     this->ui->statusbar->showMessage(tr("Callsign database updated & loaded."), 10000);
   }, Qt::QueuedConnection);
+  connect(app->user(), &UserDatabase::downloadProgress, this, [this](qint64 loaded, qint64 total) {
+    if (total > 0)
+      this->ui->statusbar->showMessage(tr("Download call-sign DB ... %1%").arg((100*loaded)/total), 10000);
+    else
+      this->ui->statusbar->showMessage(tr("Download call-sign DB ... (%1MB)").arg(double(loaded)/1024/1024, 0, 'f', 1), 10000);
+  }, Qt::QueuedConnection);
 
   connect(ui->actionRefreshTalkgroupDB, &QAction::triggered, app->talkgroup(), &TalkGroupDatabase::download);
   QObject::connect(app->talkgroup(), &TalkGroupDatabase::error, this, [this](const QString &msg) {
@@ -79,6 +85,13 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   }, Qt::QueuedConnection);
   QObject::connect(app->talkgroup(), &TalkGroupDatabase::loaded, this, [this]() {
     this->ui->statusbar->showMessage(tr("Talkgroup database updated & loaded."), 10000);
+  }, Qt::QueuedConnection);
+  connect(app->talkgroup(), &TalkGroupDatabase::downloadProgress, this, [this](qint64 loaded, qint64 total) {
+    if (total > 0)
+      this->ui->statusbar->showMessage(tr("Download talkgroup DB ... %1%").arg((100*loaded)/total), 10000);
+    else
+      this->ui->statusbar->showMessage(tr("Download talkgroup DB ... (%1MB)")
+        .arg(static_cast<double>(loaded)/1024/1024, 0, 'f', 1), 10000);
   }, Qt::QueuedConnection);
 
   connect(ui->actionRefreshOrbitalElements, &QAction::triggered, app->satellite(), &SatelliteDatabase::update);
@@ -94,6 +107,10 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
     this->ui->actionUploadCallsignDB->setEnabled(ready);
   }, Qt::QueuedConnection);
   ui->actionUploadCallsignDB->setEnabled(app->user()->ready());
+
+  connect(app->repeater(), &RepeaterDatabase::error, this, [this](const QString &msg) {
+    this->ui->statusbar->showMessage(msg);
+  }, Qt::QueuedConnection);
 
   connect(ui->actionEditSatellites, SIGNAL(triggered()), app, SLOT(editSatellites()));
   connect(ui->actionDetectDevice, SIGNAL(triggered()), app, SLOT(detectRadio()));
@@ -131,7 +148,7 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   _extensionView->setObject(config, config);
   ui->tabs->addTab(_extensionView, tr("Extensions"));
 
-  restoreGeometry(settings.mainWindowState());
+  restoreGeometry(settings.windowState(objectName()));
 
   connect(config, &ConfigItem::modified, [this, config]() {
     this->setWindowModified(config->isModified());
@@ -150,6 +167,6 @@ MainWindow::closeEvent(QCloseEvent *event) {
     return;
   }
 
-  Settings().setMainWindowState(saveGeometry());
+  Settings().setWindowState(objectName(), saveGeometry());
   event->accept();
 }

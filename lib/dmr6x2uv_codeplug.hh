@@ -803,7 +803,7 @@ public:
 
 protected:
     /// @cond DO_NOT_DOCUMENT
-    struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
+    struct Offset: AnytoneCodeplug::ChannelElement::Offset {
       static constexpr unsigned int aesEncryptionKeyIndex()        { return 0x0013; }
       static constexpr Bit roaming()                               { return {0x001b, 2}; }
       static constexpr Bit ranging()                               { return {0x001b, 0}; }
@@ -1118,6 +1118,10 @@ protected:
   bool createChannels(Context &ctx, const ErrorStack &err=ErrorStack());
   bool linkChannels(Context &ctx, const ErrorStack &err=ErrorStack());
 
+  virtual void allocateZones();
+  virtual bool encodeZone(int i, Zone *zone, const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
+  virtual bool decodeZone(int i, Zone *zone, Context &ctx, const ErrorStack &err=ErrorStack());
+
   void allocateGPSSystems();
   bool encodeGPSSystems(const Flags &flags, Context &ctx, const ErrorStack &err=ErrorStack());
   bool createGPSSystems(Context &ctx, const ErrorStack &err=ErrorStack());
@@ -1171,6 +1175,7 @@ protected:
     static constexpr unsigned int roamingChannels()               { return 0x01040000; }
     static constexpr unsigned int roamingZoneBitmap()             { return 0x01042080; }
     static constexpr unsigned int roamingZones()                  { return 0x01043000; }
+    static constexpr unsigned int hiddenZoneBitmap()              { return 0x024c1360; }
 
     static constexpr unsigned int fmAPRSMessage()                 { return 0x02501200; }
     static constexpr unsigned int fmAPRSFrequencyNames()          { return 0x02502000; }

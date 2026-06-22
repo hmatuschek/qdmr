@@ -59,7 +59,16 @@ GPSSystemDialog::construct() {
 
   extensionView->setObjectName("dmrAPRSSystemExtension");
   extensionView->setObject(_myGPSSystem, _config);
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
+
+void
+GPSSystemDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
+}
+
 
 DMRAPRSSystem *
 GPSSystemDialog::gpsSystem() {

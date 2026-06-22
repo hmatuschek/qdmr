@@ -41,6 +41,7 @@ private slots:
   void testRadioLimits(); ///< Regression test for #816
   void testMicGain();
   void testFixedLocation();
+  void testHiddenZone(); ///< Regression test for #203
 
 protected:
   Config _micGainConfig;

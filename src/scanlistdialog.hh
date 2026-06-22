@@ -16,6 +16,7 @@ class ScanListDialog: public QDialog, private Ui::ScanListDialog
 public:
 	ScanListDialog(Config *config, QWidget *parent=nullptr);
 	ScanListDialog(Config *config, ScanList *list, QWidget *parent=nullptr);
+  ~ScanListDialog();
 
 	ScanList *scanlist();
 

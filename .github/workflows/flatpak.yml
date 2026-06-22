@@ -19,7 +19,7 @@ jobs:
         manifest-path: de.darc.dm3mat.qdmr.yaml
         cache-key: flatpak-builder-${{ github.sha }}
     - name: upload linux artifact
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       if: ${{startsWith(github.ref, 'refs/tags/') }}
       with:
           files: qdmr-x86_64.flatpak.zip 

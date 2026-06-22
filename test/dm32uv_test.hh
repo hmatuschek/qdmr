@@ -19,6 +19,8 @@ private slots:
   void testAMChannelReencoding();
   /** Regression test for #873 */
   void testChannelBankEncoding();
+  /** Regression test fo #967 */
+  void testCTCSSHigherFrequencies();
 };
 
 #endif // DR1801TEST_HH

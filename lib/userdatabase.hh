@@ -105,6 +105,8 @@ signals:
   /** Gets emitted, once the database has been loaded or cleard.
    * @warning This event might be emitted by another thread. */
   void readyChanged(bool ready);
+  /** Gets emitted on download progress. */
+  void downloadProgress(qint64 bytesReceived, qint64 bytesTotal);
 
 public slots:
   /** Starts the download of the user database. */

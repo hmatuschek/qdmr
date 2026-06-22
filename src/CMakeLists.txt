@@ -71,10 +71,8 @@ qt6_add_executable(qdmr WIN32
   idselect.hh idselect.cc
   timeslotselect.hh timeslotselect.cc
   melody_edit.hh melody_edit.cc
-		channel_type_edit.cc
-		channel_type_edit.hh
-        melody_player.cc
-        melody_player.hh
+  channel_type_edit.cc channel_type_edit.hh
+  melody_player.cc melody_player.hh
 )
 
 #
@@ -85,7 +83,7 @@ qt6_add_translations(qdmr TS_FILES
   ${PROJECT_SOURCE_DIR}/i18n/sv.ts ${PROJECT_SOURCE_DIR}/i18n/it.ts
   ${PROJECT_SOURCE_DIR}/i18n/nl.ts ${PROJECT_SOURCE_DIR}/i18n/pl.ts
   ${PROJECT_SOURCE_DIR}/i18n/fr.ts ${PROJECT_SOURCE_DIR}/i18n/pt_BR.ts
-  ${PROJECT_SOURCE_DIR}/i18n/ru.ts)
+  ${PROJECT_SOURCE_DIR}/i18n/ru.ts ${PROJECT_SOURCE_DIR}/i18n/zh_Hans.ts)
 
 #
 # Icon generation

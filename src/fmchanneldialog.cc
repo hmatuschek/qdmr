@@ -20,6 +20,8 @@ FMChannelDialog::FMChannelDialog(Config *config, QWidget *parent)
   : ChannelDialog(config, parent), _clone(nullptr), _orig(nullptr), _squelch(nullptr), _admit(nullptr),
   _rxTone(nullptr), _txTone(nullptr), _bandwidth(nullptr), _aprs(nullptr)
 {
+  setObjectName("FMChannelDialog");
+
   auto app = qobject_cast<Application *>(qApp);
   auto filter = new FMRepeaterFilter(app->repeater(), app->position(), this);
   filter->setSourceModel(app->repeater());
@@ -41,6 +43,8 @@ FMChannelDialog::FMChannelDialog(Config *config, QWidget *parent)
                         _bandwidth = new BandwidthSelect());
   ui->rightForm->addRow(tr("APRS"),
                         _aprs = new FMAPRSSelect(config));
+  
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
 

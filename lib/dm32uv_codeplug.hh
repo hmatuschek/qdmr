@@ -177,6 +177,15 @@ public:
     /** Sets the color code of the channel. */
     virtual void setColorCode(unsigned int cc);
 
+    /** Returns @c true if a key index is set. */
+    virtual bool hasKeyIndex() const;
+    /** Returns the key index. */
+    virtual unsigned int keyIndex() const;
+    /** Sets the key index. */
+    virtual void setKeyIndex(unsigned int idx);
+    /** Resets the key index. */
+    virtual void clearKeyIndex();
+
     /** Returns @c true if encryption is enabled. */
     virtual bool encryptionEnabled() const;
     /* Enables encryption. */
@@ -263,6 +272,7 @@ public:
       static constexpr Bit dcdm()                 { return {0x001d, 5}; }
       static constexpr Bit timeslot()             { return {0x001d, 4}; }
       static constexpr Bit colorcode()            { return {0x001d, 0}; }
+      static constexpr unsigned int keyIndex()    { return 0x001e; }
       static constexpr Bit encryptionEnable()     { return {0x001f, 6}; }
       static constexpr Bit groupListIndex()       { return {0x001f, 0}; }
       static constexpr Bit dmrAPRSChannelIndex()  { return {0x0020, 0}; }
@@ -1062,7 +1072,7 @@ public:
     /** Some limits. */
     struct Limit: Element::Limit {
       /** Maximum number of scan lists. */
-      static constexpr unsigned int scanLists()   { return 32; }
+      static constexpr unsigned int scanLists()   { return 31; }
     };
 
     /** Some internal offsets. */
