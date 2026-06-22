@@ -24,6 +24,9 @@ public:
 
   void setFrequency(const Frequency &current);
   Frequency frequency() const;
+
+protected slots:
+  void onFrequencyEdited();
 };
 
 
