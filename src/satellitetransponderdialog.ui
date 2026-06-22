@@ -17,7 +17,7 @@
    <item>
     <widget class="QGroupBox" name="metaBox">
      <property name="title">
-      <string>Satellite</string>
+      <string extracomment="Group box title.">Satellite</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <item row="0" column="0">
@@ -68,7 +68,7 @@
       <item row="0" column="1">
        <widget class="QLabel" name="fmUplinkToneLabel">
         <property name="text">
-         <string>Uplink Tone</string>
+         <string extracomment="Label for a widget setting the sub-tone for the satellite uplink.">Uplink Tone</string>
         </property>
         <property name="buddy">
          <cstring>fmUplinkTone</cstring>
@@ -76,7 +76,11 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="TransponderFrequencyEditor" name="fmUplinkFrequency"/>
+       <widget class="TransponderFrequencyEditor" name="fmUplinkFrequency">
+        <property name="toolTip">
+         <string>Select or edit the uplink frequency.</string>
+        </property>
+       </widget>
       </item>
       <item row="1" column="1">
        <widget class="SelectiveCallBox" name="fmUplinkTone" native="true"/>
@@ -94,7 +98,7 @@
       <item row="2" column="1">
        <widget class="QLabel" name="fmDownlinkToneLabel">
         <property name="text">
-         <string>Downlink Tone</string>
+         <string extracomment="Label for a widget setting the sub-tone for the satellite uplink.">Downlink Tone</string>
         </property>
         <property name="buddy">
          <cstring>fmDownlinkTone</cstring>
@@ -102,7 +106,11 @@
        </widget>
       </item>
       <item row="3" column="0">
-       <widget class="TransponderFrequencyEditor" name="fmDownlinkFrequency"/>
+       <widget class="TransponderFrequencyEditor" name="fmDownlinkFrequency">
+        <property name="toolTip">
+         <string>Select or edit the downlink frequency.</string>
+        </property>
+       </widget>
       </item>
       <item row="3" column="1">
        <widget class="SelectiveCallBox" name="fmDownlinkTone" native="true"/>
@@ -129,6 +137,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Select or edit the uplink frequency.</string>
         </property>
         <property name="text">
          <string>Uplink Frequency</string>
@@ -167,6 +178,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Select or edit the downlink frequency.</string>
         </property>
         <property name="text">
          <string>Downlink Frequency</string>
@@ -210,7 +224,7 @@
       </sizepolicy>
      </property>
      <property name="title">
-      <string>Beacon</string>
+      <string extracomment="Group box title.">Beacon</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
@@ -220,6 +234,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="toolTip">
+         <string>Select or edit the beacon frequency.</string>
         </property>
         <property name="text">
          <string>Beacon Frequency</string>
