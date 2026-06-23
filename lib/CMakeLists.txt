@@ -49,7 +49,11 @@ qt_add_library(libdmrconf SHARED
   dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc
   dm32uv.cc dm32uv_interface.cc dm32uv_limits.cc dm32uv_codeplug.cc dm32uv_callsigndb.cc
         rt4d_interface.cc
-        rt4d_interface.hh)
+        rt4d_interface.hh
+        rt4d.cc
+        rt4d.hh
+        rt4d_codeplug.cc
+        rt4d_codeplug.hh)
 
 target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}

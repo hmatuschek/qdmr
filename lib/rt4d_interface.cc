@@ -6,7 +6,11 @@
 
 #include <QThread>
 
+#include "logger.hh"
 #include <qendian.h>
+
+#define TIMEOUT 1000
+
 
 uint8_t _rt4d_crc(uint8_t *data, size_t size) {
   uint8_t crc = 0;
@@ -29,17 +33,10 @@ RT4DInterface::CommandRequest::CommandRequest(Type type, Command command) {
 }
 
 bool
-RT4DInterface::CommandRequest::send(QIODevice *device, const ErrorStack &err) const {
-  size_t offset = 0;
-  while (offset < sizeof(CommandRequest)) {
-    qint64 bytes = device->write(reinterpret_cast<const char *>(this) + offset, sizeof(CommandRequest) - offset);
-    if (0 > bytes) {
-      errMsg(err) << "Cannot send command: " << device->errorString() << ".";
-      return false;
-    }
-    offset += bytes;
-  }
-  return true;
+RT4DInterface::CommandRequest::send(RT4DInterface *device, const ErrorStack &err) const {
+  //logDebug() << "Send " << QByteArray((const char *)this, sizeof(RT4DInterface::CommandRequest)).toHex(' ') << ".";
+  return device->send(
+    reinterpret_cast<const char *>(this), sizeof(CommandRequest),TIMEOUT, err);
 }
 
 
@@ -47,9 +44,13 @@ RT4DInterface::CommandRequest::send(QIODevice *device, const ErrorStack &err) co
  * Implementation of RT4DInterface::ACKResponse
  * ********************************************************************************************* */
 bool
-RT4DInterface::ACKResponse::receive(QIODevice *device, const ErrorStack &err) {
-  if (1 != device->read(reinterpret_cast<char *>(this), 1)) {
+RT4DInterface::ACKResponse::receive(RT4DInterface *device, const ErrorStack &err) {
+  if (! device->receive(reinterpret_cast<char *>(this), 1, TIMEOUT, err)) {
     errMsg(err) << "Cannot read response: " << device->errorString() << ".";
+    return false;
+  }
+  if (0x06 != header) {
+    errMsg(err) << "Unexpected response " << Qt::hex << static_cast<int>(header) << ".";
     return false;
   }
   return true;
@@ -61,23 +62,17 @@ RT4DInterface::ACKResponse::receive(QIODevice *device, const ErrorStack &err) {
  * ********************************************************************************************* */
 RT4DInterface::ReadRequest::ReadRequest(uint32_t address) {
   header = 'R';
-  this->page = qToBigEndian(address>>10);
+  this->page = qToBigEndian(static_cast<uint16_t>(address>>10));
   this->crc = 0;
   this->crc = _rt4d_crc(reinterpret_cast<uint8_t *>(this), sizeof(ReadRequest));
 }
 
 bool
-RT4DInterface::ReadRequest::send(QIODevice *device, const ErrorStack &err) const {
-  size_t offset = 0;
-  while (offset < sizeof(ReadRequest)) {
-    qint64 bytes = device->write(reinterpret_cast<const char *>(this) + offset, sizeof(ReadRequest) - offset);
-    if (0 > bytes) {
-      errMsg(err) << "Cannot send read re: " << device->errorString() << ".";
-      return false;
-    }
-    offset += bytes;
-  }
-  return true;
+RT4DInterface::ReadRequest::send(RT4DInterface *device, const ErrorStack &err) const {
+  //logDebug() << "Send " << QByteArray((const char *)this, sizeof(RT4DInterface::ReadRequest)).toHex(' ') << ".";
+  return device->send(
+      reinterpret_cast<const char *>(this), sizeof(ReadRequest),
+      TIMEOUT, err);
 }
 
 
@@ -85,23 +80,16 @@ RT4DInterface::ReadRequest::send(QIODevice *device, const ErrorStack &err) const
  * Implementation of RT4DInterface::ReadResponse
  * ********************************************************************************************* */
 bool
-RT4DInterface::ReadResponse::receive(QIODevice *device, const ErrorStack &err) {
-  size_t offset = 0;
-  while (offset < sizeof(ReadResponse)) {
-    qint64 bytes = device->read(reinterpret_cast<char *>(this) + offset, sizeof(ReadResponse) - offset);
-    if (0 > bytes) {
-      errMsg(err) << "Cannot read response: " << device->errorString() << ".";
-      return false;
-    }
-    offset += bytes;
-  }
+RT4DInterface::ReadResponse::receive(RT4DInterface *device, const ErrorStack &err) {
+  if (! device->receive(reinterpret_cast<char *>(this), sizeof(ReadResponse),TIMEOUT, err))
+    return false;
 
   if ('R' != header) {
     errMsg(err) << "Unexpected header: 0x" << Qt::hex << static_cast<int>(header) << ".";
     return false;
   }
 
-  if (! _rt4d_crc(reinterpret_cast<uint8_t *>(this), sizeof(ReadResponse))) {
+  if (crc != _rt4d_crc(reinterpret_cast<uint8_t *>(this), sizeof(ReadResponse)-1)) {
     errMsg(err) << "CRC mismatch.";
     return false;
   }
@@ -123,8 +111,8 @@ RT4DInterface::WriteRequest::WriteRequest(uint8_t sequence,
                                           uint32_t offset,
                                           const uint8_t *payload, int size) {
   header = 9;
-  this->sequence = sequence;
-  this->offset_page = qToBigEndian(offset>>10);
+  this->segment = sequence;
+  this->offset_page = qToBigEndian(static_cast<uint16_t>(offset>>10));
   memset(this->payload, 0, 1024);
   memcpy(this->payload, payload, std::min(1024, size));
   this->crc = 0;
@@ -132,17 +120,9 @@ RT4DInterface::WriteRequest::WriteRequest(uint8_t sequence,
 }
 
 bool
-RT4DInterface::WriteRequest::send(QIODevice *device, const ErrorStack &err) const {
-  size_t offset = 0;
-  while (offset < sizeof(WriteRequest)) {
-    qint64 bytes = device->write(reinterpret_cast<const char *>(this) + offset, sizeof(WriteRequest) - offset);
-    if (0 > bytes) {
-      errMsg(err) << "Cannot send write request: " << device->errorString() << ".";
-      return false;
-    }
-    offset += bytes;
-  }
-  return true;
+RT4DInterface::WriteRequest::send(RT4DInterface *device, const ErrorStack &err) const {
+  return device->send(
+      reinterpret_cast<const char *>(this), sizeof(WriteRequest), TIMEOUT, err);
 }
 
 
@@ -155,12 +135,14 @@ RT4DInterface::RT4DInterface(const USBDeviceDescriptor &descr, const ErrorStack 
 {
   if (USBSerial::isOpen()) {
     _state = State::Open;
-    setFlowControl(QSerialPort::HardwareControl);
+    setFlowControl(QSerialPort::NoFlowControl);
+    setRequestToSend(false);
+    setDataTerminalReady(true);
   } else if (QSerialPort::NoError != QSerialPort::error()) {
     _state = State::Error;
   }
 
-  if (request_identifier(err))
+  if (! request_identifier(err))
     _state = State::Error;
 }
 
@@ -184,6 +166,12 @@ RT4DInterface::close() {
     CommandRequest command(CommandRequest::Type::Command, CommandRequest::Command::Reboot);
     command.send(this);
   }
+
+  // No explicit "exit programming mode" command exists in the protocol.
+  // Cycle DTR low so the radio's USB-serial adapter resets the device.
+  setDataTerminalReady(false);
+  QThread::msleep(500);
+
   USBSerial::close();
   _state = State::Closed;
 }
@@ -359,6 +347,7 @@ RT4DInterface::request_identifier(const ErrorStack &err) {
     errMsg(err) << "Cannot request identification.";
     return false;
   }
+  logDebug() << "Got blob: " << QByteArray((const char*)res.payload, 0x400).toHex();
   uint16_t magic = qFromLittleEndian(*reinterpret_cast<uint16_t*>(res.payload+12));
   if (0xabcd != magic) {
     errMsg(err) << "Unknown device or firmware version: " << magic;
@@ -367,7 +356,58 @@ RT4DInterface::request_identifier(const ErrorStack &err) {
 
   _state = State::Identified;
 
+  _info = RadioInfo::byID(RadioInfo::RT4D);
   return true;
 }
 
 
+bool
+RT4DInterface::send(const char *data, qint64 n, int timeout, const ErrorStack &err) {
+  //logDebug() << "Send " << QByteArray(data, n).toHex(' ') << ".";
+  while (n) {
+    auto k = QSerialPort::write(data, n);
+    if (0 > k) {
+      errMsg(err) << "QSerialPort: " << errorString();
+      errMsg(err) << "Cannot send device detection request.";
+      return false;
+    }
+    n -= k; data += k;
+  }
+
+  if (! waitForBytesWritten(timeout)) {
+    errMsg(err) << "QSerialPort: " << errorString();
+    errMsg(err) << "Timed out waiting for bytes to be written.";
+    return false;
+  }
+
+  return true;
+}
+
+
+bool
+RT4DInterface::receive(char *data, qint64 n, int timeout, const ErrorStack &err) {
+  if (bytesAvailable()) {
+    auto k = QSerialPort::read(data, n);
+    if (0 > k) {
+      errMsg(err) << "Cannot read from serial port: " << errorString() << ".";
+      return false;
+    }
+    n -= k; data += k;
+  }
+
+  while (n) {
+    if (! waitForReadyRead(timeout)) {
+      errMsg(err) << "QSerialPort: " << errorString() << ".";
+      errMsg(err) << "Cannot read from serial port, timeout.";
+      return false;
+    }
+    auto k = QSerialPort::read(data, n);
+    if (0 > k) {
+      errMsg(err) << "Cannot read from serial port: " << errorString() << ".";
+      return false;
+    }
+    n -= k; data += k;
+  }
+
+  return true;
+}

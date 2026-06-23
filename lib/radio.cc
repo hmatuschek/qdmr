@@ -32,6 +32,8 @@
 
 #include <QSet>
 
+#include "rt4d.hh"
+#include "rt4d_interface.hh"
 
 /* ******************************************************************************************** *
  * Implementation of Radio
@@ -250,6 +252,26 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     dm32if->deleteLater();
+    return nullptr;
+  } else if ((RT4DInterface::interfaceInfo() == descr) && force.isValid() && (RadioInfo::RT4D==force.id())) {
+    auto rt4d = new RT4DInterface(descr, err);
+    if (rt4d->isOpen()) {
+      RadioInfo id = rt4d->identifier(err);
+      if (! id.isValid()) {
+        errMsg(err) << "Cannot identify device.";
+      } else if (RadioInfo::RT4D == id.id()) {
+        return new RT4D(rt4d);
+      } else if (id.isValid()) {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+        << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Cannot identify device.";
+      }
+      rt4d->close();
+      rt4d->deleteLater();
+      return nullptr;
+    }
+    rt4d->deleteLater();
     return nullptr;
   }
   return nullptr;

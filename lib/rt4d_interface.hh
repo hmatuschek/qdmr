@@ -14,62 +14,84 @@ class RT4DInterface: public USBSerial
 {
   Q_OBJECT
 
-
+  /** Common command request. */
   struct Q_PACKED CommandRequest {
+    /// Encodes the command type.
     enum class Type {
       Command = 0x05
     };
+
+    /// Encodes the actual command.
     enum class Command {
       ProgMode = 0x10,
       Reboot   = 0xee
     };
 
-    uint8_t header1;
-    uint8_t header2;
-    uint8_t type;
-    uint8_t command;
-    uint8_t crc;
+    uint8_t header1;   ///< Fixed header '4'
+    uint8_t header2;   ///< Fixed header 'R'
+    uint8_t type;      ///< Command type.
+    uint8_t command;   ///< The command.
+    uint8_t crc;       ///< CRC.
 
+    /** Constructs a command request. Also sets header and computes CRC. */
     CommandRequest(Type type, Command command);
-    bool send(QIODevice *device, const ErrorStack &err=ErrorStack()) const;
+    /** Send this command to the given device.
+     * This call is blocking and returns @c true on success. */
+    bool send(RT4DInterface *device, const ErrorStack &err=ErrorStack()) const;
   };
 
+
+  /** A common success/ACK response to command and write requests. */
   struct Q_PACKED ACKResponse {
-    uint8_t header;
-
-    bool receive(QIODevice *device, const ErrorStack &err=ErrorStack());
+    uint8_t header;  ///< Fixed header 6h.
+    /** Receives and checks the response. Returns @c true on success. */
+    bool receive(RT4DInterface *device, const ErrorStack &err=ErrorStack());
   };
 
+
+  /** A read request for exactly 1024 bytes. */
   struct Q_PACKED ReadRequest {
-    uint8_t header;
-    uint16_t page;
-    uint8_t crc;
+    uint8_t header;   ///< Fixed header `R`
+    uint16_t page;    ///< Encodes the 1k page in uint16_be.
+    uint8_t crc;      ///< CRC.
 
+    /** Creates a read request for the page at the given address.
+     * Also computes CRC. */
     ReadRequest(uint32_t address);
-    bool send(QIODevice *device, const ErrorStack &err=ErrorStack()) const;
+    /** Sens the request. Blocks until the entire request is sent and returns @c true on success. */
+    bool send(RT4DInterface *device, const ErrorStack &err=ErrorStack()) const;
   };
 
-  struct Q_PACKED ReadResponse {
-    uint8_t header;
-    uint16_t page;
-    uint8_t payload[1024];
-    uint8_t crc;
 
-    bool receive(QIODevice *device, const ErrorStack &err=ErrorStack());
+  /** Read response.
+   * Contains the entire page read. */
+  struct Q_PACKED ReadResponse {
+    uint8_t header;         ///< Fixed header 'R'.
+    uint16_t page;          ///< The page being read.
+    uint8_t payload[1024];  ///< Its content.
+    uint8_t crc;            ///< CRC
+
+    /** Receives a read response and also verifies the packet. */
+    bool receive(RT4DInterface *device, const ErrorStack &err=ErrorStack());
+    /** Computes the page address. */
     uint32_t address() const;
   };
 
+
+  /** A write request for a particular page within a segment. */
   struct Q_PACKED WriteRequest {
     uint8_t
-      sequence : 4,
-      header : 4;
-    uint16_t offset_page;
-    int8_t payload[1024];
-    uint8_t crc;
+      segment : 4,          ///< The segment index/number.
+      header : 4;           ///< Fixed header 9h.
+    uint16_t offset_page;   ///< 1k-offset within segment.
+    int8_t payload[1024];   ///< The 1k page to write.
+    uint8_t crc;            ///< CRC.
 
+    /** Constructs write request from page, offset (in bytes) and payload. */
     WriteRequest(uint8_t sequence, uint32_t offset, const uint8_t *payload, int size);
 
-    bool send(QIODevice *device, const ErrorStack &err=ErrorStack()) const;
+    /** Sets the request and blocks until the entire request is sent. Returns @c true on success. */
+    bool send(RT4DInterface *device, const ErrorStack &err=ErrorStack()) const;
   };
 
 protected:
@@ -85,6 +107,7 @@ public:
                          const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
 
 
+  /** Returns the identifier. */
   RadioInfo identifier(const ErrorStack &err=ErrorStack()) override;
   void close() override;
 
@@ -115,6 +138,11 @@ protected:
     return res.receive(this, err);
   }
 
+  /** Send some data. */
+  bool send(const char *data, qint64 n, int timeout, const ErrorStack &err=ErrorStack());
+  /** Receives some data. */
+  bool receive(char *data, qint64 n, int timeout, const ErrorStack &err=ErrorStack());
+
   /** Maps an address to segment and offset. */
   static QPair<int, uint32_t> mapToSegment(uint32_t address);
 
@@ -126,6 +154,10 @@ protected:
   /** Firmware version string. */
   QByteArray _firmwareVersion;
 
+  /** Static map mapping address ranges to segments.
+   * This is only needed because reading and writing do not follow the same address space.
+   * Reading is performed in raw address space, while writing is performed on segments addressed
+   * as segment index and offset within that segment. */
   static const QVector<QPair<uint32_t, uint32_t>> _segmentMap;
 };
 
