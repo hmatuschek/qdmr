@@ -63,6 +63,41 @@ protected:
   };
 
 
+  /** Implements a single DTMF code. */
+  class DTMFCodeElement: public Element
+  {
+  public:
+    /** Constructor from pointer. */
+    explicit DTMFCodeElement(uint8_t *ptr);
+
+    /** Size of the element. */
+    static constexpr unsigned int size() { return 0x0010; }
+
+    bool isValid() const override;
+
+    /** Returns the DTMF code as a string. */
+    virtual QString code() const;
+    /** Sets the code. */
+    virtual void setCode(const QString &code);
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      static constexpr unsigned int code() { return 14; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond  DO_NOT_DOCUMENT
+      static constexpr unsigned int code()    { return 0x0000; }
+      static constexpr unsigned int padByte() { return 0x000e; }
+      static constexpr unsigned int length()  { return 0x000f; }
+      /// @endcond
+    };
+  };
+
+
   /** Implements the first section of settings. */
   class FirstSettingsElement: public Element
   {
@@ -144,6 +179,12 @@ protected:
     /** Possible SMS encoding. */
     enum class SMSEncoding {
       Unicode = 0, GBK=1
+    };
+
+    /** DTMF Transmission mode. */
+    enum class DTMFTransmissionMode
+    {
+      Off=0, BOT=1, EOT=2, Both=3
     };
 
   public:
@@ -411,6 +452,82 @@ protected:
     /** Sets the SMS encoding. */
     virtual void setSmsEncoding(SMSEncoding encoding);
 
+    /** Returns the DTMF transmit delay. */
+    virtual Interval dtmfTransmitDelay() const;
+    /** Sets the DTMF transmit delay. */
+    virtual void setDtmfTransmitDelay(const Interval &delay);
+    /** Returns the DTMF tone duration. */
+    virtual Interval dtmfToneDuration() const;
+    /** Sets the DTMF tone duration. */
+    virtual void setDtmfToneDuration(const Interval &duration);
+    /** Returns the DTMF interval. */
+    virtual Interval dtmfInterval() const;
+    /** Sets the DTMF interval. */
+    virtual void setDtmfInterval(const Interval &interval);
+    /** Returns the DTMF transmit mode. */
+    virtual DTMFTransmissionMode dtmfTransmissionMode() const;
+    /** Sets the DTMF transmit mode. */
+    virtual void setDtmfTransmissionMode(DTMFTransmissionMode mode);
+    /** Returns the DTMF code index. */
+    unsigned int dtmfCodeIndex() const;
+    /** Sets the DTMF code index. */
+    virtual void setDtmfCodeIndex(unsigned int index);
+    /** Returns @c true if the received DTMF code is shown. */
+    virtual bool displayRxDtmfCodeEnabled() const;
+    /** Enables showing the received DTMF codes. */
+    virtual void enableDisplayRxDtmfCode(bool enable);
+    /** Returns DTMF transmit gain. */
+    virtual Level dtmfTxGain() const;
+    /** Sets the DTMF transmit gain. */
+    virtual void setDtmfTxGain(const Level &gain);
+    /** Returns the DTMF decode threshold. */
+    virtual Level dtmfDecodeThreshold() const;
+    /** Sets the DTMF decode threshold. */
+    virtual void setDtmfDecodeThreshold(const Level &threshold);
+    /** Returns @c true if the DTMF remote control is enabled. */
+    virtual bool dtmfRemoteControlEnabled() const;
+    /** Enables DTMF remote control. */
+    virtual void enableDtmfRemoteControl(bool enable);
+    /** Returns the n-th DTMF code. */
+    virtual DTMFCodeElement dtmfCode(unsigned int index) const;
+    /** Returns the DTMF remote stun code. */
+    virtual DTMFCodeElement dtmfRemoteStunCode() const;
+    /** Returns the DTMF remote kill code. */
+    virtual DTMFCodeElement dtmfRemoteKillCode() const;
+    /** Returns the DTMF remote wake code. */
+    virtual DTMFCodeElement dtmfRemoteWakeCode() const;
+    /** Returns the DTMF remote monitor code. */
+    virtual DTMFCodeElement dtmfRemoteMonitorCode() const;
+
+    /** Returns @c true if the RX and TX frequencies are swapped. */
+    virtual bool swapFrequenciesEnabled() const;
+    /** Enables swapping of RX and TX frequencies. */
+    virtual void enableSwapFrequencies(bool enable);
+
+    /** Returns @c true if the SMS notification is enabled. */
+    virtual bool smsNotificationEnabled() const;
+    /** Enables SMS notification. */
+    virtual void enableSmsNotification(bool enable);
+
+    /** Returns the lower scan frequency. */
+    virtual Frequency lowerScanFrequency() const;
+    /** Sets the lower scan frequency.*/
+    virtual void setLowerScanFrequency(const Frequency &frequency);
+    /** Returns the upper scan frequency. */
+    virtual Frequency upperScanFrequency() const;
+    /** Sets the upper scan frequency.*/
+    virtual void setUpperScanFrequency(const Frequency &frequency);
+
+    /** Returns @c true if the LED is enabled. */
+    virtual bool ledEnabled() const;
+    /** Enables the LED. */
+    virtual void enableLed(bool enable);
+
+    /** Encodes the settings element from the given config. */
+    virtual bool encode(Context &ctx, const ErrorStack &err);
+    /** Decodes the settings element and updates the given config. */
+    virtual bool decode(Context &ctx, const ErrorStack &err);
+
   public:
     /** Some limits for the element. */
     struct Limit: Element::Limit {
@@ -420,6 +537,7 @@ protected:
       static constexpr Range<unsigned int> backlightBrightness() { return {0,3}; }
       static constexpr Range<Interval> powerSaveDelay() { return { Interval::fromSeconds(0), Interval::fromSeconds(200)}; }
       static constexpr unsigned int frequencyRanges() { return 4; }
+      static constexpr unsigned int dtmfCodes() { return 16; }
     };
 
   protected:
@@ -482,6 +600,25 @@ protected:
       static constexpr unsigned int smsFormat()                   { return 0x0196; }
       static constexpr unsigned int smsEncoding()                 { return 0x0197; }
       static constexpr unsigned int talkerAliasDisplayDuration()  { return 0x0198; }
+      static constexpr unsigned int dtmfTransmitDelay()           { return 0x0200; }
+      static constexpr unsigned int dtmfToneDuration()            { return 0x0201; }
+      static constexpr unsigned int dtmfInterval()                { return 0x0202; }
+      static constexpr unsigned int dtmfTransmitMode()            { return 0x0203; }
+      static constexpr unsigned int dtmfCodeIndex()               { return 0x0204; }
+      static constexpr unsigned int enableDtmfRxDisplay()         { return 0x0205; }
+      static constexpr unsigned int dtmfTransmitGain()            { return 0x0206; }
+      static constexpr unsigned int dtmfDecodeThreshold()         { return 0x0207; }
+      static constexpr unsigned int enableDtmfRemoteControl()     { return 0x0208; }
+      static constexpr unsigned int dtmfCodes()                   { return 0x0200; }
+      static constexpr unsigned int dtmfRemoteStun()              { return 0x030a; }
+      static constexpr unsigned int dtmfRemoteKill()              { return 0x031a; }
+      static constexpr unsigned int dtmfRemoteWake()              { return 0x032a; }
+      static constexpr unsigned int dtmfRemoteMonitor()           { return 0x033a; }
+      static constexpr unsigned int swapFrequencies()             { return 0x034a; }
+      static constexpr unsigned int smsNotification()             { return 0x034b; }
+      static constexpr unsigned int lowerScanFrequency()          { return 0x034c; }
+      static constexpr unsigned int upperScanFrequency()          { return 0x0350; }
+      static constexpr unsigned int enableLed()                   { return 0x0354; }
       /// @endcond
     };
   };

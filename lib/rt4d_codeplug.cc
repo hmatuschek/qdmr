@@ -50,6 +50,36 @@ RT4DCodeplug::FrequencyRangeElement::setUpperFrequency(const Frequency &upperFre
 
 
 /* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::DTMFCodeElement
+ * ********************************************************************************************* */
+RT4DCodeplug::DTMFCodeElement::DTMFCodeElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+bool
+RT4DCodeplug::DTMFCodeElement::isValid() const {
+  return Element::isValid() && (0 < getUInt8(Offset::length())
+          && (Limit::code() <= getUInt8(Offset::length())));
+}
+
+QString
+RT4DCodeplug::DTMFCodeElement::code() const {
+  return readASCII(Offset::code(), Limit::code(), 0xff);
+}
+
+void
+RT4DCodeplug::DTMFCodeElement::setCode(const QString &code) {
+  writeASCII(Offset::code(), code, Limit::code(), 0xff);
+  setUInt8(Offset::padByte(), 0xff);
+  setUInt8(Offset::length(),
+    std::min(Limit::code(), static_cast<unsigned int>(code.length())));
+}
+
+
+
+/* ********************************************************************************************* *
  * Implementation of RT4DCodeplug::FirstSettingsElement
  * ********************************************************************************************* */
 RT4DCodeplug::FirstSettingsElement::FirstSettingsElement(uint8_t *ptr)
@@ -728,6 +758,199 @@ RT4DCodeplug::FirstSettingsElement::smsEncoding() const {
 void
 RT4DCodeplug::FirstSettingsElement::setSmsEncoding(SMSEncoding encoding) {
   setUInt8(Offset::smsEncoding(), static_cast<unsigned int>(encoding));
+}
+
+
+Interval
+RT4DCodeplug::FirstSettingsElement::dtmfTransmitDelay() const {
+  return Interval::fromMilliseconds(
+    static_cast<unsigned int>(getUInt16_le(Offset::dtmfTransmitDelay()))*100);
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::setDtmfTransmitDelay(const Interval &delay) {
+  setUInt16_le(Offset::dtmfTransmitDelay(),
+    Limit::Range<Interval>{Interval::null(), Interval::fromSeconds(2)}
+    .limit(delay).milliseconds());
+}
+
+Interval
+RT4DCodeplug::FirstSettingsElement::dtmfToneDuration() const {
+  return Interval::fromMilliseconds(
+    30 + getUInt8(Offset::dtmfToneDuration())*10);
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::setDtmfToneDuration(const Interval &duration) {
+  setUInt8(Offset::dtmfToneDuration(),
+    (Limit::Range<Interval>{Interval::fromMilliseconds(30), Interval::fromMilliseconds(200)}
+      .limit(duration).milliseconds()-30)/10);
+}
+
+Interval
+RT4DCodeplug::FirstSettingsElement::dtmfInterval() const {
+  return Interval::fromMilliseconds(
+    30 + 10*getUInt8(Offset::dtmfInterval()));
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::setDtmfInterval(const Interval &interval) {
+  setUInt8(Offset::dtmfInterval(),
+    (Limit::Range<Interval>{Interval::fromMilliseconds(30), Interval::fromMilliseconds(200)}
+    .limit(interval).milliseconds()-30)/10);
+}
+
+
+RT4DCodeplug::FirstSettingsElement::DTMFTransmissionMode
+RT4DCodeplug::FirstSettingsElement::dtmfTransmissionMode() const {
+  return static_cast<RT4DCodeplug::FirstSettingsElement::DTMFTransmissionMode>(
+    getUInt8(Offset::dtmfTransmitMode()));
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::setDtmfTransmissionMode(DTMFTransmissionMode mode) {
+  setUInt8(Offset::dtmfTransmitMode(), static_cast<unsigned int>(mode));
+}
+
+unsigned int
+RT4DCodeplug::FirstSettingsElement::dtmfCodeIndex() const {
+  return getUInt8(Offset::dtmfCodeIndex());
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::setDtmfCodeIndex(unsigned int index) {
+  setUInt8(Offset::dtmfCodeIndex(), Limit::Range<unsigned int>{0,15}.limit(index));
+}
+
+bool
+RT4DCodeplug::FirstSettingsElement::displayRxDtmfCodeEnabled() const {
+  return 0x01 == getUInt8(Offset::enableDtmfRxDisplay());
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::enableDisplayRxDtmfCode(bool enabled) {
+  setUInt8(Offset::enableDtmfRxDisplay(), enabled ? 1 : 0);
+}
+
+Level
+RT4DCodeplug::FirstSettingsElement::dtmfTxGain() const {
+  return Level::fromValue(getUInt8(Offset::dtmfTransmitGain()), {0,128});
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::setDtmfTxGain(const Level &gain) {
+  setUInt8(Offset::dtmfTransmitGain(), gain.mapTo({0, 128}));
+}
+
+Level
+RT4DCodeplug::FirstSettingsElement::dtmfDecodeThreshold() const {
+  Level::fromValue(getUInt8(Offset::dtmfDecodeThreshold()), {0,128});
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::setDtmfDecodeThreshold(const Level &threshold) {
+  setUInt8(Offset::dtmfDecodeThreshold(), threshold.mapTo({0,128}));
+}
+
+bool
+RT4DCodeplug::FirstSettingsElement::dtmfRemoteControlEnabled() const {
+  return 0x01 == getUInt8(Offset::enableDtmfRemoteControl());
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::enableDtmfRemoteControl(bool enabled) {
+  setUInt8(Offset::enableDtmfRemoteControl(), enabled ? 1 : 0);
+}
+
+RT4DCodeplug::DTMFCodeElement
+RT4DCodeplug::FirstSettingsElement::dtmfCode(unsigned int index) const {
+  return DTMFCodeElement(_data + Offset::dtmfCodes() + index * DTMFCodeElement::size());
+}
+
+RT4DCodeplug::DTMFCodeElement
+RT4DCodeplug::FirstSettingsElement::dtmfRemoteStunCode() const {
+  return DTMFCodeElement(_data + Offset::dtmfRemoteStun());
+}
+
+RT4DCodeplug::DTMFCodeElement
+RT4DCodeplug::FirstSettingsElement::dtmfRemoteKillCode() const {
+  return DTMFCodeElement(_data + Offset::dtmfRemoteKill());
+}
+
+RT4DCodeplug::DTMFCodeElement
+RT4DCodeplug::FirstSettingsElement::dtmfRemoteWakeCode() const {
+  return DTMFCodeElement(_data + Offset::dtmfRemoteWake());
+}
+
+RT4DCodeplug::DTMFCodeElement
+RT4DCodeplug::FirstSettingsElement::dtmfRemoteMonitorCode() const {
+  return DTMFCodeElement(_data + Offset::dtmfRemoteMonitor());
+}
+
+
+bool
+RT4DCodeplug::FirstSettingsElement::swapFrequenciesEnabled() const {
+  return 0x01 == getUInt8(Offset::swapFrequencies());
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::enableSwapFrequencies(bool enabled) {
+  setUInt8(Offset::swapFrequencies(), enabled ? 1 : 0);
+}
+
+
+bool
+RT4DCodeplug::FirstSettingsElement::smsNotificationEnabled() const {
+  return 0x01 == getUInt8(Offset::smsNotification());
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::enableSmsNotification(bool enabled) {
+  setUInt8(Offset::smsNotification(), enabled ? 1 : 0);
+}
+
+
+Frequency
+RT4DCodeplug::FirstSettingsElement::lowerScanFrequency() const {
+  return Frequency::fromHz(getUInt32_le(Offset::lowerScanFrequency()));
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::setLowerScanFrequency(const Frequency &frequency) {
+  setUInt32_le(Offset::lowerScanFrequency(), frequency.inHz());
+}
+
+Frequency
+RT4DCodeplug::FirstSettingsElement::upperScanFrequency() const {
+  return Frequency::fromHz(getUInt32_le(Offset::upperScanFrequency()));
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::setUpperScanFrequency(const Frequency &frequency) {
+  setUInt32_le(Offset::upperScanFrequency(), frequency.inHz());
+}
+
+
+bool
+RT4DCodeplug::FirstSettingsElement::ledEnabled() const {
+  return 0x01 == getUInt8(Offset::enableLed());
+}
+
+void
+RT4DCodeplug::FirstSettingsElement::enableLed(bool enabled) {
+  setUInt8(Offset::enableLed(), enabled ? 1 : 0);
+}
+
+
+bool
+RT4DCodeplug::FirstSettingsElement::encode(Context &ctx, const ErrorStack &errStack) {
+  return false;
+}
+
+
+bool
+RT4DCodeplug::FirstSettingsElement::decode(Context &ctx, const ErrorStack &errStack) {
+  return false;
 }
 
 
