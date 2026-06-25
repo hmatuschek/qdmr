@@ -9,6 +9,8 @@
 #include "frequency.hh"
 #include "interval.hh"
 #include "level.hh"
+#include "smsextension.hh"
+
 
 /** Implements the codeplug for the Radtel RT4D.
  *
@@ -444,9 +446,9 @@ protected:
     virtual void setTalkerAliasDisplayMode(TalkerAliasDisplayMode mode);
 
     /** Returns the SMS format. */
-    virtual SMSFormat smsFormat() const;
+    virtual SMSExtension::Format smsFormat() const;
     /** Sets the SMS format. */
-    virtual void setSmsFormat(SMSFormat format);
+    virtual void setSmsFormat(SMSExtension::Format format);
     /** Returns the SMS encoding. */
     virtual SMSEncoding smsEncoding() const;
     /** Sets the SMS encoding. */

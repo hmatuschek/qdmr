@@ -4,6 +4,7 @@
 
 #include "rt4d_codeplug.hh"
 
+#include "config.hh"
 #include "ranges.hh"
 
 /* ********************************************************************************************* *
@@ -738,15 +739,22 @@ RT4DCodeplug::FirstSettingsElement::setTalkerAliasDisplayMode(TalkerAliasDisplay
 }
 
 
-RT4DCodeplug::FirstSettingsElement::SMSFormat
+SMSExtension::Format
 RT4DCodeplug::FirstSettingsElement::smsFormat() const {
-  return static_cast<RT4DCodeplug::FirstSettingsElement::SMSFormat>(
-    getUInt8(Offset::smsFormat()));
+  switch (static_cast<SMSFormat>(getUInt8(Offset::smsFormat()))) {
+    case SMSFormat::Motorola: return SMSExtension::Format::Motorola;
+    case SMSFormat::Hytera: return SMSExtension::Format::Hytera;
+  }
+  return SMSExtension::Format::Hytera;
 }
 
 void
-RT4DCodeplug::FirstSettingsElement::setSmsFormat(SMSFormat smsFormat) {
-  setUInt8(Offset::smsFormat(), static_cast<unsigned int>(smsFormat));
+RT4DCodeplug::FirstSettingsElement::setSmsFormat(SMSExtension::Format smsFormat) {
+  switch (smsFormat) {
+  case SMSExtension::Format::Motorola: setUInt8(Offset::smsFormat(), static_cast<unsigned int>(SMSFormat::Motorola)); break;
+  case SMSExtension::Format::Hytera: setUInt8(Offset::smsFormat(), static_cast<unsigned int>(SMSFormat::Hytera)); break;
+  default: break;
+  }
 }
 
 RT4DCodeplug::FirstSettingsElement::SMSEncoding
@@ -943,14 +951,95 @@ RT4DCodeplug::FirstSettingsElement::enableLed(bool enabled) {
 
 
 bool
-RT4DCodeplug::FirstSettingsElement::encode(Context &ctx, const ErrorStack &errStack) {
-  return false;
+RT4DCodeplug::FirstSettingsElement::encode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  // Encode boot settings
+  enableBootImage(BootSettings::BootDisplay::Logo == ctx.config()->settings()->boot()->bootDisplay());
+  enableBootText(BootSettings::BootDisplay::Text == ctx.config()->settings()->boot()->bootDisplay());
+  setBootText(ctx.config()->settings()->boot()->message1());
+  enableBootTone(ctx.config()->settings()->tone()->bootToneEnabled());
+  enableBootPassword(ctx.config()->settings()->boot()->bootPasswordEnabled());
+  setBootPassword(ctx.config()->settings()->boot()->bootPassword());
+
+  // Audio settings
+  enableVoicePrompt(ctx.config()->settings()->audio()->speechSynthesisEnabled());
+  setFmSquelch(ctx.config()->settings()->audio()->squelch());
+  if (ctx.config()->settings()->audio()->dmrSquelchEnabled())
+    setDmrSquelch(ctx.config()->settings()->audio()->dmrSquelch());
+  else
+    setDmrSquelch(ctx.config()->settings()->audio()->squelch());
+  setDmrMicGain(ctx.config()->settings()->audio()->micGain());
+  if (ctx.config()->settings()->audio()->fmMicGainEnabled())
+    setFmMicGain(ctx.config()->settings()->audio()->fmMicGain());
+  else
+    setFmMicGain(ctx.config()->settings()->audio()->micGain());
+  setDmrSpeakerGain(ctx.config()->settings()->audio()->maxSpeakerVolume());
+  setFmSpeakerGain(ctx.config()->settings()->audio()->maxSpeakerVolume());
+
+  // Tone settings
+  enableKeyTone(ctx.config()->settings()->tone()->keyToneEnabled());
+  enableSmsNotification(ctx.config()->settings()->tone()->smsToneEnabled());
+  enableFmBotTone(ctx.config()->settings()->tone()->callStart().testFlag(Channel::Type::FM));
+  setFMEotTone(ctx.config()->settings()->tone()->callEnd().testFlag(Channel::Type::FM) ? FMEotTone::Roger1 : FMEotTone::None);
+  setDmrEotTone(ctx.config()->settings()->tone()->callEnd().testFlag(Channel::Type::DMR) ? DMREotTone::Roger1 : DMREotTone::None);
+
+  // DMR settings
+  if (! ctx.config()->settings()->defaultIdRef()->isNull()) {
+    setRadioName(ctx.config()->settings()->defaultId()->name());
+    setRadioDMRId(ctx.config()->settings()->defaultId()->number());
+  }
+  setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
+  setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
+  setSmsEncoding(SMSEncoding::Unicode);
+  setSmsFormat(ctx.config()->smsExtension()->format());
+
+  return true;
 }
 
 
 bool
-RT4DCodeplug::FirstSettingsElement::decode(Context &ctx, const ErrorStack &errStack) {
-  return false;
+RT4DCodeplug::FirstSettingsElement::decode(Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  // Decode boot settings
+  ctx.config()->settings()->boot()->setBootDisplay(bootImageEnabled() ? BootSettings::BootDisplay::Logo : BootSettings::BootDisplay::Text);
+  ctx.config()->settings()->boot()->setMessage1(bootText());
+  ctx.config()->settings()->boot()->setMessage2("");
+  ctx.config()->settings()->tone()->enableBootTone(bootToneEnabled());
+  ctx.config()->settings()->boot()->setBootPassword(bootPassword());
+  ctx.config()->settings()->boot()->enableBootPassword(bootPasswordEnabled());
+
+  // Audio settings
+  ctx.config()->settings()->audio()->enableSpeechSynthesis(voicePromptEnabled());
+  ctx.config()->settings()->audio()->setSquelch(fmSquelch());
+  if (fmSquelch() != dmrSquelch()) ctx.config()->settings()->audio()->setDMRSquelch(dmrSquelch());
+  else ctx.config()->settings()->audio()->setDMRSquelch(Level::invalid());
+  ctx.config()->settings()->audio()->setMicGain(dmrMicGain());
+  if (dmrMicGain() != fmMicGain()) ctx.config()->settings()->audio()->setFMMicGain(fmMicGain());
+  else ctx.config()->settings()->audio()->setFMMicGain(Level::invalid());
+  ctx.config()->settings()->audio()->setMaxSpeakerVolume(std::max(dmrSpeakerGain(), fmSpeakerGain()));
+
+  // Tone settings
+  ctx.config()->settings()->tone()->setKeyToneVolume(keyToneEnabled() ? Level::fromValue(5) : Level::invalid());
+  ctx.config()->settings()->tone()->enableSMSTone(smsNotificationEnabled());
+  ctx.config()->settings()->tone()->setCallStart(
+    fmBotToneEnabled() ? Channel::Type::FM : Channel::Type::None
+    );
+  ctx.config()->settings()->tone()->setCallEnd(
+    (FMEotTone::None != fmEotTone()) ? Channel::Type::FM : Channel::Type::None  |
+    (DMREotTone::None != dmrEotTone() ? Channel::Type::DMR : Channel::Type::None) );
+
+  // Decode DMR settings
+  auto id = new DMRRadioID(radioName(), radioDMRId());
+  ctx.config()->radioIDs()->add(id);
+  ctx.config()->settings()->setDefaultId(id);
+  ctx.add(id, 0);
+  ctx.config()->settings()->dmr()->setGroupCallHangTime(groupCallHangTime());
+  ctx.config()->settings()->dmr()->setPrivateCallHangTime(privateCallHangTime());
+  ctx.config()->smsExtension()->setFormat(smsFormat());
+
+  return true;
 }
 
 
