@@ -1447,11 +1447,90 @@ protected:
   };
 
 
+  /** Implements a single message. */
+  class MessageElement: public Element
+  {
+  public:
+    /** Constructor from pointer. */
+    explicit MessageElement(uint8_t *ptr);
+
+    static constexpr unsigned int size() { return 0x0100; }
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** Returns @c true if the index is valid. */
+    virtual bool indexIsValid() const;
+    /** Returns the index. */
+    virtual unsigned int index() const;
+    /** Sets the index. */
+    virtual void setIndex(unsigned int index);
+    /** Clears the index. */
+    virtual void clearIndex();
+
+    /** Returns the text. */
+    virtual QString text() const;
+    /** Sets the text. */
+    virtual void setText(const QString &text);
+
+    /** Encodes a message template. */
+    bool encode(const SMSTemplate *message, Context &ctx, const ErrorStack &err);
+    /** Decodes this message template. */
+    SMSTemplate *decode(Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /// Maximum text length
+      static constexpr unsigned int text() { return 200; }
+    };
+
+  protected:
+    /// Some internal offsets.
+    struct Offset: Element::Offset
+    {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int index() { return 0x0000; }
+      static constexpr unsigned int text()  { return 0x0038; }
+      /// @endcond
+    };
+  };
+
+
+  /** Represents all messages. */
   class MessageBankElement: public Element
   {
   public:
+    /** Constructor from pointer. */
+    explicit MessageBankElement(uint8_t *ptr);
+    /** Size of the element. */
     static constexpr unsigned int size() { return 0x1000; }
+
+    void clear() override;
+
+    /** Encodes all message templates. */
+    virtual bool encode(Context &ctx, const ErrorStack &err);
+    /** Decodes all message templates. */
+    virtual bool decode(Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit
+    {
+      /// Maximum number of messages.
+      static constexpr unsigned int messages()         { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset
+    {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int messages()         { return 0x0000; }
+      /// @endcond
+    };
   };
+
 
   class FMBroadcastChannelBankElement: public Element
   {

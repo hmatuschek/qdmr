@@ -100,6 +100,10 @@ target_link_libraries(dr1801_test PRIVATE Qt6::Core Qt6::Network Qt6::Positionin
 qt_add_executable(dm32uv_test dm32uv_test.cc dm32uv_test.hh ${TESTDATA})
 target_link_libraries(dm32uv_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
 
+# Unit tests for Radtel devices.
+qt_add_executable(rt4d_test rt4d_test.cc rt4d_test.hh ${TESTDATA})
+target_link_libraries(rt4d_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
+
 
 add_test(NAME Config    COMMAND configtest)
 add_test(NAME TableFormat COMMAND tableformattest)
@@ -134,3 +138,4 @@ add_test(NAME DM1701    COMMAND dm1701_test)
 add_test(NAME DR1801    COMMAND dr1801_test)
 add_test(NAME DM32UV    COMMAND dm32uv_test)
 
+add_test(NAME RT4D      COMMAND rt4d_test)

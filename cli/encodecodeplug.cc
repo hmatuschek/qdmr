@@ -26,6 +26,7 @@
 #include "dmr6x2uv2_codeplug.hh"
 #include "dr1801uv_codeplug.hh"
 #include "dm32uv_codeplug.hh"
+#include "rt4d_codeplug.hh"
 
 
 
@@ -190,6 +191,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     break;
   case RadioInfo::DM32UV:
     if (! encode<DM32UVCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::RT4D:
+    if (! encode<RT4DCodeplug>(config, flags, parser))
       return -1;
     break;
   default:

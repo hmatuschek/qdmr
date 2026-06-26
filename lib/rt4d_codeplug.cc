@@ -669,12 +669,12 @@ RT4DCodeplug::FirstSettingsElement::setDmrRxNoiseReduction(const Level &level) {
 
 Level
 RT4DCodeplug::FirstSettingsElement::dmrMicGain() const {
-  return Level::fromValue(getUInt8(Offset::dmrMicGain()), {0, 24});
+  return Level::fromValue(getUInt8(Offset::dmrMicGain()), {1, 24});
 }
 
 void
 RT4DCodeplug::FirstSettingsElement::setDmrMicGain(const Level &level) {
-  setUInt8(Offset::dmrMicGain(), level.mapTo({0,24}));
+  setUInt8(Offset::dmrMicGain(), level.mapTo({1,24}));
 }
 
 Level
@@ -1499,11 +1499,14 @@ RT4DCodeplug::ChannelElement::encode(const Channel *ch, Context &ctx, const Erro
   } else if (ch->is<FMChannel>()) {
     auto fm = ch->as<FMChannel>();
     setChannelType(ChannelType::FM);
+    setAnalogDemodulation(AnalogDemod::FM);
     setFmAdmit(fm->admit());
     setRxSubTone(fm->rxTone());
     setTxSubTone(fm->txTone());
     setBandwidth(fm->bandwidth());
   } else if (ch->is<AMChannel>()) {
+    setChannelType(ChannelType::FM);
+    setAnalogDemodulation(AnalogDemod::AM);
     setBandwidth(FMChannel::Bandwidth::Narrow);
   }
 
@@ -2553,6 +2556,122 @@ RT4DCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack &e
 
 
 /* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::MessageElement
+ * ********************************************************************************************* */
+RT4DCodeplug::MessageElement::MessageElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::MessageElement::clear() {
+  memset(_data, 0xff, size());
+}
+
+bool
+RT4DCodeplug::MessageElement::isValid() const {
+  return indexIsValid();
+}
+
+bool
+RT4DCodeplug::MessageElement::indexIsValid() const {
+  return 0xff != getUInt8(Offset::index());
+}
+
+unsigned int
+RT4DCodeplug::MessageElement::index() const {
+  return getUInt8(Offset::index());
+}
+
+void
+RT4DCodeplug::MessageElement::setIndex(unsigned int index) {
+  setUInt8(Offset::index(), index);
+}
+
+void
+RT4DCodeplug::MessageElement::clearIndex() {
+  setUInt8(Offset::index(), 0xff);
+}
+
+QString
+RT4DCodeplug::MessageElement::text() const {
+  return readASCII(Offset::text(), Limit::text(), 0xff);
+}
+
+void
+RT4DCodeplug::MessageElement::setText(const QString &text) {
+  writeASCII(Offset::text(), text, Limit::text(), 0xff);
+}
+
+bool
+RT4DCodeplug::MessageElement::encode(const SMSTemplate *message, Context &ctx, const ErrorStack &err) {
+  clear();
+  setText(message->message());
+  return true;
+}
+
+SMSTemplate *RT4DCodeplug::MessageElement::decode(Context &ctx, const ErrorStack &err) const {
+  auto msg = new SMSTemplate();
+  msg->setMessage(text());
+  return msg;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::MessageBankElement
+ * ********************************************************************************************* */
+RT4DCodeplug::MessageBankElement::MessageBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::MessageBankElement::clear() {
+  for (unsigned i = 0; i < Limit::messages(); i++) {
+    MessageElement(_data+Offset::messages() + i*MessageElement::size()).clear();
+  }
+}
+
+bool
+RT4DCodeplug::MessageBankElement::encode(Context &ctx, const ErrorStack &err) {
+  clear();
+
+  for (unsigned i = 0; i < ctx.count<SMSTemplate>(); i++) {
+    MessageElement el(_data + Offset::messages() + i*MessageElement::size());
+    if (! el.encode(ctx.get<SMSTemplate>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode SMS template at index " << i << ".";
+      return false;
+    }
+    el.setIndex(i);
+  }
+
+  return true;
+}
+
+bool
+RT4DCodeplug::MessageBankElement::decode(Context &ctx, const ErrorStack &err) const {
+  for (unsigned i = 0; i < Limit::messages(); i++) {
+    MessageElement el(_data + Offset::messages() + i*MessageElement::size());
+    if (! el.isValid())
+      continue;
+    auto msg = el.decode(ctx, err);
+    if (nullptr == msg) {
+      errMsg(err) << "Cannot decode SMS template at index " << i << ".";
+      return false;
+    }
+    ctx.config()->smsExtension()->smsTemplates()->add(msg);
+    ctx.add(msg, i);
+  }
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
  * Implementation of RT4DCodeplug
  * ********************************************************************************************* */
 RT4DCodeplug::RT4DCodeplug(QObject *parent)
@@ -2561,7 +2680,6 @@ RT4DCodeplug::RT4DCodeplug(QObject *parent)
   // Preallocate entrie codeplug
   addImage("Radtel RT4D Codeplug, FW 3.25");
   image(0).addElement(Offset::firstSettings(), FirstSettingsElement::size());
-  image(0).element(0).data().fill(0xff);
   image(0).addElement(Offset::channels(), ChannelBankElement::size());
   image(0).addElement(Offset::secondSettings(), SecondSettingsElement::size());
   image(0).addElement(Offset::zones(), ZoneBankElement::size());
@@ -2579,6 +2697,19 @@ RT4DCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   if (nullptr == copy) {
     errMsg(err) << "Cannot pre-process RT-4D codeplug.";
     return nullptr;
+  }
+
+  // Add a all-call as first DMR contact if not present.
+  bool hasFirstAllCall = false;
+  for (int i=0; i<copy->contacts()->count(); i++) {
+    if (Contact *cont = copy->contacts()->get(i)->as<DMRContact>()) {
+      hasFirstAllCall = DMRContact::Type::AllCall == cont->as<DMRContact>()->type();
+      break;
+    }
+  }
+  if (! hasFirstAllCall) {
+    copy->contacts()->add(new DMRContact(
+      DMRContact::AllCall, "All Call", 16777215), 0);
   }
 
   // Remove all M17 channels
@@ -2675,6 +2806,9 @@ RT4DCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) 
   Q_UNUSED(flags);
 
   Context ctx(config);
+  ctx.remTable(&DigitalContact::staticMetaObject, true);
+  ctx.addTable(&DMRContact::staticMetaObject);
+  ctx.addTable(&DMRContact::staticMetaObject);
   ctx.remTable(&BasicEncryptionKey::staticMetaObject, true);
   ctx.remTable(&ARC4EncryptionKey::staticMetaObject, true);
   ctx.remTable(&AESEncryptionKey::staticMetaObject, true);
@@ -2755,6 +2889,11 @@ RT4DCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! MessageBankElement(data(Offset::messages())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode messages.";
+    return false;
+  }
+
   return true;
 }
 
@@ -2820,6 +2959,11 @@ RT4DCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
 
   if (! EncryptionKeyBankElement(data(Offset::keys())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode keys.";
+    return false;
+  }
+
+  if (! MessageBankElement(data(Offset::messages())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode messages.";
     return false;
   }
 

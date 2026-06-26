@@ -107,7 +107,7 @@ public:
         /** Maps a value from this range to the given range. */
         inline T mapTo(const Range<T> &other, const T &value) const {
           T myD = max-min, oD = other.max-other.min;
-          return ((limit(value)-min)*oD)/myD + other.min;
+          return std::round((static_cast<double>((limit(value) - min)*oD))/myD) + other.min;
         }
       };
     };
