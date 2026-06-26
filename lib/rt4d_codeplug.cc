@@ -7,9 +7,7 @@
 #include "config.hh"
 #include "intermediaterepresentation.hh"
 #include "radioid.hh"
-#include <qguiapplication_platform.h>
-#include <qopenglcontext_platform.h>
-#include <qscreen_platform.h>
+
 
 /* ********************************************************************************************* *
  * Implementation of RT4DCodeplug::FrequencyRangeElement
