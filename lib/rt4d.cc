@@ -4,11 +4,11 @@
 
 #include "rt4d.hh"
 #include "rt4d_interface.hh"
+#include "rt4d_limits.hh"
 
 
 RT4D::RT4D(RT4DInterface *dev, QObject *parent)
-  : Radio{parent}, _radioName("Radtel RT-4D"), _dev(dev), _codeplugFlags(), _codeplug(),
-    _config(nullptr)
+  : Radio{parent}, _radioName("Radtel RT-4D"), _dev(dev), _config(nullptr)
 {
   // pass...
 }
@@ -37,9 +37,7 @@ RT4D::name() const {
 
 const RadioLimits &
 RT4D::limits() const {
-  /*if (nullptr == _limits)
-    _limits = new DM32UVLimits();*/
-  return *(const RadioLimits*)nullptr; //*_limits;
+  return _limits;
 }
 
 const Codeplug &

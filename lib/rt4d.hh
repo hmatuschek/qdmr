@@ -6,6 +6,7 @@
 #include "radio.hh"
 #include "radioinfo.hh"
 #include "rt4d_codeplug.hh"
+#include "rt4d_limits.hh"
 
 class RT4DInterface;
 
@@ -51,6 +52,8 @@ protected:
   /** Holds the radio name. */
   QString _radioName;
   RT4DInterface *_dev;
+  /** Some limits for the codeplug.*/
+  RT4DLimits _limits;
   /** Holds the flags to control assembly and upload of code-plugs. */
   Codeplug::Flags _codeplugFlags;
   RT4DCodeplug _codeplug;

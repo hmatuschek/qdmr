@@ -21,7 +21,7 @@
  * @ingroup rt4d */
 class RT4DCodeplug: public Codeplug
 {
-protected:
+public:
   /** Represents a single frequency range. */
   class FrequencyRangeElement: public Element
   {
