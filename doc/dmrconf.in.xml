@@ -459,6 +459,14 @@
           </para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term><option>rt4d</option></term>
+        <listitem>
+          <para>
+            Radtel RT-4D.
+          </para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </refsect1>
 

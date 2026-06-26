@@ -35,6 +35,7 @@ Currently, there are only few radios that are supported
   * BTECH DMR-6x2 (since version 0.11.0)
   * BTECH DMR-6x2 PRO (since version 0.13.0)
   * Baofeng DM-32UV (since version 0.14.0)
+  * Radtel RT-4D (since version 0.16.0)
 
 A more [detailed list](https://dm3mat.de/software/qdmr) is also available. 
 
@@ -66,8 +67,8 @@ qdmr or dmrconf.
  <img src="https://repology.org/badge/vertical-allrepos/qdmr.svg" alt="Packaging status" align="right">
 </a>
 
- * **[Version 0.15.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.15.1)** -- Bugfix release.
- * **[Version 0.15.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.15.0)** -- Added support for AnyTone AT-D168UV, added common settings.
+ * **[Version 0.16.0](https://github.com/hmatuschek/qdmr/releases/tag/v0.15.1)** -- Added support for Radtel RT-4D.
+ * **[Version 0.15.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.15.0)** -- Added support for AnyTone AT-D168UV, added common settings.
  * **[Version 0.14.1](https://github.com/hmatuschek/qdmr/releases/tag/v0.14.1)** -- Added support for Baofeng DM-32UV, added AM channels.
  * **[Version 0.13.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.13.3)** -- Added support BTech DMR6X2PRO and OpenUV390.
  * **[Version 0.12.3](https://github.com/hmatuschek/qdmr/releases/tag/v0.12.3)** -- Added support BTech DR-1801UV (A6, still unstable) and Radioddity GD-73.
