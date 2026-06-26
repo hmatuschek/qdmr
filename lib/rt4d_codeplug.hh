@@ -5,12 +5,13 @@
 #ifndef LIBDMRCONF_RT4D_CODEPLUG_HH
 #define LIBDMRCONF_RT4D_CODEPLUG_HH
 
+#include "channel.hh"
 #include "codeplug.hh"
 #include "frequency.hh"
 #include "interval.hh"
 #include "level.hh"
 #include "smsextension.hh"
-
+#include "zone.hh"
 
 /** Implements the codeplug for the Radtel RT4D.
  *
@@ -21,6 +22,7 @@
 class RT4DCodeplug: public Codeplug
 {
 protected:
+  /** Represents a single frequency range. */
   class FrequencyRangeElement: public Element
   {
   public:
@@ -626,33 +628,640 @@ protected:
   };
 
 
+  /** Implements a single channel. */
+  class ChannelElement: public Element
+  {
+  protected:
+    /** Possible channel types. */
+    enum class ChannelType {
+      FM = 1, DMR = 0
+    };
+
+    /** Possible DMR admit criteria. */
+    enum class DMRAdmit {
+      Always = 0, ChannelFree = 1, ColorCodeIdle = 2
+    };
+
+    /** Possible FM admit criteria. */
+    enum class FMAdmit {
+      Always = 0, ChannelFree = 1, ToneIdle = 2
+    };
+
+    /** Possible STE modes. */
+    enum class STEMode {
+      None = 0, STE_55Hz_0deg=1, STE_55Hz_120deg=2, STE_55Hz_180deg=3, STE_55Hz_240deg=4
+    };
+
+    /** Possible analog demodulations. */
+    enum class AnalogDemod {
+      FM = 0, AM = 1, SSB = 2
+    };
+
+    /** Possible subtone types. */
+    enum class SubToneType {
+      Normal = 0, Encrypt1 = 1, Encrypt2 = 2, Encrypt3 = 3, Mute = 4
+    };
+
+  public:
+    /** Constructor from pointer. */
+    explicit ChannelElement(uint8_t *ptr);
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** Returns @c true if the promiscuous mode is enabled. */
+    virtual bool promiscuousModeEnabled() const;
+    /** Enables the promiscuous mode. */
+    virtual void enablePromiscuousMode(bool enable);
+
+    /** Returns the time slot. */
+    virtual DMRChannel::TimeSlot timeSlot() const;
+    /** Sets the time slot. */
+    virtual void setTimeSlot(DMRChannel::TimeSlot slot);
+
+    /** Returns @c true if dual-slot is enabled. */
+    virtual bool dualSlotEnabled() const;
+    /** Enables dual-slot. */
+    virtual void enableDualSlot(bool enable);
+
+    /** Returns @c true if channel DMR id is enabled. */
+    virtual bool channelDmrIdEnabled() const;
+    /** Enables DMR channel id. */
+    virtual void enableChannelDmrId(bool enable);
+
+    /** Returns the channel type. */
+    virtual ChannelType channelType() const;
+    /** Sets the channel type. */
+    virtual void setChannelType(ChannelType type);
+
+    /** Returns @c true if an FM scambler is set. */
+    virtual bool fmScramblerEnabled() const;
+    /** Returns the FM scambler index. */
+    virtual unsigned int fmScramblerIndex() const;
+    /** Sets the FM scambler index. */
+    virtual void setFmScramblerIndex(unsigned int index);
+    /** Resets the FM scambler. */
+    virtual void clearFmScrambler();
+
+    /** Returns the color code. */
+    virtual unsigned int colorCode() const;
+    /** Sets the color code. */
+    virtual void setColorCode(unsigned int color);
+
+    /** Returns the DMR admit criterion. */
+    virtual DMRChannel::Admit dmrAdmit() const;
+    /** Sets the DMR admit criterion. */
+    virtual void setDmrAdmit(DMRChannel::Admit admit);
+    /** Returns the FM admit criterion. */
+    virtual FMChannel::Admit fmAdmit() const;
+    /** Sets the FM admit criterion. */
+    virtual void setFmAdmit(FMChannel::Admit admit);
+
+    /** Returns the STE mode. */
+    virtual STEMode steMode() const;
+    /** Returns the STE mode. */
+    virtual void setSteMode(STEMode mode);
+
+    /** Returns the bandwidth. */
+    FMChannel::Bandwidth bandwidth() const;
+    /** Sets the bandwidth. */
+    virtual void setBandwidth(FMChannel::Bandwidth bandwidth);
+
+    /** Returns the analog demodulation. */
+    virtual AnalogDemod analogDemodulation() const;
+    /** Sets the analog demodulation. */
+    virtual void setAnalogDemodulation(AnalogDemod demod);
+
+    /** Returns the sub-tone type. */
+    virtual SubToneType subToneType() const;
+    /** Sets the subtone type. */
+    virtual void setSubToneType(SubToneType type);
+
+    /** Returns the RX frequency. */
+    virtual Frequency rxFrequency() const;
+    /** Sets the RX frequency. */
+    virtual void setRxFrequency(const Frequency &frequency);
+    /** Returns the TX frequency. */
+    virtual Frequency txFrequency() const;
+    /** Sets the TX frequency. */
+    virtual void setTxFrequency(const Frequency &frequency);
+
+    /** Returns the RX sub-tone. */
+    virtual SelectiveCall rxSubTone() const;
+    /** Sets the RX sub-tone. */
+    virtual void setRxSubTone(SelectiveCall subTone);
+
+    /** Returns the TX sub-tone. */
+    virtual SelectiveCall txSubTone() const;
+    /** Sets the TX sub-tone. */
+    virtual void setTxSubTone(SelectiveCall subTone);
+
+    /** Returns the contact index. */
+    virtual unsigned int contactIndex() const;
+    /** Sets the contact index. Must be set. */
+    virtual void setContactIndex(unsigned int index);
+
+    /** Returns @c true if the group-list index is set. */
+    virtual bool hasGroupListIndex() const;
+    /** Returns the group list index. */
+    virtual unsigned int groupListIndex() const;
+    /** Sets the group list index. */
+    virtual void setGroupListIndex(unsigned int index);
+    /** Clears the group list index. */
+    virtual void clearGroupListIndex();
+
+    /** Returns @c true if the DMR encryption key is set. */
+    virtual bool hasEncryptionKey() const;
+    /** Returns the DMR encryption key index. */
+    virtual unsigned int encryptionKeyIndex() const;
+    /** Sets the DMR encryption key index. */
+    virtual void setEncryptionKeyIndex(unsigned int index);
+    /** Clears the DMR encryption key index. */
+    virtual void clearEncryptionKeyIndex();
+
+    /** Returns the channel DMR id. */
+    virtual unsigned int channelDmrId() const;
+    /** Sets the channel DMR id. */
+    virtual void setChannelDmrId(unsigned int index);
+
+    /** Returns the mute code. */
+    virtual unsigned int muteCode() const;
+    /** Sets the mute code. */
+    virtual void setMuteCode(unsigned int code);
+
+    /** Returns the channel name. */
+    virtual QString name() const;
+    /** Sets the name. */
+    virtual void setName(const QString &name);
+
+    virtual Channel *decode(Context &ctx, const ErrorStack &err) const;
+    virtual bool link(Channel *ch, Context &ctx, const ErrorStack &err) const;
+    virtual bool encode(const Channel *ch, Context &ctx, const ErrorStack &err);
+
+  public:
+    /** Some Limits for the channel. */
+    struct Limit: Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int name() { return 16; }
+    };
+
+  protected:
+    /** Some offsets within the element. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr Bit promiscuousMode()                    { return {0,0}; }
+      static constexpr Bit timeSlot()                           { return {0,1}; }
+      static constexpr Bit dualSlot()                           { return {0,2}; }
+      static constexpr Bit dmrIdSource()                        { return {0,3}; }
+      static constexpr Bit channelType()                        { return {0,6}; }
+      static constexpr Bit fmScrambler()                        { return {1,0}; }
+      static constexpr Bit colorCode()                          { return {1,4}; }
+      static constexpr Bit steMode()                            { return {3,0}; }
+      static constexpr Bit fmAdmit()                            { return {3,3}; }
+      static constexpr Bit dmrAdmit()                           { return {3,5}; }
+      static constexpr Bit subToneType()                        { return {4,1}; }
+      static constexpr Bit analogDemodulaiton()                 { return {4,4}; }
+      static constexpr Bit bandwidth()                          { return {4,6}; }
+      static constexpr unsigned int rxFrequency()               { return 0x0005; }
+      static constexpr unsigned int txFrequency()               { return 0x0009; }
+      static constexpr unsigned int rxSubtone()                 { return 0x000d; }
+      static constexpr unsigned int txSubtone()                 { return 0x000f; }
+      static constexpr unsigned int contactIndex()              { return 0x0011; }
+      static constexpr unsigned int groupListIndex()            { return 0x0014; }
+      static constexpr unsigned int encryptionKeyIndex()        { return 0x0015; }
+      static constexpr unsigned int channelDmrId()              { return 0x0016; }
+      static constexpr unsigned int muteCode()                  { return 0x001b; }
+      static constexpr unsigned int name()                      { return 0x0020; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements a bank of channels. */
   class ChannelBankElement: public Element
   {
   public:
+    /** Constructor from pointer. */
+    explicit ChannelBankElement(uint8_t *ptr);
+
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0xc000; }
+
+    /** Decodes the entire channel bank. */
+    virtual bool decode(Context &ctx, const ErrorStack &err);
+    virtual bool link(Context &ctx, const ErrorStack &err);
+    virtual bool encode(Context &ctx, const ErrorStack &err);
+
+  public:
+    /** Some limits for the bank. */
+    struct Limit: Element::Limit {
+      /** Maximum number of channels. */
+      static constexpr unsigned int channels() { return 1024; }
+    };
   };
 
 
   class SecondSettingsElement: public Element
   {
   public:
+    /** Possible active VFOs. */
+    enum class ActiveVfo {
+      A=0, B=1
+    };
+
+    /** Possible scan directions. */
+    enum class ScanDirection {
+      Up=0, Down=1
+    };
+
+    /** Possible VFO step sizes. */
+    enum class StepSize {
+      Step_250Hz=0, Step_1_25kHz=1, Step_2_5kHz=2, Step_5kHz=3, Step_6_25kHz=4, Step_10kHz=5,
+      Step_12_5kHz=6, Step_20kHz=7, Step_25kHz=8, Step_50kHz=9, Step_100kHz=10, Step_500kHz=11,
+      Step_1MHz=12, Step_5MHz=13
+    };
+
+    /** Possible channel modes. */
+    enum class ChannelMode {
+      VFO=0, Channel=1, Zone=2
+    };
+
+    /** Possible channel display modes. */
+    enum class ChannelDisplayMode{
+      Number = 0, Frequency=1, Name=2
+    };
+
+    /** Possible key functions. */
+    enum class KeyFunction {
+      None = 0, FmMonitor=1, PowerToggle=2, DualStandby=3, Priority=4, Scan=5, Backlight=6,
+      FmEotBeep=7, FmRadio=8, Talkaround=9, Alarm=10, FrequencyDetect=11, ToneDecode=12, TBST=13,
+      QueryState=14, RemoteMonitor=15, DmrRemoteStun=16, DmrRemoteKill=17, DmrRemoteWakeup=18,
+      OnlineDetect=19, ShowCall=20, AmFmToggle=21, FmSpectrum=22, Squelch=23, FrequencyStep=24,
+      FmDmrToggle=25, WeatherChannel=26, SaveChannel=27, NewSms=28, SmsMenu=29, LcdBrightness=30,
+      FmVox=31, ZoneSelect=32, PromiscuousMode=33, DualSlotToggle=34, TimeSlotToggle=35,
+      ColorCodeSelect=36, EncryptionToggle=37, GroupListSelect=38, DmrContactList=39,
+      DtmfContactList=40
+    };
+
+  public:
+    /** Constructor from pointer. */
+    explicit SecondSettingsElement(uint8_t *ptr);
+
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x0400; }
+
+    /** Returns @c true if the key-lock is enabled. */
+    virtual bool keyLockEnabled() const;
+    /** Enables key-lock. */
+    virtual void enableKeyLock(bool enable);
+
+    /** Returns the active VFO. */
+    virtual ActiveVfo activeVfo() const;
+    /** Sets the active VFO. */
+    virtual void setActiveVfo(ActiveVfo activeVfo);
+
+    /** Returns @c true if the dual-channel is enabled. */
+    virtual bool dualChannelEnabled() const;
+    /** Enables dual-channel model. */
+    virtual void enableDualChannel(bool enable);
+
+    /** Returns the scan direction. */
+    virtual ScanDirection scanDirection() const;
+    /** Sets the scan direction. */
+    virtual void setScanDirection(ScanDirection direction);
+
+    /** Returns the VFO step size. */
+    virtual Frequency vfoStepSize() const;
+    /** Sets the VFO step size. */
+    virtual void setVfoStepSize(const Frequency &frequency);
+
+    /** Returns the spectrum graph center frequency. */
+    virtual Frequency spectrumCenterFrequency() const;
+    /** Sets the spectrum center frequency. */
+    virtual void setSpectrumCenterFrequency(const Frequency &frequency);
+    /** Returns the spectrum frequency step. */
+    virtual Frequency spectrumFrequencyStep() const;
+    /** Sets the spectrum frequency step. */
+    virtual void setSpectrumFrequencyStep(const Frequency &frequency);
+    /** Returns the spectrum threshold in a.u.*/
+    virtual unsigned int spectrumThreshold() const;
+    /** Sets the spectrum threshold. */
+    virtual void setSpectrumThreshold(unsigned int threshold);
+
+    /** Returns the FM broadcast standby channel index. */
+    virtual unsigned int fmBroadcastStandbyChannel() const;
+    /** Sets the FM broadcast standby channel. */
+    virtual void setFmBroadcastStandbyChannel(unsigned int channel);
+    /** Returns @c true if the FM broadcast standby is enabled. */
+    virtual bool fmBroadcastStandbyEnabled() const;
+    /** Enables FM broadcast standby. */
+    virtual void enableFmBroadcastStandby(bool enable);
+
+    /** Returns VFO A mode. */
+    virtual ChannelMode vfoAMode() const;
+    /** Sets the VFO A mode. */
+    virtual void setVfoAMode(ChannelMode mode);
+    /** Returns VFO B mode. */
+    virtual ChannelMode vfoBMode() const;
+    /** Sets the VFO B mode. */
+    virtual void setVfoBMode(ChannelMode mode);
+
+    /** Returns the VFO A display mode. */
+    virtual ChannelDisplayMode vfoADisplayMode() const;
+    /** Sets the VFO A display mode. */
+    virtual void setVfoADisplayMode(ChannelDisplayMode mode);
+    /** Returns the VFO B display mode. */
+    virtual ChannelDisplayMode vfoBDisplayMode() const;
+    /** Sets the VFO B display mode. */
+    virtual void setVfoBDisplayMode(ChannelDisplayMode mode);
+
+    /** Returns the zone index for VFO A. */
+    virtual unsigned int vfoAZoneIndex() const;
+    /** Sets the VFO A zone index. */
+    virtual void setVfoAZoneIndex(unsigned int index);
+    /** Returns the zone index for VFO B. */
+    virtual unsigned int vfoBZoneIndex() const;
+    /** Sets the VFO B zone index. */
+    virtual void setVfoBZoneIndex(unsigned int index);
+
+    /** Returns the channel index for VFO A. */
+    virtual unsigned int vfoAChannelIndex() const;
+    /** Sets the VFO A channel index. */
+    virtual void setVfoAChannelIndex(unsigned int index);
+    /** Returns the channel index for VFO B. */
+    virtual unsigned int vfoBChannelIndex() const;
+    /** Sets the VFO B channel index. */
+    virtual void setVfoBChannelIndex(unsigned int index);
+
+    /** Returns @c true if sub-PTT is enabled. */
+    virtual bool subPttEnabled() const;
+    /** Enables sub-PTT. */
+    virtual void enableSubPtt(bool enable);
+
+    /** Returns the side-key 1 short press function. */
+    virtual KeyFunction sideKey1Short() const;
+    /** Sets the side-key 1 short press function. */
+    virtual void setSideKey1Short(KeyFunction function);
+    /** Returns the side-key 1 long press function. */
+    virtual KeyFunction sideKey1Long() const;
+    /** Sets the side-key 1 long press function. */
+    virtual void setSideKey1Long(KeyFunction function);
+
+    /** Returns the side-key 2 short press function. */
+    virtual KeyFunction sideKey2Short() const;
+    /** Sets the side-key 2 short press function. */
+    virtual void setSideKey2Short(KeyFunction function);
+    /** Returns the side-key 2 long press function. */
+    virtual KeyFunction sideKey2Long() const;
+    /** Sets the side-key 2 long press function. */
+    virtual void setSideKey2Long(KeyFunction function);
+
+    /** Returns the quick-key function for number key n. */
+    virtual KeyFunction quickKey(unsigned int n) const;
+    /** Sets the quick-key function for number key n. */
+    virtual void setQuickKey(unsigned int n, KeyFunction function);
+
+    /** Decodes the settings and updates the config. */
+    virtual bool decode(Context &ctx, const ErrorStack &err);
+    /** Links the settings and updates the config. */
+    virtual bool link(Context &ctx, const ErrorStack &err);
+    /** Encodes the config. */
+    virtual bool encode(Context &ctx, const ErrorStack &err);
+
+  public:
+    /** Some limits for the settings element. */
+    struct Limit: Element::Limit {
+
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static unsigned int enableKeyLock()                                   { return 0x0060; }
+      static unsigned int activeVFO()                                       { return 0x0061; }
+      static unsigned int enableDoubleWait()                                { return 0x0062; }
+      static unsigned int enableDualDisplay()                               { return 0x0063; }
+      static unsigned int scanDirection()                                   { return 0x0064; }
+      static unsigned int vfoStepSize()                                     { return 0x0065; }
+      static unsigned int spectrumCenterFrequency()                         { return 0x0068; }
+      static unsigned int spectrumFrequencyStep()                           { return 0x006c; }
+      static unsigned int spectrumThreshold()                               { return 0x0070; }
+      static unsigned int fmBroadcastStandbyChannel()                       { return 0x0072; }
+      static unsigned int enableFmBroadcastStandby()                        { return 0x0073; }
+      static unsigned int vfoAMode()                                        { return 0x0074; }
+      static unsigned int vfoBMode()                                        { return 0x0075; }
+      static unsigned int vfoAChannelDisplayMode()                          { return 0x0076; }
+      static unsigned int vfoBChannelDisplayMode()                          { return 0x0077; }
+      static unsigned int vfoAZoneIndex()                                   { return 0x0078; }
+      static unsigned int vfoBZoneIndex()                                   { return 0x0079; }
+      static unsigned int vfoAChannelIndex()                                { return 0x007a; }
+      static unsigned int vfoBChannelIndex()                                { return 0x007c; }
+      static unsigned int enableSubPtt()                                    { return 0x007e; }
+      static unsigned int sideKey1Short()                                   { return 0x007f; }
+      static unsigned int sideKey1Long()                                    { return 0x0080; }
+      static unsigned int sideKey2Short()                                   { return 0x0081; }
+      static unsigned int sideKey2Long()                                    { return 0x0082; }
+      static unsigned int quickKeySettings()                                { return 0x0085; }
+      /// @endcond
+    };
   };
+
+
+  /** Implements a single zone. */
+  class ZoneElement: public Element
+  {
+  public:
+    /** Constructor from pointer. */
+    explicit ZoneElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0200; }
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** Returns the default channel index VFO A. */
+    virtual unsigned int defaultChannelA() const;
+    /** Sets the default channel index VFO A. */
+    virtual void setDefaultChannelA(unsigned int channel);
+    /** Returns the default channel index VFO B. */
+    virtual unsigned int defaultChannelB() const;
+    /** Sets the default channel index VFO B. */
+    virtual void setDefaultChannelB(unsigned int channel);
+
+    /** Returns @c true if the n-th channel is set. */
+    virtual bool hasChannelIndex(unsigned int index) const;
+    /** Returns the n-th channel index. */
+    virtual unsigned int channelIndex(unsigned int index) const;
+    /** Sets the n-th channel index. */
+    virtual void setChannelIndex(unsigned int index, unsigned int channel);
+    /** Clears the n-th channel index. */
+    virtual void clearChannelIndex(unsigned int index);
+
+    /** Returns the zone name. */
+    virtual QString name() const;
+    /** Sets the zone name. */
+    virtual void setName(const QString &name);
+
+    /** Encodes a zone. */
+    virtual bool encode(const Zone *zone, Context &ctx, const ErrorStack &err);
+    /** Decodes a zone. */
+    virtual Zone *decode(Context &ctx, const ErrorStack &err) const;
+    /** Links a zone. */
+    virtual bool link(Zone *zone, Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /// The number of channels within a zone. */
+      static constexpr unsigned int channels() { return 200; }
+      /// The maximum name length. */
+      static constexpr unsigned int name() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond  DO_NOT_DOCUMENT
+      static constexpr unsigned int defaultChannelA()                    { return 0x0000; }
+      static constexpr unsigned int defaultChannelB()                    { return 0x0002; }
+      static constexpr unsigned int name()                               { return 0x0004; }
+      static constexpr unsigned int channels()                           { return 0x0014; }
+      /// @endcond
+    };
+  };
+
 
   class ZoneBankElement: public Element
   {
   public:
+    /** Constructor from pointer. */
+    ZoneBankElement(uint8_t *ptr);
+
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x20000; }
+
+    void clear() override;
+
+    /** Encodes all zones. */
+    virtual bool encode(Context &ctx, const ErrorStack &err);
+    /** Decodes all zones. */
+    virtual bool decode(Context &ctx, const ErrorStack &err) const;
+    /** Links all zones. */
+    virtual bool link(Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /// Maximum number of zones.
+      static constexpr unsigned int zones() { return 250; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond  DO_NOT_DOCUMENT
+      static constexpr unsigned int zones()                    { return 0x0000; }
+      /// @endcond
+    };
   };
 
+
+  /** Implements a single DMR contact. */
+  class ContactElement : public Element
+  {
+  public:
+    /** Posisble contact types. */
+    enum class Type {
+      PrivateCall = 0, GroupCall=1, AllCall=2
+    };
+
+  public:
+    /** Constructor from pointer. */
+    explicit ContactElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x15; }
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** Returns the type of the contact. */
+    virtual Type type() const;
+    /** Sets the contact type. */
+    virtual void setType(Type type);
+
+    /** Returns @c true if ID is all call. */
+    virtual bool hasAllCallId() const;
+    /** Returns the DMR id. */
+    virtual unsigned int id() const;
+    /** Sets the DMR id. */
+    virtual void setId(unsigned int id);
+    /** Sets the all-call id. */
+    virtual void setAllCallId();
+
+    /** Returns the contact name. */
+    virtual QString name() const;
+    /** Sets the contact name. */
+    virtual void setName(const QString &name);
+
+    /** Encodes the given contact. */
+    virtual bool encode(const DMRContact *contact, Context &ctx, const ErrorStack &err);
+    /** Decodes the contact. */
+    virtual DMRContact *decode(Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int name() { return 16; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      static constexpr unsigned int type()                    { return 0x0000; }
+      static constexpr unsigned int id()                      { return 0x0001; }
+      static constexpr unsigned int name()                    { return 0x0005; }
+    };
+  };
+
+
+  /** Represents the bank of all contacts. */
   class ContactBankElement: public Element
   {
   public:
+    /** Constructor from pointer. */
+    explicit ContactBankElement(uint8_t *ptr);
+
     /** Returns the size of the element. */
     static constexpr unsigned int size() { return 0x34000; }
+
+    void clear() override;
+
+    /** Encodes all contacts. */
+    virtual bool encode(Context &ctx, const ErrorStack &err);
+    /** Decodes all contacts. */
+    virtual bool decode(Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /// Number of contacts. */
+      static constexpr unsigned int contacts() { return 10000; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int contacts()                    { return 0x0000; }
+      /// @endcond DO_NOT_DOCUMENT
+    };
   };
 
   class GroupListBankElement: public Element
@@ -683,10 +1292,21 @@ public:
   /** Default constructor, also pre-allocates the entire codeplug. */
   explicit RT4DCodeplug(QObject *parent = nullptr);
 
+  Config * preprocess(Config *config, const ErrorStack &err) const override;
+  bool postprocess(Config *config, const ErrorStack &err) const override;
+
   bool index(Config *config, Context &ctx, const ErrorStack &err) const override;
   bool encode(Config *config, const Flags &flags, const ErrorStack &err) override;
 
   bool decode(Config *config, const ErrorStack &err) override;
+
+protected:
+  /** Decode codeplug elements. */
+  virtual bool decodeElements(Context &ctx, const ErrorStack &err);
+  /** Link decoded elements. */
+  virtual bool linkElements(Context &ctx, const ErrorStack &err);
+  /** Encode all elements. */
+  virtual bool encodeElements(Context &ctx, const ErrorStack &err);
 
 protected:
   /** Some internal offsets. */

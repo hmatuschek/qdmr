@@ -5,7 +5,11 @@
 #include "rt4d_codeplug.hh"
 
 #include "config.hh"
-#include "ranges.hh"
+#include "intermediaterepresentation.hh"
+#include "radioid.hh"
+#include <qguiapplication_platform.h>
+#include <qopenglcontext_platform.h>
+#include <qscreen_platform.h>
 
 /* ********************************************************************************************* *
  * Implementation of RT4DCodeplug::FrequencyRangeElement
@@ -1045,6 +1049,1210 @@ RT4DCodeplug::FirstSettingsElement::decode(Context &ctx, const ErrorStack &err) 
 
 
 /* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::ChannelElement
+ * ********************************************************************************************* */
+RT4DCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::ChannelElement::clear() {
+  memset(_data, 0xff, size());
+}
+
+bool
+RT4DCodeplug::ChannelElement::isValid() const {
+  return !name().isEmpty();
+}
+
+
+bool
+RT4DCodeplug::ChannelElement::promiscuousModeEnabled() const {
+  return getBit(Offset::promiscuousMode());
+}
+
+void
+RT4DCodeplug::ChannelElement::enablePromiscuousMode(bool enable) {
+  setBit(Offset::promiscuousMode(), enable);
+}
+
+
+DMRChannel::TimeSlot
+RT4DCodeplug::ChannelElement::timeSlot() const {
+  return getBit(Offset::timeSlot()) ? DMRChannel::TimeSlot::TS2 : DMRChannel::TimeSlot::TS1;
+}
+
+void
+RT4DCodeplug::ChannelElement::setTimeSlot(DMRChannel::TimeSlot timeSlot) {
+  setBit(Offset::timeSlot(), DMRChannel::TimeSlot::TS2 == timeSlot);
+}
+
+bool
+RT4DCodeplug::ChannelElement::dualSlotEnabled() const {
+  return getBit(Offset::dualSlot());
+}
+
+void
+RT4DCodeplug::ChannelElement::enableDualSlot(bool enable) {
+  setBit(Offset::dualSlot(), enable);
+}
+
+bool
+RT4DCodeplug::ChannelElement::channelDmrIdEnabled() const {
+  return getBit(Offset::dmrIdSource());
+}
+
+void
+RT4DCodeplug::ChannelElement::enableChannelDmrId(bool enable) {
+  setBit(Offset::dmrIdSource(), enable);
+}
+
+RT4DCodeplug::ChannelElement::ChannelType
+RT4DCodeplug::ChannelElement::channelType() const {
+  return getBit(Offset::channelType()) ? ChannelType::FM : ChannelType::DMR;
+}
+
+void
+RT4DCodeplug::ChannelElement::setChannelType(ChannelType type) {
+  setBit(Offset::channelType(), type == ChannelType::FM);
+}
+
+
+bool
+RT4DCodeplug::ChannelElement::fmScramblerEnabled() const {
+  return 0 != getUInt4(Offset::fmScrambler());
+}
+
+unsigned int
+RT4DCodeplug::ChannelElement::fmScramblerIndex() const {
+  return getUInt4(Offset::fmScrambler())-1;
+}
+
+void
+RT4DCodeplug::ChannelElement::setFmScramblerIndex(unsigned int index) {
+  setUInt4(Offset::fmScrambler(), index+1);
+}
+
+void
+RT4DCodeplug::ChannelElement::clearFmScrambler() {
+  setUInt4(Offset::fmScrambler(), 0);
+}
+
+
+unsigned int
+RT4DCodeplug::ChannelElement::colorCode() const {
+  return getUInt4(Offset::colorCode());
+}
+
+void
+RT4DCodeplug::ChannelElement::setColorCode(unsigned int colorCode) {
+  setUInt4(Offset::colorCode(), colorCode);
+}
+
+
+DMRChannel::Admit
+RT4DCodeplug::ChannelElement::dmrAdmit() const {
+  switch (static_cast<DMRAdmit>(getUInt2(Offset::dmrAdmit()))) {
+  case DMRAdmit::Always: return DMRChannel::Admit::Always;
+  case DMRAdmit::ChannelFree: return DMRChannel::Admit::Free;
+  case DMRAdmit::ColorCodeIdle: return DMRChannel::Admit::ColorCode;
+  }
+}
+
+void
+RT4DCodeplug::ChannelElement::setDmrAdmit(DMRChannel::Admit dmrAdmit) {
+  switch (dmrAdmit) {
+  case DMRChannel::Admit::Always:
+    setUInt2(Offset::dmrAdmit(), static_cast<unsigned int>(DMRAdmit::Always));
+    break;
+  case DMRChannel::Admit::Free:
+    setUInt2(Offset::dmrAdmit(), static_cast<unsigned int>(DMRAdmit::ChannelFree));
+    break;
+  case DMRChannel::Admit::ColorCode:
+    setUInt2(Offset::dmrAdmit(), static_cast<unsigned int>(DMRAdmit::ColorCodeIdle));
+    break;
+  }
+}
+
+FMChannel::Admit
+RT4DCodeplug::ChannelElement::fmAdmit() const {
+  switch (static_cast<DMRAdmit>(getUInt2(Offset::fmAdmit()))) {
+  case DMRAdmit::Always: return FMChannel::Admit::Always;
+  case DMRAdmit::ChannelFree: return FMChannel::Admit::Free;
+  case DMRAdmit::ColorCodeIdle: return FMChannel::Admit::Tone;
+  }
+}
+
+void
+RT4DCodeplug::ChannelElement::setFmAdmit(FMChannel::Admit admit) {
+  switch (admit) {
+  case FMChannel::Admit::Always:
+    setUInt2(Offset::fmAdmit(), static_cast<unsigned int>(FMAdmit::Always));
+    break;
+  case FMChannel::Admit::Free:
+    setUInt2(Offset::fmAdmit(), static_cast<unsigned int>(FMAdmit::ChannelFree));
+    break;
+  case FMChannel::Admit::Tone:
+    setUInt2(Offset::fmAdmit(), static_cast<unsigned int>(FMAdmit::ToneIdle));
+    break;
+  }
+}
+
+
+RT4DCodeplug::ChannelElement::STEMode
+RT4DCodeplug::ChannelElement::steMode() const {
+  return static_cast<STEMode>(getUInt3(Offset::steMode()));
+}
+
+void
+RT4DCodeplug::ChannelElement::setSteMode(STEMode mode) {
+  setUInt3(Offset::steMode(), static_cast<unsigned int>(mode));
+}
+
+
+FMChannel::Bandwidth
+RT4DCodeplug::ChannelElement::bandwidth() const {
+  return getBit(Offset::bandwidth()) ? FMChannel::Bandwidth::Narrow : FMChannel::Bandwidth::Wide;
+}
+
+void
+RT4DCodeplug::ChannelElement::setBandwidth(FMChannel::Bandwidth bandwidth) {
+  setBit(Offset::bandwidth(), FMChannel::Bandwidth::Narrow == bandwidth);
+}
+
+
+RT4DCodeplug::ChannelElement::AnalogDemod
+RT4DCodeplug::ChannelElement::analogDemodulation() const {
+  return static_cast<AnalogDemod>(getUInt2(Offset::analogDemodulaiton()));
+}
+
+void
+RT4DCodeplug::ChannelElement::setAnalogDemodulation(AnalogDemod analogDemod) {
+  setUInt2(Offset::analogDemodulaiton(), static_cast<unsigned int>(analogDemod));
+}
+
+
+RT4DCodeplug::ChannelElement::SubToneType
+RT4DCodeplug::ChannelElement::subToneType() const {
+  return static_cast<SubToneType>(getUInt3(Offset::subToneType()));
+}
+
+void
+RT4DCodeplug::ChannelElement::setSubToneType(SubToneType type) {
+  setUInt3(Offset::subToneType(), static_cast<unsigned int>(type));
+}
+
+
+Frequency
+RT4DCodeplug::ChannelElement::rxFrequency() const {
+  return Frequency::fromHz(getUInt32_le(Offset::rxFrequency())*10);
+}
+
+void
+RT4DCodeplug::ChannelElement::setRxFrequency(const Frequency &frequency) {
+  setUInt32_le(Offset::rxFrequency(), frequency.inHz()/10);
+}
+
+Frequency
+RT4DCodeplug::ChannelElement::txFrequency() const {
+  return Frequency::fromHz(getUInt32_le(Offset::txFrequency())*10);
+}
+
+void
+RT4DCodeplug::ChannelElement::setTxFrequency(const Frequency &frequency) {
+  setUInt32_le(Offset::txFrequency(), frequency.inHz()/10);
+}
+
+
+SelectiveCall
+RT4DCodeplug::ChannelElement::rxSubTone() const {
+  auto code = getUInt16_le(Offset::rxSubtone());
+  if (0 == code) return {};
+
+  uint8_t type = code>>12;
+  code &= 0x0fff;
+  switch (type) {
+  case 0: return { double(code)/10 }; // CTCSS frequency.
+  case 1: return SelectiveCall::fromBinaryDCS(code, false);
+  case 2: return SelectiveCall::fromBinaryDCS(code, true);
+  default: break;
+  }
+  return {};
+}
+
+void
+RT4DCodeplug::ChannelElement::setRxSubTone(SelectiveCall subTone) {
+  if (! subTone.isValid()) {
+    setUInt16_le(Offset::rxSubtone(), 0);
+  } else if (subTone.isCTCSS()) {
+    setUInt16_le(Offset::rxSubtone(), 1<<12 | (subTone.mHz()/100));
+  } else {
+    setUInt16_le(Offset::rxSubtone(),
+      (subTone.isInverted() ? 2 : 1) << 12 | subTone.binCode());
+  }
+}
+
+SelectiveCall
+RT4DCodeplug::ChannelElement::txSubTone() const {
+  auto code = getUInt16_le(Offset::txSubtone());
+  if (0 == code) return {};
+
+  uint8_t type = code>>12;
+  code &= 0x0fff;
+  switch (type) {
+  case 0: return { double(code)/10 }; // CTCSS frequency.
+  case 1: return SelectiveCall::fromBinaryDCS(code, false);
+  case 2: return SelectiveCall::fromBinaryDCS(code, true);
+  default: break;
+  }
+  return {};
+}
+
+void
+RT4DCodeplug::ChannelElement::setTxSubTone(SelectiveCall subTone) {
+  if (! subTone.isValid()) {
+    setUInt16_le(Offset::txSubtone(), 0);
+  } else if (subTone.isCTCSS()) {
+    setUInt16_le(Offset::txSubtone(), 1<<12 | (subTone.mHz()/100));
+  } else {
+    setUInt16_le(Offset::txSubtone(),
+      (subTone.isInverted() ? 2 : 1) << 12 | subTone.binCode());
+  }
+}
+
+
+unsigned int
+RT4DCodeplug::ChannelElement::contactIndex() const {
+  return getUInt16_le(Offset::contactIndex());
+}
+
+void
+RT4DCodeplug::ChannelElement::setContactIndex(unsigned int index) {
+  setUInt16_le(Offset::contactIndex(), index);
+}
+
+
+bool
+RT4DCodeplug::ChannelElement::hasGroupListIndex() const {
+  return 0 != getUInt8(Offset::groupListIndex());
+}
+
+unsigned int
+RT4DCodeplug::ChannelElement::groupListIndex() const {
+  return getUInt8(Offset::groupListIndex())-1;
+}
+
+void
+RT4DCodeplug::ChannelElement::setGroupListIndex(unsigned int index) {
+  setUInt8(Offset::groupListIndex(), index+1);
+}
+
+void
+RT4DCodeplug::ChannelElement::clearGroupListIndex() {
+  setUInt8(Offset::groupListIndex(), 0);
+}
+
+
+bool
+RT4DCodeplug::ChannelElement::hasEncryptionKey() const {
+  return 0 != getUInt8(Offset::encryptionKeyIndex());
+}
+
+unsigned int
+RT4DCodeplug::ChannelElement::encryptionKeyIndex() const {
+  return getUInt8(Offset::encryptionKeyIndex())-1;
+}
+
+void
+RT4DCodeplug::ChannelElement::setEncryptionKeyIndex(unsigned int index) {
+  setUInt8(Offset::encryptionKeyIndex(), index+1);
+}
+
+void
+RT4DCodeplug::ChannelElement::clearEncryptionKeyIndex() {
+  setUInt8(Offset::encryptionKeyIndex(), 0);
+}
+
+
+unsigned int
+RT4DCodeplug::ChannelElement::channelDmrId() const {
+  return getUInt32_le(Offset::channelDmrId());
+}
+
+void
+RT4DCodeplug::ChannelElement::setChannelDmrId(unsigned int index) {
+  setUInt32_le(Offset::channelDmrId(), index);
+}
+
+
+unsigned int
+RT4DCodeplug::ChannelElement::muteCode() const {
+  return getBCD6_le(Offset::muteCode());
+}
+
+void
+RT4DCodeplug::ChannelElement::setMuteCode(unsigned int code) {
+  setBCD6_le(Offset::muteCode(), code);
+}
+
+QString
+RT4DCodeplug::ChannelElement::name() const {
+  return readASCII(Offset::name(), Limit::name(), 0xff);
+}
+
+void
+RT4DCodeplug::ChannelElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::name(), 0xff);
+}
+
+
+Channel *
+RT4DCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Channel *channel = nullptr;
+  if (ChannelType::FM == channelType()) {
+    if (AnalogDemod::FM == analogDemodulation()) {
+      auto fm = new FMChannel(); channel = fm;
+      fm->setAdmit(fmAdmit());
+      fm->setRXTone(rxSubTone());
+      fm->setTXTone(txSubTone());
+      fm->setBandwidth(bandwidth());
+    } else if (AnalogDemod::AM == analogDemodulation()) {
+      auto am = new AMChannel(); channel = am;
+      am->setRXOnly(true);
+    } else {
+      errMsg(err) << "SSB channels are not yet supported.";
+      return nullptr;
+    }
+  } else if (ChannelType::DMR == channelType()) {
+    auto dmr = new DMRChannel(); channel = dmr;
+    dmr->setAdmit(dmrAdmit());
+    dmr->setColorCode(colorCode());
+    dmr->setTimeSlot(timeSlot());
+    if (channelDmrIdEnabled()) {
+      auto id = ctx.config()->radioIDs()->find(channelDmrId());
+      if (nullptr == id) {
+        id = new DMRRadioID("Channel ID", channelDmrId());
+        ctx.config()->radioIDs()->add(id);
+        ctx.add(id, ctx.count<DMRRadioID>());
+      }
+      dmr->setRadioId(id);
+    }
+  }
+
+  if (nullptr == channel)
+    return nullptr;
+
+  // Set common channel settings
+  channel->setName(name());
+  channel->setRXFrequency(rxFrequency());
+  channel->setTXFrequency(txFrequency());
+  channel->setPower(Channel::Power::High);
+  return channel;
+}
+
+
+bool
+RT4DCodeplug::ChannelElement::link(Channel *ch, Context &ctx, const ErrorStack &err) const {
+  if (ch->is<DMRChannel>()) {
+    auto dmr = ch->as<DMRChannel>();
+    if (! ctx.has<DMRContact>(contactIndex())) {
+      errMsg(err) << "Cannot link channel '" << ch->name()
+                  << "': transmit contact index " << contactIndex() << " not defined.";
+      return false;
+    }
+    dmr->setContact(ctx.get<DMRContact>(contactIndex()));
+
+    if (hasGroupListIndex() && !ctx.has<RXGroupList>(groupListIndex())) {
+      errMsg(err) << "Cannot link channel '" << ch->name()
+                  << "': group list index " << contactIndex() << " not defined.";
+      //return false;
+    }
+    //dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
+
+    if (hasEncryptionKey() && !ctx.has<EncryptionKey>(encryptionKeyIndex())) {
+      errMsg(err) << "Cannot link channel '" << ch->name()
+                  << "': encryption key index " << encryptionKeyIndex() << " not defined.";
+      //return false;
+    }
+    //dmr->commercialExtension()->setEncryptionKey(ctx.get<EncryptionKey>(encryptionKeyIndex()));
+  }
+
+  return true;
+}
+
+
+bool
+RT4DCodeplug::ChannelElement::encode(const Channel *ch, Context &ctx, const ErrorStack &err) {
+  if (ch->is<DMRChannel>()) {
+    auto dmr = ch->as<DMRChannel>();
+    setChannelType(ChannelType::DMR);
+    setDmrAdmit(dmr->admit());
+    setColorCode(dmr->colorCode());
+    setTimeSlot(dmr->timeSlot());
+    enableChannelDmrId(! dmr->radioIdRef()->isNull());
+    if (! dmr->radioIdRef()->isNull()) {
+      setChannelDmrId(dmr->radioId()->number());
+    }
+    setBandwidth(FMChannel::Bandwidth::Narrow);
+  } else if (ch->is<FMChannel>()) {
+    auto fm = ch->as<FMChannel>();
+    setChannelType(ChannelType::FM);
+    setFmAdmit(fm->admit());
+    setRxSubTone(fm->rxTone());
+    setTxSubTone(fm->txTone());
+    setBandwidth(fm->bandwidth());
+  } else if (ch->is<AMChannel>()) {
+    setBandwidth(FMChannel::Bandwidth::Narrow);
+  }
+
+  setName(ch->name());
+  setRxFrequency(ch->rxFrequency());
+  setTxFrequency(ch->txFrequency());
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::ChannelBankElement
+ * ********************************************************************************************* */
+RT4DCodeplug::ChannelBankElement::ChannelBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+bool
+RT4DCodeplug::ChannelBankElement::decode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int idx=0; idx < Limit::channels(); idx++) {
+    if (! ChannelElement(_data + idx*ChannelElement::size()).isValid())
+      continue;
+    auto obj = ChannelElement(_data + idx*ChannelElement::size()).decode(ctx, err);
+    if (nullptr == obj) {
+      errMsg(err) << "Cannot decode channel at index " << idx << ".";
+      return false;
+    }
+    ctx.config()->channelList()->add(obj);
+    ctx.add(obj, idx);
+  }
+
+  return true;
+}
+
+
+bool
+RT4DCodeplug::ChannelBankElement::link(Context &ctx, const ErrorStack &err) {
+  for (unsigned int idx=0; idx < Limit::channels(); idx++) {
+    if (! ChannelElement(_data + idx*ChannelElement::size()).isValid())
+      continue;
+    if (! ChannelElement(_data + idx*ChannelElement::size()).link(ctx.get<Channel>(idx), ctx, err)) {
+      errMsg(err) << "Cannot link channel '" << ctx.get<Channel>(idx)->name() << "' at index " << idx << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool
+RT4DCodeplug::ChannelBankElement::encode(Context &ctx, const ErrorStack &err) {
+  for (unsigned int idx=0; idx < Limit::channels(); idx++) {
+    ChannelElement element(_data + idx*ChannelElement::size());
+    if (! ctx.has<Channel>(idx)) {
+      element.clear();
+      continue;
+    }
+    if (! element.encode(ctx.get<Channel>(idx), ctx, err)) {
+      errMsg(err) << "Cannot encode channel " << ctx.get<Channel>(idx)->name()
+                  << " at index " << idx;
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::SecondSettingsElement
+ * ********************************************************************************************* */
+RT4DCodeplug::SecondSettingsElement::SecondSettingsElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+
+bool
+RT4DCodeplug::SecondSettingsElement::keyLockEnabled() const {
+  return 0x01 == getUInt8(Offset::enableKeyLock());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::enableKeyLock(bool enable) {
+  setUInt8(Offset::enableKeyLock(), enable ? 1 : 0);
+}
+
+
+RT4DCodeplug::SecondSettingsElement::ActiveVfo
+RT4DCodeplug::SecondSettingsElement::activeVfo() const {
+  return static_cast<ActiveVfo>(getUInt8(Offset::activeVFO()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setActiveVfo(ActiveVfo vfo) {
+  setUInt8(Offset::activeVFO(), static_cast<unsigned int>(vfo));
+}
+
+
+bool
+RT4DCodeplug::SecondSettingsElement::dualChannelEnabled() const {
+  return 0x01 == getUInt8(Offset::enableDoubleWait());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::enableDualChannel(bool enable) {
+  setUInt8(Offset::enableDoubleWait(), enable ? 1 : 0);
+  setUInt8(Offset::enableDualDisplay(), enable ? 1 : 0);
+}
+
+RT4DCodeplug::SecondSettingsElement::ScanDirection
+RT4DCodeplug::SecondSettingsElement::scanDirection() const {
+  return static_cast<ScanDirection>(getUInt8(Offset::scanDirection()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setScanDirection(ScanDirection direction) {
+  setUInt8(Offset::scanDirection(), static_cast<unsigned int>(direction));
+}
+
+
+Frequency
+RT4DCodeplug::SecondSettingsElement::vfoStepSize() const {
+  switch (static_cast<StepSize>(getUInt8(Offset::vfoStepSize()))) {
+    case StepSize::Step_1_25kHz: return Frequency::fromkHz(1.25);
+    case StepSize::Step_2_5kHz: return Frequency::fromkHz(2.5);
+    case StepSize::Step_5kHz: return Frequency::fromkHz(5.0);
+    case StepSize::Step_6_25kHz: return Frequency::fromkHz(6.25);
+    case StepSize::Step_10kHz: return Frequency::fromkHz(10.0);
+    case StepSize::Step_12_5kHz: return Frequency::fromkHz(12.5);
+    case StepSize::Step_20kHz: return Frequency::fromkHz(20.0);
+    case StepSize::Step_25kHz: return Frequency::fromkHz(25.0);
+    case StepSize::Step_50kHz: return Frequency::fromkHz(50.0);
+    case StepSize::Step_100kHz: return Frequency::fromkHz(100.0);
+    case StepSize::Step_250Hz: return Frequency::fromkHz(250.0);
+    case StepSize::Step_500kHz: return Frequency::fromkHz(500.0);
+    case StepSize::Step_1MHz: return Frequency::fromkHz(1000.0);
+    case StepSize::Step_5MHz: return Frequency::fromkHz(5000.0);
+  }
+  return {};
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setVfoStepSize(const Frequency &frequency) {
+  if (frequency <= Frequency::fromkHz(1.25))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_1_25kHz));
+  else if (frequency <= Frequency::fromkHz(2.5))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_2_5kHz));
+  else if (frequency <= Frequency::fromkHz(5.0))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_5kHz));
+  else if (frequency <= Frequency::fromkHz(6.25))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_6_25kHz));
+  else if (frequency <= Frequency::fromkHz(10.0))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_10kHz));
+  else if (frequency <= Frequency::fromkHz(12.5))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_12_5kHz));
+  else if (frequency <= Frequency::fromkHz(20.0))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_20kHz));
+  else if (frequency <= Frequency::fromkHz(25.0))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_25kHz));
+  else if (frequency <= Frequency::fromkHz(50.0))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_50kHz));
+  else if (frequency <= Frequency::fromkHz(100.0))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_100kHz));
+  else if (frequency <= Frequency::fromkHz(250.0))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_250Hz));
+  else if (frequency <= Frequency::fromkHz(500.0))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_500kHz));
+  else if (frequency <= Frequency::fromkHz(1000.0))
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_1MHz));
+  else
+    setUInt8(Offset::vfoStepSize(), static_cast<unsigned int>(StepSize::Step_5MHz));
+}
+
+
+Frequency
+RT4DCodeplug::SecondSettingsElement::spectrumCenterFrequency() const {
+  return Frequency::fromHz(getUInt32_le(Offset::spectrumCenterFrequency())*10);
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setSpectrumCenterFrequency(const Frequency &frequency) {
+  setUInt32_le(Offset::spectrumCenterFrequency(), frequency.inHz()/10);
+}
+
+Frequency
+RT4DCodeplug::SecondSettingsElement::spectrumFrequencyStep() const {
+  return Frequency::fromHz(getUInt32_le(Offset::spectrumFrequencyStep())*10);
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setSpectrumFrequencyStep(const Frequency &frequency) {
+  setUInt32_le(Offset::spectrumFrequencyStep(), frequency.inHz()/10);
+}
+
+unsigned int
+RT4DCodeplug::SecondSettingsElement::spectrumThreshold() const {
+  return getUInt8(Offset::spectrumThreshold());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setSpectrumThreshold(unsigned int threshold) {
+  setUInt8(Offset::spectrumThreshold(), threshold);
+}
+
+
+unsigned int
+RT4DCodeplug::SecondSettingsElement::fmBroadcastStandbyChannel() const {
+  return getUInt8(Offset::fmBroadcastStandbyChannel());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setFmBroadcastStandbyChannel(unsigned int channel) {
+  setUInt8(Offset::fmBroadcastStandbyChannel(), channel);
+}
+
+bool
+RT4DCodeplug::SecondSettingsElement::fmBroadcastStandbyEnabled() const {
+  return 0x01 == getUInt8(Offset::enableFmBroadcastStandby());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::enableFmBroadcastStandby(bool enable) {
+  setUInt8(Offset::enableFmBroadcastStandby(), enable ? 1 : 0);
+}
+
+RT4DCodeplug::SecondSettingsElement::ChannelMode
+RT4DCodeplug::SecondSettingsElement::vfoAMode() const {
+  return static_cast<ChannelMode>(getUInt8(Offset::vfoAMode()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setVfoAMode(ChannelMode mode) {
+  setUInt8(Offset::vfoAMode(), static_cast<unsigned int>(mode));
+}
+
+RT4DCodeplug::SecondSettingsElement::ChannelMode
+RT4DCodeplug::SecondSettingsElement::vfoBMode() const {
+  return static_cast<ChannelMode>(getUInt8(Offset::vfoBMode()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setVfoBMode(ChannelMode mode) {
+  setUInt8(Offset::vfoBMode(), static_cast<unsigned int>(mode));
+}
+
+RT4DCodeplug::SecondSettingsElement::ChannelDisplayMode
+RT4DCodeplug::SecondSettingsElement::vfoADisplayMode() const {
+  return static_cast<ChannelDisplayMode>(getUInt8(Offset::vfoAChannelDisplayMode()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setVfoADisplayMode(ChannelDisplayMode mode) {
+  setUInt8(Offset::vfoAChannelDisplayMode(), static_cast<unsigned int>(mode));
+}
+
+RT4DCodeplug::SecondSettingsElement::ChannelDisplayMode
+RT4DCodeplug::SecondSettingsElement::vfoBDisplayMode() const {
+  return static_cast<ChannelDisplayMode>(getUInt8(Offset::vfoBChannelDisplayMode()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setVfoBDisplayMode(ChannelDisplayMode mode) {
+  setUInt8(Offset::vfoBChannelDisplayMode(), static_cast<unsigned int>(mode));
+}
+
+unsigned int
+RT4DCodeplug::SecondSettingsElement::vfoAZoneIndex() const {
+  return getUInt8(Offset::vfoAZoneIndex());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setVfoAZoneIndex(unsigned int index) {
+  setUInt8(Offset::vfoAZoneIndex(), index);
+}
+
+unsigned int
+RT4DCodeplug::SecondSettingsElement::vfoBZoneIndex() const {
+  return getUInt8(Offset::vfoBZoneIndex());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setVfoBZoneIndex(unsigned int index) {
+  setUInt8(Offset::vfoBZoneIndex(), index);
+}
+
+unsigned int
+RT4DCodeplug::SecondSettingsElement::vfoAChannelIndex() const {
+  return getUInt16_le(Offset::vfoAChannelIndex());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setVfoAChannelIndex(unsigned int index) {
+  setUInt16_le(Offset::vfoAChannelIndex(), index);
+}
+
+unsigned int
+RT4DCodeplug::SecondSettingsElement::vfoBChannelIndex() const {
+  return getUInt16_le(Offset::vfoBChannelIndex());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setVfoBChannelIndex(unsigned int index) {
+  setUInt16_le(Offset::vfoBChannelIndex(), index);
+}
+
+
+bool
+RT4DCodeplug::SecondSettingsElement::subPttEnabled() const {
+  return 0x01 == getUInt8(Offset::enableSubPtt());
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::enableSubPtt(bool enabled) {
+  setUInt8(Offset::enableSubPtt(), enabled ? 1 : 0);
+}
+
+
+RT4DCodeplug::SecondSettingsElement::KeyFunction
+RT4DCodeplug::SecondSettingsElement::sideKey1Short() const {
+  return static_cast<KeyFunction>(getUInt8(Offset::sideKey1Short()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setSideKey1Short(KeyFunction function) {
+  setUInt8(Offset::sideKey1Short(), static_cast<unsigned char>(function));
+}
+
+RT4DCodeplug::SecondSettingsElement::KeyFunction
+RT4DCodeplug::SecondSettingsElement::sideKey1Long() const {
+  return static_cast<KeyFunction>(getUInt8(Offset::sideKey1Long()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setSideKey1Long(KeyFunction function) {
+  setUInt8(Offset::sideKey1Long(), static_cast<unsigned char>(function));
+}
+
+RT4DCodeplug::SecondSettingsElement::KeyFunction
+RT4DCodeplug::SecondSettingsElement::sideKey2Short() const {
+  return static_cast<KeyFunction>(getUInt8(Offset::sideKey2Short()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setSideKey2Short(KeyFunction function) {
+  setUInt8(Offset::sideKey2Short(), static_cast<unsigned char>(function));
+}
+
+RT4DCodeplug::SecondSettingsElement::KeyFunction
+RT4DCodeplug::SecondSettingsElement::sideKey2Long() const {
+  return static_cast<KeyFunction>(getUInt8(Offset::sideKey2Long()));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setSideKey2Long(KeyFunction function) {
+  setUInt8(Offset::sideKey2Long(), static_cast<unsigned char>(function));
+}
+
+RT4DCodeplug::SecondSettingsElement::KeyFunction
+RT4DCodeplug::SecondSettingsElement::quickKey(unsigned int key) const {
+  return static_cast<KeyFunction>(getUInt8(Offset::quickKeySettings()+key));
+}
+
+void
+RT4DCodeplug::SecondSettingsElement::setQuickKey(unsigned int key, KeyFunction function) {
+  setUInt8(Offset::quickKeySettings()+key, static_cast<unsigned char>(function));
+}
+
+
+bool
+RT4DCodeplug::SecondSettingsElement::decode(Context &ctx, const ErrorStack &errStack) {
+  return true;
+}
+
+bool
+RT4DCodeplug::SecondSettingsElement::link(Context &ctx, const ErrorStack &err) {
+  ctx.config()->settings()->boot()->enableDefaultChannel(
+    ctx.has<Zone>(vfoAZoneIndex()) && ctx.has<Channel>(vfoAChannelIndex()) &&
+    ctx.has<Zone>(vfoBZoneIndex()) && ctx.has<Channel>(vfoBChannelIndex()) );
+
+  if (ctx.has<Zone>(vfoAZoneIndex()) && ctx.has<Channel>(vfoAChannelIndex())) {
+    ctx.config()->settings()->boot()->zoneA()->set(ctx.get<Zone>(vfoAZoneIndex()));
+    ctx.config()->settings()->boot()->channelA()->set(ctx.get<Channel>(vfoAChannelIndex()));
+  }
+
+  if (ctx.has<Zone>(vfoBZoneIndex()) && ctx.has<Channel>(vfoBChannelIndex())) {
+    ctx.config()->settings()->boot()->zoneB()->set(ctx.get<Zone>(vfoBZoneIndex()));
+    ctx.config()->settings()->boot()->channelB()->set(ctx.get<Channel>(vfoBChannelIndex()));
+  }
+
+  return true;
+}
+
+bool
+RT4DCodeplug::SecondSettingsElement::encode(Context &ctx, const ErrorStack &errStack) {
+  if (ctx.config()->settings()->boot()->defaultChannelEnabled()
+      && !ctx.config()->settings()->boot()->zoneA()->isNull()
+      && !ctx.config()->settings()->boot()->channelA()->isNull()) {
+    setVfoAZoneIndex(ctx.index(ctx.config()->settings()->boot()->zoneA()->as<Zone>()));
+    setVfoAChannelIndex(ctx.index(ctx.config()->settings()->boot()->channelA()->as<Channel>()));
+  }
+  if (ctx.config()->settings()->boot()->defaultChannelEnabled()
+      && !ctx.config()->settings()->boot()->zoneB()->isNull()
+      && !ctx.config()->settings()->boot()->channelB()->isNull()) {
+    setVfoBZoneIndex(ctx.index(ctx.config()->settings()->boot()->zoneB()->as<Zone>()));
+    setVfoBChannelIndex(ctx.index(ctx.config()->settings()->boot()->channelB()->as<Channel>()));
+  }
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::ZoneElement
+ * ********************************************************************************************* */
+RT4DCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::ZoneElement::clear() {
+  memset(_data, 0xff, size());
+}
+
+bool
+RT4DCodeplug::ZoneElement::isValid() const {
+  return !name().isEmpty();
+}
+
+
+unsigned int
+RT4DCodeplug::ZoneElement::defaultChannelA() const {
+  return getUInt16_le(Offset::defaultChannelA());
+}
+
+void
+RT4DCodeplug::ZoneElement::setDefaultChannelA(unsigned int channel) {
+  setUInt16_le(Offset::defaultChannelA(), channel);
+}
+
+unsigned int
+RT4DCodeplug::ZoneElement::defaultChannelB() const {
+  return getUInt16_le(Offset::defaultChannelB());
+}
+
+void
+RT4DCodeplug::ZoneElement::setDefaultChannelB(unsigned int channel) {
+  setUInt16_le(Offset::defaultChannelB(), channel);
+}
+
+
+QString
+RT4DCodeplug::ZoneElement::name() const {
+  return readASCII(Offset::name(), Limit::name(), 0xff);
+}
+
+void
+RT4DCodeplug::ZoneElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::name(), 0xff);
+}
+
+
+bool
+RT4DCodeplug::ZoneElement::hasChannelIndex(unsigned int index) const {
+  return 0xffff != getUInt16_le(Offset::channels() + 2*index);
+}
+
+unsigned int
+RT4DCodeplug::ZoneElement::channelIndex(unsigned int index) const {
+  return getUInt16_le(Offset::channels() + 2*index);
+}
+
+void
+RT4DCodeplug::ZoneElement::setChannelIndex(unsigned int index, unsigned int channel) {
+  setUInt16_le(Offset::channels() + 2*index, channel);
+}
+
+void
+RT4DCodeplug::ZoneElement::clearChannelIndex(unsigned int index) {
+  setUInt16_le(Offset::channels() + 2*index, 0xffff);
+}
+
+
+bool
+RT4DCodeplug::ZoneElement::encode(const Zone *zone, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
+  clear();
+  setName(zone->name());
+  for (int idx = 0; idx < zone->A()->count(); idx++) {
+    setChannelIndex(idx, ctx.index(zone->A()->get(idx)->as<Channel>()));
+  }
+
+  return true;
+}
+
+Zone *
+RT4DCodeplug::ZoneElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx); Q_UNUSED(err);
+  return new Zone(name());
+}
+
+bool
+RT4DCodeplug::ZoneElement::link(Zone *zone, Context &ctx, const ErrorStack &err) const {
+  for (unsigned int idx = 0; idx < Limit::channels(); idx++) {
+    if (! hasChannelIndex(idx))
+      continue;
+    if (! ctx.has<Channel>(channelIndex(idx))) {
+      errMsg(err) << "Cannot link zone '" << zone->name()
+                  << "': channel index " << channelIndex(idx) << " not defined.";
+      return false;
+    }
+    zone->A()->add(ctx.get<Channel>(channelIndex(idx)));
+  }
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::ZoneBankElement
+ * ********************************************************************************************* */
+RT4DCodeplug::ZoneBankElement::ZoneBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::ZoneBankElement::clear() {
+  for (unsigned int idx = 0; idx < Limit::zones(); idx++) {
+    ZoneElement(_data + Offset::zones() + idx*ZoneElement::size()).clear();
+  }
+}
+
+bool
+RT4DCodeplug::ZoneBankElement::encode(Context &ctx, const ErrorStack &err) {
+  clear();
+
+  for (unsigned int idx = 0; idx < ctx.count<Zone>(); idx++) {
+    if (! ZoneElement(_data + Offset::zones() + idx*ZoneElement::size()).encode(ctx.get<Zone>(idx), ctx, err)) {
+      errMsg(err) << "Cannot encode zone '" << ctx.get<Zone>(idx)->name() << "' at index " << idx << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+RT4DCodeplug::ZoneBankElement::decode(Context &ctx, const ErrorStack &err) const {
+  for (unsigned int idx = 0; idx < Limit::zones(); idx++) {
+    ZoneElement el(_data + Offset::zones() + idx*ZoneElement::size());
+    if (! el.isValid())
+      continue;
+    auto zone = el.decode(ctx, err);
+    if (nullptr == zone) {
+      errMsg(err) << "Cannot decode zone at index " << idx << ".";
+      return false;
+    }
+    ctx.config()->zones()->add(zone);
+    ctx.add(zone, idx);
+  }
+
+  return true;
+}
+
+bool
+RT4DCodeplug::ZoneBankElement::link(Context &ctx, const ErrorStack &err) const {
+  for (unsigned int idx = 0; idx < Limit::zones(); idx++) {
+    ZoneElement el(_data + Offset::zones() + idx*ZoneElement::size());
+    if (! el.isValid())
+      continue;
+    if (! el.link(ctx.get<Zone>(idx), ctx, err)) {
+      errMsg(err) << "Cannot link zone '" << ctx.get<Zone>(idx) << "' at index " << idx << ".";
+      return false;
+    }
+  }
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::ContactElement
+ * ********************************************************************************************* */
+RT4DCodeplug::ContactElement::ContactElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::ContactElement::clear() {
+  memset(_data, 0xff, size());
+}
+
+bool
+RT4DCodeplug::ContactElement::isValid() const {
+  return !name().isEmpty();
+}
+
+
+RT4DCodeplug::ContactElement::Type
+RT4DCodeplug::ContactElement::type() const {
+  return static_cast<Type>(getUInt8(Offset::type()));
+}
+
+void
+RT4DCodeplug::ContactElement::setType(Type type) {
+  setUInt8(Offset::type(), static_cast<unsigned int>(type));
+}
+
+
+bool
+RT4DCodeplug::ContactElement::hasAllCallId() const {
+  return 0xaaaaaaaa == getUInt32_le(Offset::id());
+}
+
+unsigned int
+RT4DCodeplug::ContactElement::id() const {
+  return getBCD8_le(Offset::id());
+}
+
+void
+RT4DCodeplug::ContactElement::setId(unsigned int id) {
+  setBCD8_le(Offset::id(), id);
+}
+
+void
+RT4DCodeplug::ContactElement::setAllCallId() {
+  setUInt32_le(Offset::id(), 0xaaaaaaaa);
+}
+
+
+QString
+RT4DCodeplug::ContactElement::name() const {
+  return readASCII(Offset::name(), Limit::name(), 0xff);
+}
+
+void
+RT4DCodeplug::ContactElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::name(), 0xff);
+}
+
+
+bool
+RT4DCodeplug::ContactElement::encode(const DMRContact *contact, Context &ctx, const ErrorStack &err) {
+  setId(contact->number());
+  switch (contact->type()) {
+  case DMRContact::PrivateCall:
+    setType(Type::PrivateCall);
+    break;
+  case DMRContact::GroupCall:
+    setType(Type::GroupCall);
+    break;
+  case DMRContact::AllCall:
+    setType(Type::AllCall);
+    setAllCallId();
+    break;
+  }
+
+  setName(contact->name());
+
+  return true;
+}
+
+
+DMRContact *
+RT4DCodeplug::ContactElement::decode(Context &ctx, const ErrorStack &err) const {
+  switch (type()) {
+    case Type::PrivateCall:
+      return new DMRContact(DMRContact::Type::PrivateCall, name(), id());
+    case Type::GroupCall:
+      return new DMRContact(DMRContact::Type::GroupCall, name(), id());
+    case Type::AllCall:
+      return new DMRContact(DMRContact::Type::AllCall, name(), 16777215);
+  }
+
+  errMsg(err) << "Unknown call type.";
+  return nullptr;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::ContactBankElement
+ * ********************************************************************************************* */
+RT4DCodeplug::ContactBankElement::ContactBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::ContactBankElement::clear() {
+  for (unsigned int i = 0; i < Limit::contacts(); i++) {
+    ContactElement(_data + Offset::contacts() + i*ContactElement::size()).clear();
+  }
+}
+
+bool
+RT4DCodeplug::ContactBankElement::encode(Context &ctx, const ErrorStack &err) {
+  clear();
+
+  for (unsigned int i = 0; i < ctx.count<DMRContact>(); i++) {
+    ContactElement el(_data + Offset::contacts() + i*ContactElement::size());
+    if (! el.encode(ctx.get<DMRContact>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode contact '" << ctx.get<DMRContact>(i)->name()
+                  << "' at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool
+RT4DCodeplug::ContactBankElement::decode(Context &ctx, const ErrorStack &err) const {
+  for (unsigned int i = 0; i < Limit::contacts(); i++) {
+    ContactElement el(_data + Offset::contacts() + i*ContactElement::size());
+    if (! el.isValid())
+      continue;
+    auto contact = el.decode(ctx, err);
+    if (nullptr == contact) {
+      errMsg(err) << "Cannot decode contact at index " << i << ".";
+      return false;
+    }
+    ctx.config()->contacts()->add(contact);
+    ctx.add(contact, i);
+  }
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
  * Implementation of RT4DCodeplug
  * ********************************************************************************************* */
 RT4DCodeplug::RT4DCodeplug(QObject *parent)
@@ -1065,19 +2273,234 @@ RT4DCodeplug::RT4DCodeplug(QObject *parent)
 }
 
 
+Config *
+RT4DCodeplug::preprocess(Config *config, const ErrorStack &err) const {
+  Config *copy = Codeplug::preprocess(config, err);
+  if (nullptr == copy) {
+    errMsg(err) << "Cannot pre-process RT-4D codeplug.";
+    return nullptr;
+  }
+
+  // Remove all M17 channels
+  ObjectFilterVisitor m17Filter{M17Channel::staticMetaObject};
+  if (! m17Filter.process(copy, err)) {
+    errMsg(err) << "Remove M17 channels.";
+    delete copy;
+    return nullptr;
+  }
+
+  // Keep only ARC4, AES (128 and 256)
+  EncryptionKeyFilterVisitor encFilter{
+    EncryptionKeyFilterVisitor::Filter(ARC4EncryptionKey::staticMetaObject, 40),
+    EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 128),
+    EncryptionKeyFilterVisitor::Filter(AESEncryptionKey::staticMetaObject, 256)
+  };
+  if (! encFilter.process(copy, err)) {
+    errMsg(err) << "Clear encryption keys.";
+    errMsg(err) << "Cannot pre-process DM32UV codeplug.";
+    delete copy;
+    return nullptr;
+  }
+
+  // Split dual-zones into two.
+  ZoneSplitVisitor splitter;
+  if (! splitter.process(copy, err)) {
+    errMsg(err) << "Cannot split dual VFO zones.";
+    errMsg(err) << "Cannot pre-process DM32UV codeplug.";
+    delete copy;
+    return nullptr;
+  }
+
+  return copy;
+}
+
+bool
+RT4DCodeplug::postprocess(Config *config, const ErrorStack &err) const {
+  if (! Codeplug::postprocess(config, err)) {
+    errMsg(err) << "Cannot post-process RT-4D codeplug.";
+    return false;
+  }
+
+  // Merge split zones into one.
+  ZoneMergeVisitor merger;
+  if (! merger.process(config, err)) {
+    errMsg(err) << "Cannot merge zones.";
+    return false;
+  }
+
+  return true;
+}
+
+
 bool
 RT4DCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
-  return false;
+  Q_UNUSED(err)
+
+  // All indices as 0-based. That is, the first channel gets index 0 etc.
+
+  // Map DMR contacts
+  for (int i=0, d=0; i<config->contacts()->count(); i++) {
+    if (config->contacts()->contact(i)->is<DMRContact>()) {
+      ctx.add(config->contacts()->contact(i)->as<DMRContact>(), d); d++;
+    }
+  }
+
+  // Map rx group lists
+  for (int i=0; i<config->rxGroupLists()->count(); i++)
+    ctx.add(config->rxGroupLists()->list(i), i);
+
+  // Map channels
+  for (int i=0; i<config->channelList()->count(); i++)
+    ctx.add(config->channelList()->channel(i), i);
+
+  // Map zones
+  for (int i=0; i<config->zones()->count(); i++)
+    ctx.add(config->zones()->zone(i), i);
+
+  // Map scan lists
+  for (int i=0; i<config->scanlists()->count(); i++)
+    ctx.add(config->scanlists()->scanlist(i), i);
+
+  // Map encryption keys
+  if (config->commercialExtension()) {
+    for (int i=0; i<config->commercialExtension()->encryptionKeys()->count(); i++)
+      ctx.add(config->commercialExtension()->encryptionKeys()->key(i), i);
+  }
+  return true;
 }
 
 
 bool
 RT4DCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err) {
-  return false;
+  Q_UNUSED(flags);
+
+  Context ctx(config);
+  ctx.remTable(&BasicEncryptionKey::staticMetaObject, true);
+  ctx.remTable(&ARC4EncryptionKey::staticMetaObject, true);
+  ctx.remTable(&AESEncryptionKey::staticMetaObject, true);
+  ctx.addTable(&EncryptionKey::staticMetaObject);
+  if (! index(config, ctx, err)) {
+    errMsg(err) << "Index elements.";
+    return false;
+  }
+
+  if (! encodeElements(ctx, err)) {
+    errMsg(err) << "Cannot encode codeplug.";
+    return false;
+  }
+
+  return true;
 }
 
 
 bool
 RT4DCodeplug::decode(Config *config, const ErrorStack &err) {
-  return false;
+  Context ctx(config);
+  // Remove tables for each encryption method
+  ctx.remTable(&BasicEncryptionKey::staticMetaObject, true);
+  ctx.remTable(&ARC4EncryptionKey::staticMetaObject, true);
+  ctx.remTable(&AESEncryptionKey::staticMetaObject, true);
+  // Add common index table for all encryption keys.
+  ctx.addTable(&EncryptionKey::staticMetaObject);
+
+  if (! decodeElements(ctx, err)) {
+    errMsg(err) << "Cannot decode elements.";
+    return false;
+  }
+
+  if (! linkElements(ctx, err)) {
+    errMsg(err) << "Cannot decode elements.";
+    return false;
+  }
+
+  return true;
 }
+
+
+
+bool
+RT4DCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
+  if (! FirstSettingsElement(data(Offset::firstSettings())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode first settings element.";
+    return false;
+  }
+
+  if (! ChannelBankElement(data(Offset::channels())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode channels.";
+    return false;
+  }
+
+  if (! SecondSettingsElement(data(Offset::secondSettings())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode second settings element.";
+    return false;
+  }
+
+  if (! ZoneBankElement(data(Offset::zones())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode zones.";
+    return false;
+  }
+
+  if (! ContactBankElement(data(Offset::contacts())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode contacts.";
+    return false;
+  }
+
+  return true;
+}
+
+
+bool
+RT4DCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
+  if (! ChannelBankElement(data(Offset::channels())).link(ctx, err)) {
+    errMsg(err) << "Cannot link channels.";
+    return false;
+  }
+
+  if (! SecondSettingsElement(data(Offset::secondSettings())).link(ctx, err)) {
+    errMsg(err) << "Cannot link second settings element.";
+    return false;
+  }
+
+  if (! ZoneBankElement(data(Offset::zones())).link(ctx, err)) {
+    errMsg(err) << "Cannot link zones.";
+    return false;
+  }
+
+  return true;
+}
+
+
+bool
+RT4DCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
+  if (! FirstSettingsElement(data(Offset::firstSettings())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode first settings element.";
+    return false;
+  }
+
+  if (! ChannelBankElement(data(Offset::channels())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode channels.";
+    return false;
+  }
+
+
+  if (! SecondSettingsElement(data(Offset::secondSettings())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode second settings element.";
+    return false;
+  }
+
+  if (! ZoneBankElement(data(Offset::zones())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode zones.";
+    return false;
+  }
+
+  if (! ContactBankElement(data(Offset::contacts())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode contacts.";
+    return false;
+  }
+
+  return true;
+}
+
+
+
+

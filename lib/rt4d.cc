@@ -7,7 +7,8 @@
 
 
 RT4D::RT4D(RT4DInterface *dev, QObject *parent)
-  : Radio{parent}, _dev(dev), _radioName("Radtel RT-4D"), _codeplug()
+  : Radio{parent}, _radioName("Radtel RT-4D"), _dev(dev), _codeplugFlags(), _codeplug(),
+    _config(nullptr)
 {
   // pass...
 }
