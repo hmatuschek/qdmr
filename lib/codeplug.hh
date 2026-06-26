@@ -107,7 +107,7 @@ public:
         /** Maps a value from this range to the given range. */
         inline T mapTo(const Range<T> &other, const T &value) const {
           T myD = max-min, oD = other.max-other.min;
-          return ((limit(value)-min)*oD)/myD + other.min;
+          return std::round((static_cast<double>((limit(value) - min)*oD))/myD) + other.min;
         }
       };
     };
@@ -250,8 +250,17 @@ public:
     void setBCD4_be(unsigned offset, uint16_t value);
     /** Reads a 4-digit (2-byte/16bit) BDC value in little-endian at the given byte-offset. */
     uint16_t getBCD4_le(unsigned offset) const;
-    /** Stores a 4-digit (1-byte/16bit) BDC value in little-endian at the given byte-offset. */
+    /** Stores a 4-digit (2-byte/16bit) BDC value in little-endian at the given byte-offset. */
     void setBCD4_le(unsigned offset, uint16_t value);
+
+    /** Reads a 6-digit (3-byte/24bit) BCD value in big-endian at the given byte-offset. */
+    uint32_t getBCD6_be(unsigned offset) const;
+    /** Stores a 6-digit (3-byte/24bit) BDC value in big-endian at the given byte-offset. */
+    void setBCD6_be(unsigned offset, uint32_t value);
+    /** Reads a 6-digit (3-byte/24bit) BDC value in little-endian at the given byte-offset. */
+    uint32_t getBCD6_le(unsigned offset) const;
+    /** Stores a 6-digit (3-byte/24bit) BDC value in little-endian at the given byte-offset. */
+    void setBCD6_le(unsigned offset, uint32_t value);
 
     /** Reads a 8-digit (4-byte/32bit) BDC value in big-endian at the given byte-offset. */
     uint32_t getBCD8_be(unsigned offset) const;

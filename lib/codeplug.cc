@@ -585,6 +585,76 @@ Codeplug::Element::setBCD4_le(unsigned offset, uint16_t val) {
   setUInt16_le(offset, (a << 12) + (b << 8) + (c << 4) + d);
 }
 
+
+uint32_t
+Codeplug::Element::getBCD6_be(unsigned offset) const {
+  if ((offset+3) > _size) {
+    logFatal() << "Cannot get BCD6 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
+  const uint8_t *vals = _data+offset;
+  uint32_t a = (vals[0]>>4), b = (vals[0]&0xf);
+  uint32_t c = (vals[1]>>4), d = (vals[1]&0xf);
+  uint32_t e = (vals[2]>>4), f = (vals[2]&0xf);
+  return a*100000 + b*10000 + c*1000 + d*100 + e*10 + f;
+}
+
+void
+Codeplug::Element::setBCD6_be(unsigned offset, uint32_t val) {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot set BCD8 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
+  uint32_t a  = (val / 100000) % 10;
+  uint32_t b  = (val /  10000) % 10;
+  uint32_t c  = (val /   1000) % 10;
+  uint32_t d  = (val /    100) % 10;
+  uint32_t e  = (val /     10) % 10;
+  uint32_t f  = (val /      1) % 10;
+
+  uint8_t *vals = _data+offset;
+  vals[0] = (a<<4) | b;
+  vals[1] = (c<<4) | d;
+  vals[2] = (e<<4) | f;
+}
+
+uint32_t
+Codeplug::Element::getBCD6_le(unsigned offset) const {
+  if ((offset+3) > _size) {
+    logFatal() << "Cannot get BCD6 (le) at " << QString::number(offset, 16) << ": Overflow.";
+    return 0;
+  }
+
+  const uint8_t *vals = _data+offset;
+  uint32_t a = (vals[2]>>4), b = (vals[2]&0xf);
+  uint32_t c = (vals[1]>>4), d = (vals[1]&0xf);
+  uint32_t e = (vals[0]>>4), f = (vals[0]&0xf);
+  return a*100000 + b*10000 + c*1000 + d*100 + e*10 + f;
+}
+
+void
+Codeplug::Element::setBCD6_le(unsigned offset, uint32_t val) {
+  if ((offset+4) > _size) {
+    logFatal() << "Cannot set BCD8 (be) at " << QString::number(offset, 16) << ": Overflow.";
+    return;
+  }
+
+  uint32_t a  = (val / 100000) % 10;
+  uint32_t b  = (val /  10000) % 10;
+  uint32_t c  = (val /   1000) % 10;
+  uint32_t d  = (val /    100) % 10;
+  uint32_t e  = (val /     10) % 10;
+  uint32_t f  = (val /      1) % 10;
+
+  uint8_t *vals = _data+offset;
+  vals[2] = (a<<4) | b;
+  vals[1] = (c<<4) | d;
+  vals[0] = (e<<4) | f;
+}
+
+
 uint32_t
 Codeplug::Element::getBCD8_be(unsigned offset) const {
   if ((offset+4) > _size) {

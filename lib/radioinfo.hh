@@ -42,7 +42,8 @@ public:
     // Baofeng/BTECH
     DM1701, RT84 = DM1701,
     DR1801UV,
-    DM32UV
+    DM32UV,
+    RT4D
   };
 
 public:

@@ -6,6 +6,7 @@
 #include "frequency.hh"
 #include "chirpformat.hh"
 #include "config.hh"
+#include "ranges.hh"
 
 
 UtilsTest::UtilsTest(QObject *parent)
@@ -162,6 +163,14 @@ UtilsTest::testFrequencyNearestMap() {
   QCOMPARE(map.value(Frequency::fromHz(360)), 3);
   QCOMPARE(map.value(Frequency::fromHz(400)), 3);
   QCOMPARE(map.value(Frequency::fromHz(410)), 3);
+}
+
+
+void
+UtilsTest::testLevelRangeMap() {
+  Level value = Level::fromValue(3); // by default the range of level is [1,10] and has 0 as a special value.
+  unsigned int mapped = value.mapTo({1,24});
+  QCOMPARE(value.value(), Level::fromValue(mapped, {1,24}).value());
 }
 
 
