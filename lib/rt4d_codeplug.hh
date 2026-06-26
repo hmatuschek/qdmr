@@ -1264,17 +1264,188 @@ protected:
     };
   };
 
+
+  /** Implements a single group list. */
+  class GroupListElement: public Element
+  {
+  public:
+    /** Constructor from pointer. */
+    explicit GroupListElement(uint8_t *ptr);
+
+    static constexpr unsigned int size() { return 0x50; }
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** Returns the name. */
+    virtual QString name() const;
+    /** Sets the name. */
+    virtual void setName(const QString &name);
+
+    /** Returns @c true if the n-th group call is set. */
+    virtual bool hasGroupCallIndex(unsigned int index) const;
+    /** Returns the n-th group call. */
+    virtual unsigned int groupCallIndex(unsigned int index) const;
+    /** Sets the n-th group call. */
+    virtual void setGroupCallIndex(unsigned int index, unsigned int groupCallIndex);
+    /** Clears the n-th group call. */
+    virtual void clearGroupCallIndex(unsigned int index);
+
+    /** Encodes the given group list. */
+    virtual bool encode(const RXGroupList *lst, Context &ctx, const ErrorStack &err);
+    /** Decodes the given group list. */
+    virtual RXGroupList *decode(Context &ctx, const ErrorStack &err) const;
+    /** Links the given group list. */
+    virtual bool link(RXGroupList *lst, Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int name() { return 14; }
+      /// Maximum number of group calls.
+      static constexpr unsigned int groupCalls() { return 32; }
+    };
+
+  protected:
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int name()       { return 0x0000; }
+      static constexpr unsigned int groupCalls() { return 0x0010; }
+      /// @endcond
+    };
+  };
+
+
+  /** A bank of group lists. */
   class GroupListBankElement: public Element
   {
   public:
+    /** Constructor from pointer. */
+    explicit GroupListBankElement(uint8_t *ptr);
+
+    /** The size of the element. */
     static constexpr unsigned int size() { return 0x5000; }
+
+    void clear() override;
+
+    virtual bool encode(Context &ctx, const ErrorStack &err);
+    virtual bool decode(Context &ctx, const ErrorStack &err) const;
+    virtual bool link(Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit
+    {
+      /// The maximum number of group lists.
+      static constexpr unsigned int groupLists() { return 250; }
+    };
+
+  protected:
+    /** Some internal offset. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int groupLists() { return 0x0000; }
+      /// @endcond
+    };
   };
 
+
+  class EncryptionKeyElement: public Element
+  {
+  public:
+    /** Possible key types. */
+    enum class Type
+    {
+      ARC4=0, AES128=1, AES256=2
+    };
+
+  public:
+    /** Constructor from pointer. */
+    explicit EncryptionKeyElement(uint8_t *ptr);
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0030; }
+
+    void clear() override;
+    bool isValid() const override;
+
+    /** Returns the key index. */
+    virtual unsigned int keyId() const;
+    /** Sets the key index. */
+    virtual void setKeyId(unsigned int index);
+
+    /** Returns the key type. */
+    virtual Type type() const;
+    /** Sets the key type. */
+    virtual void setType(Type type);
+
+    /** Returns the name. */
+    virtual QString name() const;
+    /** Sets the name. */
+    virtual void setName(const QString &name);
+
+    /** Returns the key-data. */
+    virtual QByteArray key() const ;
+    /** Sets the key-data. */
+    virtual void setKey(const QByteArray &key);
+
+    /** Encodes an encryption key. */
+    virtual bool encode(const EncryptionKey *key, Context &ctx, const ErrorStack &err);
+    /** Decodes the encryption key. */
+    virtual EncryptionKey *decode(Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int name() { return 14; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int id()             { return 0x0000; }
+      static constexpr unsigned int type()           { return 0x0001; }
+      static constexpr unsigned int name()           { return 0x0002; }
+      static constexpr unsigned int key()            { return 0x0010; }
+      /// @endcond
+    };
+  };
+
+
+  /** Implements the bank of all encryption keys. */
   class EncryptionKeyBankElement: public Element
   {
   public:
+    /** Constructor from pointer. */
+    explicit EncryptionKeyBankElement(uint8_t *ptr);
+    /** The size of the element. */
     static constexpr unsigned int size() { return 0x3000; }
+
+    void clear() override;
+
+    /** Encode all keys. */
+    virtual bool encode(Context &ctx, const ErrorStack &err);
+    /** Decode all keys. */
+    virtual bool decode(Context &ctx, const ErrorStack &err) const;
+
+  public:
+    /** Some limits. */
+    struct Limit: Element::Limit {
+      /// Maximum number of keys.
+      static constexpr unsigned int keys() { return 255; }
+    };
+
+  protected:
+    /** Some internal offsets. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int keys()             { return 0x0000; }
+      /// @endcond
+    };
   };
+
 
   class MessageBankElement: public Element
   {

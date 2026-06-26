@@ -1467,9 +1467,9 @@ RT4DCodeplug::ChannelElement::link(Channel *ch, Context &ctx, const ErrorStack &
     if (hasGroupListIndex() && !ctx.has<RXGroupList>(groupListIndex())) {
       errMsg(err) << "Cannot link channel '" << ch->name()
                   << "': group list index " << contactIndex() << " not defined.";
-      //return false;
+      return false;
     }
-    //dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
+    dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
 
     if (hasEncryptionKey() && !ctx.has<EncryptionKey>(encryptionKeyIndex())) {
       errMsg(err) << "Cannot link channel '" << ch->name()
@@ -2253,6 +2253,306 @@ RT4DCodeplug::ContactBankElement::decode(Context &ctx, const ErrorStack &err) co
 
 
 /* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::GroupListElement
+ * ********************************************************************************************* */
+RT4DCodeplug::GroupListElement::GroupListElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::GroupListElement::clear() {
+  memset(_data, 0xff, size());
+}
+
+bool
+RT4DCodeplug::GroupListElement::isValid() const {
+  return !name().isEmpty();
+}
+
+QString
+RT4DCodeplug::GroupListElement::name() const {
+  return readASCII(Offset::name(), Limit::name(), 0xff);
+}
+
+void
+RT4DCodeplug::GroupListElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::name(), 0xff);
+}
+
+
+bool
+RT4DCodeplug::GroupListElement::hasGroupCallIndex(unsigned int index) const {
+  return 0xffff != getUInt16_le(Offset::groupCalls() + index*2);
+}
+
+unsigned int
+RT4DCodeplug::GroupListElement::groupCallIndex(unsigned int index) const {
+  return getUInt16_le(Offset::groupCalls() + index*2);
+}
+
+void
+RT4DCodeplug::GroupListElement::setGroupCallIndex(unsigned int index, unsigned int groupCallIndex) {
+  setUInt16_le(Offset::groupCalls() + index*2, groupCallIndex);
+}
+
+void
+RT4DCodeplug::GroupListElement::clearGroupCallIndex(unsigned int index) {
+  setUInt16_le(Offset::groupCalls() + index*2, 0xffff);
+}
+
+
+bool
+RT4DCodeplug::GroupListElement::encode(const RXGroupList *lst, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  clear();
+  setName(lst->name());
+  for (int i = 0; i < std::min(lst->count(), (int)Limit::groupCalls()); i++) {
+    setGroupCallIndex(i, ctx.index(lst->contact(i)));
+  }
+  return true;
+}
+
+RXGroupList *
+RT4DCodeplug::GroupListElement::decode(Context &ctx, const ErrorStack &err) const {
+  return new RXGroupList(name());
+}
+
+bool
+RT4DCodeplug::GroupListElement::link(RXGroupList *lst, Context &ctx, const ErrorStack &err) const {
+  for (unsigned int i = 0; i < Limit::groupCalls(); i++) {
+    if (! hasGroupCallIndex(i))
+      continue;
+    if (! ctx.has<DMRContact>(hasGroupCallIndex(i))) {
+      errMsg(err) << "Cannot link group list " << lst->name()
+                  << ", DMR contact index " << hasGroupCallIndex(i) << " not defined.";
+      return false;
+    }
+    lst->addContact(ctx.get<DMRContact>(groupCallIndex(i)));
+  }
+  return true;
+}
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::GroupListBankElement
+ * ********************************************************************************************* */
+RT4DCodeplug::GroupListBankElement::GroupListBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::GroupListBankElement::clear() {
+  for (unsigned int i = 0; i < Limit::groupLists(); i++) {
+    GroupListElement(_data + Offset::groupLists() + i*GroupListElement::size()).clear();
+  }
+}
+
+bool
+RT4DCodeplug::GroupListBankElement::encode(Context &ctx, const ErrorStack &err) {
+  clear();
+
+  for (unsigned int i = 0; i < ctx.count<RXGroupList>(); i++) {
+    GroupListElement el(_data + Offset::groupLists() + i*GroupListElement::size());
+    if (! el.encode(ctx.get<RXGroupList>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode group list '" << ctx.get<RXGroupList>(i)->name()
+                  << "' at index " << i << ".";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+
+bool
+RT4DCodeplug::GroupListBankElement::decode(Context &ctx, const ErrorStack &err) const {
+  for (unsigned int i = 0; i < Limit::groupLists(); i++) {
+    GroupListElement el(_data + Offset::groupLists() + i*GroupListElement::size());
+    if (! el.isValid())
+      continue;
+    auto lst = el.decode(ctx, err);
+    if (nullptr == lst) {
+      errMsg(err) << "Cannot decode group list at index " << i << ".";
+      return false;
+    }
+    ctx.config()->rxGroupLists()->add(lst);
+    ctx.add(lst, i);
+  }
+
+  return true;
+}
+
+
+bool
+RT4DCodeplug::GroupListBankElement::link(Context &ctx, const ErrorStack &err) const {
+  for (unsigned int i = 0; i < Limit::groupLists(); i++) {
+    GroupListElement el(_data + Offset::groupLists() + i*GroupListElement::size());
+    if (! el.isValid())
+      continue;
+    if (! el.link(ctx.get<RXGroupList>(i), ctx, err)) {
+      errMsg(err) << "Cannot link group list '" << ctx.get<RXGroupList>(i)->name()
+                  << "' at index " << i << ".";
+      return false;
+    }
+  }
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::EncryptionKeyElement
+ * ********************************************************************************************* */
+RT4DCodeplug::EncryptionKeyElement::EncryptionKeyElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::EncryptionKeyElement::clear() {
+  memset(_data, 0xff, sizeof(_data));
+}
+
+bool
+RT4DCodeplug::EncryptionKeyElement::isValid() const {
+  return ! name().isEmpty();
+}
+
+unsigned int
+RT4DCodeplug::EncryptionKeyElement::keyId() const {
+  return getUInt8(Offset::id());
+}
+
+void
+RT4DCodeplug::EncryptionKeyElement::setKeyId(unsigned int keyId) {
+  setUInt8(Offset::id(), keyId);
+}
+
+RT4DCodeplug::EncryptionKeyElement::Type
+RT4DCodeplug::EncryptionKeyElement::type() const {
+  return static_cast<Type>(getUInt8(Offset::type()));
+}
+
+void
+RT4DCodeplug::EncryptionKeyElement::setType(Type type) {
+  setUInt8(Offset::type(), static_cast<unsigned int>(type));
+}
+
+QString
+RT4DCodeplug::EncryptionKeyElement::name() const {
+  return readASCII(Offset::name(), Limit::name(), 0xff);
+}
+
+void
+RT4DCodeplug::EncryptionKeyElement::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::name(), 0xff);
+}
+
+QByteArray
+RT4DCodeplug::EncryptionKeyElement::key() const {
+  switch (type()) {
+  case Type::ARC4:   return {(const char *)_data+Offset::key(), 8};
+  case Type::AES128: return {(const char *)_data+Offset::key(), 16};
+  case Type::AES256: return {(const char *)_data+Offset::key(), 32};
+  }
+  return {};
+}
+
+void
+RT4DCodeplug::EncryptionKeyElement::setKey(const QByteArray &key) {
+  auto len = std::min((qsizetype)64, key.length());
+  memcpy(_data+Offset::key(), key.constData(), len);
+}
+
+bool
+RT4DCodeplug::EncryptionKeyElement::encode(const EncryptionKey *key, Context &ctx, const ErrorStack &err) {
+  clear();
+  if (key->is<ARC4EncryptionKey>()) {
+    setType(Type::ARC4);
+  } else if (key->is<AESEncryptionKey>()) {
+    if (16 == key->key().size()) {
+      setType(Type::AES128);
+    } else {
+      setType(Type::AES256);
+    }
+  }
+  setKey(key->key());
+  setName(key->name());
+  return true;
+}
+
+EncryptionKey *
+RT4DCodeplug::EncryptionKeyElement::decode(Context &ctx, const ErrorStack &err) const {
+  EncryptionKey *key = nullptr;
+  if (Type::ARC4 == type()) {
+    key = new ARC4EncryptionKey();
+  } else if (Type::AES128 == type() || Type::AES256 == type()) {
+    key = new AESEncryptionKey();
+  }
+  key->setKey(this->key());
+  key->setName(this->name());
+  return key;
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of RT4DCodeplug::EncryptionKeyBankElement
+ * ********************************************************************************************* */
+RT4DCodeplug::EncryptionKeyBankElement::EncryptionKeyBankElement(uint8_t *ptr)
+  : Element(ptr, size())
+{
+  // pass...
+}
+
+void
+RT4DCodeplug::EncryptionKeyBankElement::clear() {
+  for (unsigned i = 0; i < Limit::keys(); i++) {
+    EncryptionKeyElement(_data + Offset::keys() + i*EncryptionKeyElement::size()).clear();
+  }
+}
+
+bool
+RT4DCodeplug::EncryptionKeyBankElement::encode(Context &ctx, const ErrorStack &err) {
+  clear();
+  for (unsigned i = 0; i < ctx.count<EncryptionKey>(); i++) {
+    EncryptionKeyElement el(_data + Offset::keys() + i*EncryptionKeyElement::size());
+    if (! el.encode(ctx.get<EncryptionKey>(i), ctx, err)) {
+      errMsg(err) << "Cannot encode encryption key '" << ctx.get<EncryptionKey>(i)
+                  << "' at index " << i << ".";
+      return false;
+    }
+    el.setKeyId(i);
+  }
+  return true;
+}
+
+bool
+RT4DCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack &err) const {
+  for (unsigned i = 0; i < Limit::keys(); i++) {
+    EncryptionKeyElement el(_data + Offset::keys() + i*EncryptionKeyElement::size());
+    if (! el.isValid())
+      continue;
+    auto key = el.decode(ctx, err);
+    if (nullptr == key) {
+      errMsg(err) << "Cannot decode key at index " << i << ".";
+      return false;
+    }
+    ctx.config()->commercialExtension()->encryptionKeys()->add(key);
+    ctx.add(key, i);
+  }
+
+  return true;
+}
+
+
+
+/* ********************************************************************************************* *
  * Implementation of RT4DCodeplug
  * ********************************************************************************************* */
 RT4DCodeplug::RT4DCodeplug(QObject *parent)
@@ -2445,6 +2745,16 @@ RT4DCodeplug::decodeElements(Context &ctx, const ErrorStack &err) {
     return false;
   }
 
+  if (! GroupListBankElement(data(Offset::groupLists())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode group lists.";
+    return false;
+  }
+
+  if (! EncryptionKeyBankElement(data(Offset::keys())).decode(ctx, err)) {
+    errMsg(err) << "Cannot decode keys.";
+    return false;
+  }
+
   return true;
 }
 
@@ -2463,6 +2773,11 @@ RT4DCodeplug::linkElements(Context &ctx, const ErrorStack &err) {
 
   if (! ZoneBankElement(data(Offset::zones())).link(ctx, err)) {
     errMsg(err) << "Cannot link zones.";
+    return false;
+  }
+
+  if (! GroupListBankElement(data(Offset::groupLists())).link(ctx, err)) {
+    errMsg(err) << "Cannot link group lists.";
     return false;
   }
 
@@ -2495,6 +2810,16 @@ RT4DCodeplug::encodeElements(Context &ctx, const ErrorStack &err) {
 
   if (! ContactBankElement(data(Offset::contacts())).encode(ctx, err)) {
     errMsg(err) << "Cannot encode contacts.";
+    return false;
+  }
+
+  if (! GroupListBankElement(data(Offset::groupLists())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode group lists.";
+    return false;
+  }
+
+  if (! EncryptionKeyBankElement(data(Offset::keys())).encode(ctx, err)) {
+    errMsg(err) << "Cannot encode keys.";
     return false;
   }
 
