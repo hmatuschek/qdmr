@@ -1502,6 +1502,8 @@ RT4DCodeplug::ChannelElement::link(Channel *ch, Context &ctx, const ErrorStack &
 
 bool
 RT4DCodeplug::ChannelElement::encode(const Channel *ch, Context &ctx, const ErrorStack &err) {
+  memset(_data, 0, size());
+
   if (ch->is<DMRChannel>()) {
     auto dmr = ch->as<DMRChannel>();
     setChannelType(ChannelType::DMR);
@@ -1533,6 +1535,8 @@ RT4DCodeplug::ChannelElement::encode(const Channel *ch, Context &ctx, const Erro
   setName(ch->name());
   setRxFrequency(ch->rxFrequency());
   setTxFrequency(ch->txFrequency());
+  if (ch->is<AMChannel>() && ch->txFrequency().isZero())
+    setTxFrequency(ch->rxFrequency());
   setTrxMode(ch->rxOnly() ? TrxMode::RxOnly : TrxMode::RxTx);
   return true;
 }

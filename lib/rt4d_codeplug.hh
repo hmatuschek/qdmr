@@ -1090,7 +1090,7 @@ public:
     explicit ZoneElement(uint8_t *ptr);
 
     /** The size of the element. */
-    static constexpr unsigned int size() { return 0x0200; }
+    static constexpr unsigned int size() { return 0x0208; }
 
     void clear() override;
     bool isValid() const override;
