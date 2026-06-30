@@ -990,6 +990,9 @@ RT4DCodeplug::FirstSettingsElement::encode(Context &ctx, const ErrorStack &err) 
   if (! ctx.config()->settings()->defaultIdRef()->isNull()) {
     setRadioName(ctx.config()->settings()->defaultId()->name());
     setRadioDMRId(ctx.config()->settings()->defaultId()->number());
+  } else {
+    setRadioName("None");
+    setRadioDMRId(0);
   }
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
   setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
@@ -1489,10 +1492,8 @@ RT4DCodeplug::ChannelElement::encode(const Channel *ch, Context &ctx, const Erro
     setDmrAdmit(dmr->admit());
     setColorCode(dmr->colorCode());
     setTimeSlot(dmr->timeSlot());
-    enableChannelDmrId(! dmr->radioIdRef()->isNull());
-    if (! dmr->radioIdRef()->isNull()) {
-      setChannelDmrId(dmr->radioId()->number());
-    }
+    enableChannelDmrId(! dmr->radioIdRef()->isNull() && !dmr->radioId()->is<DefaultRadioID>());
+    if (channelDmrIdEnabled()) setChannelDmrId(dmr->radioId()->number());
     setBandwidth(FMChannel::Bandwidth::Narrow);
   } else if (ch->is<FMChannel>()) {
     auto fm = ch->as<FMChannel>();
@@ -1938,6 +1939,8 @@ RT4DCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
 void
 RT4DCodeplug::ZoneElement::clear() {
   memset(_data, 0xff, size());
+  setDefaultChannelA(0);
+  setDefaultChannelB(0);
 }
 
 bool
@@ -2269,7 +2272,14 @@ RT4DCodeplug::GroupListElement::clear() {
 
 bool
 RT4DCodeplug::GroupListElement::isValid() const {
-  return !name().isEmpty();
+  // must have a name
+  if (! name().isEmpty())
+    return false;
+  // valid if there is at least one group call index set
+  bool valid = false;
+  for (unsigned int i = 0; i < Limit::groupCalls(); i++)
+    valid |= hasGroupCallIndex(i);
+  return valid;
 }
 
 QString
@@ -2421,7 +2431,7 @@ RT4DCodeplug::EncryptionKeyElement::clear() {
 
 bool
 RT4DCodeplug::EncryptionKeyElement::isValid() const {
-  return ! name().isEmpty();
+  return ! name().isEmpty() && ! isKeyEmpty();
 }
 
 unsigned int
@@ -2454,10 +2464,19 @@ RT4DCodeplug::EncryptionKeyElement::setName(const QString &name) {
   writeASCII(Offset::name(), name, Limit::name(), 0xff);
 }
 
+bool
+RT4DCodeplug::EncryptionKeyElement::isKeyEmpty() const {
+  bool empty = true;
+  for (char c: key()) {
+    empty &= 0xff==c;
+  }
+  return empty;
+}
+
 QByteArray
 RT4DCodeplug::EncryptionKeyElement::key() const {
   switch (type()) {
-  case Type::ARC4:   return {(const char *)_data+Offset::key(), 8};
+  case Type::ARC4:   return {(const char *)_data+Offset::key(), 5};
   case Type::AES128: return {(const char *)_data+Offset::key(), 16};
   case Type::AES256: return {(const char *)_data+Offset::key(), 32};
   }

@@ -1384,6 +1384,9 @@ public:
     /** Sets the name. */
     virtual void setName(const QString &name);
 
+    /** Returns @c true if the key is empty.
+     * That is, filled with ffh. */
+    virtual bool isKeyEmpty() const;
     /** Returns the key-data. */
     virtual QByteArray key() const ;
     /** Sets the key-data. */
