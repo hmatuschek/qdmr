@@ -1302,14 +1302,13 @@ RT4DCodeplug::ChannelElement::setTxFrequency(const Frequency &frequency) {
 SelectiveCall
 RT4DCodeplug::ChannelElement::rxSubTone() const {
   auto code = getUInt16_le(Offset::rxSubtone());
-  if (0 == code) return {};
-
   uint8_t type = code>>12;
   code &= 0x0fff;
   switch (type) {
-  case 0: return { double(code)/10 }; // CTCSS frequency.
-  case 1: return SelectiveCall::fromBinaryDCS(code, false);
-  case 2: return SelectiveCall::fromBinaryDCS(code, true);
+  case 0: return {};
+  case 1: return { double(code)/10 }; // CTCSS frequency.
+  case 2: return SelectiveCall::fromBinaryDCS(code, false);
+  case 3: return SelectiveCall::fromBinaryDCS(code, true);
   default: break;
   }
   return {};
@@ -1318,7 +1317,7 @@ RT4DCodeplug::ChannelElement::rxSubTone() const {
 void
 RT4DCodeplug::ChannelElement::setRxSubTone(SelectiveCall subTone) {
   if (! subTone.isValid()) {
-    setUInt16_le(Offset::rxSubtone(), 0);
+    setUInt16_le(Offset::rxSubtone(), 0xfff);
   } else if (subTone.isCTCSS()) {
     setUInt16_le(Offset::rxSubtone(), 1<<12 | (subTone.mHz()/100));
   } else {
@@ -1330,14 +1329,13 @@ RT4DCodeplug::ChannelElement::setRxSubTone(SelectiveCall subTone) {
 SelectiveCall
 RT4DCodeplug::ChannelElement::txSubTone() const {
   auto code = getUInt16_le(Offset::txSubtone());
-  if (0 == code) return {};
-
   uint8_t type = code>>12;
   code &= 0x0fff;
   switch (type) {
-  case 0: return { double(code)/10 }; // CTCSS frequency.
-  case 1: return SelectiveCall::fromBinaryDCS(code, false);
-  case 2: return SelectiveCall::fromBinaryDCS(code, true);
+  case 0: return {};
+  case 1: return { double(code)/10 }; // CTCSS frequency.
+  case 2: return SelectiveCall::fromBinaryDCS(code, false);
+  case 3: return SelectiveCall::fromBinaryDCS(code, true);
   default: break;
   }
   return {};
@@ -1346,7 +1344,7 @@ RT4DCodeplug::ChannelElement::txSubTone() const {
 void
 RT4DCodeplug::ChannelElement::setTxSubTone(SelectiveCall subTone) {
   if (! subTone.isValid()) {
-    setUInt16_le(Offset::txSubtone(), 0);
+    setUInt16_le(Offset::txSubtone(), 0xfff);
   } else if (subTone.isCTCSS()) {
     setUInt16_le(Offset::txSubtone(), 1<<12 | (subTone.mHz()/100));
   } else {
