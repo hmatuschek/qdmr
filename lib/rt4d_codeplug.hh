@@ -721,6 +721,11 @@ public:
     /** Sets the color code. */
     virtual void setColorCode(unsigned int color);
 
+    /** Returns the power setting. */
+    virtual Channel::Power power() const;
+    /** Sets the transmit power. */
+    virtual void setPower(Channel::Power power);
+
     /** Returns the DMR admit criterion. */
     virtual DMRChannel::Admit dmrAdmit() const;
     /** Sets the DMR admit criterion. */
@@ -830,11 +835,12 @@ public:
       static constexpr Bit channelType()                        { return {0,6}; }
       static constexpr Bit fmScrambler()                        { return {1,0}; }
       static constexpr Bit colorCode()                          { return {1,4}; }
+      static constexpr Bit power()                              { return {2,6}; }
       static constexpr Bit steMode()                            { return {3,0}; }
       static constexpr Bit fmAdmit()                            { return {3,3}; }
       static constexpr Bit dmrAdmit()                           { return {3,5}; }
       static constexpr Bit subToneType()                        { return {4,1}; }
-      static constexpr Bit analogDemodulaiton()                 { return {4,4}; }
+      static constexpr Bit analogDemodulation()                 { return {4,4}; }
       static constexpr Bit bandwidth()                          { return {4,6}; }
       static constexpr unsigned int rxFrequency()               { return 0x0005; }
       static constexpr unsigned int txFrequency()               { return 0x0009; }
