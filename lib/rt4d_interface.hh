@@ -6,6 +6,7 @@
 #define LIBDMRCONF_RT4D_INTERFACE_HH
 
 #include "usbserial.hh"
+#include <QThread>
 
 /** Implements the communication protocol for the Radtel RD-4D.
  * The protocol is documented at
@@ -37,7 +38,7 @@ class RT4DInterface: public USBSerial
     CommandRequest(Type type, Command command);
     /** Send this command to the given device.
      * This call is blocking and returns @c true on success. */
-    bool send(RT4DInterface *device, const ErrorStack &err=ErrorStack()) const;
+    bool send(RT4DInterface *device, const ErrorStack &err) const;
   };
 
 
@@ -45,7 +46,7 @@ class RT4DInterface: public USBSerial
   struct Q_PACKED ACKResponse {
     uint8_t header;  ///< Fixed header 6h.
     /** Receives and checks the response. Returns @c true on success. */
-    bool receive(RT4DInterface *device, const ErrorStack &err=ErrorStack());
+    bool receive(RT4DInterface *device, const ErrorStack &err);
   };
 
 
@@ -59,7 +60,7 @@ class RT4DInterface: public USBSerial
      * Also computes CRC. */
     ReadRequest(uint32_t address);
     /** Sens the request. Blocks until the entire request is sent and returns @c true on success. */
-    bool send(RT4DInterface *device, const ErrorStack &err=ErrorStack()) const;
+    bool send(RT4DInterface *device, const ErrorStack &err) const;
   };
 
 
@@ -72,7 +73,7 @@ class RT4DInterface: public USBSerial
     uint8_t crc;            ///< CRC
 
     /** Receives a read response and also verifies the packet. */
-    bool receive(RT4DInterface *device, const ErrorStack &err=ErrorStack());
+    bool receive(RT4DInterface *device, const ErrorStack &err);
     /** Computes the page address. */
     uint32_t address() const;
   };
@@ -91,7 +92,7 @@ class RT4DInterface: public USBSerial
     WriteRequest(uint8_t sequence, uint32_t offset, const uint8_t *payload, int size);
 
     /** Sets the request and blocks until the entire request is sent. Returns @c true on success. */
-    bool send(RT4DInterface *device, const ErrorStack &err=ErrorStack()) const;
+    bool send(RT4DInterface *device, const ErrorStack &err) const;
   };
 
 protected:
@@ -135,6 +136,7 @@ protected:
   bool sendReceive(const Request &req, Response &res, const ErrorStack &err=ErrorStack()) {
     if (! req.send(this, err))
       return false;
+    QThread::msleep(100);
     return res.receive(this, err);
   }
 

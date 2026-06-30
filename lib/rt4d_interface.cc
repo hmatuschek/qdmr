@@ -9,7 +9,7 @@
 #include "logger.hh"
 #include <qendian.h>
 
-#define TIMEOUT 1000
+#define TIMEOUT 5000
 
 
 uint8_t _rt4d_crc(uint8_t *data, size_t size) {
@@ -121,6 +121,7 @@ RT4DInterface::WriteRequest::WriteRequest(uint8_t sequence,
 
 bool
 RT4DInterface::WriteRequest::send(RT4DInterface *device, const ErrorStack &err) const {
+  QByteArray packet(reinterpret_cast<const char *>(this), sizeof(WriteRequest));
   return device->send(
       reinterpret_cast<const char *>(this), sizeof(WriteRequest), TIMEOUT, err);
 }
@@ -136,7 +137,7 @@ RT4DInterface::RT4DInterface(const USBDeviceDescriptor &descr, const ErrorStack 
   if (USBSerial::isOpen()) {
     _state = State::Open;
     setFlowControl(QSerialPort::NoFlowControl);
-    setRequestToSend(false);
+    setRequestToSend(true);
     setDataTerminalReady(true);
   } else if (QSerialPort::NoError != QSerialPort::error()) {
     _state = State::Error;
@@ -164,11 +165,14 @@ RT4DInterface::close() {
     return;
   if (State::Connected == _state || State::Identified == _state) {
     CommandRequest command(CommandRequest::Type::Command, CommandRequest::Command::Reboot);
-    command.send(this);
+    ErrorStack err;
+    if (! command.send(this, err))
+      errMsg(err) << "Cannot close RT4D interface.";
   }
 
   // No explicit "exit programming mode" command exists in the protocol.
   // Cycle DTR low so the radio's USB-serial adapter resets the device.
+  setRequestToSend(false);
   setDataTerminalReady(false);
   QThread::msleep(500);
 
@@ -239,7 +243,9 @@ RT4DInterface::read(uint32_t bank, uint32_t address, uint8_t *data, int nbytes, 
 bool
 RT4DInterface::read_finish(const ErrorStack &err) {
   Q_UNUSED(err)
-  // Nothing to do.
+
+  // Nothing to do...
+
   return true;
 }
 
@@ -278,7 +284,8 @@ RT4DInterface::write(uint32_t bank, uint32_t address, uint8_t *data, int nbytes,
   WriteRequest req(segment.first, segment.second, data, nbytes);
   ACKResponse res;
   if (! sendReceive(req, res, err)) {
-    errMsg(err) << "Cannot write to " << Qt::hex << address << "h " << nbytes << " bytes.";
+    errMsg(err) << "Cannot write " << nbytes << " bytes to " << Qt::hex << address
+                << "h (seg=" << segment.first << ", page=" << (segment.second>>10) << ").";
     return false;
   }
 

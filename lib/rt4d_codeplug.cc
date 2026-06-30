@@ -6,6 +6,7 @@
 
 #include "config.hh"
 #include "intermediaterepresentation.hh"
+#include "logger.hh"
 #include "radioid.hh"
 
 
@@ -990,6 +991,9 @@ RT4DCodeplug::FirstSettingsElement::encode(Context &ctx, const ErrorStack &err) 
   if (! ctx.config()->settings()->defaultIdRef()->isNull()) {
     setRadioName(ctx.config()->settings()->defaultId()->name());
     setRadioDMRId(ctx.config()->settings()->defaultId()->number());
+  } else {
+    setRadioName("None");
+    setRadioDMRId(0);
   }
   setGroupCallHangTime(ctx.config()->settings()->dmr()->groupCallHangTime());
   setPrivateCallHangTime(ctx.config()->settings()->dmr()->privateCallHangTime());
@@ -1105,6 +1109,16 @@ RT4DCodeplug::ChannelElement::channelDmrIdEnabled() const {
 void
 RT4DCodeplug::ChannelElement::enableChannelDmrId(bool enable) {
   setBit(Offset::dmrIdSource(), enable);
+}
+
+RT4DCodeplug::ChannelElement::TrxMode
+RT4DCodeplug::ChannelElement::trxMode() const {
+  return static_cast<TrxMode>(getUInt2(Offset::trxMode()));
+}
+
+void
+RT4DCodeplug::ChannelElement::setTrxMode(TrxMode mode) {
+  setUInt2(Offset::trxMode(), static_cast<unsigned int>(mode));
 }
 
 RT4DCodeplug::ChannelElement::ChannelType
@@ -1376,12 +1390,12 @@ RT4DCodeplug::ChannelElement::clearEncryptionKeyIndex() {
 
 unsigned int
 RT4DCodeplug::ChannelElement::channelDmrId() const {
-  return getUInt32_le(Offset::channelDmrId());
+  return getBCD8_le(Offset::channelDmrId());
 }
 
 void
-RT4DCodeplug::ChannelElement::setChannelDmrId(unsigned int index) {
-  setUInt32_le(Offset::channelDmrId(), index);
+RT4DCodeplug::ChannelElement::setChannelDmrId(unsigned int id) {
+  setBCD8_le(Offset::channelDmrId(), id);
 }
 
 
@@ -1428,15 +1442,6 @@ RT4DCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const 
     dmr->setAdmit(dmrAdmit());
     dmr->setColorCode(colorCode());
     dmr->setTimeSlot(timeSlot());
-    if (channelDmrIdEnabled()) {
-      auto id = ctx.config()->radioIDs()->find(channelDmrId());
-      if (nullptr == id) {
-        id = new DMRRadioID("Channel ID", channelDmrId());
-        ctx.config()->radioIDs()->add(id);
-        ctx.add(id, ctx.count<DMRRadioID>());
-      }
-      dmr->setRadioId(id);
-    }
   }
 
   if (nullptr == channel)
@@ -1447,6 +1452,8 @@ RT4DCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const 
   channel->setRXFrequency(rxFrequency());
   channel->setTXFrequency(txFrequency());
   channel->setPower(Channel::Power::High);
+  channel->setRXOnly(TrxMode::RxOnly == trxMode());
+
   return channel;
 }
 
@@ -1455,6 +1462,16 @@ bool
 RT4DCodeplug::ChannelElement::link(Channel *ch, Context &ctx, const ErrorStack &err) const {
   if (ch->is<DMRChannel>()) {
     auto dmr = ch->as<DMRChannel>();
+
+    if (channelDmrIdEnabled()) {
+      auto id = ctx.config()->radioIDs()->find(channelDmrId());
+      if (nullptr == id) {
+        id = new DMRRadioID("Channel ID", channelDmrId());
+        ctx.config()->radioIDs()->add(id);
+      }
+      dmr->setRadioId(id);
+    }
+
     if (! ctx.has<DMRContact>(contactIndex())) {
       errMsg(err) << "Cannot link channel '" << ch->name()
                   << "': transmit contact index " << contactIndex() << " not defined.";
@@ -1463,18 +1480,20 @@ RT4DCodeplug::ChannelElement::link(Channel *ch, Context &ctx, const ErrorStack &
     dmr->setContact(ctx.get<DMRContact>(contactIndex()));
 
     if (hasGroupListIndex() && !ctx.has<RXGroupList>(groupListIndex())) {
-      errMsg(err) << "Cannot link channel '" << ch->name()
-                  << "': group list index " << contactIndex() << " not defined.";
-      return false;
+      logWarn() << "Cannot link channel '" << ch->name()
+                << "': group list index " << contactIndex() << " not defined.";
+    } else if (hasGroupListIndex()) {
+      dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
     }
-    dmr->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
 
     if (hasEncryptionKey() && !ctx.has<EncryptionKey>(encryptionKeyIndex())) {
-      errMsg(err) << "Cannot link channel '" << ch->name()
-                  << "': encryption key index " << encryptionKeyIndex() << " not defined.";
-      //return false;
+      logWarn() << "Cannot link channel '" << ch->name()
+                << "': encryption key index " << encryptionKeyIndex() << " not defined.";
+    } else if (hasEncryptionKey()) {
+      dmr->commercialExtension()->setEncryptionKey(ctx.get<EncryptionKey>(encryptionKeyIndex()));
     }
-    //dmr->commercialExtension()->setEncryptionKey(ctx.get<EncryptionKey>(encryptionKeyIndex()));
+
+    return true;
   }
 
   return true;
@@ -1483,16 +1502,21 @@ RT4DCodeplug::ChannelElement::link(Channel *ch, Context &ctx, const ErrorStack &
 
 bool
 RT4DCodeplug::ChannelElement::encode(const Channel *ch, Context &ctx, const ErrorStack &err) {
+  memset(_data, 0, size());
+
   if (ch->is<DMRChannel>()) {
     auto dmr = ch->as<DMRChannel>();
     setChannelType(ChannelType::DMR);
     setDmrAdmit(dmr->admit());
     setColorCode(dmr->colorCode());
     setTimeSlot(dmr->timeSlot());
-    enableChannelDmrId(! dmr->radioIdRef()->isNull());
-    if (! dmr->radioIdRef()->isNull()) {
+    setContactIndex(dmr->contactRef()->isNull() ? 0 : ctx.index(dmr->contact()));
+    clearGroupListIndex();
+    if (!dmr->groupListRef()->isNull())
+      setGroupListIndex(ctx.index(dmr->groupList()));
+    enableChannelDmrId(!dmr->radioIdRef()->isNull() && !dmr->radioId()->is<DefaultRadioID>());
+    if (channelDmrIdEnabled())
       setChannelDmrId(dmr->radioId()->number());
-    }
     setBandwidth(FMChannel::Bandwidth::Narrow);
   } else if (ch->is<FMChannel>()) {
     auto fm = ch->as<FMChannel>();
@@ -1511,7 +1535,9 @@ RT4DCodeplug::ChannelElement::encode(const Channel *ch, Context &ctx, const Erro
   setName(ch->name());
   setRxFrequency(ch->rxFrequency());
   setTxFrequency(ch->txFrequency());
-
+  if (ch->is<AMChannel>() && ch->txFrequency().isZero())
+    setTxFrequency(ch->rxFrequency());
+  setTrxMode(ch->rxOnly() ? TrxMode::RxOnly : TrxMode::RxTx);
   return true;
 }
 
@@ -1938,6 +1964,8 @@ RT4DCodeplug::ZoneElement::ZoneElement(uint8_t *ptr)
 void
 RT4DCodeplug::ZoneElement::clear() {
   memset(_data, 0xff, size());
+  setDefaultChannelA(0);
+  setDefaultChannelB(0);
 }
 
 bool
@@ -2269,7 +2297,14 @@ RT4DCodeplug::GroupListElement::clear() {
 
 bool
 RT4DCodeplug::GroupListElement::isValid() const {
-  return !name().isEmpty();
+  // must have a name
+  if (! name().isEmpty())
+    return false;
+  // valid if there is at least one group call index set
+  bool valid = false;
+  for (unsigned int i = 0; i < Limit::groupCalls(); i++)
+    valid |= hasGroupCallIndex(i);
+  return valid;
 }
 
 QString
@@ -2421,7 +2456,7 @@ RT4DCodeplug::EncryptionKeyElement::clear() {
 
 bool
 RT4DCodeplug::EncryptionKeyElement::isValid() const {
-  return ! name().isEmpty();
+  return ! name().isEmpty() && ! isKeyEmpty();
 }
 
 unsigned int
@@ -2454,10 +2489,19 @@ RT4DCodeplug::EncryptionKeyElement::setName(const QString &name) {
   writeASCII(Offset::name(), name, Limit::name(), 0xff);
 }
 
+bool
+RT4DCodeplug::EncryptionKeyElement::isKeyEmpty() const {
+  bool empty = true;
+  for (char c: key()) {
+    empty &= 0xff==c;
+  }
+  return empty;
+}
+
 QByteArray
 RT4DCodeplug::EncryptionKeyElement::key() const {
   switch (type()) {
-  case Type::ARC4:   return {(const char *)_data+Offset::key(), 8};
+  case Type::ARC4:   return {(const char *)_data+Offset::key(), 5};
   case Type::AES128: return {(const char *)_data+Offset::key(), 16};
   case Type::AES256: return {(const char *)_data+Offset::key(), 32};
   }

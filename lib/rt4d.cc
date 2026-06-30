@@ -151,7 +151,7 @@ RT4D::run() {
 
     emit uploadStarted();
 
-    if (! upload()) {
+    if (! upload(_errorStack)) {
       _dev->write_finish();
       _dev->reboot();
       _dev->close();
@@ -174,7 +174,7 @@ RT4D::run() {
 
     emit uploadStarted();
 
-    if (! uploadCallsigns()) {
+    if (! uploadCallsigns(_errorStack)) {
       _dev->write_finish();
       _dev->reboot();
       _dev->close();
