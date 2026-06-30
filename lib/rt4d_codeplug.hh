@@ -632,6 +632,11 @@ public:
   class ChannelElement: public Element
   {
   protected:
+    /** Possible TRX modes. */
+    enum class TrxMode {
+      RxTx = 0, RxOnly = 1, TxOnly = 2
+    };
+
     /** Possible channel types. */
     enum class ChannelType {
       FM = 1, DMR = 0
@@ -691,6 +696,11 @@ public:
     virtual bool channelDmrIdEnabled() const;
     /** Enables DMR channel id. */
     virtual void enableChannelDmrId(bool enable);
+
+    /** Returns the TRX mode. */
+    virtual TrxMode trxMode() const;
+    /** Sets the TRX mode. */
+    virtual void setTrxMode(TrxMode mode);
 
     /** Returns the channel type. */
     virtual ChannelType channelType() const;
@@ -785,7 +795,7 @@ public:
     /** Returns the channel DMR id. */
     virtual unsigned int channelDmrId() const;
     /** Sets the channel DMR id. */
-    virtual void setChannelDmrId(unsigned int index);
+    virtual void setChannelDmrId(unsigned int id);
 
     /** Returns the mute code. */
     virtual unsigned int muteCode() const;
@@ -816,6 +826,7 @@ public:
       static constexpr Bit timeSlot()                           { return {0,1}; }
       static constexpr Bit dualSlot()                           { return {0,2}; }
       static constexpr Bit dmrIdSource()                        { return {0,3}; }
+      static constexpr Bit trxMode()                            { return {0,4}; }
       static constexpr Bit channelType()                        { return {0,6}; }
       static constexpr Bit fmScrambler()                        { return {1,0}; }
       static constexpr Bit colorCode()                          { return {1,4}; }
