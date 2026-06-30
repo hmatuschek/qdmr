@@ -1164,6 +1164,27 @@ RT4DCodeplug::ChannelElement::setColorCode(unsigned int colorCode) {
 }
 
 
+Channel::Power
+RT4DCodeplug::ChannelElement::power() const {
+  return getBit(Offset::power()) ? Channel::Power::High : Channel::Power::Low;
+}
+
+void
+RT4DCodeplug::ChannelElement::setPower(Channel::Power power) {
+  switch(power) {
+  case Channel::Power::Max:
+  case Channel::Power::High:
+  case Channel::Power::Mid:
+    setBit(Offset::power(), true);
+    break;
+  case Channel::Power::Low:
+  case Channel::Power::Min:
+    setBit(Offset::power(), false);
+    break;
+  }
+}
+
+
 DMRChannel::Admit
 RT4DCodeplug::ChannelElement::dmrAdmit() const {
   switch (static_cast<DMRAdmit>(getUInt2(Offset::dmrAdmit()))) {
@@ -1237,12 +1258,12 @@ RT4DCodeplug::ChannelElement::setBandwidth(FMChannel::Bandwidth bandwidth) {
 
 RT4DCodeplug::ChannelElement::AnalogDemod
 RT4DCodeplug::ChannelElement::analogDemodulation() const {
-  return static_cast<AnalogDemod>(getUInt2(Offset::analogDemodulaiton()));
+  return static_cast<AnalogDemod>(getUInt2(Offset::analogDemodulation()));
 }
 
 void
 RT4DCodeplug::ChannelElement::setAnalogDemodulation(AnalogDemod analogDemod) {
-  setUInt2(Offset::analogDemodulaiton(), static_cast<unsigned int>(analogDemod));
+  setUInt2(Offset::analogDemodulation(), static_cast<unsigned int>(analogDemod));
 }
 
 
@@ -1451,7 +1472,7 @@ RT4DCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const 
   channel->setName(name());
   channel->setRXFrequency(rxFrequency());
   channel->setTXFrequency(txFrequency());
-  channel->setPower(Channel::Power::High);
+  channel->setPower(power());
   channel->setRXOnly(TrxMode::RxOnly == trxMode());
 
   return channel;
@@ -1538,6 +1559,8 @@ RT4DCodeplug::ChannelElement::encode(const Channel *ch, Context &ctx, const Erro
   if (ch->is<AMChannel>() && ch->txFrequency().isZero())
     setTxFrequency(ch->rxFrequency());
   setTrxMode(ch->rxOnly() ? TrxMode::RxOnly : TrxMode::RxTx);
+  setPower(ch->power());
+
   return true;
 }
 

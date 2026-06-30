@@ -1,14 +1,70 @@
 ---
-version: 0.14.0
+version: 0.16.0
 settings:
-  introLine1: Berlin Air
-  introLine2: ""
-  micLevel: 3
-  speech: false
   power: High
-  squelch: 1
-  vox: 0
-  tot: 0
+  boot:
+    display: Logo
+    message1: Berlin Air
+    message2: ""
+    passwordEnabled: false
+    password: ""
+    defaultChannel: false
+    allowFactoryReset: true
+  audio:
+    squelch: 1
+    dmrSquelch: none
+    micGain: 3
+    fmMicGain: none
+    m17MicGain: none
+    maxSpeakerVolume: 10
+    maxHeadphoneVolume: 10
+    vox: off
+    voxDelay: 0
+    speech: false
+  tone:
+    silent: false
+    keyTone: off
+    smsTone: true
+    ringtone: true
+    bootTone: false
+    bootMelody:
+      bpm: 100
+      melody: ""
+    talkPermit:
+      - None
+    callStart:
+      - Digital
+    callStartMelody:
+      bpm: 100
+      melody: ""
+    callEnd:
+      - None
+    callEndMelody:
+      bpm: 100
+      melody: ""
+    channelIdle:
+      - All
+    channelIdleMelody:
+      bpm: 100
+      melody: ""
+    callReset: true
+    callResetMelody:
+      bpm: 100
+      melody: ""
+  gnss:
+    fixedPositionEnabled: false
+    fixedPosition: ""
+    systems:
+      - GPS
+    units: Metric
+  dmr:
+    privateCallMatch: true
+    groupCallMatch: true
+    privateCallHangTime: 5 s
+    groupCallHangTime: 3 s
+    sendTalkerAlias: false
+    talkerAliasEncoding: Iso8
+    preamble: 100 ms
 radioIDs:
   []
 contacts:
@@ -19,57 +75,147 @@ channels:
   - am:
       id: ch1
       name: BER EM
-      rxOnly: true
       rxFrequency: 121.5 MHz
-      txFrequency: ~
-      power: !<!default> ""
+      txFrequency: 0 Hz
       timeout: !<!default> ""
+      rxOnly: true
       vox: !<!default> ""
       squelch: !<!default> ""
+      power: !<!default> ""
   - am:
       id: ch2
       name: BER ATIS
-      rxOnly: true
       rxFrequency: 123.78 MHz
-      txFrequency: ~
-      power: !<!default> ""
+      txFrequency: 0 Hz
       timeout: !<!default> ""
+      rxOnly: true
       vox: !<!default> ""
       squelch: !<!default> ""
+      power: !<!default> ""
   - am:
       id: ch3
-      name: BER ARR
-      rxOnly: true
-      rxFrequency: 121.13 MHz
-      txFrequency: ~
-      power: !<!default> ""
+      name: BER ATIS 2
+      rxFrequency: 133.63 MHz
+      txFrequency: 0 Hz
       timeout: !<!default> ""
+      rxOnly: true
       vox: !<!default> ""
       squelch: !<!default> ""
+      power: !<!default> ""
   - am:
       id: ch4
-      name: BER Tower S
-      rxOnly: true
-      rxFrequency: 118.805 MHz
-      txFrequency: ~
-      power: !<!default> ""
+      name: BER ARR
+      rxFrequency: 121.13 MHz
+      txFrequency: 0 Hz
       timeout: !<!default> ""
+      rxOnly: true
       vox: !<!default> ""
       squelch: !<!default> ""
+      power: !<!default> ""
   - am:
       id: ch5
-      name: BER Tower N
-      rxOnly: true
-      rxFrequency: 120.03 MHz
-      txFrequency: ~
-      power: !<!default> ""
+      name: BER Tower S
+      rxFrequency: 118.805 MHz
+      txFrequency: 0 Hz
       timeout: !<!default> ""
+      rxOnly: true
       vox: !<!default> ""
       squelch: !<!default> ""
+      power: !<!default> ""
+  - am:
+      id: ch6
+      name: BER Tower N
+      rxFrequency: 120.03 MHz
+      txFrequency: 0 Hz
+      timeout: !<!default> ""
+      rxOnly: true
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      power: !<!default> ""
+  - am:
+      id: ch7
+      name: BER Approach 1
+      rxFrequency: 119.5 MHz
+      txFrequency: 0 Hz
+      timeout: !<!default> ""
+      rxOnly: false
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      power: !<!default> ""
+  - am:
+      id: ch8
+      name: BER Approach 2
+      rxFrequency: 119.63 MHz
+      txFrequency: 0 Hz
+      timeout: !<!default> ""
+      rxOnly: false
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      power: !<!default> ""
+  - am:
+      id: ch9
+      name: BER Approach 3
+      rxFrequency: 120.63 MHz
+      txFrequency: 0 Hz
+      timeout: !<!default> ""
+      rxOnly: false
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      power: !<!default> ""
+  - am:
+      id: ch10
+      name: BER Approach 4
+      rxFrequency: 126.42 MHz
+      txFrequency: 0 Hz
+      timeout: !<!default> ""
+      rxOnly: false
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      power: !<!default> ""
+  - am:
+      id: ch11
+      name: BER Approach 5
+      rxFrequency: 134.43 MHz
+      txFrequency: 0 Hz
+      timeout: !<!default> ""
+      rxOnly: false
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      power: !<!default> ""
+  - am:
+      id: ch12
+      name: BER GND
+      rxFrequency: 121.705 MHz
+      txFrequency: 0 Hz
+      timeout: !<!default> ""
+      rxOnly: true
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      power: !<!default> ""
+  - am:
+      id: ch13
+      name: BER GND
+      rxFrequency: 129.505 MHz
+      txFrequency: 0 Hz
+      timeout: !<!default> ""
+      rxOnly: true
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      power: !<!default> ""
+  - am:
+      id: ch14
+      name: BER VOLMET
+      rxFrequency: 128.405 MHz
+      txFrequency: 0 Hz
+      timeout: !<!default> ""
+      rxOnly: true
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      power: !<!default> ""
 zones:
   - id: zone1
     name: BER Air
-    A: [ch1, ch2, ch3, ch4, ch5]
+    A: [ch1, ch2, ch3, ch5, ch6, ch12, ch13, ch4, ch14, ch7, ch8, ch9, ch10, ch11]
     B: []
 commercial:
   encryptionKeys:
