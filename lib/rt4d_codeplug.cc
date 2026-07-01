@@ -2319,7 +2319,7 @@ RT4DCodeplug::GroupListElement::clear() {
 bool
 RT4DCodeplug::GroupListElement::isValid() const {
   // must have a name
-  if (! name().isEmpty())
+  if (name().isEmpty())
     return false;
   // valid if there is at least one group call index set
   bool valid = false;
