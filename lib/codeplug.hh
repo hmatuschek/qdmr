@@ -104,10 +104,17 @@ public:
         inline bool in(const T &value) const {
           return (value <= max) && (value >= min);
         }
-        /** Maps a value from this range to the given range. */
+        /** Maps a value from this range to the given range.
+         * Rounds to the nearest value rather than truncating. Truncating in both
+         * directions makes @c Level round-trips lossy: reading a setting from the
+         * radio and writing it back unchanged shifts it down (e.g. mic gain 1 -> 0,
+         * volume 6 -> 5), so every read-modify-write cycle walks such settings
+         * towards their minimum. */
         inline T mapTo(const Range<T> &other, const T &value) const {
           T myD = max-min, oD = other.max-other.min;
-          return ((limit(value)-min)*oD)/myD + other.min;
+          if (0 == myD)
+            return other.min;
+          return ((limit(value)-min)*oD + myD/2)/myD + other.min;
         }
       };
     };
