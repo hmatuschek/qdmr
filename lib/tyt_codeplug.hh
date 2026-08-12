@@ -212,14 +212,23 @@ public:
     /** Enables/disables DTMF decoding this channel. */
     virtual void setDTMFDecode(uint8_t idx, bool enable);
 
+    /** Returns @c true if the RX frequency is valid. */
+    virtual bool rxFrequencyIsValid() const;
     /** Returns the RX frequency in Hz. */
     virtual Frequency rxFrequency() const;
     /** Sets the RX frequency in Hz. */
     virtual void setRXFrequency(const Frequency &Hz);
+    /** Clears the RX frequency. */
+    virtual void clearRXFrequency();
+
+    /** Returns @c true if the TX frequency is valid. */
+    virtual bool txFrequencyIsValid() const;
     /** Returns the TX frequency in Hz. */
     virtual Frequency txFrequency() const;
     /** Sets the TX frequency in Hz. */
     virtual void setTXFrequency(const Frequency &Hz);
+    /** Clears the TX frequency. */
+    virtual void clearTXFrequency();
 
     /** Returns the CTCSS/DSC signaling for RX. */
     virtual SelectiveCall rxSignaling() const;
