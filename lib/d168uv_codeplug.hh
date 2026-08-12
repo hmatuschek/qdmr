@@ -40,9 +40,9 @@ public:
     virtual void disableDMRCRC(bool disable);
 
     /** Constructs a Channel object from this element. */
-    Channel *toChannelObj(Context &ctx) const override;
+    Channel *decode(Context &ctx, const ErrorStack &err) const override;
     /** Encodes the given channel object. */
-    bool fromChannelObj(const Channel *c, Context &ctx) override;
+    bool encode(const Channel *c, Context &ctx, const ErrorStack &err) override;
 
   protected:
     /** Some internal offsets. */

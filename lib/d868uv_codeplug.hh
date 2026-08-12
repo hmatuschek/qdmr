@@ -61,7 +61,7 @@ public:
    *
    *  Memory layout of the encoded channel element (size 0x0040 bytes):
    *  @verbinclude d868uv_channel.txt */
-  class ChannelElement: public AnytoneCodeplug::ChannelElement
+  class ChannelElement: public AnytoneCodeplug::ChannelElementGen1
   {
   public:
     /** Possible encryption types. */
@@ -131,16 +131,13 @@ public:
     /** Enables/disables SMS. */
     virtual void enableSMS(bool enable);
 
-    /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj(Context &ctx) const;
-    /** Links a previously constructed channel to the rest of the configuration. */
-    virtual bool linkChannelObj(Channel *c, Context &ctx) const;
-    /** Initializes this codeplug channel from the given generic configuration. */
-    virtual bool fromChannelObj(const Channel *c, Context &ctx);
+    Channel *decode(Context &ctx, const ErrorStack &err) const override;
+    bool link(Channel *c, Context &ctx, const ErrorStack &err) const override;
+    bool encode(const Channel *c, Context &ctx, const ErrorStack &err) override;
 
   protected:
     /** Internal used offsets within the channel element. */
-    struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
+    struct Offset: AnytoneCodeplug::ChannelElementGen1::Offset {
       /// @cond DO_NOT_DOCUMENT
       static Bit dmrEncryptionType()               { return {0x0021, 6}; }
       static unsigned int dmrEncryptionKey()       { return 0x0022; }

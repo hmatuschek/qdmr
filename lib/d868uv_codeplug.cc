@@ -49,13 +49,13 @@ D868UVCodeplug::Color::encode(AnytoneDisplaySettingsExtension::Color color) {
  * Implementation of D868UVCodeplug::ChannelElement
  * ******************************************************************************************** */
 D868UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::ChannelElement(ptr, size)
+  : AnytoneCodeplug::ChannelElementGen1(ptr, size)
 {
   // pass...
 }
 
 D868UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : AnytoneCodeplug::ChannelElement(ptr)
+  : AnytoneCodeplug::ChannelElementGen1(ptr)
 {
   // pass...
 }
@@ -163,8 +163,8 @@ D868UVCodeplug::ChannelElement::enableSMS(bool enable) {
 }
 
 Channel *
-D868UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
-  Channel *ch = AnytoneCodeplug::ChannelElement::toChannelObj(ctx);
+D868UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Channel *ch = AnytoneCodeplug::ChannelElementGen1::decode(ctx, err);
   if (nullptr == ch)
     return nullptr;
 
@@ -182,8 +182,8 @@ D868UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 }
 
 bool
-D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+D868UVCodeplug::ChannelElement::link(Channel *c, Context &ctx, const ErrorStack &err) const {
+  if (! AnytoneCodeplug::ChannelElementGen1::link(c, ctx, err))
     return false;
 
   if (c->is<DMRChannel>()) {
@@ -211,8 +211,8 @@ D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
 }
 
 bool
-D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+D868UVCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::ChannelElementGen1::encode(c, ctx, err))
     return false;
 
   if (c->is<DMRChannel>()) {
@@ -1627,7 +1627,7 @@ D868UVCodeplug::allocateChannels() {
 
 bool
 D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags)
 
   // Encode channels
   for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
@@ -1635,7 +1635,7 @@ D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     ChannelElement ch(data(Offset::channelBanks() + bank * Offset::betweenChannelBanks()
                            + idx * ChannelElement::size()));
-    if (! ch.fromChannelObj(ctx.get<Channel>(i), ctx))
+    if (! ch.encode(ctx.get<Channel>(i), ctx, err))
       return false;
   }
   return true;
@@ -1643,7 +1643,6 @@ D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
 
 bool
 D868UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
 
   // Create channels
@@ -1654,7 +1653,7 @@ D868UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
       continue;
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
-    if (Channel *obj = ch.toChannelObj(ctx)) {
+    if (Channel *obj = ch.decode(ctx, err)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
     }
   }
@@ -1674,7 +1673,7 @@ D868UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
     if (ctx.has<Channel>(i))
-      ch.linkChannelObj(ctx.get<Channel>(i), ctx);
+      ch.link(ctx.get<Channel>(i), ctx, err);
   }
   return true;
 }

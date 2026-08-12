@@ -131,8 +131,8 @@ public:
     void setARC4EncryptionKeyIndex(unsigned int index) override;
     void clearARC4EncryptionKeyIndex() override;
 
-    Channel *toChannelObj(Context &ctx) const override;
-    bool fromChannelObj(const Channel *ch, Context &ctx) override;
+    Channel *decode(Context &ctx, const ErrorStack &err) const override;
+    bool encode(const Channel *ch, Context &ctx, const ErrorStack &err) override;
 
   protected:
     /** Internal offsets within the channel element. */

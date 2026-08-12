@@ -1552,13 +1552,13 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorS
  * Implementation of DMR6X2UVCodeplug::ChannelElement
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::ChannelElement(ptr, size)
+  : AnytoneCodeplug::ChannelElementGen1(ptr, size)
 {
   // pass...
 }
 
 DMR6X2UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : AnytoneCodeplug::ChannelElement(ptr)
+  : AnytoneCodeplug::ChannelElementGen1(ptr)
 {
   // pass...
 }
@@ -1722,8 +1722,8 @@ DMR6X2UVCodeplug::ChannelElement::setAPRSType(APRSType aprstype) {
 }
 
 bool
-DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+DMR6X2UVCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::ChannelElementGen1::encode(c, ctx, err))
     return false;
 
   if (const FMChannel *fm = c->as<FMChannel>()) {
@@ -1781,8 +1781,8 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
 }
 
 bool
-DMR6X2UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+DMR6X2UVCodeplug::ChannelElement::link(Channel *c, Context &ctx, const ErrorStack &err) const {
+  if (! AnytoneCodeplug::ChannelElementGen1::link(c, ctx, err))
     return false;
   if (FMChannel *fm = c->as<FMChannel>()) {
     auto ext = fm->anytoneChannelExtension();
@@ -2581,7 +2581,7 @@ DMR6X2UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorSt
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()+ idx*ChannelElement::size();
     ChannelElement ch(data(addr));
-    if (! ch.fromChannelObj(ctx.get<Channel>(i), ctx))
+    if (! ch.encode(ctx.get<Channel>(i), ctx, err))
       return false;
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
     if (! ext.fromChannelObj(ctx.get<Channel>(i), ctx, err))
@@ -2592,7 +2592,6 @@ DMR6X2UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorSt
 
 bool
 DMR6X2UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
   // Create channels
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
   for (uint16_t i=0; i<Limit::numChannels(); i++) {
@@ -2602,7 +2601,7 @@ DMR6X2UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
       continue;
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
-    if (Channel *obj = ch.toChannelObj(ctx)) {
+    if (Channel *obj = ch.decode(ctx, err)) {
       ctx.config()->channelList()->add(obj);
       ctx.add(obj, i);
     }
@@ -2612,8 +2611,6 @@ DMR6X2UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
 
 bool
 DMR6X2UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
   // Link channel objects
   for (uint16_t i=0; i<Limit::numChannels(); i++) {
@@ -2627,7 +2624,7 @@ DMR6X2UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
 
     if (ctx.has<Channel>(i)) {
-      if (! ch.linkChannelObj(ctx.get<Channel>(i), ctx))
+      if (! ch.link(ctx.get<Channel>(i), ctx, err))
         return false;
       if (! ext.linkChannelObj(ctx.get<Channel>(i), ctx, err))
         return false;

@@ -58,7 +58,7 @@ SelectiveCallBox::SelectiveCallBox(QWidget *parent)
   dcsWidget->setContentsMargins(0,0,0,0);
   _stack->addWidget(dcsWidget);
 
-  connect(_typeSelection, &QComboBox::currentTextChanged, [=]() {
+  connect(_typeSelection, &QComboBox::currentTextChanged, [this]() {
     _stack->setCurrentIndex(_typeSelection->currentIndex());
   });
 

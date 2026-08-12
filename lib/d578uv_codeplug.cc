@@ -231,8 +231,8 @@ D578UVCodeplug::ChannelElement::clearARC4EncryptionKeyIndex() {
 
 
 Channel *
-D578UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
-  Channel *ch = D878UVCodeplug::ChannelElement::toChannelObj(ctx);
+D578UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Channel *ch = D878UVCodeplug::ChannelElement::decode(ctx, err);
   if (nullptr == ch)
     return nullptr;
 
@@ -258,8 +258,8 @@ D578UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
 
 bool
-D578UVCodeplug::ChannelElement::fromChannelObj(const Channel *ch, Context &ctx) {
-  if (! D878UVCodeplug::ChannelElement::fromChannelObj(ch, ctx))
+D578UVCodeplug::ChannelElement::encode(const Channel *ch, Context &ctx, const ErrorStack &err) {
+  if (! D878UVCodeplug::ChannelElement::encode(ch, ctx, err))
     return false;
 
   // Apply extensions
@@ -3389,7 +3389,7 @@ D578UVCodeplug::createElements(Context &ctx, const ErrorStack &err) {
 
 bool
 D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags)
 
   // Encode channels
   for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
@@ -3398,7 +3398,7 @@ D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                     + idx*ChannelElement::size();
     ChannelElement ch(data(addr));
-    ch.fromChannelObj(ctx.get<Channel>(i), ctx);
+    ch.encode(ctx.get<Channel>(i), ctx, err);
 
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
     ext.clear();
@@ -3408,8 +3408,6 @@ D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
 
 bool
 D578UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
 
   // Create channels
@@ -3420,7 +3418,7 @@ D578UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
       continue;
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
-    if (Channel *obj = ch.toChannelObj(ctx)) {
+    if (Channel *obj = ch.decode(ctx, err)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
     }
   }
@@ -3429,8 +3427,6 @@ D578UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
 
 bool
 D578UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
 
   // Link channel objects
@@ -3442,7 +3438,7 @@ D578UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
     if (ctx.has<Channel>(i))
-      ch.linkChannelObj(ctx.get<Channel>(i), ctx);
+      ch.link(ctx.get<Channel>(i), ctx, err);
   }
 
   return true;

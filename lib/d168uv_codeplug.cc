@@ -25,8 +25,8 @@ D168UVCodeplug::ChannelElement::disableDMRCRC(bool disable) {
 
 
 Channel *
-D168UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
-  auto ch = D878UVCodeplug::ChannelElement::toChannelObj(ctx);
+D168UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  auto ch = D878UVCodeplug::ChannelElement::decode(ctx, err);
   if (nullptr == ch)
     return ch;
 
@@ -41,8 +41,8 @@ D168UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   return ch;
 }
 
-bool D168UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! D878UVCodeplug::ChannelElement::fromChannelObj(c, ctx))
+bool D168UVCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, const ErrorStack &err) {
+  if (! D878UVCodeplug::ChannelElement::encode(c, ctx, err))
     return false;
 
   if (c->is<DMRChannel>() && c->as<DMRChannel>()->anytoneChannelExtension()) {
@@ -472,7 +472,7 @@ D168UVCodeplug::allocateUpdated() {
 
 bool
 D168UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags)
   // Encode channels
   for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
@@ -481,7 +481,7 @@ D168UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
         + idx*ChannelElement::size();
 
     ChannelElement ch(data(addr));
-    ch.fromChannelObj(ctx.get<Channel>(i), ctx);
+    ch.encode(ctx.get<Channel>(i), ctx, err);
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
     ext.fromChannelObj(ctx.get<Channel>(i), ctx);
   }
@@ -506,7 +506,7 @@ D168UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
     ChannelElement ch(data(addr));
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
 
-    if (Channel *obj = ch.toChannelObj(ctx)) {
+    if (Channel *obj = ch.decode(ctx, err)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
       ext.updateChannelObj(obj, ctx);
     }
@@ -516,7 +516,6 @@ D168UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
 
 bool
 D168UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
 
   // Link channel objects
@@ -531,7 +530,7 @@ D168UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
 
     if (ctx.has<Channel>(i)) {
-      ch.linkChannelObj(ctx.get<Channel>(i), ctx);
+      ch.link(ctx.get<Channel>(i), ctx, err);
       ext.linkChannelObj(ctx.get<Channel>(i), ctx);
     }
   }

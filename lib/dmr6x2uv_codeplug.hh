@@ -687,7 +687,7 @@ public:
    *
    *  Memory representation of the encoded channel element (size 0x040 bytes):
    *  @verbinclude dmr6x2uv_channel.txt */
-  class ChannelElement: public AnytoneCodeplug::ChannelElement
+  class ChannelElement: public AnytoneCodeplug::ChannelElementGen1
   {
   public:
     /** Possible PTT modes for FM APRS. */
@@ -791,8 +791,8 @@ public:
     /** Sets the APRS type. */
     virtual void setAPRSType(APRSType aprstype);
 
-    bool linkChannelObj(Channel *c, Context &ctx) const;
-    bool fromChannelObj(const Channel *c, Context &ctx);
+    bool link(Channel *c, Context &ctx, const ErrorStack &err) const override;
+    bool encode(const Channel *c, Context &ctx, const ErrorStack &err) override;
 
 public:
     /** Some limits of this element. */
@@ -803,7 +803,7 @@ public:
 
 protected:
     /// @cond DO_NOT_DOCUMENT
-    struct Offset: AnytoneCodeplug::ChannelElement::Offset {
+    struct Offset: AnytoneCodeplug::ChannelElementGen1::Offset {
       static constexpr unsigned int aesEncryptionKeyIndex()        { return 0x0013; }
       static constexpr Bit roaming()                               { return {0x001b, 2}; }
       static constexpr Bit ranging()                               { return {0x001b, 0}; }

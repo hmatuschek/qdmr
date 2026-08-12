@@ -223,11 +223,11 @@ public:
     void enableAdaptiveTDMA(bool enable) override;
 
     /** Constructs a Channel object from this element. */
-    Channel *toChannelObj(Context &ctx) const override;
+    Channel *decode(Context &ctx, const ErrorStack &err) const override;
     /** Links a previously created channel object. */
-    bool linkChannelObj(Channel *c, Context &ctx) const override;
+    bool link(Channel *c, Context &ctx, const ErrorStack &err) const override;
     /** Encodes the given channel object. */
-    bool fromChannelObj(const Channel *c, Context &ctx) override;
+    bool encode(const Channel *c, Context &ctx, const ErrorStack &err) override;
 
   protected:
     /** Internal used offsets within the channel element. */

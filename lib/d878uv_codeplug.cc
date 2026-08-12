@@ -316,8 +316,8 @@ D878UVCodeplug::ChannelElement::clearARC4EncryptionKeyIndex() {
 
 
 Channel *
-D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
-  Channel *ch = D868UVCodeplug::ChannelElement::toChannelObj(ctx);
+D878UVCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Channel *ch = D868UVCodeplug::ChannelElement::decode(ctx, err);
 
   if (nullptr == ch)
     return nullptr;
@@ -345,8 +345,8 @@ D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 }
 
 bool
-D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+D878UVCodeplug::ChannelElement::link(Channel *c, Context &ctx, const ErrorStack &err) const {
+  if (! AnytoneCodeplug::ChannelElementGen1::link(c, ctx, err))
     return false;
 
   if (c->is<DMRChannel>()) {
@@ -436,8 +436,8 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
 }
 
 bool
-D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+D878UVCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, const ErrorStack &err) {
+  if (! AnytoneCodeplug::ChannelElementGen1::encode(c, ctx, err))
     return false;
 
   AnytoneChannelExtension *ch_ext = nullptr;
@@ -4100,7 +4100,7 @@ D878UVCodeplug::allocateChannels() {
 
 bool
 D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(flags); Q_UNUSED(err)
+  Q_UNUSED(flags)
   // Encode channels
   for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
     // enable channel
@@ -4109,7 +4109,7 @@ D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
         + idx*ChannelElement::size();
 
     ChannelElement ch(data(addr));
-    ch.fromChannelObj(ctx.get<Channel>(i), ctx);
+    ch.encode(ctx.get<Channel>(i), ctx, err);
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
     ext.fromChannelObj(ctx.get<Channel>(i), ctx);
   }
@@ -4118,8 +4118,6 @@ D878UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
 
 bool
 D878UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
-
   // Create channels
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
   for (uint16_t i=0; i<Limit::numChannels(); i++) {
@@ -4134,7 +4132,7 @@ D878UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
     ChannelElement ch(data(addr));
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
 
-    if (Channel *obj = ch.toChannelObj(ctx)) {
+    if (Channel *obj = ch.decode(ctx, err)) {
       ctx.config()->channelList()->add(obj); ctx.add(obj, i);
       ext.updateChannelObj(obj, ctx);
     }
@@ -4144,7 +4142,6 @@ D878UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
 
 bool
 D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
-  Q_UNUSED(err)
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
 
   // Link channel objects
@@ -4159,7 +4156,7 @@ D878UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
 
     if (ctx.has<Channel>(i)) {
-      ch.linkChannelObj(ctx.get<Channel>(i), ctx);
+      ch.link(ctx.get<Channel>(i), ctx, err);
       ext.linkChannelObj(ctx.get<Channel>(i), ctx);
     }
   }

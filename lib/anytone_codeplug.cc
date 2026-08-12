@@ -89,156 +89,50 @@ AnytoneCodeplug::InvertedBytemapElement::enableFirst(unsigned int n) {
 }
 
 
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ChannelElement
  * ********************************************************************************************* */
 AnytoneCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
-  : Element(ptr, size)
+  : Element{ptr, size}
 {
   // pass...
 }
 
-AnytoneCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : Element(ptr, ChannelElement::size())
-{
-  // pass...
-}
-
-AnytoneCodeplug::ChannelElement::~ChannelElement() {
-  // pass...
-}
 
 void
 AnytoneCodeplug::ChannelElement::clear() {
-  setRXFrequency(0);
-  setTXOffset(0);
+  setRXFrequency(Frequency::fromHz(0));
+  setTXOffset(FrequencyOffset::fromHz(0));
   setMode(Mode::Analog);
   setPower(Channel::Power::Low);
   setBandwidth(FMChannel::Bandwidth::Narrow);
   setRXTone(SelectiveCall());
   setTXTone(SelectiveCall());
-  setBit(0x0008, 5, false); // Unused set to 0
 }
 
-unsigned
-AnytoneCodeplug::ChannelElement::rxFrequency() const {
-  return ((unsigned)getBCD8_be(Offset::rxFrequency()))*10;
-}
-void
-AnytoneCodeplug::ChannelElement::setRXFrequency(unsigned hz) {
-  setBCD8_be(Offset::rxFrequency(), hz/10);
-}
 
-unsigned
-AnytoneCodeplug::ChannelElement::txOffset() const {
-  return ((unsigned)getBCD8_be(Offset::txFrequencyOffset()))*10;
-}
-void
-AnytoneCodeplug::ChannelElement::setTXOffset(unsigned hz) {
-  setBCD8_be(Offset::txFrequencyOffset(), hz/10);
-}
-
-unsigned
+Frequency
 AnytoneCodeplug::ChannelElement::txFrequency() const {
-  unsigned rx = rxFrequency(), off = txOffset();
-  if (RepeaterMode::Simplex == repeaterMode())
-    return rx;
-  else if (RepeaterMode::Positive == repeaterMode())
-    return rx+off;
-  return rx-off;
+  return rxFrequency() + txOffset();
 }
 void
-AnytoneCodeplug::ChannelElement::setTXFrequency(unsigned hz) {
-  unsigned rx = rxFrequency();
-  if (rx == hz) {
-    setTXOffset(0); setRepeaterMode(RepeaterMode::Simplex);
-  } else if (rx < hz) {
-    setTXOffset(hz-rx); setRepeaterMode(RepeaterMode::Positive);
-  } else {
-    setTXOffset(rx-hz); setRepeaterMode(RepeaterMode::Negative);
-  }
+AnytoneCodeplug::ChannelElement::setTXFrequency(Frequency hz) {
+  setTXOffset(hz-rxFrequency());
 }
 
-AnytoneCodeplug::ChannelElement::Mode
-AnytoneCodeplug::ChannelElement::mode() const {
-  return (Mode) getUInt2(Offset::channelMode());
-}
-void
-AnytoneCodeplug::ChannelElement::setMode(Mode mode) {
-  setUInt2(Offset::channelMode(), (unsigned)mode);
-}
-
-Channel::Power
-AnytoneCodeplug::ChannelElement::power() const {
-  switch ((Power)getUInt2(Offset::power())) {
-  case POWER_LOW: return Channel::Power::Low;
-  case POWER_MIDDLE: return Channel::Power::Mid;
-  case POWER_HIGH: return Channel::Power::High;
-  case POWER_TURBO: return Channel::Power::Max;
-  }
-  return Channel::Power::Low;
-}
-void
-AnytoneCodeplug::ChannelElement::setPower(Channel::Power power) {
-  switch (power) {
-  case Channel::Power::Min:
-  case Channel::Power::Low:
-    setUInt2(Offset::power(), (unsigned)POWER_LOW);
-    break;
-  case Channel::Power::Mid:
-    setUInt2(Offset::power(), (unsigned)POWER_MIDDLE);
-    break;
-  case Channel::Power::High:
-    setUInt2(Offset::power(), (unsigned)POWER_HIGH);
-    break;
-  case Channel::Power::Max:
-    setUInt2(Offset::power(), (unsigned)POWER_TURBO);
-    break;
-  }
-}
-
-FMChannel::Bandwidth
-AnytoneCodeplug::ChannelElement::bandwidth() const {
-  if (getBit(Offset::bandwidth()))
-    return FMChannel::Bandwidth::Wide;
-  return FMChannel::Bandwidth::Narrow;
-}
-void
-AnytoneCodeplug::ChannelElement::setBandwidth(FMChannel::Bandwidth bw) {
-  switch (bw) {
-  case FMChannel::Bandwidth::Narrow: setBit(Offset::bandwidth(), false); break;
-  case FMChannel::Bandwidth::Wide: setBit(Offset::bandwidth(), true); break;
-  }
-}
-
-AnytoneCodeplug::ChannelElement::RepeaterMode
-AnytoneCodeplug::ChannelElement::repeaterMode() const {
-  return (RepeaterMode)getUInt2(Offset::repeaterMode());
-}
-void
-AnytoneCodeplug::ChannelElement::setRepeaterMode(RepeaterMode mode) {
-  setUInt2(Offset::repeaterMode(), (unsigned)mode);
-}
-
-AnytoneCodeplug::ChannelElement::SignalingMode
-AnytoneCodeplug::ChannelElement::rxSignalingMode() const {
-  return (SignalingMode)getUInt2(Offset::rxSignalingMode());
-}
-void
-AnytoneCodeplug::ChannelElement::setRXSignalingMode(SignalingMode mode) {
-  setUInt2(Offset::rxSignalingMode(), (unsigned)mode);
-}
 
 SelectiveCall
 AnytoneCodeplug::ChannelElement::rxTone() const {
   if (SignalingMode::None == rxSignalingMode())
-    return SelectiveCall();
+    return {};
   else if (SignalingMode::CTCSS == rxSignalingMode())
     return rxCTCSS();
   else if (SignalingMode::DCS == rxSignalingMode())
     return rxDCS();
-  return SelectiveCall();
+  return {};
 }
+
 void
 AnytoneCodeplug::ChannelElement::setRXTone(const SelectiveCall &code) {
   if (code.isInvalid()) {
@@ -252,25 +146,18 @@ AnytoneCodeplug::ChannelElement::setRXTone(const SelectiveCall &code) {
   }
 }
 
-AnytoneCodeplug::ChannelElement::SignalingMode
-AnytoneCodeplug::ChannelElement::txSignalingMode() const {
-  return (SignalingMode)getUInt2(Offset::txSignalingMode());
-}
-void
-AnytoneCodeplug::ChannelElement::setTXSignalingMode(SignalingMode mode) {
-  setUInt2(Offset::txSignalingMode(), (unsigned)mode);
-}
 
 SelectiveCall
 AnytoneCodeplug::ChannelElement::txTone() const {
   if (SignalingMode::None == txSignalingMode())
-    return SelectiveCall();
+    return {};
   else if (SignalingMode::CTCSS == txSignalingMode())
     return txCTCSS();
   else if (SignalingMode::DCS == txSignalingMode())
     return txDCS();
-  return SelectiveCall();
+  return {};
 }
+
 void
 AnytoneCodeplug::ChannelElement::setTXTone(const SelectiveCall &code) {
   if (code.isInvalid()) {
@@ -284,310 +171,17 @@ AnytoneCodeplug::ChannelElement::setTXTone(const SelectiveCall &code) {
   }
 }
 
-bool
-AnytoneCodeplug::ChannelElement::rxTxSwapped() const {
-  return getBit(Offset::swapRXTX());
-}
-void
-AnytoneCodeplug::ChannelElement::enableSwapRxTx(bool enable) {
-  setBit(Offset::swapRXTX(), enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::rxOnly() const {
-  return getBit(Offset::rxOnly());
-}
-void
-AnytoneCodeplug::ChannelElement::enableRXOnly(bool enable) {
-  setBit(Offset::rxOnly(), enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::callConfirm() const {
-  return getBit(Offset::callConfirm());
-}
-void
-AnytoneCodeplug::ChannelElement::enableCallConfirm(bool enable) {
-  setBit(Offset::callConfirm(), enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::talkaround() const {
-  return getBit(Offset::talkaround());
-}
-void
-AnytoneCodeplug::ChannelElement::enableTalkaround(bool enable) {
-  setBit(Offset::talkaround(), enable);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::txCTCSSIsCustom() const {
-  return CUSTOM_CTCSS_TONE == getUInt8(Offset::txCTCSS());
-}
-SelectiveCall
-AnytoneCodeplug::ChannelElement::txCTCSS() const {
-  return CTCSS::decode(getUInt8(Offset::txCTCSS()));
-}
-void
-AnytoneCodeplug::ChannelElement::setTXCTCSS(const SelectiveCall &tone) {
-  setUInt8(Offset::txCTCSS(), CTCSS::encode(tone));
-}
-void
-AnytoneCodeplug::ChannelElement::enableTXCustomCTCSS() {
-  setUInt8(Offset::txCTCSS(), CUSTOM_CTCSS_TONE);
-}
-bool
-AnytoneCodeplug::ChannelElement::rxCTCSSIsCustom() const {
-  return CUSTOM_CTCSS_TONE == getUInt8(Offset::rxCTCSS());
-}
-SelectiveCall
-AnytoneCodeplug::ChannelElement::rxCTCSS() const {
-  return CTCSS::decode(getUInt8(Offset::rxCTCSS()));
-}
-void
-AnytoneCodeplug::ChannelElement::setRXCTCSS(const SelectiveCall &tone) {
-  setUInt8(Offset::rxCTCSS(), CTCSS::encode(tone));
-}
-void
-AnytoneCodeplug::ChannelElement::enableRXCustomCTCSS() {
-  setUInt8(Offset::rxCTCSS(), CUSTOM_CTCSS_TONE);
-}
-
-SelectiveCall
-AnytoneCodeplug::ChannelElement::txDCS() const {
-  uint16_t code = getUInt16_le(Offset::txDCS());
-  if (512 > code)
-    return SelectiveCall::fromBinaryDCS(code, false);
-  return SelectiveCall::fromBinaryDCS(code-512, true);
-}
-void
-AnytoneCodeplug::ChannelElement::setTXDCS(const SelectiveCall &code) {
-  if (code.isDCS())
-    setUInt16_le(Offset::txDCS(), code.binCode() + (code.isInverted() ? 512 : 0));
-  else
-    setUInt16_le(Offset::txDCS(), 0);
-}
-
-SelectiveCall
-AnytoneCodeplug::ChannelElement::rxDCS() const {
-  uint16_t code = getUInt16_le(Offset::rxDCS());
-  if (512 > code)
-    return SelectiveCall::fromBinaryDCS(code, false);
-  return SelectiveCall::fromBinaryDCS(code-512, true);
-}
-void
-AnytoneCodeplug::ChannelElement::setRXDCS(const SelectiveCall &code) {
-  if (code.isDCS())
-    setUInt16_le(Offset::rxDCS(), code.binCode() + (code.isInverted() ? 512 : 0));
-  else
-    setUInt16_le(Offset::rxDCS(), 0);
-}
-
-double
-AnytoneCodeplug::ChannelElement::customCTCSSFrequency() const {
-  return ((double) getUInt16_le(Offset::customCTCSS()))/10;
-}
-void
-AnytoneCodeplug::ChannelElement::setCustomCTCSSFrequency(double hz) {
-  setUInt16_le(Offset::customCTCSS(), hz*10);
-}
-
-unsigned
-AnytoneCodeplug::ChannelElement::twoToneDecodeIndex() const {
-  return getUInt16_le(Offset::twoFunctionIndex());
-}
-void
-AnytoneCodeplug::ChannelElement::setTwoToneDecodeIndex(unsigned idx) {
-  setUInt16_le(Offset::twoFunctionIndex(), idx);
-}
-
-unsigned
-AnytoneCodeplug::ChannelElement::contactIndex() const {
-  return getUInt32_le(Offset::contactIndex());
-}
-void
-AnytoneCodeplug::ChannelElement::setContactIndex(unsigned idx) {
-  return setUInt32_le(Offset::contactIndex(), idx);
-}
-
-unsigned
-AnytoneCodeplug::ChannelElement::radioIDIndex() const {
-  return getUInt8(Offset::radioIdIndex());
-}
-void
-AnytoneCodeplug::ChannelElement::setRadioIDIndex(unsigned idx) {
-  return setUInt8(Offset::radioIdIndex(), idx);
-}
-
-AnytoneFMChannelExtension::SquelchMode
-AnytoneCodeplug::ChannelElement::squelchMode() const {
-  return (AnytoneFMChannelExtension::SquelchMode)getUInt3(Offset::squelchMode());
-}
-void
-AnytoneCodeplug::ChannelElement::setSquelchMode(AnytoneFMChannelExtension::SquelchMode mode) {
-  setUInt3(Offset::squelchMode(), (unsigned)mode);
-}
-
-AnytoneCodeplug::ChannelElement::Admit
-AnytoneCodeplug::ChannelElement::admit() const {
-  return (Admit)getUInt2(Offset::admitCriterion());
-}
-void
-AnytoneCodeplug::ChannelElement::setAdmit(Admit admit) {
-  setUInt2(Offset::admitCriterion(), (unsigned)admit);
-}
-
-AnytoneCodeplug::ChannelElement::OptSignaling
-AnytoneCodeplug::ChannelElement::optionalSignaling() const {
-  return (OptSignaling)getUInt2(Offset::optionalSingnaling());
-}
-void
-AnytoneCodeplug::ChannelElement::setOptionalSignaling(OptSignaling sig) {
-  setUInt2(Offset::optionalSingnaling(), (unsigned)sig);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::hasScanListIndex() const {
-  return 0xff != scanListIndex();
-}
-unsigned
-AnytoneCodeplug::ChannelElement::scanListIndex() const {
-  return getUInt8(Offset::scanListIndex());
-}
-void
-AnytoneCodeplug::ChannelElement::setScanListIndex(unsigned idx) {
-  setUInt8(Offset::scanListIndex(), idx);
-}
-void
-AnytoneCodeplug::ChannelElement::clearScanListIndex() {
-  setScanListIndex(0xff);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::hasGroupListIndex() const {
-  return 0xff != groupListIndex();
-}
-unsigned
-AnytoneCodeplug::ChannelElement::groupListIndex() const {
-  return getUInt8(Offset::groupListIndex());
-}
-void
-AnytoneCodeplug::ChannelElement::setGroupListIndex(unsigned idx) {
-  setUInt8(Offset::groupListIndex(), idx);
-}
-void
-AnytoneCodeplug::ChannelElement::clearGroupListIndex() {
-  setGroupListIndex(0xff);
-}
-
-unsigned
-AnytoneCodeplug::ChannelElement::twoToneIDIndex() const {
-  return getUInt8(Offset::twoToneIDIndex());
-}
-void
-AnytoneCodeplug::ChannelElement::setTwoToneIDIndex(unsigned idx) {
-  setUInt8(Offset::twoToneIDIndex(), idx);
-}
-unsigned
-AnytoneCodeplug::ChannelElement::fiveToneIDIndex() const {
-  return getUInt8(Offset::fiveToneIDIndex());
-}
-void
-AnytoneCodeplug::ChannelElement::setFiveToneIDIndex(unsigned idx) {
-  setUInt8(Offset::fiveToneIDIndex(), idx);
-}
-unsigned
-AnytoneCodeplug::ChannelElement::dtmfIDIndex() const {
-  return getUInt8(Offset::dtmfIDIndex());
-}
-void
-AnytoneCodeplug::ChannelElement::setDTMFIDIndex(unsigned idx) {
-  setUInt8(Offset::dtmfIDIndex(), idx);
-}
-
-unsigned
-AnytoneCodeplug::ChannelElement::colorCode() const {
-  return getUInt8(Offset::colorCode());
-}
-void
-AnytoneCodeplug::ChannelElement::setColorCode(unsigned code) {
-  setUInt8(Offset::colorCode(), code);
-}
-
-DMRChannel::TimeSlot
-AnytoneCodeplug::ChannelElement::timeSlot() const {
-  if (false == getBit(Offset::timeSlot()))
-    return DMRChannel::TimeSlot::TS1;
-  return DMRChannel::TimeSlot::TS2;
-}
-void
-AnytoneCodeplug::ChannelElement::setTimeSlot(DMRChannel::TimeSlot ts) {
-  if (DMRChannel::TimeSlot::TS1 == ts)
-    setBit(Offset::timeSlot(), false);
-  else
-    setBit(Offset::timeSlot(), true);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::smsConfirm() const {
-  return getBit(Offset::smsConfirm());
-}
-void
-AnytoneCodeplug::ChannelElement::enableSMSConfirm(bool enable) {
-  setBit(Offset::smsConfirm(), enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::simplexTDMA() const {
-  return getBit(Offset::simplexTDMA());
-}
-void
-AnytoneCodeplug::ChannelElement::enableSimplexTDMA(bool enable) {
-  setBit(Offset::simplexTDMA(), enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::adaptiveTDMA() const {
-  return getBit(Offset::adaptiveTDMA());
-}
-void
-AnytoneCodeplug::ChannelElement::enableAdaptiveTDMA(bool enable) {
-  setBit(Offset::adaptiveTDMA(), enable);
-}
-bool
-AnytoneCodeplug::ChannelElement::rxAPRS() const {
-  return getBit(Offset::rxAPRS());
-}
-void
-AnytoneCodeplug::ChannelElement::enableRXAPRS(bool enable) {
-  setBit(Offset::rxAPRS(), enable);
-}
-
-bool
-AnytoneCodeplug::ChannelElement::loneWorker() const {
-  return getBit(Offset::loneWorker());
-}
-void
-AnytoneCodeplug::ChannelElement::enableLoneWorker(bool enable) {
-  setBit(Offset::loneWorker(), enable);
-}
-
-QString
-AnytoneCodeplug::ChannelElement::name() const {
-  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
-}
-void
-AnytoneCodeplug::ChannelElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
-}
-
-
 Channel *
-AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
-  Q_UNUSED(ctx)
+AnytoneCodeplug::ChannelElement::decode(Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(ctx);
 
-  Channel *ch;
+  Channel *ch = nullptr;
 
   if ((Mode::Analog == mode()) || (Mode::MixedAnalog == mode())) {
     if (Mode::MixedAnalog == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << name() <<"' as analog channel.";
-    FMChannel *ach = new FMChannel();
+    auto ach = new FMChannel();
     switch(this->admit()) {
     case Admit::Always: ach->setAdmit(FMChannel::Admit::Always); break;
     case Admit::Busy: ach->setAdmit(FMChannel::Admit::Free); break;
@@ -602,7 +196,7 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     ach->extended()->enableTalkaround(talkaround());
 
     // Create extension
-    AnytoneFMChannelExtension *ext = new AnytoneFMChannelExtension();
+    auto ext = new AnytoneFMChannelExtension();
     ach->setAnytoneChannelExtension(ext);
     ext->enableRXCustomCTCSS(rxCTCSSIsCustom());
     ext->enableTXCustomCTCSS(txCTCSSIsCustom());
@@ -615,7 +209,7 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     if (Mode::MixedDigital == mode())
       logWarn() << "Mixed mode channels are not supported (for now). Treat ch '"
                 << name() <<"' as digital channel.";
-    DMRChannel *dch = new DMRChannel();
+    auto dch = new DMRChannel();
     switch (this->admit()) {
     case Admit::Always: dch->setAdmit(DMRChannel::Admit::Always); break;
     case Admit::Free: dch->setAdmit(DMRChannel::Admit::Free); break;
@@ -634,20 +228,20 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
     dch->extended()->enableLoneWorker(loneWorker());
 
     // Create extension
-    AnytoneDMRChannelExtension *ext = new AnytoneDMRChannelExtension();
+    auto ext = new AnytoneDMRChannelExtension();
     dch->setAnytoneChannelExtension(ext);
     ext->enableAdaptiveTDMA(adaptiveTDMA());
     // Done
     ch = dch;
   } else {
-    logError() << "Cannot create channel '" << name()
-               << "': Channel type " << (unsigned)mode() << "not supported.";
+    errMsg(err) << "Cannot create channel '" << name()
+                << "': Channel type " << (unsigned)mode() << "not supported.";
     return nullptr;
   }
 
   ch->setName(name());
-  ch->setRXFrequency(Frequency::fromHz(rxFrequency()));
-  ch->setTXFrequency(Frequency::fromHz(txFrequency()));
+  ch->setRXFrequency(rxFrequency());
+  ch->setTXFrequency(txFrequency());
   ch->setPower(power());
   ch->setRXOnly(rxOnly());
 
@@ -658,18 +252,19 @@ AnytoneCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
   return ch;
 }
 
+
 bool
-AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
+AnytoneCodeplug::ChannelElement::link(Channel *c, Context &ctx, const ErrorStack &err) const {
   if (Mode::Digital == mode()) {
     // If channel is digital
-    DMRChannel *dc = c->as<DMRChannel>();
+    auto dc = c->as<DMRChannel>();
     if (nullptr == dc)
       return false;
 
     // Check if default contact is set, in fact a valid contact index is mandatory.
     if (! ctx.has<DMRContact>(contactIndex())) {
-      logError() << "Cannot resolve contact index " << contactIndex() << " for channel '"
-                 << c->name() << "'.";
+      errMsg(err) << "Cannot resolve contact index " << contactIndex() << " for channel '"
+                  << c->name() << "'.";
       return false;
     }
     dc->setContact(ctx.get<DMRContact>(contactIndex()));
@@ -679,14 +274,14 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
       dc->setGroupList(ctx.get<RXGroupList>(groupListIndex()));
 
     // Link radio ID
-    DMRRadioID *rid = ctx.get<DMRRadioID>(radioIDIndex());
+    auto rid = ctx.get<DMRRadioID>(radioIDIndex());
     if (rid == ctx.config()->settings()->defaultIdRef()->as<DMRRadioID>())
       dc->setRadioId(DefaultRadioID::get());
     else
       dc->setRadioId(rid);
   } else if (Mode::Analog == mode()) {
     // If channel is analog
-    FMChannel *ac = c->as<FMChannel>();
+    auto ac = c->as<FMChannel>();
     if (nullptr == ac)
       return false;
   }
@@ -700,16 +295,19 @@ AnytoneCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const 
   return true;
 }
 
+
 bool
-AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
+AnytoneCodeplug::ChannelElement::encode(const Channel *c, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+
   // Clear channel element
   clear();
 
   // set channel name
   setName(c->name());
   // set rx and tx frequencies
-  setRXFrequency(c->rxFrequency().inHz());
-  setTXFrequency(c->txFrequency().inHz());
+  setRXFrequency(c->rxFrequency());
+  setTXFrequency(c->txFrequency());
   // set power
   if (c->defaultPower())
     setPower(ctx.config()->settings()->power());
@@ -724,7 +322,7 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
 
   // Dispatch by channel type
   if (c->is<FMChannel>()) {
-    const FMChannel *ac = c->as<const FMChannel>();
+    const auto ac = c->as<const FMChannel>();
     setMode(Mode::Analog);
     // set admit criterion
     switch (ac->admit()) {
@@ -755,7 +353,7 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
       setSquelchMode(ext->squelchMode());
     }
   } else if (c->is<DMRChannel>()) {
-    const DMRChannel *dc = c->as<const DMRChannel>();
+    const auto dc = c->as<const DMRChannel>();
     // pack digital channel config.
     setMode(Mode::Digital);
     // set admit criterion
@@ -806,6 +404,590 @@ AnytoneCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) 
 }
 
 
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ChannelElementGen1
+ * ********************************************************************************************* */
+AnytoneCodeplug::ChannelElementGen1::ChannelElementGen1(uint8_t *ptr, unsigned size)
+  : ChannelElement(ptr, size)
+{
+  // pass...
+}
+
+AnytoneCodeplug::ChannelElementGen1::ChannelElementGen1(uint8_t *ptr)
+  : ChannelElement(ptr, ChannelElementGen1::size())
+{
+  // pass...
+}
+
+AnytoneCodeplug::ChannelElementGen1::~ChannelElementGen1() {
+  // pass...
+}
+
+void
+AnytoneCodeplug::ChannelElementGen1::clear() {
+  ChannelElement::clear();
+  setBit(0x0008, 5, false); // Unused set to 0
+}
+
+
+Frequency
+AnytoneCodeplug::ChannelElementGen1::rxFrequency() const {
+  return Frequency::fromHz((quint64)getBCD8_be(Offset::rxFrequency())*10);
+}
+
+void
+AnytoneCodeplug::ChannelElementGen1::setRXFrequency(Frequency hz) {
+  setBCD8_be(Offset::rxFrequency(), hz.inHz()/10);
+}
+
+
+FrequencyOffset
+AnytoneCodeplug::ChannelElementGen1::txOffset() const {
+  if (RepeaterMode::Simplex == repeaterMode())
+    return FrequencyOffset::fromHz(0);
+  auto offset = static_cast<qint64>(getBCD8_be(Offset::txFrequencyOffset()))*10;
+  return (RepeaterMode::Positive == repeaterMode())
+    ? FrequencyOffset::fromHz(offset)
+    : FrequencyOffset::fromHz(-offset);
+}
+
+void
+AnytoneCodeplug::ChannelElementGen1::setTXOffset(FrequencyOffset hz) {
+  if (hz.isZero()) {
+    setBCD8_be(Offset::txFrequencyOffset(), 0);
+    setRepeaterMode(RepeaterMode::Simplex);
+  } else {
+    setBCD8_be(Offset::txFrequencyOffset(), hz.abs().inHz()/10);
+    setRepeaterMode(hz.isPositive() ? RepeaterMode::Positive : RepeaterMode::Negative);
+  }
+}
+
+
+AnytoneCodeplug::ChannelElementGen1::Mode
+AnytoneCodeplug::ChannelElementGen1::mode() const {
+  return (Mode) getUInt2(Offset::channelMode());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setMode(Mode mode) {
+  setUInt2(Offset::channelMode(), (unsigned)mode);
+}
+
+Channel::Power
+AnytoneCodeplug::ChannelElementGen1::power() const {
+  switch ((Power)getUInt2(Offset::power())) {
+  case POWER_LOW: return Channel::Power::Low;
+  case POWER_MIDDLE: return Channel::Power::Mid;
+  case POWER_HIGH: return Channel::Power::High;
+  case POWER_TURBO: return Channel::Power::Max;
+  }
+  return Channel::Power::Low;
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setPower(Channel::Power power) {
+  switch (power) {
+  case Channel::Power::Min:
+  case Channel::Power::Low:
+    setUInt2(Offset::power(), (unsigned)POWER_LOW);
+    break;
+  case Channel::Power::Mid:
+    setUInt2(Offset::power(), (unsigned)POWER_MIDDLE);
+    break;
+  case Channel::Power::High:
+    setUInt2(Offset::power(), (unsigned)POWER_HIGH);
+    break;
+  case Channel::Power::Max:
+    setUInt2(Offset::power(), (unsigned)POWER_TURBO);
+    break;
+  }
+}
+
+FMChannel::Bandwidth
+AnytoneCodeplug::ChannelElementGen1::bandwidth() const {
+  if (getBit(Offset::bandwidth()))
+    return FMChannel::Bandwidth::Wide;
+  return FMChannel::Bandwidth::Narrow;
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setBandwidth(FMChannel::Bandwidth bw) {
+  switch (bw) {
+  case FMChannel::Bandwidth::Narrow: setBit(Offset::bandwidth(), false); break;
+  case FMChannel::Bandwidth::Wide: setBit(Offset::bandwidth(), true); break;
+  }
+}
+
+AnytoneCodeplug::ChannelElementGen1::RepeaterMode
+AnytoneCodeplug::ChannelElementGen1::repeaterMode() const {
+  return (RepeaterMode)getUInt2(Offset::repeaterMode());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setRepeaterMode(RepeaterMode mode) {
+  setUInt2(Offset::repeaterMode(), (unsigned)mode);
+}
+
+AnytoneCodeplug::ChannelElementGen1::SignalingMode
+AnytoneCodeplug::ChannelElementGen1::rxSignalingMode() const {
+  return (SignalingMode)getUInt2(Offset::rxSignalingMode());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setRXSignalingMode(SignalingMode mode) {
+  setUInt2(Offset::rxSignalingMode(), (unsigned)mode);
+}
+
+
+AnytoneCodeplug::ChannelElementGen1::SignalingMode
+AnytoneCodeplug::ChannelElementGen1::txSignalingMode() const {
+  return (SignalingMode)getUInt2(Offset::txSignalingMode());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setTXSignalingMode(SignalingMode mode) {
+  setUInt2(Offset::txSignalingMode(), (unsigned)mode);
+}
+
+bool
+AnytoneCodeplug::ChannelElementGen1::rxTxSwapped() const {
+  return getBit(Offset::swapRXTX());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableSwapRxTx(bool enable) {
+  setBit(Offset::swapRXTX(), enable);
+}
+bool
+AnytoneCodeplug::ChannelElementGen1::rxOnly() const {
+  return getBit(Offset::rxOnly());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableRXOnly(bool enable) {
+  setBit(Offset::rxOnly(), enable);
+}
+bool
+AnytoneCodeplug::ChannelElementGen1::callConfirm() const {
+  return getBit(Offset::callConfirm());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableCallConfirm(bool enable) {
+  setBit(Offset::callConfirm(), enable);
+}
+bool
+AnytoneCodeplug::ChannelElementGen1::talkaround() const {
+  return getBit(Offset::talkaround());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableTalkaround(bool enable) {
+  setBit(Offset::talkaround(), enable);
+}
+
+bool
+AnytoneCodeplug::ChannelElementGen1::txCTCSSIsCustom() const {
+  return CUSTOM_CTCSS_TONE == getUInt8(Offset::txCTCSS());
+}
+SelectiveCall
+AnytoneCodeplug::ChannelElementGen1::txCTCSS() const {
+  return CTCSS::decode(getUInt8(Offset::txCTCSS()));
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setTXCTCSS(const SelectiveCall &tone) {
+  setUInt8(Offset::txCTCSS(), CTCSS::encode(tone));
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableTXCustomCTCSS() {
+  setUInt8(Offset::txCTCSS(), CUSTOM_CTCSS_TONE);
+}
+bool
+AnytoneCodeplug::ChannelElementGen1::rxCTCSSIsCustom() const {
+  return CUSTOM_CTCSS_TONE == getUInt8(Offset::rxCTCSS());
+}
+SelectiveCall
+AnytoneCodeplug::ChannelElementGen1::rxCTCSS() const {
+  return CTCSS::decode(getUInt8(Offset::rxCTCSS()));
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setRXCTCSS(const SelectiveCall &tone) {
+  setUInt8(Offset::rxCTCSS(), CTCSS::encode(tone));
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableRXCustomCTCSS() {
+  setUInt8(Offset::rxCTCSS(), CUSTOM_CTCSS_TONE);
+}
+
+SelectiveCall
+AnytoneCodeplug::ChannelElementGen1::txDCS() const {
+  uint16_t code = getUInt16_le(Offset::txDCS());
+  if (512 > code)
+    return SelectiveCall::fromBinaryDCS(code, false);
+  return SelectiveCall::fromBinaryDCS(code-512, true);
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setTXDCS(const SelectiveCall &code) {
+  if (code.isDCS())
+    setUInt16_le(Offset::txDCS(), code.binCode() + (code.isInverted() ? 512 : 0));
+  else
+    setUInt16_le(Offset::txDCS(), 0);
+}
+
+SelectiveCall
+AnytoneCodeplug::ChannelElementGen1::rxDCS() const {
+  uint16_t code = getUInt16_le(Offset::rxDCS());
+  if (512 > code)
+    return SelectiveCall::fromBinaryDCS(code, false);
+  return SelectiveCall::fromBinaryDCS(code-512, true);
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setRXDCS(const SelectiveCall &code) {
+  if (code.isDCS())
+    setUInt16_le(Offset::rxDCS(), code.binCode() + (code.isInverted() ? 512 : 0));
+  else
+    setUInt16_le(Offset::rxDCS(), 0);
+}
+
+double
+AnytoneCodeplug::ChannelElementGen1::customCTCSSFrequency() const {
+  return ((double) getUInt16_le(Offset::customCTCSS()))/10;
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setCustomCTCSSFrequency(double hz) {
+  setUInt16_le(Offset::customCTCSS(), hz*10);
+}
+
+unsigned
+AnytoneCodeplug::ChannelElementGen1::twoToneDecodeIndex() const {
+  return getUInt16_le(Offset::twoFunctionIndex());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setTwoToneDecodeIndex(unsigned idx) {
+  setUInt16_le(Offset::twoFunctionIndex(), idx);
+}
+
+unsigned
+AnytoneCodeplug::ChannelElementGen1::contactIndex() const {
+  return getUInt32_le(Offset::contactIndex());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setContactIndex(unsigned idx) {
+  return setUInt32_le(Offset::contactIndex(), idx);
+}
+
+unsigned
+AnytoneCodeplug::ChannelElementGen1::radioIDIndex() const {
+  return getUInt8(Offset::radioIdIndex());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setRadioIDIndex(unsigned idx) {
+  return setUInt8(Offset::radioIdIndex(), idx);
+}
+
+AnytoneFMChannelExtension::SquelchMode
+AnytoneCodeplug::ChannelElementGen1::squelchMode() const {
+  return (AnytoneFMChannelExtension::SquelchMode)getUInt3(Offset::squelchMode());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setSquelchMode(AnytoneFMChannelExtension::SquelchMode mode) {
+  setUInt3(Offset::squelchMode(), (unsigned)mode);
+}
+
+AnytoneCodeplug::ChannelElementGen1::Admit
+AnytoneCodeplug::ChannelElementGen1::admit() const {
+  return (Admit)getUInt2(Offset::admitCriterion());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setAdmit(Admit admit) {
+  setUInt2(Offset::admitCriterion(), (unsigned)admit);
+}
+
+AnytoneCodeplug::ChannelElementGen1::OptSignaling
+AnytoneCodeplug::ChannelElementGen1::optionalSignaling() const {
+  return (OptSignaling)getUInt2(Offset::optionalSingnaling());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setOptionalSignaling(OptSignaling sig) {
+  setUInt2(Offset::optionalSingnaling(), (unsigned)sig);
+}
+
+bool
+AnytoneCodeplug::ChannelElementGen1::hasScanListIndex() const {
+  return 0xff != scanListIndex();
+}
+unsigned
+AnytoneCodeplug::ChannelElementGen1::scanListIndex() const {
+  return getUInt8(Offset::scanListIndex());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setScanListIndex(unsigned idx) {
+  setUInt8(Offset::scanListIndex(), idx);
+}
+void
+AnytoneCodeplug::ChannelElementGen1::clearScanListIndex() {
+  setScanListIndex(0xff);
+}
+
+bool
+AnytoneCodeplug::ChannelElementGen1::hasGroupListIndex() const {
+  return 0xff != groupListIndex();
+}
+unsigned
+AnytoneCodeplug::ChannelElementGen1::groupListIndex() const {
+  return getUInt8(Offset::groupListIndex());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setGroupListIndex(unsigned idx) {
+  setUInt8(Offset::groupListIndex(), idx);
+}
+void
+AnytoneCodeplug::ChannelElementGen1::clearGroupListIndex() {
+  setGroupListIndex(0xff);
+}
+
+unsigned
+AnytoneCodeplug::ChannelElementGen1::twoToneIDIndex() const {
+  return getUInt8(Offset::twoToneIDIndex());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setTwoToneIDIndex(unsigned idx) {
+  setUInt8(Offset::twoToneIDIndex(), idx);
+}
+unsigned
+AnytoneCodeplug::ChannelElementGen1::fiveToneIDIndex() const {
+  return getUInt8(Offset::fiveToneIDIndex());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setFiveToneIDIndex(unsigned idx) {
+  setUInt8(Offset::fiveToneIDIndex(), idx);
+}
+unsigned
+AnytoneCodeplug::ChannelElementGen1::dtmfIDIndex() const {
+  return getUInt8(Offset::dtmfIDIndex());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setDTMFIDIndex(unsigned idx) {
+  setUInt8(Offset::dtmfIDIndex(), idx);
+}
+
+unsigned
+AnytoneCodeplug::ChannelElementGen1::colorCode() const {
+  return getUInt8(Offset::colorCode());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setColorCode(unsigned code) {
+  setUInt8(Offset::colorCode(), code);
+}
+
+DMRChannel::TimeSlot
+AnytoneCodeplug::ChannelElementGen1::timeSlot() const {
+  if (false == getBit(Offset::timeSlot()))
+    return DMRChannel::TimeSlot::TS1;
+  return DMRChannel::TimeSlot::TS2;
+}
+void
+AnytoneCodeplug::ChannelElementGen1::setTimeSlot(DMRChannel::TimeSlot ts) {
+  if (DMRChannel::TimeSlot::TS1 == ts)
+    setBit(Offset::timeSlot(), false);
+  else
+    setBit(Offset::timeSlot(), true);
+}
+
+bool
+AnytoneCodeplug::ChannelElementGen1::smsConfirm() const {
+  return getBit(Offset::smsConfirm());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableSMSConfirm(bool enable) {
+  setBit(Offset::smsConfirm(), enable);
+}
+bool
+AnytoneCodeplug::ChannelElementGen1::simplexTDMA() const {
+  return getBit(Offset::simplexTDMA());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableSimplexTDMA(bool enable) {
+  setBit(Offset::simplexTDMA(), enable);
+}
+bool
+AnytoneCodeplug::ChannelElementGen1::adaptiveTDMA() const {
+  return getBit(Offset::adaptiveTDMA());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableAdaptiveTDMA(bool enable) {
+  setBit(Offset::adaptiveTDMA(), enable);
+}
+bool
+AnytoneCodeplug::ChannelElementGen1::rxAPRS() const {
+  return getBit(Offset::rxAPRS());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableRXAPRS(bool enable) {
+  setBit(Offset::rxAPRS(), enable);
+}
+
+bool
+AnytoneCodeplug::ChannelElementGen1::loneWorker() const {
+  return getBit(Offset::loneWorker());
+}
+void
+AnytoneCodeplug::ChannelElementGen1::enableLoneWorker(bool enable) {
+  setBit(Offset::loneWorker(), enable);
+}
+
+QString
+AnytoneCodeplug::ChannelElementGen1::name() const {
+  return readASCII(Offset::name(), Limit::nameLength(), 0x00);
+}
+
+void
+AnytoneCodeplug::ChannelElementGen1::setName(const QString &name) {
+  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+}
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of AnytoneCodeplug::ChannelElementGen2
+ * ********************************************************************************************* */
+AnytoneCodeplug::ChannelElementGen2::ChannelElementGen2(uint8_t *ptr, unsigned size)
+  : ChannelElement{ptr, size}
+{
+  // pass...
+}
+
+AnytoneCodeplug::ChannelElementGen2::ChannelElementGen2(uint8_t *ptr)
+  : ChannelElement{ptr, size()}
+{
+  // pass...
+}
+
+
+void
+AnytoneCodeplug::ChannelElementGen2::clear() {
+  ChannelElement::clear();
+}
+
+
+Frequency
+AnytoneCodeplug::ChannelElementGen2::rxFrequency() const {
+  return Frequency::fromHz(static_cast<quint64>(getBCD8_be(Offset::rxFrequency()))*10);
+}
+
+void
+AnytoneCodeplug::ChannelElementGen2::setRXFrequency(Frequency hz) {
+  setBCD8_be(Offset::rxFrequency(), hz.inHz()/10);
+}
+
+
+FrequencyOffset
+AnytoneCodeplug::ChannelElementGen2::txOffset() const {
+  if (RepeaterMode::Simplex == repeaterMode())
+    return FrequencyOffset::fromHz(0);
+  auto offset = static_cast<qint64>(getBCD8_be(Offset::txFrequencyOffset()))*10;
+  return (RepeaterMode::Positive == repeaterMode())
+    ? FrequencyOffset::fromHz(offset)
+    : FrequencyOffset::fromHz(-offset);
+}
+
+void
+AnytoneCodeplug::ChannelElementGen2::setTXOffset(FrequencyOffset hz) {
+  if (hz.isZero()) {
+    setBCD8_be(Offset::txFrequencyOffset(), 0);
+    setRepeaterMode(RepeaterMode::Simplex);
+  } else {
+    setBCD8_be(Offset::txFrequencyOffset(), hz.abs().inHz()/10);
+    setRepeaterMode(hz.isPositive() ? RepeaterMode::Positive : RepeaterMode::Negative);
+  }
+}
+
+
+AnytoneCodeplug::ChannelElement::Mode
+AnytoneCodeplug::ChannelElementGen2::mode() const {
+  return static_cast<Mode>(getUInt2(Offset::channelMode()));
+}
+
+void
+AnytoneCodeplug::ChannelElementGen2::setMode(Mode mode) {
+  setUInt2(Offset::channelMode(), static_cast<unsigned>(mode));
+}
+
+
+Channel::Power
+AnytoneCodeplug::ChannelElementGen2::power() const {
+  switch (static_cast<Power>(getUInt2(Offset::power()))) {
+  case POWER_LOW: return Channel::Power::Low;
+  case POWER_MIDDLE: return Channel::Power::Mid;
+  case POWER_HIGH: return Channel::Power::High;
+  case POWER_TURBO: return Channel::Power::Max;
+  }
+  return Channel::Power::Low;
+}
+
+void
+AnytoneCodeplug::ChannelElementGen2::setPower(Channel::Power power) {
+  switch (power) {
+  case Channel::Power::Min:
+  case Channel::Power::Low:
+    setUInt2(Offset::power(), POWER_LOW);
+    break;
+  case Channel::Power::Mid:
+    setUInt2(Offset::power(), POWER_MIDDLE);
+    break;
+  case Channel::Power::High:
+    setUInt2(Offset::power(), POWER_HIGH);
+    break;
+  case Channel::Power::Max:
+    setUInt2(Offset::power(), POWER_TURBO);
+    break;
+  }
+}
+
+
+FMChannel::Bandwidth
+AnytoneCodeplug::ChannelElementGen2::bandwidth() const {
+  if (getBit(Offset::bandwidth()))
+    return FMChannel::Bandwidth::Wide;
+  return FMChannel::Bandwidth::Narrow;
+}
+
+void
+AnytoneCodeplug::ChannelElementGen2::setBandwidth(FMChannel::Bandwidth bw) {
+  switch (bw) {
+  case FMChannel::Bandwidth::Narrow: setBit(Offset::bandwidth(), false); break;
+  case FMChannel::Bandwidth::Wide: setBit(Offset::bandwidth(), true); break;
+  }
+}
+
+
+AnytoneCodeplug::ChannelElement::RepeaterMode
+AnytoneCodeplug::ChannelElementGen2::repeaterMode() const {
+  return static_cast<RepeaterMode>(getUInt2(Offset::repeaterMode()));
+}
+
+void
+AnytoneCodeplug::ChannelElementGen2::setRepeaterMode(RepeaterMode mode) {
+  setUInt2(Offset::repeaterMode(), static_cast<unsigned>(mode));
+}
+
+
+AnytoneCodeplug::ChannelElement::SignalingMode
+AnytoneCodeplug::ChannelElementGen2::rxSignalingMode() const {
+  return static_cast<SignalingMode>(getUInt2(Offset::rxSignalingMode()));
+}
+
+void
+AnytoneCodeplug::ChannelElementGen2::setRXSignalingMode(SignalingMode mode) {
+  setUInt2(Offset::rxSignalingMode(), static_cast<unsigned>(mode));
+}
+
+
+AnytoneCodeplug::ChannelElement::SignalingMode
+AnytoneCodeplug::ChannelElementGen2::txSignalingMode() const {
+  return static_cast<SignalingMode>(getUInt2(Offset::txSignalingMode()));
+}
+
+void
+AnytoneCodeplug::ChannelElementGen2::setTXSignalingMode(SignalingMode mode) {
+  setUInt2(Offset::txSignalingMode(), static_cast<unsigned>(mode));
+}
+
+
+
+
+
 /* ********************************************************************************************* *
  * Implementation of AnytoneCodeplug::ChannelBitmapElement
  * ********************************************************************************************* */
@@ -820,6 +1002,7 @@ AnytoneCodeplug::ChannelBitmapElement::ChannelBitmapElement(uint8_t *ptr)
 {
   // pass...
 }
+
 
 
 /* ********************************************************************************************* *

@@ -48,7 +48,8 @@ qt_add_library(libdmrconf SHARED
   auctus_a6_interface.cc
   dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc
   dm32uv.cc dm32uv_interface.cc dm32uv_limits.cc dm32uv_codeplug.cc dm32uv_callsigndb.cc
-  rt4d.cc rt4d_interface.cc rt4d_codeplug.cc rt4d_limits.cc)
+  rt4d.cc rt4d_interface.cc rt4d_codeplug.cc rt4d_limits.cc
+  d890uv_codeplug.cc)
 
 target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   BASE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
@@ -91,7 +92,8 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   auctus_a6_interface.hh
   dr1801uv.hh dr1801uv_interface.hh dr1801uv_codeplug.hh dr1801uv_filereader.hh dr1801uv_limits.hh
   dm32uv.hh dm32uv_interface.hh dm32uv_limits.hh dm32uv_codeplug.hh dm32uv_callsigndb.hh
-  rt4d.hh rt4d_interface.hh rt4d_codeplug.hh rt4d_limits.hh)
+  rt4d.hh rt4d_interface.hh rt4d_codeplug.hh rt4d_limits.hh
+  d890uv_codeplug.hh)
 
 
 set_target_properties(libdmrconf PROPERTIES

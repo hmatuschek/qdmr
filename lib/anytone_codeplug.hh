@@ -8,6 +8,8 @@
 #include "contact.hh"
 #include <QGeoCoordinate>
 
+#include "codeplug.hh"
+
 class RadioSettings;
 
 
@@ -60,11 +62,11 @@ public:
     virtual void enableFirst(unsigned int n);
   };
 
-  /** Represents the base class for channel encodings in all AnyTone codeplugs.
-   *
-   * Memory layout of encoded channel (0x40 bytes):
-   * @verbinclude anytone_channel.txt
-   */
+
+  /** Represents the base class for channels in all AnyTone code plugs.
+   * The encoding of these elements changed a lot over the time. Therefore, this class only
+   * implements the common logic of encoding and decoding element. It does not implement the actual
+   * encoding/decoding of the fields. */
   class ChannelElement: public Element
   {
   public:
@@ -108,7 +110,7 @@ public:
       Busy = 2                     ///< For analog channels.
     };
 
-    /** Defines all possible optional signalling settings. */
+    /** Defines all possible optional signaling settings. */
     enum class OptSignaling {
       Off = 0,                    ///< None.
       DTMF = 1,                   ///< Use DTMF.
@@ -121,170 +123,268 @@ public:
     ChannelElement(uint8_t *ptr, unsigned size);
 
   public:
-    /** Constructor. */
-    ChannelElement(uint8_t *ptr);
-    /** Destructor. */
-    virtual ~ChannelElement();
-
-    /** Returns the size of the element. */
-    static constexpr unsigned int size() { return 0x0040; }
-
     /** Resets the channel. */
-    void clear();
+    void clear() override;
 
-    /** Returns the RX frequency in Hz. */
-    virtual unsigned rxFrequency() const;
-    /** Sets the RX frequency in Hz. */
-    virtual void setRXFrequency(unsigned hz);
+    /** Returns the RX frequency. */
+    [[nodiscard]] virtual Frequency rxFrequency() const = 0;
+    /** Sets the RX frequency. */
+    virtual void setRXFrequency(Frequency hz) = 0;
 
-    /** Returns the TX frequency offset in Hz.
-     * This method returns an unsigned value, the sign of the offset frequency is stored in
-     * @c repeaterMode(). */
-    virtual unsigned txOffset() const;
-    /** Sets the TX frequency offset in Hz.
-     * This method accepts unsigned values, the sign of the offset frequency is stored in
-     * @c repeaterMode(). */
-    virtual void setTXOffset(unsigned hz);
-    /** Returns the TX frequency in Hz. */
-    virtual unsigned txFrequency() const;
-    /** Sets the TX frequency indirectly. That is, relative to the RX frequency which must be set
-     * first. This method also updates the @c repeaterMode. */
-    virtual void setTXFrequency(unsigned hz);
+    /** Returns the TX frequency. */
+    [[nodiscard]] virtual Frequency txFrequency() const;
+    /** Sets the TX frequency indirectly. Also updates repeater mode. */
+    virtual void setTXFrequency(Frequency hz);
 
-    /** Returns the channel mode (analog, digtital, etc). */
-    virtual Mode mode() const;
+    /** Returns the channel mode (analog, digital, etc). */
+    [[nodiscard]] virtual Mode mode() const = 0;
     /** Sets the channel mode. */
-    virtual void setMode(Mode mode);
+    virtual void setMode(Mode mode) = 0;
 
     /** Returns the channel power. */
-    virtual Channel::Power power() const;
+    [[nodiscard]] virtual Channel::Power power() const = 0;
     /** Sets the channel power. */
-    virtual void setPower(Channel::Power power);
+    virtual void setPower(Channel::Power power) = 0;
 
-    /** Returns the band width of the channel. */
-    virtual FMChannel::Bandwidth bandwidth() const;
-    /** Sets the band width of the channel. */
-    virtual void setBandwidth(FMChannel::Bandwidth bw);
+    /** Returns the bandwidth of the channel. */
+    [[nodiscard]] virtual FMChannel::Bandwidth bandwidth() const = 0;
+    /** Sets the bandwidth of the channel. */
+    virtual void setBandwidth(FMChannel::Bandwidth bw) = 0;
 
-    /** Returns the transmit offset direction. */
-    virtual RepeaterMode repeaterMode() const;
-    /** Sets the transmit offset direction. */
-    virtual void setRepeaterMode(RepeaterMode mode);
-
-    /** Returns the RX signaling mode */
-    virtual SignalingMode rxSignalingMode() const;
-    /** Sets the RX signaling mode */
-    virtual void setRXSignalingMode(SignalingMode mode);
     /** Simplified access to RX signaling (tone). */
-    virtual SelectiveCall rxTone() const;
+    [[nodiscard]] virtual SelectiveCall rxTone() const;
     /** Sets the RX signaling (tone). */
     virtual void setRXTone(const SelectiveCall &code);
-
-    /** Returns the TX signaling mode */
-    virtual SignalingMode txSignalingMode() const;
-    /** Sets the TX signaling mode */
-    virtual void setTXSignalingMode(SignalingMode mode);
     /** Simplified access to TX signaling (tone). */
-    virtual SelectiveCall txTone() const;
+    [[nodiscard]] virtual SelectiveCall txTone() const;
     /** Sets the RX signaling (tone). */
     virtual void setTXTone(const SelectiveCall &code);
 
     /** Returns @c true if RX and TX frequencies are swapped. */
-    virtual bool rxTxSwapped() const;
+    [[nodiscard]] virtual bool rxTxSwapped() const = 0;
     /** Swaps RX and TX frequencies. */
-    virtual void enableSwapRxTx(bool enable);
+    virtual void enableSwapRxTx(bool enable) = 0;
 
     /** Returns @c true if the RX only is enabled. */
-    virtual bool rxOnly() const;
+    [[nodiscard]] virtual bool rxOnly() const = 0;
     /** Enables/disables RX only. */
-    virtual void enableRXOnly(bool enable);
+    virtual void enableRXOnly(bool enable) = 0;
+
     /** Returns @c true if the call confirm is enabled. */
-    virtual bool callConfirm() const;
+    [[nodiscard]] virtual bool callConfirm() const = 0;
     /** Enables/disables call confirm. */
-    virtual void enableCallConfirm(bool enable);
-    /** Returns @c true if the talkaround is enabled. */
-    virtual bool talkaround() const;
-    /** Enables/disables talkaround. */
-    virtual void enableTalkaround(bool enable);
+    virtual void enableCallConfirm(bool enable) = 0;
+
+    /** Returns @c true if talk around is enabled. */
+    [[nodiscard]] virtual bool talkaround() const = 0;
+    /** Enables/disables talk around. */
+    virtual void enableTalkaround(bool enable) = 0;
+
+    /** Returns the transmit contact index (0-based). */
+    [[nodiscard]] virtual unsigned contactIndex() const = 0;
+    /** Sets the transmit contact index (0-based). */
+    virtual void setContactIndex(unsigned idx) = 0;
+
+    /** Returns the radio ID index (0-based). */
+    [[nodiscard]] virtual unsigned radioIDIndex() const = 0;
+    /** Sets the radio ID index (0-based). */
+    virtual void setRadioIDIndex(unsigned idx) = 0;
+
+    /** Returns @c true if the squelch is silent and @c false if open. */
+    [[nodiscard]] virtual AnytoneFMChannelExtension::SquelchMode squelchMode() const = 0;
+    /** Enables/disables silent squelch. */
+    virtual void setSquelchMode(AnytoneFMChannelExtension::SquelchMode mode) = 0;
+
+    /** Returns the admit criterion. */
+    [[nodiscard]] virtual Admit admit() const = 0;
+    /** Sets the admit criterion. */
+    virtual void setAdmit(Admit admit) = 0;
+
+    /** Returns @c true, if a scan list index is set. */
+    [[nodiscard]] virtual bool hasScanListIndex() const = 0;
+    /** Returns the scan list index (0-based). */
+    [[nodiscard]] virtual unsigned scanListIndex() const = 0;
+    /** Sets the scan list index (0-based). */
+    virtual void setScanListIndex(unsigned idx) = 0;
+    /** Clears the scan list index. */
+    virtual void clearScanListIndex() = 0;
+
+    /** Returns @c true, if a group list index is set. */
+    [[nodiscard]] virtual bool hasGroupListIndex() const = 0;
+    /** Returns the scan list index (0-based). */
+    [[nodiscard]] virtual unsigned groupListIndex() const = 0;
+    /** Sets the group list index (0-based). */
+    virtual void setGroupListIndex(unsigned idx) = 0;
+    /** Clears the group list index. */
+    virtual void clearGroupListIndex() = 0;
+
+    /** Returns the color code. */
+    [[nodiscard]] virtual unsigned colorCode() const = 0;
+    /** Sets the color code. */
+    virtual void setColorCode(unsigned code) = 0;
+
+    /** Returns the time slot. */
+    [[nodiscard]] virtual DMRChannel::TimeSlot timeSlot() const = 0;
+    /** Sets the time slot. */
+    virtual void setTimeSlot(DMRChannel::TimeSlot ts) = 0;
+
+    /** Returns @c true if SMS confirmation is enabled. */
+    [[nodiscard]] virtual bool smsConfirm() const = 0;
+    /** Enables/disables SMS confirmation. */
+    virtual void enableSMSConfirm(bool enable) = 0;
+    /** Returns @c true if simplex TDMA is enabled. */
+    [[nodiscard]] virtual bool simplexTDMA() const = 0;
+    /** Enables/disables simplex TDMA confirmation. */
+    virtual void enableSimplexTDMA(bool enable) = 0;
+    /** Returns @c true if adaptive TDMA is enabled. */
+    [[nodiscard]] virtual bool adaptiveTDMA() const = 0;
+    /** Enables/disables adaptive TDMA. */
+    virtual void enableAdaptiveTDMA(bool enable) = 0;
+    /** Returns @c true if RX APRS is enabled. */
+    [[nodiscard]] virtual bool rxAPRS() const = 0;
+    /** Enables/disables RX APRS. */
+    virtual void enableRXAPRS(bool enable) = 0;
+    /** Returns @c true if lone worker is enabled. */
+    [[nodiscard]] virtual bool loneWorker() const = 0;
+    /** Enables/disables lone worker. */
+    virtual void enableLoneWorker(bool enable) = 0;
+
+    /** Returns the channel name. */
+    [[nodiscard]] virtual QString name() const = 0;
+    /** Sets the channel name. */
+    virtual void setName(const QString &name) = 0;
+
+    /** Constructs a generic @c Channel object from the codeplug channel. */
+    virtual Channel *decode(Context &ctx, const ErrorStack &err) const;
+    /** Links a previously constructed channel to the rest of the configuration. */
+    virtual bool link(Channel *c, Context &ctx, const ErrorStack &err) const;
+    /** Initializes this codeplug channel from the given generic configuration. */
+    virtual bool encode(const Channel *c, Context &ctx, const ErrorStack &err);
+
+
+  protected:
+    /** Returns the TX frequency offset. */
+    [[nodiscard]] virtual FrequencyOffset txOffset() const=0;
+    /** Sets the TX frequency offset. This also updates the repeater mode.*/
+    virtual void setTXOffset(FrequencyOffset hz)=0;
+    /** Returns the transmit offset direction. */
+    [[nodiscard]] virtual RepeaterMode repeaterMode() const = 0;
+    /** Sets the transmit offset direction. */
+    virtual void setRepeaterMode(RepeaterMode mode) = 0;
+
+    /** Returns the RX signaling mode */
+    [[nodiscard]] virtual SignalingMode rxSignalingMode() const = 0;
+    /** Sets the RX signaling mode */
+    virtual void setRXSignalingMode(SignalingMode mode) = 0;
+    /** Returns the TX signaling mode */
+    [[nodiscard]] virtual SignalingMode txSignalingMode() const = 0;
+    /** Sets the TX signaling mode */
+    virtual void setTXSignalingMode(SignalingMode mode) = 0;
 
     /** Returns @c true if the TX CTCSS tone frequency is custom (non standard). */
-    virtual bool txCTCSSIsCustom() const;
+    [[nodiscard]] virtual bool txCTCSSIsCustom() const = 0;
     /** Returns the TX CTCSS tone. */
-    virtual SelectiveCall txCTCSS() const;
+    [[nodiscard]] virtual SelectiveCall txCTCSS() const = 0;
     /** Sets the TX CTCSS tone. */
-    virtual void setTXCTCSS(const SelectiveCall &tone);
+    virtual void setTXCTCSS(const SelectiveCall &tone) = 0;
     /** Enables TX custom CTCSS frequency. */
-    virtual void enableTXCustomCTCSS();
+    virtual void enableTXCustomCTCSS() = 0;
     /** Returns @c true if the RX CTCSS tone frequency is custom (non standard). */
-    virtual bool rxCTCSSIsCustom() const;
+    [[nodiscard]] virtual bool rxCTCSSIsCustom() const = 0;
     /** Returns the RX CTCSS tone. */
-    virtual SelectiveCall rxCTCSS() const;
+    [[nodiscard]] virtual SelectiveCall rxCTCSS() const = 0;
     /** Sets the RX CTCSS tone. */
-    virtual void setRXCTCSS(const SelectiveCall &tone);
+    virtual void setRXCTCSS(const SelectiveCall &tone) = 0;
     /** Enables RX custom CTCSS frequency. */
-    virtual void enableRXCustomCTCSS();
-
+    virtual void enableRXCustomCTCSS() = 0;
     /** Returns the TX DCS code. */
-    virtual SelectiveCall txDCS() const;
+    [[nodiscard]] virtual SelectiveCall txDCS() const = 0;
     /** Sets the TX DCS code. */
-    virtual void setTXDCS(const SelectiveCall &code);
+    virtual void setTXDCS(const SelectiveCall &code) = 0;
     /** Returns the RX DCS code. */
-    virtual SelectiveCall rxDCS() const;
+    [[nodiscard]] virtual SelectiveCall rxDCS() const = 0;
     /** Sets the RX DCS code. */
-    virtual void setRXDCS(const SelectiveCall &code);
-
+    virtual void setRXDCS(const SelectiveCall &code) = 0;
     /** Returns the custom CTCSS frequency in Hz. */
-    virtual double customCTCSSFrequency() const;
+    [[nodiscard]] virtual double customCTCSSFrequency() const = 0;
     /** Sets the custom CTCSS frequency in Hz. */
-    virtual void setCustomCTCSSFrequency(double hz);
+    virtual void setCustomCTCSSFrequency(double hz) = 0;
+  };
+
+
+  /** Implements encoding/decoding of common channel fields for the first generation of AnyTone
+   * devices. I.e., the D868UV, D878UV, D578UV & D168UV series. */
+  class ChannelElementGen1: public ChannelElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelElementGen1(uint8_t *ptr, unsigned size);
+
+    /** Constructor. */
+    ChannelElementGen1(uint8_t *ptr);
+
+  public:
+    /** Destructor. */
+    virtual ~ChannelElementGen1();
+
+    /** Returns the size of the element. */
+    static constexpr unsigned int size() { return 0x0040; }
+
+    void clear();
+
+    [[nodiscard]] Frequency rxFrequency() const override;
+    void setRXFrequency(Frequency hz) override;
+
+    [[nodiscard]] Mode mode() const override;
+    void setMode(Mode mode) override;
+
+    [[nodiscard]] Channel::Power power() const override;
+    void setPower(Channel::Power power) override;
+
+    [[nodiscard]] FMChannel::Bandwidth bandwidth() const override;
+    void setBandwidth(FMChannel::Bandwidth bw) override;
+
+    [[nodiscard]] bool rxTxSwapped() const override;
+    void enableSwapRxTx(bool enable) override;
+
+    [[nodiscard]] bool rxOnly() const override;
+    void enableRXOnly(bool enable) override;
+    [[nodiscard]] bool callConfirm() const override;
+    void enableCallConfirm(bool enable) override;
+    [[nodiscard]] bool talkaround() const override;
+    void enableTalkaround(bool enable) override;
 
     /** Returns the 2-tone decode index (0-based). */
-    virtual unsigned twoToneDecodeIndex() const;
+    [[nodiscard]] virtual unsigned twoToneDecodeIndex() const;
     /** Sets the 2-tone decode index (0-based). */
     virtual void setTwoToneDecodeIndex(unsigned idx);
 
-    /** Returns the transmit contact index (0-based). */
-    virtual unsigned contactIndex() const;
-    /** Sets the transmit contact index (0-based). */
-    virtual void setContactIndex(unsigned idx);
+    [[nodiscard]] unsigned contactIndex() const override;
+    void setContactIndex(unsigned idx) override;
 
-    /** Returns the radio ID index (0-based). */
-    virtual unsigned radioIDIndex() const;
-    /** Sets the radio ID index (0-based). */
-    virtual void setRadioIDIndex(unsigned idx);
+    [[nodiscard]] unsigned radioIDIndex() const override;
+    void setRadioIDIndex(unsigned idx) override;
 
-    /** Returns @c true if the sequelch is silent and @c false if open. */
-    virtual AnytoneFMChannelExtension::SquelchMode squelchMode() const;
-    /** Enables/disables silent squelch. */
-    virtual void setSquelchMode(AnytoneFMChannelExtension::SquelchMode mode);
+    [[nodiscard]] AnytoneFMChannelExtension::SquelchMode squelchMode() const override;
+    void setSquelchMode(AnytoneFMChannelExtension::SquelchMode mode) override;
 
-    /** Returns the admit criterion. */
-    virtual Admit admit() const;
-    /** Sets the admit criterion. */
-    virtual void setAdmit(Admit admit);
+    [[nodiscard]] Admit admit() const override;
+    void setAdmit(Admit admit) override;
 
-    /** Returns the optional signalling type. */
-    virtual OptSignaling optionalSignaling() const;
+    /** Returns the optional signaling type. */
+    [[nodiscard]] virtual OptSignaling optionalSignaling() const;
     /** Sets the optional signaling type. */
     virtual void setOptionalSignaling(OptSignaling sig);
 
-    /** Returns @c true, if a scan list index is set. */
-    virtual bool hasScanListIndex() const;
-    /** Returns the scan list index (0-based). */
-    virtual unsigned scanListIndex() const;
-    /** Sets the scan list index (0-based). */
-    virtual void setScanListIndex(unsigned idx);
-    /** Clears the scan list index. */
-    virtual void clearScanListIndex();
+    [[nodiscard]] bool hasScanListIndex() const override;
+    [[nodiscard]] unsigned scanListIndex() const override;
+    void setScanListIndex(unsigned idx) override;
+    void clearScanListIndex() override;
 
-    /** Returns @c true, if a group list index is set. */
-    virtual bool hasGroupListIndex() const;
-    /** Returns the scan list index (0-based). */
-    virtual unsigned groupListIndex() const;
-    /** Sets the group list index (0-based). */
-    virtual void setGroupListIndex(unsigned idx);
-    /** Clears the group list index. */
-    virtual void clearGroupListIndex();
+    [[nodiscard]] bool hasGroupListIndex() const override;
+    [[nodiscard]] unsigned groupListIndex() const override;
+    void setGroupListIndex(unsigned idx) override;
+    void clearGroupListIndex() override;
 
     /** Returns the two-tone ID index (0-based). */
     virtual unsigned twoToneIDIndex() const;
@@ -299,48 +399,49 @@ public:
     /** Sets the DTMF ID index (0-based). */
     virtual void setDTMFIDIndex(unsigned idx);
 
-    /** Returns the color code. */
-    virtual unsigned colorCode() const;
-    /** Sets the color code. */
-    virtual void setColorCode(unsigned code);
+    [[nodiscard]] unsigned colorCode() const override;
+    void setColorCode(unsigned code) override;
 
-    /** Returns the time slot. */
-    virtual DMRChannel::TimeSlot timeSlot() const;
-    /** Sets the time slot. */
-    virtual void setTimeSlot(DMRChannel::TimeSlot ts);
+    [[nodiscard]] DMRChannel::TimeSlot timeSlot() const override;
+    void setTimeSlot(DMRChannel::TimeSlot ts) override;
 
-    /** Returns @c true if SMS confirmation is enabled. */
-    virtual bool smsConfirm() const;
-    /** Enables/disables SMS confirmation. */
-    virtual void enableSMSConfirm(bool enable);
-    /** Returns @c true if simplex TDMA is enabled. */
-    virtual bool simplexTDMA() const;
-    /** Enables/disables simplex TDMA confirmation. */
-    virtual void enableSimplexTDMA(bool enable);
-    /** Returns @c true if adaptive TDMA is enabled. */
-    virtual bool adaptiveTDMA() const;
-    /** Enables/disables adaptive TDMA. */
-    virtual void enableAdaptiveTDMA(bool enable);
-    /** Returns @c true if RX APRS is enabled. */
-    virtual bool rxAPRS() const;
-    /** Enables/disables RX APRS. */
-    virtual void enableRXAPRS(bool enable);
-    /** Returns @c true if lone worker is enabled. */
-    virtual bool loneWorker() const;
-    /** Enables/disables lone worker. */
-    virtual void enableLoneWorker(bool enable);
+    [[nodiscard]] bool smsConfirm() const override;
+    void enableSMSConfirm(bool enable) override;
+    [[nodiscard]] bool simplexTDMA() const override;
+    void enableSimplexTDMA(bool enable) override;
+    [[nodiscard]] bool adaptiveTDMA() const override;
+    void enableAdaptiveTDMA(bool enable) override;
+    [[nodiscard]] bool rxAPRS() const override;
+    void enableRXAPRS(bool enable) override;
+    [[nodiscard]] bool loneWorker() const override;
+    void enableLoneWorker(bool enable) override;
 
-    /** Returns the channel name. */
-    virtual QString name() const;
-    /** Sets the channel name. */
-    virtual void setName(const QString &name);
+    [[nodiscard]] QString name() const override;
+    void setName(const QString &name) override;
 
-    /** Constructs a generic @c Channel object from the codeplug channel. */
-    virtual Channel *toChannelObj(Context &ctx) const;
-    /** Links a previously constructed channel to the rest of the configuration. */
-    virtual bool linkChannelObj(Channel *c, Context &ctx) const;
-    /** Initializes this codeplug channel from the given generic configuration. */
-    virtual bool fromChannelObj(const Channel *c, Context &ctx);
+  protected:
+    [[nodiscard]] FrequencyOffset txOffset() const override;
+    void setTXOffset(FrequencyOffset hz) override;
+    [[nodiscard]] RepeaterMode repeaterMode() const override;
+    void setRepeaterMode(RepeaterMode mode) override;
+    [[nodiscard]] SignalingMode rxSignalingMode() const override;
+    void setRXSignalingMode(SignalingMode mode) override;
+    [[nodiscard]] SignalingMode txSignalingMode() const override;
+    void setTXSignalingMode(SignalingMode mode) override;
+    [[nodiscard]] bool txCTCSSIsCustom() const override;
+    [[nodiscard]] SelectiveCall txCTCSS() const override;
+    void setTXCTCSS(const SelectiveCall &tone) override;
+    void enableTXCustomCTCSS() override;
+    [[nodiscard]] bool rxCTCSSIsCustom() const override;
+    [[nodiscard]] SelectiveCall rxCTCSS() const override;
+    void setRXCTCSS(const SelectiveCall &tone) override;
+    void enableRXCustomCTCSS() override;
+    [[nodiscard]] SelectiveCall txDCS() const override;
+    void setTXDCS(const SelectiveCall &code) override;
+    [[nodiscard]] SelectiveCall rxDCS() const override;
+    void setRXDCS(const SelectiveCall &code) override;
+    [[nodiscard]] double customCTCSSFrequency() const override;
+    void setCustomCTCSSFrequency(double hz) override;
 
   public:
     /** Some limits for the channel element. */
@@ -351,7 +452,7 @@ public:
 
   protected:
     /** Internal used offsets within the channel element. */
-    struct Offset: public Element::Offset {
+    struct Offset: Element::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int rxFrequency()       { return 0x0000; }
       static constexpr unsigned int txFrequencyOffset() { return 0x0004; }
@@ -392,6 +493,126 @@ public:
       /// @endcond
     };
   };
+
+
+  /** Implements encoding/decoding of common channel fields for the first generation of AnyTone
+   * devices. I.e., the D890UV series. */
+  class ChannelElementGen2: public ChannelElement
+  {
+  protected:
+    /** Hidden constructor. */
+    ChannelElementGen2(uint8_t *ptr, unsigned size);
+
+    /** Constructor from pointer. */
+    ChannelElementGen2(uint8_t *ptr);
+
+  public:
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0080; }
+
+    void clear() override;
+
+    [[nodiscard]] Frequency rxFrequency() const override;
+    void setRXFrequency(Frequency hz) override;
+
+    [[nodiscard]] Mode mode() const override;
+    void setMode(Mode mode) override;
+
+    [[nodiscard]] Channel::Power power() const override;
+    void setPower(Channel::Power power) override;
+
+    [[nodiscard]] FMChannel::Bandwidth bandwidth() const override;
+    void setBandwidth(FMChannel::Bandwidth bw) override;
+
+
+  protected:
+    [[nodiscard]] FrequencyOffset txOffset() const override;
+    void setTXOffset(FrequencyOffset hz) override;
+    [[nodiscard]] RepeaterMode repeaterMode() const override;
+    void setRepeaterMode(RepeaterMode mode) override;
+    [[nodiscard]] SignalingMode rxSignalingMode() const override;
+    void setRXSignalingMode(SignalingMode mode) override;
+    [[nodiscard]] SignalingMode txSignalingMode() const override;
+    void setTXSignalingMode(SignalingMode mode) override;
+
+
+  public:
+    /** Some limits for the channel element. */
+    struct Limit: Element::Limit {
+      /// Maximum name length.
+      static constexpr unsigned int nameLength() { return 16; }
+    };
+
+  protected:
+    /** Internal used offsets within the channel element. */
+    struct Offset: Element::Offset {
+      /// @cond DO_NOT_DOCUMENT
+      static constexpr unsigned int rxFrequency()       { return 0x0000; }
+      static constexpr unsigned int txFrequencyOffset() { return 0x0004; }
+      static constexpr Bit channelMode()                { return {0x0008, 0}; }
+      static constexpr Bit power()                      { return {0x0008, 2}; }
+      static constexpr Bit bandwidth()                  { return {0x0008, 4}; }
+      static constexpr Bit repeaterMode()               { return {0x0008, 6}; }
+      static constexpr Bit rxSignalingMode()            { return {0x0009, 0}; }
+      static constexpr Bit txSignalingMode()            { return {0x0009, 2}; }
+      static constexpr Bit swapRXTX()                   { return {0x0009, 4}; }
+      static constexpr Bit rxOnly()                     { return {0x0009, 5}; }
+      static constexpr Bit callConfirm()                { return {0x0009, 6}; }
+      static constexpr Bit talkaround()                 { return {0x0009, 7}; }
+      static constexpr unsigned int txCTCSS()           { return 0x000a; }
+      static constexpr unsigned int rxCTCSS()           { return 0x000b; }
+      static constexpr unsigned int txDCS()             { return 0x000c; }
+      static constexpr unsigned int rxDCS()             { return 0x000e; }
+      static constexpr unsigned int customCTCSS()       { return 0x0010; }
+      static constexpr unsigned int twoFunctionIndex()  { return 0x0012; }
+      static constexpr unsigned int contactIndex()      { return 0x0014; }
+      static constexpr unsigned int radioIdIndex()      { return 0x0018; }
+      static constexpr Bit squelchMode()                { return {0x0019, 4}; }
+      static constexpr Bit pttId()                      { return {0x0019, 0}; }
+      static constexpr Bit admitCriterion()             { return {0x001a, 0}; }
+      static constexpr Bit optionalSingnaling()         { return {0x001a, 4}; }
+      static constexpr unsigned int scanListIndex()     { return 0x001b; }
+      static constexpr unsigned int groupListIndex()    { return 0x001c; }
+      static constexpr unsigned int twoToneIDIndex()    { return 0x001d; }
+      static constexpr unsigned int fiveToneIDIndex()   { return 0x001e; }
+      static constexpr unsigned int dtmfIDIndex()       { return 0x001f; }
+      static constexpr unsigned int colorCode()         { return 0x0020; }
+      static constexpr Bit timeSlot()                   { return {0x0021, 0}; }
+      static constexpr Bit smsConfirm()                 { return {0x0021, 1}; }
+      static constexpr Bit simplexTDMA()                { return {0x0021, 2}; }
+      static constexpr Bit adaptiveTDMA()               { return {0x0021, 4}; }
+      static constexpr Bit rxAPRS()                     { return {0x0021, 5}; }
+      static constexpr Bit encryptionType()             { return {0x0021, 6}; }
+      static constexpr Bit loneWorker()                 { return {0x0021, 7}; }
+      static constexpr unsigned int aesKeyIndex()       { return 0x0022; }
+      static constexpr Bit ranging()                    { return {0x0034, 0}; }
+      static constexpr Bit simplex()                    { return {0x0034, 1}; }
+      static constexpr Bit excludeFromRoaming()         { return {0x0034, 2}; }
+      static constexpr Bit disableDataACK()             { return {0x0034, 3}; }
+      static constexpr Bit autoScan()                   { return {0x0034, 4}; }
+      static constexpr Bit idleTSSwitch()               { return {0x0034, 5}; }
+      static constexpr Bit dmrIgnoreCRC()               { return {0x0034, 7}; }
+      static constexpr unsigned int aprsType()          { return 0x0035; }
+      static constexpr unsigned int dmrAPRSIndex()      { return 0x0036; }
+      static constexpr unsigned int freqCorrection()    { return 0x0039; }
+      static constexpr unsigned int dmrKexIndex()       { return 0x003a; }
+      static constexpr Bit multipleKeys()               { return {0x003b, 0}; }
+      static constexpr Bit randomKey()                  { return {0x003b, 1}; }
+      static constexpr Bit smsForbid()                  { return {0x003b, 2}; }
+      static constexpr Bit sendTalkerAlias()            { return {0x003b, 4}; }
+      static constexpr Bit extendedEncryptionType()     { return {0x003b, 5}; }
+      static constexpr unsigned int arc4KexIndex()      { return 0x003d; }
+      static constexpr unsigned int scrambler()         { return 0x003e; }
+      static constexpr unsigned int customScrambler()   { return 0x003f; }
+      static constexpr unsigned int fiveToneBOT()       { return 0x0040; }
+      static constexpr unsigned int fiveToneEOT()       { return 0x0041; }
+      static constexpr unsigned int qdc1200Index()      { return 0x0042; }
+      static constexpr unsigned int txColorCode()       { return 0x0043; }
+      static constexpr unsigned int name()              { return 0x0044; }
+      /// @endcond
+    };
+  };
+
 
   /** Represents the channel bitmaps in all AnyTone codeplugs. */
   class ChannelBitmapElement: public BitmapElement
