@@ -22,6 +22,10 @@ public:
 signals:
   void selected(const SelectiveCall &call);
 
+protected slots:
+  void onCTCSSEdited();
+  void onDCSEdited();
+
 private:
   QComboBox *_typeSelection;
   QStackedWidget *_stack;

@@ -31,6 +31,10 @@ public:
     /** Decodes to Signaling::Code CTCSS tones. */
     static SelectiveCall decode(uint8_t code);
 
+  public:
+    /** The index corresponding to a custom CTCSS tone. */
+    static constexpr uint8_t customIndex() { return 51; };
+
   protected:
     /** Translation table. */
     static SelectiveCall _codeTable[52];
