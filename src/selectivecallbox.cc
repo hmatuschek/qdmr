@@ -105,24 +105,31 @@ SelectiveCallBox::setSelectiveCall(const SelectiveCall &call) {
   }
 }
 
+
 SelectiveCall
 SelectiveCallBox::selectiveCall() const {
-  if (0 == _typeSelection->currentIndex()) {
-    return SelectiveCall();
-  } else if (1 == _typeSelection->currentIndex()) {
+  // handle CTCSS setting
+  if (1 == _typeSelection->currentIndex()) {
+    // idx < 0 if edited (custom CTCSS frequency)
     int idx = _ctcss->currentIndex();
-    if (0 >= idx)
+    if (0 <= idx)
       return _ctcss->currentData().value<SelectiveCall>();
     return SelectiveCall::parseCTCSS(_ctcss->currentText());
-  } else if (2 == _typeSelection->currentIndex()) {
+  }
+
+  // handle DCS setting
+  if (2 == _typeSelection->currentIndex()) {
+    // idx < 0 if edited (custom DCS code)
     int idx = _dcs->currentIndex();
-    if (0 >= idx)
+    if (0 <= idx)
       return SelectiveCall(_dcs->currentData().toUInt(), _inverted->isChecked());
     return SelectiveCall(_dcs->currentText().toUInt(), _inverted->isChecked());
   }
 
+  // none
   return SelectiveCall();
 }
+
 
 
 /* ********************************************************************************************* *
