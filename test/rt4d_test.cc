@@ -104,7 +104,7 @@ RT4DTest::testAMChannelReencoding() {
   QCOMPARE(testConfig.channelList()->count(), config.channelList()->count());
   QVERIFY(testConfig.channelList()->channel(0)->is<AMChannel>());
   QCOMPARE(testConfig.channelList()->channel(0)->rxFrequency(), Frequency::fromMHz(121.13));
-  QVERIFY(testConfig.channelList()->channel(0)->txFrequency().isZero());
+  QVERIFY(testConfig.channelList()->channel(0)->rxOnly());
 }
 
 
