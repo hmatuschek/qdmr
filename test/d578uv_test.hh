@@ -16,6 +16,8 @@ private slots:
   void testBasicConfigDecoding();
   void testChannelFrequency();
   void testARC4Encryption();
+  void testAESEncryption();
+  void testAESEncryptionWithoutKeyDoesNotEnableEncryption();
   void testAMChannel();
   void testMicGain(); // Retression test for #773
   void testChannelDataACK(); // Regression test for #813

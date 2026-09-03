@@ -150,6 +150,17 @@ D578UVCodeplug::ChannelElement::setEncryptionType(AdvancedEncryptionType type) {
 
 
 bool
+D578UVCodeplug::ChannelElement::digitalEncryptionEnabled() const {
+  return 0 != getUInt8(Offset::digitalEncryption());
+}
+
+void
+D578UVCodeplug::ChannelElement::enableDigitalEncryption(bool enable) {
+  setUInt8(Offset::digitalEncryption(), enable ? 0x01 : 0x00);
+}
+
+
+bool
 D578UVCodeplug::ChannelElement::analogScamblerEnabled() const {
   return FMScramblerFrequency::Off != (FMScramblerFrequency)getUInt8(Offset::fmScrambler());
 }
@@ -264,6 +275,7 @@ D578UVCodeplug::ChannelElement::fromChannelObj(const Channel *ch, Context &ctx) 
 
   // Apply extensions
   if (const FMChannel *fch = ch->as<FMChannel>()) {
+    enableDigitalEncryption(false);
     if (AnytoneFMChannelExtension *ext = fch->anytoneChannelExtension()) {
       // Common settings
       enableBluetooth(ext->handsFree());
@@ -278,6 +290,12 @@ D578UVCodeplug::ChannelElement::fromChannelObj(const Channel *ch, Context &ctx) 
       // Common settings
       enableBluetooth(ext->handsFree());
       // DMR specific extensions
+    }
+    // Enable digital encryption if a key is assigned to this channel
+    if (CommercialChannelExtension *ext = dch->commercialExtension()) {
+      enableDigitalEncryption(nullptr != ext->encryptionKey());
+    } else {
+      enableDigitalEncryption(false);
     }
   }
 
