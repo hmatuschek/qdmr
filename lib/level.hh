@@ -58,10 +58,18 @@ public:
 
   /** Returns the value of the level. */
   inline unsigned int value() const { return _level; }
-  inline unsigned int mapTo(const Codeplug::Element::Limit::Range<unsigned int> &range) const {
-    if (isNull() || isInvalid())
-      return 0;
-    return Codeplug::Element::Limit::Range<unsigned int>{1,10}.mapTo(range, value());
+  /** Maps a level (i.e., [1,10]) to a given value range.
+   * Special values (null, invalid) are mapped to the given values or to range.min if not specified. */
+  inline unsigned int mapTo(const Codeplug::Element::Limit::Range<unsigned int> &range,
+                            unsigned int nullValue=std::numeric_limits<unsigned int>::max(),
+                            unsigned int invalidValue=std::numeric_limits<unsigned int>::max()) const {
+    if (isNull() && std::numeric_limits<unsigned int>::max() != nullValue)
+      return nullValue;
+    if (isInvalid() && std::numeric_limits<unsigned int>::max() != invalidValue)
+      return invalidValue;
+    if (isFinite())
+      return Codeplug::Element::Limit::Range<unsigned int>{1,10}.mapTo(range, value());
+    return range.min;
   }
 
   /** Format the frequency. */
@@ -71,15 +79,21 @@ public:
 
 public:
   /** Constructs null level. */
-  inline static constexpr Level null() { return Level(0); }
+  static constexpr Level null() { return Level(0); }
   /** Constructs an invalid level. */
-  inline static constexpr Level invalid() { return Level(std::numeric_limits<unsigned int>::max()); }
-  /** Constructs a proper level. */
-  inline static constexpr Level fromValue(unsigned int value, const Codeplug::Element::Limit::Range<unsigned int> range={1,10}) {
-    // If 0 is not in normal range -> always may 0 -> 0 (e.g. means off).
-    if ((0 == value) && (0 != range.min))
-      return Level::null();
-    return Level(range.mapTo({1,10},value));
+  static constexpr Level invalid() { return Level(std::numeric_limits<unsigned int>::max()); }
+  /** Constructs a proper level from a given value.
+   * The value must be within the given range or the null/invalue value.
+   * If the value is outside the range, an invalid level is returned. */
+  static constexpr Level fromValue(unsigned int value,
+    const Codeplug::Element::Limit::Range<unsigned int> range={1,10},
+    unsigned int nullValue=std::numeric_limits<unsigned int>::max(),
+    unsigned int invalidValue=std::numeric_limits<unsigned int>::max()) {
+    if (nullValue == value)
+      return null();
+    if (invalidValue == value || ! range.in(value))
+      return invalid();
+    return Level(range.mapTo({1,10}, value));
   }
 
 protected:
