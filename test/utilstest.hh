@@ -23,6 +23,7 @@ private slots:
   void testLocator();
   void testEndianess();
   void testFrequencyNearestMap();
+  void testLevel();
 };
 
 #endif // UTILSTEST_HH

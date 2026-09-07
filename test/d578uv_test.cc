@@ -150,14 +150,14 @@ D578UVTest::testSettingsDisplayVolumeChangePrompt() {
 void
 D578UVTest::testMicGain() {
   Config copy, config; config.copy(_basicConfig);
-  config.settings()->audio()->setMicGain(Level::fromValue(10));
+  config.settings()->audio()->setMicGain(Level::fromValue(9));
   encodeDecode(config, copy);
-  QCOMPARE(copy.settings()->audio()->micGain(), Level::fromValue(10));
+  QCOMPARE(copy.settings()->audio()->micGain(), Level::fromValue(9));
   QVERIFY(copy.settings()->anytoneExtension());
   // FM mic gain enabled only if it differs from DMR gain
   QVERIFY(! copy.settings()->audio()->fmMicGainEnabled());
 
-  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,3}, {4,3}, {5,5}, {6,5}, {7,7}, {8,7}, {9,9}, {10,9}};
   for (auto pair: pairs) {
     config.settings()->audio()->setMicGain(Level::fromValue(pair.first));
     encodeDecode(config, copy);
