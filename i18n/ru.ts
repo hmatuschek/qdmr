@@ -109,272 +109,272 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../src/application.cc" line="181"/>
-        <location filename="../src/application.cc" line="199"/>
-        <location filename="../src/application.cc" line="521"/>
+        <location filename="../src/application.cc" line="167"/>
+        <location filename="../src/application.cc" line="185"/>
+        <location filename="../src/application.cc" line="507"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Несохранённые изменения кодплага.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="182"/>
-        <location filename="../src/application.cc" line="200"/>
-        <location filename="../src/application.cc" line="522"/>
+        <location filename="../src/application.cc" line="168"/>
+        <location filename="../src/application.cc" line="186"/>
+        <location filename="../src/application.cc" line="508"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>В текущем кодплаге есть несохранённые изменения. Они будут потеряны, если продолжить.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="208"/>
+        <location filename="../src/application.cc" line="194"/>
         <source>Open codeplug</source>
         <translation>Открыть кодплаг</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="287"/>
-        <location filename="../src/application.cc" line="324"/>
-        <location filename="../src/application.cc" line="363"/>
+        <location filename="../src/application.cc" line="273"/>
+        <location filename="../src/application.cc" line="310"/>
+        <location filename="../src/application.cc" line="349"/>
         <source>Cannot open file</source>
         <translation>Не удалось открыть файл</translation>
     </message>
     <message>
+        <location filename="../src/application.cc" line="204"/>
         <location filename="../src/application.cc" line="218"/>
-        <location filename="../src/application.cc" line="232"/>
-        <location filename="../src/application.cc" line="251"/>
-        <location filename="../src/application.cc" line="364"/>
+        <location filename="../src/application.cc" line="237"/>
+        <location filename="../src/application.cc" line="350"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
         <translation>Не удалось прочитать кодплаг из файла «%1»: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="210"/>
+        <location filename="../src/application.cc" line="196"/>
         <source>Codeplug Files (*.yaml *.yml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="217"/>
+        <location filename="../src/application.cc" line="203"/>
         <source>Cannot read codeplug.</source>
         <translation>Не удалось прочитать кодплаг.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="268"/>
+        <location filename="../src/application.cc" line="254"/>
         <source>Save codeplug</source>
         <translation>Сохранить кодплаг</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="269"/>
+        <location filename="../src/application.cc" line="255"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
         <translation>Файлы кодплага (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="275"/>
+        <location filename="../src/application.cc" line="261"/>
         <source>Please use new YAML format.</source>
         <translation>Используйте новый формат YAML.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="276"/>
+        <location filename="../src/application.cc" line="262"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
         <translation>Сохранение в старом табличном формате conf отключено с версии 0.9.0. Чтение таких файлов по-прежнему поддерживается.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="288"/>
-        <location filename="../src/application.cc" line="325"/>
+        <location filename="../src/application.cc" line="274"/>
+        <location filename="../src/application.cc" line="311"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
         <translation>Не удалось сохранить кодплаг в файл «%1»: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="297"/>
+        <location filename="../src/application.cc" line="283"/>
         <source>Cannot save codeplug</source>
         <translation>Не удалось сохранить кодплаг</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="298"/>
+        <location filename="../src/application.cc" line="284"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
         <translation>Не удалось сохранить кодплаг в файл «%1».</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="315"/>
+        <location filename="../src/application.cc" line="301"/>
         <source>Export codeplug</source>
         <translation>Экспорт кодплага</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="316"/>
+        <location filename="../src/application.cc" line="302"/>
         <source>CHIRP CSV Files (*.csv)</source>
         <translation>Файлы CHIRP CSV (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="333"/>
+        <location filename="../src/application.cc" line="319"/>
         <source>Cannot export codeplug</source>
         <translation>Не удалось экспортировать кодплаг</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="334"/>
+        <location filename="../src/application.cc" line="320"/>
         <source>Cannot export codeplug to file &apos;%1&apos;:
 %2</source>
         <translation>Не удалось экспортировать кодплаг в файл «%1»:
 %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="350"/>
+        <location filename="../src/application.cc" line="336"/>
         <source>Import codeplug</source>
         <translation>Импорт кодплага</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="351"/>
+        <location filename="../src/application.cc" line="337"/>
         <source>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</source>
         <translation>Файлы CHIRP CSV (*.csv);;Файлы YAML (*.yaml *.yml)</translation>
     </message>
     <message>
+        <location filename="../src/application.cc" line="356"/>
+        <location filename="../src/application.cc" line="364"/>
         <location filename="../src/application.cc" line="370"/>
-        <location filename="../src/application.cc" line="378"/>
-        <location filename="../src/application.cc" line="384"/>
-        <location filename="../src/application.cc" line="397"/>
+        <location filename="../src/application.cc" line="383"/>
         <source>Cannot import codeplug</source>
         <translation>Не удалось импортировать кодплаг</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="371"/>
-        <location filename="../src/application.cc" line="379"/>
-        <location filename="../src/application.cc" line="398"/>
+        <location filename="../src/application.cc" line="357"/>
+        <location filename="../src/application.cc" line="365"/>
+        <location filename="../src/application.cc" line="384"/>
         <source>Cannot import codeplug from &apos;%1&apos;: %2</source>
         <translation>Не удалось импортировать кодплаг из «%1»: %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="385"/>
+        <location filename="../src/application.cc" line="371"/>
         <source>Do not know, how to handle file &apos;%1&apos;.</source>
         <translation>Неизвестно, как обработать файл «%1».</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="419"/>
+        <location filename="../src/application.cc" line="405"/>
         <source>No matching devices found.</source>
         <translation>Подходящих устройств не найдено.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="445"/>
+        <location filename="../src/application.cc" line="431"/>
         <source>Cannot connect to radio</source>
         <translation>Не удалось подключиться к радиостанции</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="446"/>
+        <location filename="../src/application.cc" line="432"/>
         <source>Cannot connect to radio: %1</source>
         <translation>Не удалось подключиться к радиостанции: %1</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="456"/>
+        <location filename="../src/application.cc" line="442"/>
         <source>Radio found</source>
         <translation>Радиостанция найдена</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="456"/>
+        <location filename="../src/application.cc" line="442"/>
         <source>Found device &apos;%1&apos;.</source>
         <translation>Найдено устройство «%1».</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="459"/>
-        <location filename="../src/application.cc" line="475"/>
-        <location filename="../src/application.cc" line="530"/>
-        <location filename="../src/application.cc" line="601"/>
-        <location filename="../src/application.cc" line="644"/>
-        <location filename="../src/application.cc" line="725"/>
+        <location filename="../src/application.cc" line="445"/>
+        <location filename="../src/application.cc" line="461"/>
+        <location filename="../src/application.cc" line="516"/>
+        <location filename="../src/application.cc" line="580"/>
+        <location filename="../src/application.cc" line="618"/>
+        <location filename="../src/application.cc" line="695"/>
         <source>No radio found</source>
         <translation>Радиостанция не найдена</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="500"/>
+        <location filename="../src/application.cc" line="486"/>
         <source>Verification success</source>
         <translation>Проверка пройдена</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="501"/>
+        <location filename="../src/application.cc" line="487"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
         <translation>Кодплаг совпадает с данными в радиостанции «%1».</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="545"/>
-        <source>Read ...</source>
-        <translation>Считать…</translation>
+        <location filename="../src/application.cc" line="683"/>
+        <source>Write call-sign db</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="555"/>
+        <location filename="../src/application.cc" line="732"/>
+        <source>Write satellites</source>
+        <translation type="unfinished">Записать спутники</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="536"/>
         <source>Read error</source>
         <translation>Ошибка чтения</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="574"/>
+        <location filename="../src/application.cc" line="554"/>
         <source>Read complete</source>
         <translation>Чтение завершено</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="630"/>
-        <source>Upload ...</source>
-        <translation>Запись…</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="651"/>
-        <location filename="../src/application.cc" line="661"/>
-        <location filename="../src/application.cc" line="673"/>
+        <location filename="../src/application.cc" line="625"/>
+        <location filename="../src/application.cc" line="635"/>
+        <location filename="../src/application.cc" line="647"/>
         <source>Cannot write call-sign DB.</source>
         <translation>Не удалось записать базу позывных.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="652"/>
+        <location filename="../src/application.cc" line="626"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>Радиостанция «%1» не поддерживает базу позывных.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="460"/>
-        <location filename="../src/application.cc" line="476"/>
-        <location filename="../src/application.cc" line="531"/>
-        <location filename="../src/application.cc" line="602"/>
-        <location filename="../src/application.cc" line="645"/>
-        <location filename="../src/application.cc" line="726"/>
+        <location filename="../src/application.cc" line="446"/>
+        <location filename="../src/application.cc" line="462"/>
+        <location filename="../src/application.cc" line="517"/>
+        <location filename="../src/application.cc" line="581"/>
+        <location filename="../src/application.cc" line="619"/>
+        <location filename="../src/application.cc" line="696"/>
         <source>No matching device was found.</source>
         <translation>Подходящее устройство не найдено.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="662"/>
+        <location filename="../src/application.cc" line="528"/>
+        <source>Read codeplug</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="606"/>
+        <source>Write codeplug</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="636"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
         <translation>Радиостанция «%1» поддерживает базу позывных, но эта функция пока не реализована.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="674"/>
+        <location filename="../src/application.cc" line="648"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
         <translation>QDMR подбирает позывные для записи по DMR ID радиостанции. DMR ID по умолчанию не задан.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="711"/>
-        <source>Write call-sign DB ...</source>
-        <translation>Запись базы позывных…</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="732"/>
-        <location filename="../src/application.cc" line="742"/>
+        <location filename="../src/application.cc" line="702"/>
+        <location filename="../src/application.cc" line="712"/>
         <source>Cannot write satellite config.</source>
         <translation>Не удалось записать конфигурацию спутников.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="733"/>
+        <location filename="../src/application.cc" line="703"/>
         <source>The detected radio &apos;%1&apos; does not support satellite tracking.</source>
         <translation>Радиостанция «%1» не поддерживает слежение за спутниками.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="743"/>
+        <location filename="../src/application.cc" line="713"/>
         <source>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</source>
         <translation>Радиостанция «%1» поддерживает слежение за спутниками, но эта функция пока не реализована.</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="765"/>
-        <source>Write satellite config ...</source>
-        <translation>Запись конфигурации спутников…</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="784"/>
+        <location filename="../src/application.cc" line="741"/>
         <source>Write error</source>
         <translation>Ошибка записи</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="796"/>
+        <location filename="../src/application.cc" line="752"/>
         <source>Write complete</source>
         <translation>Запись завершена</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="857"/>
+        <location filename="../src/application.cc" line="812"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1 (псевдоним для %2 %3)</translation>
     </message>
@@ -2736,7 +2736,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="280"/>
-        <location filename="../src/mainwindow.cc" line="124"/>
+        <location filename="../src/mainwindow.cc" line="101"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
@@ -2826,112 +2826,72 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation>Записывает орбитальные элементы и данные транспондера на подключённое устройство.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="70"/>
-        <source>Cannot update callsign DB: %1</source>
-        <translation>Не удалось обновить базу позывных: %1</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="73"/>
-        <source>Callsign database updated &amp; loaded.</source>
-        <translation>База позывных обновлена и загружена.</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="77"/>
-        <source>Download call-sign DB ... %1%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="79"/>
-        <source>Download call-sign DB ... (%1MB)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="84"/>
-        <source>Cannot update talkgroup DB: %1</source>
-        <translation>Не удалось обновить БД токгрупп: %1</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="87"/>
-        <source>Talkgroup database updated &amp; loaded.</source>
-        <translation>База токгрупп обновлена и загружена.</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="91"/>
-        <source>Download talkgroup DB ... %1%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="93"/>
-        <source>Download talkgroup DB ... (%1MB)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="99"/>
+        <location filename="../src/mainwindow.cc" line="76"/>
         <source>Cannot update orbital elements: %1</source>
         <translation>Не удалось обновить орбитальные элементы: %1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="102"/>
+        <location filename="../src/mainwindow.cc" line="79"/>
         <source>Orbital elements updated &amp; loaded.</source>
         <translation>Орбитальные элементы обновлены и загружены.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="128"/>
+        <location filename="../src/mainwindow.cc" line="105"/>
         <source>Radio IDs</source>
         <translation>DMR ID</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="130"/>
+        <location filename="../src/mainwindow.cc" line="107"/>
         <source>Contacts</source>
         <translation>Контакты</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="132"/>
+        <location filename="../src/mainwindow.cc" line="109"/>
         <source>Group Lists</source>
         <translation>Групповые списки</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="134"/>
+        <location filename="../src/mainwindow.cc" line="111"/>
         <source>Channels</source>
         <translation>Каналы</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="136"/>
+        <location filename="../src/mainwindow.cc" line="113"/>
         <source>Zones</source>
         <translation>Зоны</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="138"/>
+        <location filename="../src/mainwindow.cc" line="115"/>
         <source>Scan Lists</source>
         <translation>Списки сканирования</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="140"/>
+        <location filename="../src/mainwindow.cc" line="117"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="142"/>
+        <location filename="../src/mainwindow.cc" line="119"/>
         <source>Roaming Channels</source>
         <translation>Каналы роуминга</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="145"/>
+        <location filename="../src/mainwindow.cc" line="122"/>
         <source>Roaming Zones</source>
         <translation>Зоны роуминга</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="149"/>
+        <location filename="../src/mainwindow.cc" line="126"/>
         <source>Extensions</source>
         <translation>Расширения</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="162"/>
+        <location filename="../src/mainwindow.cc" line="139"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>Несохранённые изменения кодплага.</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="163"/>
+        <location filename="../src/mainwindow.cc" line="140"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>В текущем кодплаге есть несохранённые изменения. Они будут потеряны, если продолжить.</translation>
     </message>

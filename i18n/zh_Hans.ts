@@ -109,272 +109,272 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../src/application.cc" line="181"/>
-        <location filename="../src/application.cc" line="199"/>
-        <location filename="../src/application.cc" line="521"/>
+        <location filename="../src/application.cc" line="167"/>
+        <location filename="../src/application.cc" line="185"/>
+        <location filename="../src/application.cc" line="507"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>信道配置有未保存的更改。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="182"/>
-        <location filename="../src/application.cc" line="200"/>
-        <location filename="../src/application.cc" line="522"/>
+        <location filename="../src/application.cc" line="168"/>
+        <location filename="../src/application.cc" line="186"/>
+        <location filename="../src/application.cc" line="508"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>当前信道配置有未保存的更改。如果继续，这些更改将丢失。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="208"/>
+        <location filename="../src/application.cc" line="194"/>
         <source>Open codeplug</source>
         <translation>打开信道配置</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="287"/>
-        <location filename="../src/application.cc" line="324"/>
-        <location filename="../src/application.cc" line="363"/>
+        <location filename="../src/application.cc" line="273"/>
+        <location filename="../src/application.cc" line="310"/>
+        <location filename="../src/application.cc" line="349"/>
         <source>Cannot open file</source>
         <translation>无法打开文件</translation>
     </message>
     <message>
+        <location filename="../src/application.cc" line="204"/>
         <location filename="../src/application.cc" line="218"/>
-        <location filename="../src/application.cc" line="232"/>
-        <location filename="../src/application.cc" line="251"/>
-        <location filename="../src/application.cc" line="364"/>
+        <location filename="../src/application.cc" line="237"/>
+        <location filename="../src/application.cc" line="350"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
         <translation>无法从文件 &apos;%1&apos; 读取信道配置：%2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="210"/>
+        <location filename="../src/application.cc" line="196"/>
         <source>Codeplug Files (*.yaml *.yml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="217"/>
+        <location filename="../src/application.cc" line="203"/>
         <source>Cannot read codeplug.</source>
         <translation>无法读取信道配置。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="268"/>
+        <location filename="../src/application.cc" line="254"/>
         <source>Save codeplug</source>
         <translation>保存信道配置</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="269"/>
+        <location filename="../src/application.cc" line="255"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
         <translation>信道配置文件 (*.yaml *.yml)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="275"/>
+        <location filename="../src/application.cc" line="261"/>
         <source>Please use new YAML format.</source>
         <translation>请使用新的 YAML 格式。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="276"/>
+        <location filename="../src/application.cc" line="262"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
         <translation>0.9.0 版本已禁用旧的表格 conf 格式保存。读取这些文件仍然有效。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="288"/>
-        <location filename="../src/application.cc" line="325"/>
+        <location filename="../src/application.cc" line="274"/>
+        <location filename="../src/application.cc" line="311"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
         <translation>无法将信道配置保存到文件 &apos;%1&apos;：%2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="297"/>
+        <location filename="../src/application.cc" line="283"/>
         <source>Cannot save codeplug</source>
         <translation>无法保存信道配置</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="298"/>
+        <location filename="../src/application.cc" line="284"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
         <translation>无法将信道配置保存到文件 &apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="315"/>
+        <location filename="../src/application.cc" line="301"/>
         <source>Export codeplug</source>
         <translation>导出信道配置</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="316"/>
+        <location filename="../src/application.cc" line="302"/>
         <source>CHIRP CSV Files (*.csv)</source>
         <translation>CHIRP CSV 文件 (*.csv)</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="333"/>
+        <location filename="../src/application.cc" line="319"/>
         <source>Cannot export codeplug</source>
         <translation>无法导出信道配置</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="334"/>
+        <location filename="../src/application.cc" line="320"/>
         <source>Cannot export codeplug to file &apos;%1&apos;:
 %2</source>
         <translation>无法将信道配置导出到文件 &apos;%1&apos;：
 %2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="350"/>
+        <location filename="../src/application.cc" line="336"/>
         <source>Import codeplug</source>
         <translation>导入信道配置</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="351"/>
+        <location filename="../src/application.cc" line="337"/>
         <source>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</source>
         <translation>CHIRP CSV 文件 (*.csv);;YAML 文件 (*.yaml *.yml)</translation>
     </message>
     <message>
+        <location filename="../src/application.cc" line="356"/>
+        <location filename="../src/application.cc" line="364"/>
         <location filename="../src/application.cc" line="370"/>
-        <location filename="../src/application.cc" line="378"/>
-        <location filename="../src/application.cc" line="384"/>
-        <location filename="../src/application.cc" line="397"/>
+        <location filename="../src/application.cc" line="383"/>
         <source>Cannot import codeplug</source>
         <translation>无法导入信道配置</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="371"/>
-        <location filename="../src/application.cc" line="379"/>
-        <location filename="../src/application.cc" line="398"/>
+        <location filename="../src/application.cc" line="357"/>
+        <location filename="../src/application.cc" line="365"/>
+        <location filename="../src/application.cc" line="384"/>
         <source>Cannot import codeplug from &apos;%1&apos;: %2</source>
         <translation>无法从 &apos;%1&apos; 导入信道配置：%2</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="385"/>
+        <location filename="../src/application.cc" line="371"/>
         <source>Do not know, how to handle file &apos;%1&apos;.</source>
         <translation>不知道如何处理文件 &apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="419"/>
+        <location filename="../src/application.cc" line="405"/>
         <source>No matching devices found.</source>
         <translation>未找到匹配的设备。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="445"/>
+        <location filename="../src/application.cc" line="431"/>
         <source>Cannot connect to radio</source>
         <translation>无法连接到电台</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="446"/>
+        <location filename="../src/application.cc" line="432"/>
         <source>Cannot connect to radio: %1</source>
         <translation>无法连接到电台：%1</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="456"/>
+        <location filename="../src/application.cc" line="442"/>
         <source>Radio found</source>
         <translation>找到电台</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="456"/>
+        <location filename="../src/application.cc" line="442"/>
         <source>Found device &apos;%1&apos;.</source>
         <translation>找到设备 &apos;%1&apos;。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="459"/>
-        <location filename="../src/application.cc" line="475"/>
-        <location filename="../src/application.cc" line="530"/>
-        <location filename="../src/application.cc" line="601"/>
-        <location filename="../src/application.cc" line="644"/>
-        <location filename="../src/application.cc" line="725"/>
+        <location filename="../src/application.cc" line="445"/>
+        <location filename="../src/application.cc" line="461"/>
+        <location filename="../src/application.cc" line="516"/>
+        <location filename="../src/application.cc" line="580"/>
+        <location filename="../src/application.cc" line="618"/>
+        <location filename="../src/application.cc" line="695"/>
         <source>No radio found</source>
         <translation>未找到电台</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="500"/>
+        <location filename="../src/application.cc" line="486"/>
         <source>Verification success</source>
         <translation>验证成功</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="501"/>
+        <location filename="../src/application.cc" line="487"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
         <translation>已成功使用电台 &apos;%1&apos; 验证信道配置</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="545"/>
-        <source>Read ...</source>
-        <translation>读取中…</translation>
+        <location filename="../src/application.cc" line="683"/>
+        <source>Write call-sign db</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="555"/>
+        <location filename="../src/application.cc" line="732"/>
+        <source>Write satellites</source>
+        <translation type="unfinished">写入卫星</translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="536"/>
         <source>Read error</source>
         <translation>读取错误</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="574"/>
+        <location filename="../src/application.cc" line="554"/>
         <source>Read complete</source>
         <translation>读取完成</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="630"/>
-        <source>Upload ...</source>
-        <translation>上传中…</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="651"/>
-        <location filename="../src/application.cc" line="661"/>
-        <location filename="../src/application.cc" line="673"/>
+        <location filename="../src/application.cc" line="625"/>
+        <location filename="../src/application.cc" line="635"/>
+        <location filename="../src/application.cc" line="647"/>
         <source>Cannot write call-sign DB.</source>
         <translation>无法写入呼号数据库。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="652"/>
+        <location filename="../src/application.cc" line="626"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
         <translation>检测到的电台 &apos;%1&apos; 不支持呼号数据库。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="460"/>
-        <location filename="../src/application.cc" line="476"/>
-        <location filename="../src/application.cc" line="531"/>
-        <location filename="../src/application.cc" line="602"/>
-        <location filename="../src/application.cc" line="645"/>
-        <location filename="../src/application.cc" line="726"/>
+        <location filename="../src/application.cc" line="446"/>
+        <location filename="../src/application.cc" line="462"/>
+        <location filename="../src/application.cc" line="517"/>
+        <location filename="../src/application.cc" line="581"/>
+        <location filename="../src/application.cc" line="619"/>
+        <location filename="../src/application.cc" line="696"/>
         <source>No matching device was found.</source>
         <translation>未找到匹配的设备。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="662"/>
+        <location filename="../src/application.cc" line="528"/>
+        <source>Read codeplug</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="606"/>
+        <source>Write codeplug</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/application.cc" line="636"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
         <translation>检测到的电台 &apos;%1&apos; 支持呼号数据库。但是，此功能尚未实现。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="674"/>
+        <location filename="../src/application.cc" line="648"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
         <translation>QDMR 根据电台的默认 DMR ID 选择要写入的呼号。未设置默认 ID。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="711"/>
-        <source>Write call-sign DB ...</source>
-        <translation>写入呼号数据库中…</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="732"/>
-        <location filename="../src/application.cc" line="742"/>
+        <location filename="../src/application.cc" line="702"/>
+        <location filename="../src/application.cc" line="712"/>
         <source>Cannot write satellite config.</source>
         <translation>无法写入卫星配置。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="733"/>
+        <location filename="../src/application.cc" line="703"/>
         <source>The detected radio &apos;%1&apos; does not support satellite tracking.</source>
         <translation>检测到的电台 &apos;%1&apos; 不支持卫星追踪。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="743"/>
+        <location filename="../src/application.cc" line="713"/>
         <source>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</source>
         <translation>检测到的电台 &apos;%1&apos; 支持卫星追踪。但是，此功能尚未实现。</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="765"/>
-        <source>Write satellite config ...</source>
-        <translation>写入卫星配置中…</translation>
-    </message>
-    <message>
-        <location filename="../src/application.cc" line="784"/>
+        <location filename="../src/application.cc" line="741"/>
         <source>Write error</source>
         <translation>写入错误</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="796"/>
+        <location filename="../src/application.cc" line="752"/>
         <source>Write complete</source>
         <translation>写入完成</translation>
     </message>
     <message>
-        <location filename="../src/application.cc" line="857"/>
+        <location filename="../src/application.cc" line="812"/>
         <source>%1 (alias for %2 %3)</source>
         <translation>%1（%2 %3 的别名）</translation>
     </message>
@@ -2736,7 +2736,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="280"/>
-        <location filename="../src/mainwindow.cc" line="124"/>
+        <location filename="../src/mainwindow.cc" line="101"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
@@ -2826,112 +2826,72 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <translation>将轨道参数和转发器信息写入连接的设备。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="70"/>
-        <source>Cannot update callsign DB: %1</source>
-        <translation>无法更新呼号数据库：%1</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="73"/>
-        <source>Callsign database updated &amp; loaded.</source>
-        <translation>呼号数据库已更新并加载。</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="77"/>
-        <source>Download call-sign DB ... %1%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="79"/>
-        <source>Download call-sign DB ... (%1MB)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="84"/>
-        <source>Cannot update talkgroup DB: %1</source>
-        <translation>无法更新通话组数据库：%1</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="87"/>
-        <source>Talkgroup database updated &amp; loaded.</source>
-        <translation>通话组数据库已更新并加载。</translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="91"/>
-        <source>Download talkgroup DB ... %1%</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="93"/>
-        <source>Download talkgroup DB ... (%1MB)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/mainwindow.cc" line="99"/>
+        <location filename="../src/mainwindow.cc" line="76"/>
         <source>Cannot update orbital elements: %1</source>
         <translation>无法更新轨道参数：%1</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="102"/>
+        <location filename="../src/mainwindow.cc" line="79"/>
         <source>Orbital elements updated &amp; loaded.</source>
         <translation>轨道参数已更新并加载。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="128"/>
+        <location filename="../src/mainwindow.cc" line="105"/>
         <source>Radio IDs</source>
         <translation>电台 ID</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="130"/>
+        <location filename="../src/mainwindow.cc" line="107"/>
         <source>Contacts</source>
         <translation>联系人</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="132"/>
+        <location filename="../src/mainwindow.cc" line="109"/>
         <source>Group Lists</source>
         <translation>群组列表</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="134"/>
+        <location filename="../src/mainwindow.cc" line="111"/>
         <source>Channels</source>
         <translation>信道</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="136"/>
+        <location filename="../src/mainwindow.cc" line="113"/>
         <source>Zones</source>
         <translation>区域</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="138"/>
+        <location filename="../src/mainwindow.cc" line="115"/>
         <source>Scan Lists</source>
         <translation>扫描列表</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="140"/>
+        <location filename="../src/mainwindow.cc" line="117"/>
         <source>GPS/APRS</source>
         <translation>GPS/APRS</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="142"/>
+        <location filename="../src/mainwindow.cc" line="119"/>
         <source>Roaming Channels</source>
         <translation>漫游信道</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="145"/>
+        <location filename="../src/mainwindow.cc" line="122"/>
         <source>Roaming Zones</source>
         <translation>漫游区域</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="149"/>
+        <location filename="../src/mainwindow.cc" line="126"/>
         <source>Extensions</source>
         <translation>扩展</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="162"/>
+        <location filename="../src/mainwindow.cc" line="139"/>
         <source>Unsaved changes to codeplug.</source>
         <translation>信道配置有未保存的更改。</translation>
     </message>
     <message>
-        <location filename="../src/mainwindow.cc" line="163"/>
+        <location filename="../src/mainwindow.cc" line="140"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
         <translation>当前信道配置有未保存的更改。如果继续，这些更改将丢失。</translation>
     </message>
