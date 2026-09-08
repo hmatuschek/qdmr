@@ -593,7 +593,7 @@ void
 D878UVTest::testMicGain() {
   ErrorStack err;
   Config copy, config; config.copy(_basicConfig);
-  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,3}, {4,3}, {5,5}, {6,5}, {7,7}, {8,7}, {9,9}, {10,9}};
   for (auto pair: pairs) {
     config.settings()->audio()->setMicGain(Level::fromValue(pair.first));
     encodeDecode(config, copy);
@@ -631,6 +631,27 @@ D878UVTest::testHiddenZone() {
   QVERIFY(decoded.zones()->zone(0)->anytoneExtension());
   QVERIFY(decoded.zones()->zone(0)->anytoneExtension()->hidden());
 }
+
+void
+D878UVTest::testCustomCTCSS() {
+  ErrorStack err;
+  Config decoded, config;
+  if (! config.readYAML(":/data/ctcss_copy_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  config.channelList()->channel(0)->as<FMChannel>()->setRXTone({206.6});
+  config.channelList()->channel(0)->as<FMChannel>()->setTXTone({206.6});
+
+  encodeDecode(config, decoded);
+
+  QCOMPARE(decoded.channelList()->count(), 1);
+  QVERIFY(decoded.channelList()->channel(0)->is<FMChannel>());
+  QCOMPARE(decoded.channelList()->channel(0)->as<FMChannel>()->rxTone(), SelectiveCall(206.6));
+  QCOMPARE(decoded.channelList()->channel(0)->as<FMChannel>()->txTone(), SelectiveCall(206.6));
+}
+
 
 QTEST_GUILESS_MAIN(D878UVTest)
 

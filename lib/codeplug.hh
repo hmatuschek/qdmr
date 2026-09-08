@@ -106,7 +106,8 @@ public:
         }
         /** Maps a value from this range to the given range. */
         inline T mapTo(const Range<T> &other, const T &value) const {
-          T myD = max-min, oD = other.max-other.min;
+          T myD = max-min + (std::is_integral<T>() ? 1 : 0),
+            oD = other.max-other.min + (std::is_integral<T>() ? 1 : 0);
           return ((limit(value)-min)*oD)/myD + other.min;
         }
       };

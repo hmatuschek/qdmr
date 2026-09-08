@@ -7,8 +7,6 @@
 #include <QTimeZone>
 #include <QRegularExpression>
 
-#define CUSTOM_CTCSS_TONE 0x33
-
 
 QVector<char> _anytone_bin_dtmf_tab = {
   '0','1','2','3','4','5','6','7','8','9','A','B','C','D','*','#'
@@ -41,7 +39,7 @@ AnytoneCodeplug::CTCSS::encode(const SelectiveCall &code) {
     if (code == _codeTable[i])
       return i;
   }
-  return 0;
+  return customIndex();
 }
 
 SelectiveCall
@@ -317,38 +315,54 @@ AnytoneCodeplug::ChannelElement::enableTalkaround(bool enable) {
   setBit(Offset::talkaround(), enable);
 }
 
+
 bool
 AnytoneCodeplug::ChannelElement::txCTCSSIsCustom() const {
-  return CUSTOM_CTCSS_TONE == getUInt8(Offset::txCTCSS());
+  return CTCSS::customIndex() == getUInt8(Offset::txCTCSS());
 }
+
 SelectiveCall
 AnytoneCodeplug::ChannelElement::txCTCSS() const {
+  if (txCTCSSIsCustom())
+    return {customCTCSSFrequency()};
   return CTCSS::decode(getUInt8(Offset::txCTCSS()));
 }
+
 void
 AnytoneCodeplug::ChannelElement::setTXCTCSS(const SelectiveCall &tone) {
   setUInt8(Offset::txCTCSS(), CTCSS::encode(tone));
+  if (txCTCSSIsCustom()) setCustomCTCSSFrequency(tone.Hz());
 }
+
 void
 AnytoneCodeplug::ChannelElement::enableTXCustomCTCSS() {
-  setUInt8(Offset::txCTCSS(), CUSTOM_CTCSS_TONE);
+  setUInt8(Offset::txCTCSS(), CTCSS::customIndex());
 }
+
+
 bool
 AnytoneCodeplug::ChannelElement::rxCTCSSIsCustom() const {
-  return CUSTOM_CTCSS_TONE == getUInt8(Offset::rxCTCSS());
+  return CTCSS::customIndex() == getUInt8(Offset::rxCTCSS());
 }
+
 SelectiveCall
 AnytoneCodeplug::ChannelElement::rxCTCSS() const {
+  if (rxCTCSSIsCustom())
+    return {customCTCSSFrequency()};
   return CTCSS::decode(getUInt8(Offset::rxCTCSS()));
 }
+
 void
 AnytoneCodeplug::ChannelElement::setRXCTCSS(const SelectiveCall &tone) {
   setUInt8(Offset::rxCTCSS(), CTCSS::encode(tone));
+  if (rxCTCSSIsCustom()) setCustomCTCSSFrequency(tone.Hz());
 }
+
 void
 AnytoneCodeplug::ChannelElement::enableRXCustomCTCSS() {
-  setUInt8(Offset::rxCTCSS(), CUSTOM_CTCSS_TONE);
+  setUInt8(Offset::rxCTCSS(), CTCSS::customIndex());
 }
+
 
 SelectiveCall
 AnytoneCodeplug::ChannelElement::txDCS() const {
@@ -2245,7 +2259,12 @@ AnytoneCodeplug::BootSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->boot()->setMessage2(introLine2());
 
   ctx.config()->settings()->boot()->setBootPassword(password());
-  ctx.config()->settings()->boot()->enableBootPassword(! password().isEmpty());
+  // Do NOT derive the enabled-flag from the password string here. The radio stores
+  // that flag separately, in the general settings, and it is already decoded by
+  // GeneralSettingsElement::updateConfig(), which runs before this element. A radio
+  // may well hold a non-empty but *disabled* boot password; inferring "enabled" from
+  // "password is not empty" overwrites the correct flag, and the next write then
+  // enables the password and locks the user out of their radio.
 
   return true;
 }

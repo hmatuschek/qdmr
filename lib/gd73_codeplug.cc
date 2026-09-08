@@ -216,20 +216,20 @@ GD73Codeplug::SettingsElement::setLanguage(Language lang) {
 
 Level
 GD73Codeplug::SettingsElement::vox() const {
-  return Level::fromValue(getUInt8(Offset::voxLevel()), Limit::vox());
+  return Level::fromValue(getUInt8(Offset::voxLevel()), Limit::vox(), 0);
 }
 void
 GD73Codeplug::SettingsElement::setVOX(Level level) {
-  setUInt8(Offset::voxLevel(), level.mapTo(Limit::vox()));
+  setUInt8(Offset::voxLevel(), level.mapTo(Limit::vox(), 0));
 }
 
 Level
 GD73Codeplug::SettingsElement::squelch() const {
-  return Level::fromValue(getUInt8(Offset::squelchLevel()), Limit::squelch());
+  return Level::fromValue(getUInt8(Offset::squelchLevel()), Limit::squelch(), 0);
 }
 void
 GD73Codeplug::SettingsElement::setSquelch(Level level) {
-  setUInt8(Offset::squelchLevel(), level.mapTo(Limit::squelch()));
+  setUInt8(Offset::squelchLevel(), level.mapTo(Limit::squelch(), 0));
 }
 
 bool

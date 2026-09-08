@@ -43,7 +43,7 @@
 </para>
 
 <variablelist>
-  <title>Channel extension fields</title>
+  <title>Contact extension fields</title>
   <varlistentry>
     <term><token>timeSlotOverride</token></term>
     <listitem>

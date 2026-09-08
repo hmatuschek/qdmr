@@ -107,7 +107,7 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <string>Specifies the default (DMR) microphone amplifiction level.</string>
+              <string>Specifies the default (DMR) microphone amplification level.</string>
              </property>
              <property name="minimum">
               <number>1</number>
@@ -120,7 +120,7 @@
            <item row="1" column="0">
             <widget class="QLabel" name="label">
              <property name="text">
-              <string>FM Microphone Amplifiction</string>
+              <string>FM Microphone Amplification</string>
              </property>
             </widget>
            </item>
