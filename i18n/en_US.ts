@@ -37,52 +37,52 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="20"/>
         <source>Edit APRS System</source>
-        <translation type="unfinished">Edit APRS System</translation>
+        <translation>Edit APRS System</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="30"/>
         <source>Basic</source>
-        <translation type="unfinished">Basic</translation>
+        <translation>Basic</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="42"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="52"/>
         <source>Channel</source>
-        <translation type="unfinished">Channel</translation>
+        <translation>Channel</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="62"/>
         <source>Source</source>
-        <translation type="unfinished">Source</translation>
+        <translation>Source</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="100"/>
         <source>Destination</source>
-        <translation type="unfinished">Destination</translation>
+        <translation>Destination</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="138"/>
         <source>Path</source>
-        <translation type="unfinished">Path</translation>
+        <translation>Path</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="145"/>
         <source>Icon</source>
-        <translation type="unfinished">Icon</translation>
+        <translation>Icon</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="152"/>
         <source>Update period [s]</source>
-        <translation type="unfinished">Update period [s]</translation>
+        <translation>Update period [s]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="159"/>
         <source>Message</source>
-        <translation type="unfinished">Message</translation>
+        <translation>Message</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="192"/>
@@ -2321,12 +2321,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/generalsettingsview.ui" line="110"/>
         <source>Specifies the default (DMR) microphone amplification level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Specifies the default (DMR) microphone amplification level.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="123"/>
         <source>FM Microphone Amplification</source>
-        <translation type="unfinished"></translation>
+        <translation>FM Microphone Amplification</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="617"/>
@@ -3744,7 +3744,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/satellitetransponderdialog.ui" line="81"/>
         <location filename="../src/satellitetransponderdialog.ui" line="142"/>
         <source>Select or edit the uplink frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>Select or edit the uplink frequency.</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="91"/>
@@ -3763,7 +3763,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/satellitetransponderdialog.ui" line="111"/>
         <location filename="../src/satellitetransponderdialog.ui" line="183"/>
         <source>Select or edit the downlink frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>Select or edit the downlink frequency.</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="130"/>
@@ -3779,7 +3779,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="239"/>
         <source>Select or edit the beacon frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>Select or edit the beacon frequency.</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="242"/>
