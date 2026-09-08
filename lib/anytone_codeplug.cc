@@ -2245,7 +2245,12 @@ AnytoneCodeplug::BootSettingsElement::updateConfig(Context &ctx) {
   ctx.config()->settings()->boot()->setMessage2(introLine2());
 
   ctx.config()->settings()->boot()->setBootPassword(password());
-  ctx.config()->settings()->boot()->enableBootPassword(! password().isEmpty());
+  // Do NOT derive the enabled-flag from the password string here. The radio stores
+  // that flag separately, in the general settings, and it is already decoded by
+  // GeneralSettingsElement::updateConfig(), which runs before this element. A radio
+  // may well hold a non-empty but *disabled* boot password; inferring "enabled" from
+  // "password is not empty" overwrites the correct flag, and the next write then
+  // enables the password and locks the user out of their radio.
 
   return true;
 }

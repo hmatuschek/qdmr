@@ -39,7 +39,10 @@ TyTCodeplug::ChannelElement::~ChannelElement() {
 
 bool
 TyTCodeplug::ChannelElement::isValid() const {
-  return Element::isValid() && QChar::isPrint(getUInt16_le(Offset::name()));
+  return Element::isValid()
+    && QChar::isPrint(getUInt16_le(Offset::name()))
+    && rxFrequencyIsValid()
+    && txFrequencyIsValid();
 }
 
 void
@@ -80,8 +83,8 @@ TyTCodeplug::ChannelElement::clear() {
   setPositioningSystemIndex(0);
   for (uint8_t i=0; i<8; i++)
     setDTMFDecode(i, false);
-  setRXFrequency(Frequency::fromMHz(400));
-  setTXFrequency(Frequency::fromMHz(400));
+  clearRXFrequency();
+  clearTXFrequency();
   setRXSignaling(SelectiveCall());
   setTXSignaling(SelectiveCall());
   setRXSignalingSystemIndex(0);
@@ -347,23 +350,48 @@ TyTCodeplug::ChannelElement::setDTMFDecode(uint8_t idx, bool enable) {
   setBit(Offset::dtmfDecode(), idx, enable);
 }
 
+
+bool
+TyTCodeplug::ChannelElement::rxFrequencyIsValid() const {
+  return 0xffffffff != getUInt32_le(Offset::rxFrequency());
+}
+
 Frequency
 TyTCodeplug::ChannelElement::rxFrequency() const {
   return Frequency::fromHz(getBCD8_le(Offset::rxFrequency())*10);
 }
+
 void
 TyTCodeplug::ChannelElement::setRXFrequency(const Frequency &freq_Hz) {
   return setBCD8_le(Offset::rxFrequency(), freq_Hz.inHz()/10);
+}
+
+void
+TyTCodeplug::ChannelElement::clearRXFrequency() {
+  setUInt32_le(Offset::rxFrequency(), 0xffffffff);
+}
+
+
+bool
+TyTCodeplug::ChannelElement::txFrequencyIsValid() const {
+  return 0xffffffff != getUInt32_le(Offset::txFrequency());
 }
 
 Frequency
 TyTCodeplug::ChannelElement::txFrequency() const {
   return Frequency::fromHz(getBCD8_le(Offset::txFrequency())*10);
 }
+
 void
 TyTCodeplug::ChannelElement::setTXFrequency(const Frequency &freq_Hz) {
   return setBCD8_le(Offset::txFrequency(), freq_Hz.inHz()/10);
 }
+
+void
+TyTCodeplug::ChannelElement::clearTXFrequency() {
+  setUInt32_le(Offset::txFrequency(), 0xffffffff);
+}
+
 
 SelectiveCall
 TyTCodeplug::ChannelElement::rxSignaling() const {
