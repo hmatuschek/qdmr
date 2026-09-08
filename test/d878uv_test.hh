@@ -42,6 +42,7 @@ private slots:
   void testMicGain();
   void testFixedLocation();
   void testHiddenZone(); ///< Regression test for #203
+  void testCustomCTCSS(); ///< Regression test fpr #1004
 
 protected:
   Config _micGainConfig;

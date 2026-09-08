@@ -73,6 +73,11 @@ SelectiveCallBox::SelectiveCallBox(QWidget *parent)
                     QVariant(call.binCode()));
   }
 
+  connect(_ctcss->lineEdit(), &QLineEdit::editingFinished,
+    this, &SelectiveCallBox::onCTCSSEdited);
+  connect(_dcs->lineEdit(), &QLineEdit::editingFinished,
+    this, &SelectiveCallBox::onDCSEdited);
+
   auto layout = new QHBoxLayout();
   layout->addWidget(_typeSelection,0);
   layout->addWidget(_stack, 1);
@@ -90,39 +95,81 @@ SelectiveCallBox::setSelectiveCall(const SelectiveCall &call) {
   } else if (call.isCTCSS()) {
     _typeSelection->setCurrentIndex(1);
     int idx = _ctcss->findData(QVariant::fromValue(call));
-    if (idx >= 0)
+    if (idx >= 0) {
       _ctcss->setCurrentIndex(idx);
-    else
-      _ctcss->setEditText(call.format());
+    } else {
+      _ctcss->setEditText(QString("%1.%2").arg(call.mHz()/1000).arg((call.mHz()/100)%10));
+      onCTCSSEdited();
+    }
   } else if (call.isDCS()) {
     _typeSelection->setCurrentIndex(2);
     int idx = _dcs->findData(QVariant(call.binCode()));
-    if (idx >= 0)
+    if (idx >= 0) {
       _dcs->setCurrentIndex(idx);
-    else
+    } else {
       _dcs->setEditText(QString("%1").arg(call.binCode(), 3, 8, QChar('0')));
+      onDCSEdited();
+    }
     _inverted->setChecked(call.isInverted());
   }
 }
 
+
 SelectiveCall
 SelectiveCallBox::selectiveCall() const {
-  if (0 == _typeSelection->currentIndex()) {
-    return SelectiveCall();
-  } else if (1 == _typeSelection->currentIndex()) {
-    int idx = _ctcss->currentIndex();
-    if (0 >= idx)
+  if (1 == _typeSelection->currentIndex()) {
+    // handle CTCSS setting
+    if (0 <= _ctcss->currentIndex())
       return _ctcss->currentData().value<SelectiveCall>();
-    return SelectiveCall::parseCTCSS(_ctcss->currentText());
   } else if (2 == _typeSelection->currentIndex()) {
-    int idx = _dcs->currentIndex();
-    if (0 >= idx)
+    // handle DCS setting
+    if (0 <= _dcs->currentIndex())
       return SelectiveCall(_dcs->currentData().toUInt(), _inverted->isChecked());
-    return SelectiveCall(_dcs->currentText().toUInt(), _inverted->isChecked());
+  }
+  // none
+  return {};
+}
+
+
+void
+SelectiveCallBox::onCTCSSEdited() {
+  const auto call = SelectiveCall::parseCTCSS(_ctcss->currentText());
+  if (! call.isValid())
+    return;
+
+  for (int idx=0; idx<_ctcss->count(); idx++) {
+    if (call == _ctcss->itemData(idx).value<SelectiveCall>()) {
+      _ctcss->setCurrentIndex(idx);
+      return;
+    }
   }
 
-  return SelectiveCall();
+  const int idx = _ctcss->count();
+  _ctcss->addItem(QString("%1.%2").arg(call.mHz()/1000).arg((call.mHz()/100)%10),
+                  QVariant::fromValue(call));
+  _ctcss->setCurrentIndex(idx);
 }
+
+
+void
+SelectiveCallBox::onDCSEdited() {
+  const auto call = SelectiveCall::parseDCS(_dcs->currentText());
+  if (! call.isValid())
+    return;
+
+  for (int idx=0; idx<_dcs->count(); idx++) {
+    if (call == _dcs->itemData(idx).value<SelectiveCall>()) {
+      _dcs->setCurrentIndex(idx);
+      return;
+    }
+  }
+
+  const int idx = _dcs->count();
+  _dcs->addItem(QString("%1").arg(call.binCode(), 3, 8, QChar('0')),
+                QVariant(call.binCode()));
+  _dcs->setCurrentIndex(idx);
+}
+
 
 
 /* ********************************************************************************************* *
