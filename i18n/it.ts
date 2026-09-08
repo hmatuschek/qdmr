@@ -2149,16 +2149,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/generalsettingsview.ui" line="110"/>
-        <source>Specifies the default (DMR) microphone amplifiction level.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/generalsettingsview.ui" line="123"/>
-        <source>FM Microphone Amplifiction</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/generalsettingsview.ui" line="136"/>
         <source>default</source>
         <extracomment>Special value indicating, that the global default mic gain should be used.</extracomment>
@@ -2327,6 +2317,16 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/generalsettingsview.ui" line="319"/>
         <source>Speech Synthesis</source>
         <translation>Sintesi vocale</translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="110"/>
+        <source>Specifies the default (DMR) microphone amplification level.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/generalsettingsview.ui" line="123"/>
+        <source>FM Microphone Amplification</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="617"/>
@@ -3714,6 +3714,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="20"/>
         <source>Satellite</source>
+        <extracomment>Group box title.</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3728,40 +3729,60 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="61"/>
-        <location filename="../src/satellitetransponderdialog.ui" line="134"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="145"/>
         <source>Uplink Frequency</source>
         <translation>Frequenza di uplink</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="71"/>
-        <location filename="../src/satellitetransponderdialog.ui" line="150"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="161"/>
         <source>Uplink Tone</source>
+        <extracomment>Label for a widget setting the sub-tone for the satellite uplink.</extracomment>
         <translation>Tono di uplink</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="87"/>
-        <location filename="../src/satellitetransponderdialog.ui" line="172"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="81"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="142"/>
+        <source>Select or edit the uplink frequency.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="91"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="186"/>
         <source>Downlink Frequency</source>
         <translation>Frequenza di downlink</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="97"/>
-        <location filename="../src/satellitetransponderdialog.ui" line="188"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="101"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="202"/>
         <source>Downlink Tone</source>
+        <extracomment>Label for a widget setting the sub-tone for the satellite uplink.</extracomment>
         <translation>Tono di downlink</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="122"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="111"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="183"/>
+        <source>Select or edit the downlink frequency.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="130"/>
         <source>APRS Transponder</source>
         <translation>Transponder APRS</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="213"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="227"/>
         <source>Beacon</source>
+        <extracomment>Group box title.</extracomment>
         <translation>Beacon</translation>
     </message>
     <message>
-        <location filename="../src/satellitetransponderdialog.ui" line="225"/>
+        <location filename="../src/satellitetransponderdialog.ui" line="239"/>
+        <source>Select or edit the beacon frequency.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/satellitetransponderdialog.ui" line="242"/>
         <source>Beacon Frequency</source>
         <translation>Frequenza del beacon</translation>
     </message>
@@ -4198,7 +4219,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
 <context>
     <name>TransponderFrequencyEditor</name>
     <message>
-        <location filename="../src/transponderfrequencydelegate.cc" line="28"/>
+        <location filename="../src/transponderfrequencydelegate.cc" line="35"/>
         <source>None</source>
         <translation>Nessuno/a</translation>
     </message>
