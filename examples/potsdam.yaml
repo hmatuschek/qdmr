@@ -1,14 +1,57 @@
 ---
-version: 0.14.0
+version: 0.15.1
 settings:
-  introLine1: qDMR
-  introLine2: DM3MAT
-  micLevel: 5
-  speech: false
   power: High
-  squelch: 2
-  vox: off
   defaultID: id1
+  boot:
+    display: Logo
+    message1: qDMR
+    message2: DM3MAT
+    passwordEnabled: false
+    password: ""
+    defaultChannel: false
+    allowFactoryReset: true
+  audio:
+    squelch: 2
+    dmrSquelch: none
+    micGain: 5
+    fmMicGain: none
+    m17MicGain: none
+    maxSpeakerVolume: 10
+    maxHeadphoneVolume: 10
+    vox: off
+    voxDelay: 0
+    speech: false
+  tone:
+    silent: false
+    keyTone: off
+    smsTone: true
+    ringtone: true
+    bootTone: false
+    bootMelody:
+      bpm: 100
+      melody: ""
+    talkPermit:
+      - None
+    callStart:
+      - Digital
+    callStartMelody:
+      bpm: 100
+      melody: ""
+    callEnd:
+      - None
+    callEndMelody:
+      bpm: 100
+      melody: ""
+    channelIdle:
+      - All
+    channelIdleMelody:
+      bpm: 100
+      melody: ""
+    callReset: true
+    callResetMelody:
+      bpm: 100
+      melody: ""
   gnss:
     fixedPositionEnabled: false
     fixedPosition: ""
@@ -299,6 +342,25 @@ channels:
       admit: Free
       rxTone: ~
       txTone: ~
+      bandwidth: Narrow
+      extended:
+        talkaround: false
+        reverseBurst: false
+      power: !<!default> ""
+  - fm:
+      id: ch14
+      name: D23 - 70cm
+      rxFrequency: 433.625 MHz
+      txFrequency: 433.625 MHz
+      timeout: !<!default> ""
+      rxOnly: false
+      vox: !<!default> ""
+      squelch: !<!default> ""
+      admit: Always
+      rxTone:
+        ctcss: 123.0 Hz
+      txTone:
+        ctcss: 123.0 Hz
       bandwidth: Narrow
       extended:
         talkaround: false
