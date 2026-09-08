@@ -77,17 +77,17 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="152"/>
         <source>Update period [s]</source>
-        <translation type="unfinished">Periode [s]</translation>
+        <translation>Periode [s]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="159"/>
         <source>Message</source>
-        <translation type="unfinished">Nachricht</translation>
+        <translation>Nachricht</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="192"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -273,27 +273,27 @@
     <message>
         <location filename="../src/application.cc" line="487"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation type="unfinished">Der aktuelle Codeplug passt zum Gerät &apos;%1&apos;.</translation>
+        <translation>Der aktuelle Codeplug passt zum Gerät &apos;%1&apos;.</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="528"/>
         <source>Read codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Codeplug lesen</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="606"/>
         <source>Write codeplug</source>
-        <translation type="unfinished"></translation>
+        <translation>Codeplug schreiben</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="683"/>
         <source>Write call-sign db</source>
-        <translation type="unfinished"></translation>
+        <translation>Rufzeichendatenbank schreiben</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="732"/>
         <source>Write satellites</source>
-        <translation type="unfinished">Satelliten schreiben</translation>
+        <translation>Satelliten schreiben</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="536"/>
@@ -384,12 +384,12 @@
     <message>
         <location filename="../src/bandwidthselect.cc" line="8"/>
         <source>Narrow (12.5 kHz)</source>
-        <translation type="unfinished">Schmal (12.5 kHz)</translation>
+        <translation>Schmal (12.5 kHz)</translation>
     </message>
     <message>
         <location filename="../src/bandwidthselect.cc" line="9"/>
         <source>Wide (25 kHz)</source>
-        <translation type="unfinished">Breit (25 kHz)</translation>
+        <translation>Breit (25 kHz)</translation>
     </message>
 </context>
 <context>
@@ -402,7 +402,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="26"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hinweis:&lt;/span&gt; qdmr bietet Autovervollständigung für Kanäle an, wenn Sie anfangen, das Rufzeichen eines Repeaters einzugeben. Nach drei eingegebenen Zeichen wird eine Anfrage an repeaterbook.com geschickt, um die Informationen der passenden Repeater abzurufen. Diese Anfragen können einen kurzen Moment dauern. Die erhaltenen Ergebnisse werden lokal zwischengespeichert.&lt;/p&gt;&lt;p&gt;Eine drop-down Liste wird erscheinen, die es Ihnen erlaubt, einen Repeater auszuwählen. Wenn Sie einen Repeater ausgewählt haben, werden die RX &amp;amp; TX Frequenzen sowie die CTCSS Subtoneinstellungen ausgefüllt, insofern vorhanden.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;ausblenden&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hinweis:&lt;/span&gt; qdmr bietet Autovervollständigung für Kanäle an, wenn Sie anfangen, das Rufzeichen eines Repeaters einzugeben. Nach drei eingegebenen Zeichen wird eine Anfrage an repeaterbook.com geschickt, um die Informationen der passenden Repeater abzurufen. Diese Anfragen können einen kurzen Moment dauern. Die erhaltenen Ergebnisse werden lokal zwischengespeichert.&lt;/p&gt;&lt;p&gt;Eine drop-down Liste wird erscheinen, die es Ihnen erlaubt, einen Repeater auszuwählen. Wenn Sie einen Repeater ausgewählt haben, werden die RX &amp;amp; TX Frequenzen sowie die CTCSS Subtoneinstellungen ausgefüllt, insofern vorhanden.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;ausblenden&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="49"/>
@@ -412,7 +412,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="57"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="76"/>
@@ -422,54 +422,54 @@
     <message>
         <location filename="../src/channeldialog.ui" line="83"/>
         <source>Rx Frequency</source>
-        <translation type="unfinished">RX Frequenz</translation>
+        <translation>RX Frequenz</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="100"/>
         <source>Tx Frequency</source>
-        <translation type="unfinished">TX Frequenz</translation>
+        <translation>TX Frequenz</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="117"/>
         <source>Tx Offset</source>
-        <translation type="unfinished">TX Ablage</translation>
+        <translation>TX Ablage</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="175"/>
         <source>Power</source>
-        <translation type="unfinished">Leistung</translation>
+        <translation>Leistung</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="191"/>
         <source>Max</source>
-        <translation type="unfinished">Maximum</translation>
+        <translation>Maximum</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="196"/>
         <source>High</source>
-        <translation type="unfinished">Hoch</translation>
+        <translation>Hoch</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="201"/>
         <source>Mid</source>
-        <translation type="unfinished">Mittel</translation>
+        <translation>Mittel</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="206"/>
         <source>Low</source>
-        <translation type="unfinished">Niedrig</translation>
+        <translation>Niedrig</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="211"/>
         <source>Min</source>
-        <translation type="unfinished">Minimum</translation>
+        <translation>Minimum</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="225"/>
         <location filename="../src/channeldialog.ui" line="268"/>
         <location filename="../src/channeldialog.ui" line="308"/>
         <source>Default</source>
-        <translation type="unfinished">Standard</translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="234"/>
@@ -480,7 +480,7 @@
         <location filename="../src/channeldialog.ui" line="249"/>
         <location filename="../src/channeldialog.ui" line="292"/>
         <source>Off</source>
-        <translation type="unfinished">Aus</translation>
+        <translation>Aus</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="277"/>
@@ -490,7 +490,7 @@
     <message>
         <location filename="../src/channeldialog.ui" line="317"/>
         <source>Rx Only</source>
-        <translation type="unfinished">Nur RX</translation>
+        <translation>Nur RX</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="334"/>
@@ -505,17 +505,17 @@
     <message>
         <location filename="../src/channeldialog.cc" line="25"/>
         <source>No offset</source>
-        <translation type="unfinished">Keine Ablage (simplex)</translation>
+        <translation>Keine Ablage (simplex)</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="27"/>
         <source>Positive offset</source>
-        <translation type="unfinished">Positive Ablage</translation>
+        <translation>Positive Ablage</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="29"/>
         <source>Negative offset</source>
-        <translation type="unfinished">Negative Ablage</translation>
+        <translation>Negative Ablage</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="50"/>
@@ -802,7 +802,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="486"/>
         <source>RX Group List</source>
-        <translation type="unfinished">Empfangsgruppe</translation>
+        <translation>Empfangsgruppe</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="487"/>
@@ -1097,7 +1097,7 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation type="unfinished">Wählen Sie die Klasse des Objektes aus, das Sie erzeugen wollen.</translation>
+        <translation>Wählen Sie die Klasse des Objektes aus, das Sie erzeugen wollen.</translation>
     </message>
 </context>
 <context>
@@ -1175,12 +1175,12 @@
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
         <source>Delete contact button</source>
-        <translation type="unfinished">Dieser Button löscht den ausgewählten Kontakt.</translation>
+        <translation>Dieser Button löscht den ausgewählten Kontakt.</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
         <source>Add Contact</source>
-        <translation type="unfinished">Kontakt hinzufügen</translation>
+        <translation>Kontakt hinzufügen</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="48"/>
@@ -1275,12 +1275,12 @@
     <message>
         <location filename="../src/admitselect.cc" line="35"/>
         <source>Always</source>
-        <translation type="unfinished">Immer</translation>
+        <translation>Immer</translation>
     </message>
     <message>
         <location filename="../src/admitselect.cc" line="36"/>
         <source>Channel Free</source>
-        <translation type="unfinished">Kanal frei</translation>
+        <translation>Kanal frei</translation>
     </message>
     <message>
         <location filename="../src/admitselect.cc" line="37"/>
@@ -1318,17 +1318,17 @@
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="48"/>
         <source>Tx Contact</source>
-        <translation type="unfinished">TX Kontakt</translation>
+        <translation>TX Kontakt</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="50"/>
         <source>APRS</source>
-        <translation type="unfinished">APRS</translation>
+        <translation>APRS</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="52"/>
         <source>Roaming zone</source>
-        <translation type="unfinished">Roamingzone</translation>
+        <translation>Roamingzone</translation>
     </message>
 </context>
 <context>
@@ -1425,7 +1425,7 @@
     <message>
         <location filename="../src/idselect.cc" line="9"/>
         <source>[Default]</source>
-        <translation type="unfinished">[Standard]</translation>
+        <translation>[Standard]</translation>
     </message>
 </context>
 <context>
@@ -1994,12 +1994,12 @@
     <message>
         <location filename="../src/admitselect.cc" line="9"/>
         <source>Always</source>
-        <translation type="unfinished">Immer</translation>
+        <translation>Immer</translation>
     </message>
     <message>
         <location filename="../src/admitselect.cc" line="10"/>
         <source>Channel Free</source>
-        <translation type="unfinished">Kanal frei</translation>
+        <translation>Kanal frei</translation>
     </message>
     <message>
         <location filename="../src/admitselect.cc" line="11"/>
@@ -2012,7 +2012,7 @@
     <message>
         <location filename="../src/fmchanneldialog.cc" line="34"/>
         <source>Squelch</source>
-        <translation type="unfinished">Rauschsperre</translation>
+        <translation>Rauschsperre</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="36"/>
@@ -2022,22 +2022,22 @@
     <message>
         <location filename="../src/fmchanneldialog.cc" line="38"/>
         <source>Rx Tone</source>
-        <translation type="unfinished">RX Subton</translation>
+        <translation>RX Subton</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="40"/>
         <source>Tx Tone</source>
-        <translation type="unfinished">TX Subton</translation>
+        <translation>TX Subton</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="42"/>
         <source>Bandwidth</source>
-        <translation type="unfinished">Bandbreite</translation>
+        <translation>Bandbreite</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="44"/>
         <source>APRS</source>
-        <translation type="unfinished">APRS</translation>
+        <translation>APRS</translation>
     </message>
 </context>
 <context>
@@ -2180,7 +2180,7 @@
         <location filename="../src/generalsettingsview.ui" line="206"/>
         <source>Default</source>
         <extracomment>Label for a checkbox that disables a separate DMR squelch setting. The default squelch is then used.</extracomment>
-        <translation type="unfinished">Standard</translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="215"/>
@@ -2321,12 +2321,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/generalsettingsview.ui" line="110"/>
         <source>Specifies the default (DMR) microphone amplification level.</source>
-        <translation type="unfinished"></translation>
+        <translation>Gibt die Standardmikrofonverstärkung (DMR) an.</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="123"/>
         <source>FM Microphone Amplification</source>
-        <translation type="unfinished"></translation>
+        <translation>FM Mikrofonverstärkung</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="617"/>
@@ -2385,32 +2385,32 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="38"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="65"/>
         <source>Add Contact</source>
-        <translation type="unfinished">Kontakt hinzufügen</translation>
+        <translation>Kontakt hinzufügen</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="68"/>
         <source>Alt++</source>
-        <translation type="unfinished">Alt++</translation>
+        <translation>Alt++</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="75"/>
         <source>Remove Contact</source>
-        <translation type="unfinished">Kontakt entfernen</translation>
+        <translation>Kontakt entfernen</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="78"/>
         <source>Alt+-</source>
-        <translation type="unfinished">Alt+-</translation>
+        <translation>Alt+-</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="88"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
 </context>
 <context>
@@ -2535,7 +2535,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/m17contactdialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="37"/>
@@ -2555,7 +2555,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/m17contactdialog.ui" line="58"/>
         <source>Ring</source>
-        <translation type="unfinished">Klingelton</translation>
+        <translation>Klingelton</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="68"/>
@@ -2570,7 +2570,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/m17contactdialog.ui" line="86"/>
         <source>Extensions</source>
-        <translation type="unfinished">Erweiterungen</translation>
+        <translation>Erweiterungen</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.cc" line="49"/>
@@ -3309,7 +3309,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/releasenotes.cc" line="59"/>
         <source>qDMR was updated to version %1</source>
-        <translation type="unfinished">Eine neue Version %1 von qdmr wurde freigegeben.</translation>
+        <translation>Eine neue Version %1 von qdmr wurde freigegeben.</translation>
     </message>
 </context>
 <context>
@@ -3634,7 +3634,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingzonedialog.cc" line="126"/>
         <source>[Default]</source>
-        <translation type="unfinished">[Standard]</translation>
+        <translation>[Standard]</translation>
     </message>
 </context>
 <context>
@@ -3704,7 +3704,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/satellitetransponderdialog.ui" line="81"/>
         <location filename="../src/satellitetransponderdialog.ui" line="142"/>
         <source>Select or edit the uplink frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uplinkfrequenz auswählen oder eintragen.</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="91"/>
@@ -3723,7 +3723,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/satellitetransponderdialog.ui" line="111"/>
         <location filename="../src/satellitetransponderdialog.ui" line="183"/>
         <source>Select or edit the downlink frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>Downlinkfrequenz auswählen oder eintragen.</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="130"/>
@@ -3739,7 +3739,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="239"/>
         <source>Select or edit the beacon frequency.</source>
-        <translation type="unfinished"></translation>
+        <translation>Beaconfrequenz auswählen oder eintragen.</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="242"/>
@@ -4150,7 +4150,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>
-        <translation type="unfinished">Offen</translation>
+        <translation>Offen</translation>
     </message>
     <message>
         <location filename="../src/squelchedit.ui" line="45"/>
@@ -4160,7 +4160,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/squelchedit.ui" line="48"/>
         <source>Default</source>
-        <translation type="unfinished">Standard</translation>
+        <translation>Standard</translation>
     </message>
 </context>
 <context>
