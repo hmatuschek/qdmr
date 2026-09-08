@@ -37,42 +37,42 @@
     <message>
         <location filename="../src/aprssystemdialog.ui" line="20"/>
         <source>Edit APRS System</source>
-        <translation type="unfinished">APRS System bearbeiten</translation>
+        <translation>APRS System bearbeiten</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="30"/>
         <source>Basic</source>
-        <translation type="unfinished">Basis</translation>
+        <translation>Basis</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="42"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>Name</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="52"/>
         <source>Channel</source>
-        <translation type="unfinished">Kanal</translation>
+        <translation>Kanal</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="62"/>
         <source>Source</source>
-        <translation type="unfinished">Quelle</translation>
+        <translation>Quelle</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="100"/>
         <source>Destination</source>
-        <translation type="unfinished">Ziel</translation>
+        <translation>Ziel</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="138"/>
         <source>Path</source>
-        <translation type="unfinished">Pfad</translation>
+        <translation>Pfad</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="145"/>
         <source>Icon</source>
-        <translation type="unfinished">Icon</translation>
+        <translation>Icon</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="152"/>
