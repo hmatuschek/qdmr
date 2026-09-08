@@ -119,12 +119,12 @@ UV390Codeplug::ChannelElement::setTurnOffFreq(TyTChannelExtension::KillTone freq
 
 Level
 UV390Codeplug::ChannelElement::squelch() const {
-  return Level::fromValue(getUInt8(Offset::squelch()));
+  return Level::fromValue(getUInt8(Offset::squelch()), {0,9});
 }
 void
 UV390Codeplug::ChannelElement::setSquelch(Level value) {
-  if (value.isInvalid())
-    setUInt8(Offset::squelch(), value.value());
+  if (value.isFinite())
+    setUInt8(Offset::squelch(), value.mapTo({0,9}));
 }
 
 Channel::Power

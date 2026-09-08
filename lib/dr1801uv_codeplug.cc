@@ -1274,20 +1274,12 @@ DR1801UVCodeplug::SettingsElement::setPowerSaveMode(PowerSaveMode mode) {
 
 Level
 DR1801UVCodeplug::SettingsElement::voxSensitivity() const {
-  if (0x00 == getUInt8(Offset::voxEnabled())) {
-    return Level::null();
-  }
-  return Level::fromValue(getUInt8(Offset::voxSensitivity()), Limit::vox());
+  return Level::fromValue(getUInt8(Offset::voxSensitivity()), Limit::vox(), 0);
 }
 
 void
 DR1801UVCodeplug::SettingsElement::setVOXSensitivity(Level sens) {
-  if (sens.isNull()) {
-    setUInt8(Offset::voxEnabled(), 0x00);
-  } else {
-    setUInt8(Offset::voxEnabled(), 0x01);
-    setUInt8(Offset::voxSensitivity(), sens.mapTo(Limit::vox()));
-  }
+  setUInt8(Offset::voxSensitivity(), sens.mapTo(Limit::vox(), 0));
 }
 
 
