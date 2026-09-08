@@ -257,6 +257,71 @@ D578UVTest::testARC4Encryption() {
            decoded.commercialExtension()->encryptionKeys()->key(0));
 }
 
+void
+D578UVTest::testAESEncryption() {
+  ErrorStack err;
+
+  // Load config from file
+  Config config;
+  if (! config.readYAML(":/data/aes_encryption.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file:\n%1")
+          .arg(err.format(" ")).toStdString().c_str());
+  }
+
+  D578UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Verify the digital encryption enable byte is set in the encoded channel element
+  D578UVCodeplug::ChannelElement ch(codeplug.data(0x00800000));
+  QVERIFY(ch.digitalEncryptionEnabled());
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Verify existence of key
+  QVERIFY(nullptr != decoded.commercialExtension());
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 1);
+  QCOMPARE(decoded.commercialExtension()->encryptionKeys()->key(0)->key(), QByteArray::fromHex("11223344556677889900AABBCCDDEEFF"));
+
+  // Verify link to channel
+  QVERIFY(nullptr != decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension());
+  QCOMPARE(decoded.channelList()->channel(0)->as<DMRChannel>()->commercialExtension()->encryptionKey(),
+           decoded.commercialExtension()->encryptionKeys()->key(0));
+}
+
+void
+D578UVTest::testAESEncryptionWithoutKeyDoesNotEnableEncryption() {
+  ErrorStack err;
+
+  // Load config from file. This config has an AES key assigned to the channel
+  Config config;
+  if (! config.readYAML(":/data/aes_encryption.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file:\n%1")
+          .arg(err.format(" ")).toStdString().c_str());
+  }
+
+  // Remove the encryption key from the channel
+  auto *dch = config.channelList()->channel(0)->as<DMRChannel>();
+  dch->commercialExtension()->setEncryptionKey(nullptr);
+
+  D578UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Verify the digital encryption enable byte is NOT set in the encoded channel element
+  D578UVCodeplug::ChannelElement noKeyCh(codeplug.data(0x00800000));
+  QVERIFY(! noKeyCh.digitalEncryptionEnabled());
+}
 
 void
 D578UVTest::testAMChannel() {
@@ -281,4 +346,3 @@ D578UVTest::testAMChannel() {
 
 
 QTEST_GUILESS_MAIN(D578UVTest)
-

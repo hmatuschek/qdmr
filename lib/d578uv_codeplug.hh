@@ -114,6 +114,11 @@ public:
     AdvancedEncryptionType advancedEncryptionType() const override;
     void setEncryptionType(AdvancedEncryptionType type) override;
 
+    /** Returns @c true if digital encryption is enabled for this channel. */
+    virtual bool digitalEncryptionEnabled() const;
+    /** Enables/disables digital encryption for this channel. */
+    virtual void enableDigitalEncryption(bool enable);
+
     /** Returns @c true if the analog scambler is enabled. */
     virtual bool analogScamblerEnabled() const;
     /** If enabled, returns the analog scrambler frequency. */
@@ -145,6 +150,7 @@ public:
       static constexpr Bit roaming()                       { return {0x0034, 6}; }
       static constexpr unsigned int fmScrambler()          { return 0x003a; }
       static constexpr unsigned int customScrambler()      { return 0x003b; }
+      static constexpr unsigned int digitalEncryption()    { return 0x003c; }
       static constexpr Bit multipleKeyEncryption()         { return {0x003d, 0}; }
       static constexpr Bit randomKey()                     { return {0x003d, 1}; }
       static constexpr Bit sms()                           { return {0x003d, 2}; }
