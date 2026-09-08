@@ -1,6 +1,5 @@
 #include "mainwindow.hh"
 #include "ui_mainwindow.h"
-#include <QProgressBar>
 #include <QCloseEvent>
 #include <QMessageBox>
 #include <QStyleHints>
@@ -9,35 +8,34 @@
 #include "logger.hh"
 #include "application.hh"
 
-#include "generalsettingsview.hh"
-#include "radioidlistview.hh"
-#include "contactlistview.hh"
-#include "grouplistsview.hh"
 #include "channellistview.hh"
-#include "zonelistview.hh"
-#include "scanlistsview.hh"
+#include "contactlistview.hh"
+#include "extensionview.hh"
+#include "generalsettingsview.hh"
+#include "grouplistsview.hh"
 #include "positioningsystemlistview.hh"
+#include "radioidlistview.hh"
 #include "roamingchannellistview.hh"
 #include "roamingzonelistview.hh"
-#include "extensionview.hh"
-#include "talkgroupdatabase.hh"
 #include "satellitedatabase.hh"
-
-
+#include "scanlistsview.hh"
+#include "talkgroupdatabase.hh"
+#include "task_progress.hh"
+#include "task_progress_view.hh"
+#include "zonelistview.hh"
 
 MainWindow::MainWindow(Config *config, QWidget *parent)
   : QMainWindow(parent), ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
-  Application *app = qobject_cast<Application*>(QApplication::instance());
+  auto app = qobject_cast<Application*>(QApplication::instance());
 
   Settings settings;
   logDebug() << "Create main window using icon theme '" << QIcon::themeName() << "'.";
 
-  QProgressBar *progress = new QProgressBar();
+  auto progress = new TaskProgressListView();
   progress->setObjectName("progress");
   ui->statusbar->addPermanentWidget(progress);
-  progress->setVisible(false);
 
   ui->actionExportToCHIRP->setIcon(QIcon::fromTheme("document-export"));
   ui->actionImport->setIcon(QIcon::fromTheme("document-import"));
@@ -65,34 +63,13 @@ MainWindow::MainWindow(Config *config, QWidget *parent)
   connect(ui->actionSettings, SIGNAL(triggered()), app, SLOT(showSettings()));
   connect(ui->actionHelp, SIGNAL(triggered()), app, SLOT(showHelp()));
 
-  connect(ui->actionRefreshCallsignDB, &QAction::triggered, app->user(), &UserDatabase::download);
-  QObject::connect(app->user(), &UserDatabase::error, this, [this](const QString &msg) {
-    this->ui->statusbar->showMessage(tr("Cannot update callsign DB: %1").arg(msg), 10000);
-  }, Qt::QueuedConnection);
-  QObject::connect(app->user(), &UserDatabase::loaded, this, [this]() {
-    this->ui->statusbar->showMessage(tr("Callsign database updated & loaded."), 10000);
-  }, Qt::QueuedConnection);
-  connect(app->user(), &UserDatabase::downloadProgress, this, [this](qint64 loaded, qint64 total) {
-    if (total > 0)
-      this->ui->statusbar->showMessage(tr("Download call-sign DB ... %1%").arg((100*loaded)/total), 10000);
-    else
-      this->ui->statusbar->showMessage(tr("Download call-sign DB ... (%1MB)").arg(double(loaded)/1024/1024, 0, 'f', 1), 10000);
-  }, Qt::QueuedConnection);
+  connect(ui->actionRefreshCallsignDB, &QAction::triggered, [app, progress]() {
+    progress->addTask(app->user()->download());
+  });
 
-  connect(ui->actionRefreshTalkgroupDB, &QAction::triggered, app->talkgroup(), &TalkGroupDatabase::download);
-  QObject::connect(app->talkgroup(), &TalkGroupDatabase::error, this, [this](const QString &msg) {
-    this->ui->statusbar->showMessage(tr("Cannot update talkgroup DB: %1").arg(msg), 10000);
-  }, Qt::QueuedConnection);
-  QObject::connect(app->talkgroup(), &TalkGroupDatabase::loaded, this, [this]() {
-    this->ui->statusbar->showMessage(tr("Talkgroup database updated & loaded."), 10000);
-  }, Qt::QueuedConnection);
-  connect(app->talkgroup(), &TalkGroupDatabase::downloadProgress, this, [this](qint64 loaded, qint64 total) {
-    if (total > 0)
-      this->ui->statusbar->showMessage(tr("Download talkgroup DB ... %1%").arg((100*loaded)/total), 10000);
-    else
-      this->ui->statusbar->showMessage(tr("Download talkgroup DB ... (%1MB)")
-        .arg(static_cast<double>(loaded)/1024/1024, 0, 'f', 1), 10000);
-  }, Qt::QueuedConnection);
+  connect(ui->actionRefreshTalkgroupDB, &QAction::triggered, [app, progress]() {
+    progress->addTask(app->talkgroup()->download());
+  });
 
   connect(ui->actionRefreshOrbitalElements, &QAction::triggered, app->satellite(), &SatelliteDatabase::update);
   QObject::connect(app->satellite(), &SatelliteDatabase::error, this, [this](const QString &msg) {

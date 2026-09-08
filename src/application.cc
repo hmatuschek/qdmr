@@ -1,49 +1,35 @@
 #include "application.hh"
-#include <QMainWindow>
 #include <QtUiTools>
 #include <QDesktopServices>
 #include <QTranslator>
 #include <QStandardPaths>
 
-#include "logger.hh"
-#include "radio.hh"
+#include "chirpformat.hh"
 #include "codeplug.hh"
 #include "config.h"
-#include "settings.hh"
-#include "radiolimits.hh"
-#include "verifydialog.hh"
-#include "rxgrouplistdialog.hh"
-#include "zonedialog.hh"
-#include "scanlistdialog.hh"
-#include "roamingzonedialog.hh"
-#include "repeaterdatabase.hh"
-#include "repeaterbooksource.hh"
-#include "repeatermapsource.hh"
-#include "hearhamrepeatersource.hh"
-#include "radioidrepeatersource.hh"
-#include "userdatabase.hh"
-#include "talkgroupdatabase.hh"
-#include "satellitedatabase.hh"
-#include "generalsettingsview.hh"
-#include "radioidlistview.hh"
-#include "contactlistview.hh"
-#include "grouplistsview.hh"
-#include "channellistview.hh"
-#include "zonelistview.hh"
-#include "scanlistsview.hh"
-#include "positioningsystemlistview.hh"
-#include "roamingchannellistview.hh"
-#include "roamingzonelistview.hh"
-#include "errormessageview.hh"
-#include "deviceselectiondialog.hh"
-#include "radioselectiondialog.hh"
-#include "chirpformat.hh"
 #include "configmergedialog.hh"
 #include "configmergevisitor.hh"
-#include "satellitedatabasedialog.hh"
+#include "deviceselectiondialog.hh"
+#include "errormessageview.hh"
+#include "generalsettingsview.hh"
+#include "hearhamrepeatersource.hh"
+#include "logger.hh"
 #include "mainwindow.hh"
-
-
+#include "radio.hh"
+#include "radioidrepeatersource.hh"
+#include "radiolimits.hh"
+#include "radioselectiondialog.hh"
+#include "repeaterbooksource.hh"
+#include "repeaterdatabase.hh"
+#include "repeatermapsource.hh"
+#include "satellitedatabase.hh"
+#include "satellitedatabasedialog.hh"
+#include "settings.hh"
+#include "talkgroupdatabase.hh"
+#include "task_progress.hh"
+#include "task_progress_view.hh"
+#include "userdatabase.hh"
+#include "verifydialog.hh"
 
 inline QStringList getLanguages() {
   QStringList languages = {QLocale::system().name()};
@@ -532,21 +518,16 @@ Application::downloadCodeplug() {
     return;
   }
 
-  QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  progress->setMaximum(0); progress->setVisible(true);
-  connect(radio, &Radio::downloadProgress, this, &Application::onProgress);
-  connect(radio, SIGNAL(downloadError(Radio *)), this, SLOT(onCodeplugDownloadError(Radio *)));
-  connect(radio, SIGNAL(downloadFinished(Radio *, Codeplug *)), this, SLOT(onCodeplugDownloaded(Radio *, Codeplug *)));
+
 
   TransferFlags flags; flags.setBlocking(false);
-
   ErrorStack err;
   if (radio->startDownload(flags, err)) {
-    _mainWindow->statusBar()->showMessage(tr("Read ..."));
     _mainWindow->setEnabled(false);
+    auto progress = _mainWindow->findChild<TaskProgressListView *>("progress");
+    progress->addTask(new RadioTransferTaskProgress(tr("Read codeplug"), radio));
   } else {
     ErrorMessageView(err).exec();
-    progress->setVisible(false);
   }
 }
 
@@ -554,7 +535,6 @@ void
 Application::onCodeplugDownloadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Read error"));
   ErrorMessageView(radio->errorStack()).exec();
-  _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
   if (radio->wait(250))
@@ -572,7 +552,6 @@ Application::onCodeplugDownloaded(Radio *radio, Codeplug *codeplug) {
   ErrorStack err;
   if (codeplug->decode(_config, err)) {
     _mainWindow->statusBar()->showMessage(tr("Read complete"));
-    _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
     _config->setModified(false);
   } else {
     ErrorMessageView(err).exec();
@@ -608,10 +587,6 @@ Application::uploadCodeplug() {
     return;
   }
 
-  QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  progress->setValue(0); progress->setMaximum(0); progress->setVisible(true);
-  connect(radio, &Radio::uploadProgress, this, &Application::onProgress);
-
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
@@ -619,7 +594,6 @@ Application::uploadCodeplug() {
   Config *intermediate = radio->codeplug().preprocess(_config, err);
   if (nullptr == intermediate) {
     ErrorMessageView(err).exec();
-    progress->setVisible(false);
     return;
   }
 
@@ -627,11 +601,11 @@ Application::uploadCodeplug() {
   flags.setBlocking(false);
 
   if (radio->startUpload(intermediate, flags, err)) {
-     _mainWindow->statusBar()->showMessage(tr("Upload ..."));
-     _mainWindow->setEnabled(false);
+    _mainWindow->setEnabled(false);
+    auto progress = _mainWindow->findChild<TaskProgressListView *>("progress");
+    progress->addTask(new RadioTransferTaskProgress(tr("Write codeplug"), radio));
   } else {
     ErrorMessageView(err).exec();
-    progress->setVisible(false);
   }
 }
 
@@ -697,10 +671,6 @@ Application::uploadCallsignDB() {
     css.setCountLimit(settings.maxCallSignDBEntries());
   }
 
-  QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  progress->setRange(0, 0); progress->setValue(0); progress->setVisible(true);
-
-  connect(radio, &Radio::uploadProgress, this, &Application::onProgress);
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
@@ -708,11 +678,11 @@ Application::uploadCallsignDB() {
   css.setBlocking(false);
   if (radio->startUploadCallsignDB(_users, css, err)) {
     logDebug() << "Start call-sign DB write...";
-    _mainWindow->statusBar()->showMessage(tr("Write call-sign DB ..."));
     _mainWindow->setEnabled(false);
+    auto progress = _mainWindow->findChild<TaskProgressListView *>("progress");
+    progress->addTask(new RadioTransferTaskProgress(tr("Write call-sign db"), radio));
   } else {
     ErrorMessageView(err).exec();
-    progress->setVisible(false);
   }
 }
 
@@ -750,11 +720,6 @@ Application::uploadSatellites() {
   TransferFlags flags;
   flags.setUpdateDeviceClock(settings.updateDeviceClock());
 
-  QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  progress->setRange(0, 100); progress->setValue(0);
-  progress->setVisible(true);
-
-  connect(radio, SIGNAL(uploadProgress(int)), progress, SLOT(setValue(int)));
   connect(radio, SIGNAL(uploadError(Radio *)), this, SLOT(onCodeplugUploadError(Radio *)));
   connect(radio, SIGNAL(uploadComplete(Radio *)), this, SLOT(onCodeplugUploaded(Radio *)));
 
@@ -762,28 +727,19 @@ Application::uploadSatellites() {
   flags.setBlocking(false);
   if (radio->startUploadSatelliteConfig(_satellites, flags, err)) {
     logDebug() << "Start satellite config write...";
-    _mainWindow->statusBar()->showMessage(tr("Write satellite config ..."));
     _mainWindow->setEnabled(false);
+    auto progress = _mainWindow->findChild<TaskProgressListView *>("progress");
+    progress->addTask(new RadioTransferTaskProgress(tr("Write satellites"), radio));
   } else {
     ErrorMessageView(err).exec();
-    progress->setVisible(false);
   }
 }
 
 
 void
-Application::onProgress(int value) {
-  QProgressBar *progress = _mainWindow->findChild<QProgressBar *>("progress");
-  if (value >= 0)
-    progress->setMaximum(100);
-  progress->setValue(value);
-}
-
-void
 Application::onCodeplugUploadError(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write error"));
   ErrorMessageView(radio->errorStack()).exec();
-  _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
   if (radio->wait(250))
@@ -794,7 +750,6 @@ Application::onCodeplugUploadError(Radio *radio) {
 void
 Application::onCodeplugUploaded(Radio *radio) {
   _mainWindow->statusBar()->showMessage(tr("Write complete"));
-  _mainWindow->findChild<QProgressBar *>("progress")->setVisible(false);
   _mainWindow->setEnabled(true);
 
   logDebug() << "Write complete.";

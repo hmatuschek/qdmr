@@ -1,24 +1,30 @@
 #include "gd73_interface.hh"
 #include "logger.hh"
 #include <QtEndian>
+#include <QThread>
 
 #define BLOCK_SIZE 0x35
 
 GD73Interface::GD73Interface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
   : C7000Device(descriptor, err, parent), RadioInterface()
 {
-  Packet request, response;
+  Packet request = Packet(0x01, 0x04), response;
   if (nullptr == _dev) {
     errMsg(err) << "Cannot initialize GD73 interface: C7000 interface not open.";
     return;
   }
 
-  request = Packet(0x01, 0x04);
-  if (! sendRecv(request, response, err)) {
-    errMsg(err) << "Cannot enter programming mode.";
-    C7000Device::close();
+  for (int retry = 0; retry<3; retry++) {
+    ErrorStack e;
+    if (sendRecv(request, response, e)) {
+      logDebug() << "Entered prog mode. Response: " << response.payload().toHex() << ".";
+      return;
+    }
+    logDebug() << "Failed to enter programming mode: " << e.format() << " Retry.";
+    QThread::msleep(500);
   }
-  logDebug() << "Entered prog mode. Response: " << response.payload().toHex() << ".";
+  C7000Device::close();
+  errMsg(err) << "Cannot enter programming mode.";
 }
 
 bool
