@@ -2637,6 +2637,45 @@ DMR6X2UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   return true;
 }
 
+
+void
+DMR6X2UVCodeplug::allocateZones() {
+  D868UVCodeplug::allocateZones();
+  // Hidden zone map
+  image(0).addElement(Offset::hiddenZoneBitmap(), HiddenZoneBitmapElement::size());
+}
+
+bool
+DMR6X2UVCodeplug::encodeZone(int i, Zone *zone, const Flags &flags, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::encodeZone(i, zone, flags, ctx, err))
+    return false;
+
+  AnytoneZoneExtension *ext = zone->anytoneExtension();
+  if (nullptr == ext)
+    return true;
+
+  HiddenZoneBitmapElement(data(Offset::hiddenZoneBitmap())).setEncoded(i, ext->hidden());
+
+  return true;
+}
+
+bool
+DMR6X2UVCodeplug::decodeZone(int i, Zone *zone, Context &ctx, const ErrorStack &err) {
+  if (! D868UVCodeplug::decodeZone(i, zone, ctx, err))
+    return false;
+  AnytoneZoneExtension *ext = zone->anytoneExtension();
+  if (nullptr == ext) {
+    ext = new AnytoneZoneExtension();
+    zone->setAnytoneExtension(ext);
+  }
+
+  HiddenZoneBitmapElement bitmap(data(Offset::hiddenZoneBitmap()));
+  ext->enableHidden(bitmap.isEncoded(i));
+
+  return true;
+}
+
+
 void
 DMR6X2UVCodeplug::allocateGPSSystems() {
   // replaces D868UVCodeplug::allocateGPSSystems

@@ -31,6 +31,10 @@ public:
     /** Decodes to Signaling::Code CTCSS tones. */
     static SelectiveCall decode(uint8_t code);
 
+  public:
+    /** The index corresponding to a custom CTCSS tone. */
+    static constexpr uint8_t customIndex() { return 51; };
+
   protected:
     /** Translation table. */
     static SelectiveCall _codeTable[52];
@@ -1433,6 +1437,22 @@ public:
   public:
     /** Constructor. */
     ZoneBitmapElement(uint8_t *ptr);
+
+    /** The size of the element. */
+    static constexpr unsigned int size() { return 0x0020; }
+  };
+
+
+  /** Encodes the bitmap, indicating which zone is hidden. */
+  class HiddenZoneBitmapElement: public BitmapElement
+  {
+  protected:
+    /** Hidden constructor. */
+    HiddenZoneBitmapElement(uint8_t *ptr, size_t size);
+
+  public:
+    /** Constructor. */
+    HiddenZoneBitmapElement(uint8_t *ptr);
 
     /** The size of the element. */
     static constexpr unsigned int size() { return 0x0020; }

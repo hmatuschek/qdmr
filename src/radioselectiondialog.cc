@@ -1,9 +1,10 @@
 #include "radioselectiondialog.hh"
 #include "ui_radioselectiondialog.h"
+#include "settings.hh"
+
 
 RadioSelectionDialog::RadioSelectionDialog(const USBDeviceDescriptor &device, QWidget *parent) :
-  QDialog(parent),
-  ui(new Ui::RadioSelectionDialog)
+  QDialog(parent), ui(new Ui::RadioSelectionDialog)
 {
   ui->setupUi(this);
 
@@ -17,10 +18,12 @@ RadioSelectionDialog::RadioSelectionDialog(const USBDeviceDescriptor &device, QW
 
   connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
-RadioSelectionDialog::~RadioSelectionDialog()
-{
+RadioSelectionDialog::~RadioSelectionDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 

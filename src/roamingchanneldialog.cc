@@ -2,6 +2,8 @@
 #include "ui_roamingchanneldialog.h"
 #include "roamingchannel.hh"
 #include "utils.hh"
+#include "settings.hh"
+
 
 RoamingChannelDialog::RoamingChannelDialog(Config *config, QWidget *parent)
   : QDialog(parent), ui(new Ui::RoamingChannelDialog), _myChannel(new RoamingChannel(this)),
@@ -28,6 +30,7 @@ RoamingChannelDialog::RoamingChannelDialog(Config *config, RoamingChannel *chann
 }
 
 RoamingChannelDialog::~RoamingChannelDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 
@@ -61,8 +64,9 @@ RoamingChannelDialog::construct() {
           this, SLOT(onOverrideTimeSlotToggled(bool)));
   connect(ui->overrideColorCode, SIGNAL(toggled(bool)),
           this, SLOT(onOverrideColorCodeToggled(bool)));
-}
 
+  restoreGeometry(Settings().windowState(objectName()));
+}
 
 void
 RoamingChannelDialog::onOverrideTimeSlotToggled(bool override) {

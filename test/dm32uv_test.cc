@@ -184,6 +184,35 @@ DM32UVTest::testChannelBankEncoding() {
 }
 
 
+void
+DM32UVTest::testCTCSSHigherFrequencies() {
+  ErrorStack err;
+  DM32UVCodeplug codeplug;
+  Config config;
+  if (! config.readYAML(":/data/ctcss_copy_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  config.channelList()->channel(0)->as<FMChannel>()->setRXTone(SelectiveCall(100.0));
+  config.channelList()->channel(0)->as<FMChannel>()->setTXTone(SelectiveCall(107.2));
+
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DM32UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY(decoded.channelList()->channel(0)->is<FMChannel>());
+  QCOMPARE(decoded.channelList()->channel(0)->as<FMChannel>()->rxTone().Hz(), 100.0);
+  QCOMPARE(decoded.channelList()->channel(0)->as<FMChannel>()->txTone().Hz(), 107.2);
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 

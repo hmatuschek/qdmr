@@ -488,11 +488,11 @@ DM32UVCodeplug::ChannelElement::link(Channel *channel, Context &ctx, const Error
   // Link scan list
   if (validScanListIndex()) {
     if (! ctx.has<ScanList>(scanListIndex())) {
-      errMsg(err) << "Cannot link channel: Scan list with index " << scanListIndex()
-                  << " not defined.";
-      return false;
+      logWarn() << "While linking channel '" << channel->name()
+                << "': Scan list with index " << scanListIndex() << " not defined.";
+    } else {
+      channel->setScanList(ctx.get<ScanList>(scanListIndex()));
     }
-    channel->setScanList(ctx.get<ScanList>(scanListIndex()));
   }
 
   if (channel->is<DMRChannel>()) {
@@ -625,13 +625,15 @@ DM32UVCodeplug::ChannelElement::decodeSelectiveCall(uint16_t code) {
   if (0xffff == code)
     return SelectiveCall();
 
+  logTrace() << "Selective Call word: " << Qt::hex << code;
   uint8_t type = code >> 14;
   code &= 0x3fff;
 
   if (0 == type) {
-    return SelectiveCall(double((code>>8)&0xf)*10 + double((code>>4)&0xf)*1 + double(code & 0xf)/10);
-  } else if ((1 == type) || (2 == type)) {
-    return SelectiveCall(code, 2 == type);
+    return SelectiveCall(double((code>>12)&0xf)*100 + double((code>>8)&0xf)*10
+      + double((code>>4)&0xf)*1 + double(code & 0xf)/10);
+  } else if ((2 == type) || (3 == type)) {
+    return SelectiveCall(((code>>8)&0xf)*100 + ((code>>4)&0xf)*10 + (code & 0xf), 3 == type);
   }
 
   return SelectiveCall();
@@ -642,9 +644,14 @@ DM32UVCodeplug::ChannelElement::encodeSelectiveCall(const SelectiveCall &tone) {
   if (! tone.isValid())
     return 0xffff;
   if (tone.isCTCSS())
-    return (((tone.mHz()/10000) % 10) << 8) | (((tone.mHz()/1000) % 10) << 4) | ((tone.mHz()/100) % 10);
+    return (((tone.mHz()/100000) % 10) << 12)
+      | (((tone.mHz()/10000) % 10) << 8)
+      | (((tone.mHz()/1000) % 10) << 4) | ((tone.mHz()/100) % 10);
   if (tone.isDCS())
-    return ((tone.isInverted() ? 2 : 1) << 14) | tone.octalCode();
+    return ((tone.isInverted() ? 3 : 2) << 14)
+      | (((tone.binCode()/64) % 8) << 8)
+      | (((tone.binCode()/8) % 8) << 4)
+      | (tone.binCode() % 8);
   return 0xffff;
 }
 
@@ -4123,9 +4130,11 @@ DM32UVCodeplug::encode(Config *config, const Flags &flags, const ErrorStack &err
 bool
 DM32UVCodeplug::decode(Config *config, const ErrorStack &err) {
   Context ctx(config);
+  // Remove tables for each encryption method
   ctx.remTable(&BasicEncryptionKey::staticMetaObject, true);
   ctx.remTable(&ARC4EncryptionKey::staticMetaObject, true);
   ctx.remTable(&AESEncryptionKey::staticMetaObject, true);
+  // Add common index table for all encryption keys.
   ctx.addTable(&EncryptionKey::staticMetaObject);
 
   if (! decodeElements(ctx, err)) {

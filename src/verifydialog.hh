@@ -14,6 +14,7 @@ public:
 
 public:
   explicit VerifyDialog(const RadioLimitContext &ctx, bool upload, QWidget *parent = nullptr);
+  ~VerifyDialog();
 };
 
 #endif // VERIFYDIALOG_HH

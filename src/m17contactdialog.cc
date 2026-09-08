@@ -55,6 +55,14 @@ M17ContactDialog::construct() {
   connect(ui->broadcast, SIGNAL(toggled(bool)), this, SLOT(onBroadcastToggled(bool)));
   connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+  restoreGeometry(Settings().windowState(objectName()));
+}
+
+void
+M17ContactDialog::closeEvent(QCloseEvent *event) {
+  Settings().setWindowState(objectName(), saveGeometry());
+  QDialog::closeEvent(event);
 }
 
 M17Contact *

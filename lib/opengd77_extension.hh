@@ -71,10 +71,6 @@ public:
   /** Enables power save for this channel. */
   void enablePowerSave(bool enable);
 
-  /** Returns @c true if the fixed location is enabled. */
-  bool locationEnabled() const;
-  /** Enables the fixed location. */
-  void enableLocation(bool enable);
   /** Returns the fixed location for this channel. */
   const QGeoCoordinate &location() const;
   /** Returns the fixed location for this channel. */
@@ -103,8 +99,6 @@ protected:
   bool _beep;
   /** Holds the power-save flag. */
   bool _powerSave;
-  /** If @c true, fixed location is used. */
-  bool _locationEnabled;
   /** Holds the fixed location. */
   QGeoCoordinate _location;
   /** Holds the talker alias setting for timeslot 1. */
@@ -158,6 +152,50 @@ public:
 protected:
   /** Holds the time slot override. */
   TimeSlotOverride _timeSlotOverride;
+};
+
+
+/** Implements the FM-APRS extensions for the OpenGD77 radios.
+ * @since 0.15.2
+ * @ingroup ogd77ex */
+class OpenGD77FMAPRSSystemExtension: public ConfigExtension
+{
+  Q_OBJECT
+
+  Q_CLASSINFO("description", "FM APRS settings for OpenGD77 radios.")
+  Q_CLASSINFO("longDescription", "This extension implements all FM APRS settings specific to radios "
+              "running the OpenGD77 firmware.")
+
+  Q_CLASSINFO("transmitQSYDescription", "Adds the channel frequency to APRS message.")
+  Q_CLASSINFO("transmitQSYLongDescription", "If enabled, the current frequency gets added to the APRS message.")
+  /** Transmit QSY flag. */
+  Q_PROPERTY(bool transmitQSY READ transmitQSY WRITE enableTransmitQSY)
+
+  Q_CLASSINFO("baudDescription", "Specifies the baud rate.")
+  /** Baud rate settings. */
+  Q_PROPERTY(unsigned int baud READ baudRate WRITE setBaudRate)
+
+public:
+  /** Constructor. */
+  Q_INVOKABLE explicit OpenGD77FMAPRSSystemExtension(QObject *parent=nullptr);
+
+  ConfigItem *clone() const override;
+
+  /** Returns @c true if transmit QSY is enabled. */
+  bool transmitQSY() const;
+  /** Enables/disables transmit QSY. */
+  void enableTransmitQSY(bool enable);
+
+  /** Returns the baud rate. */
+  unsigned int baudRate() const;
+  /** Sets the baud rate. */
+  void setBaudRate(unsigned int baudRate);
+
+protected:
+  /** Hold the transmit QSY flag. */
+  bool _transmitQSY;
+  /** Holds the baud rate. */
+  unsigned int _baudRate;
 };
 
 

@@ -2,6 +2,8 @@
 #include "ui_configobjecttypeselectiondialog.h"
 #include "logger.hh"
 #include <QMetaClassInfo>
+#include "settings.hh"
+#include <QCloseEvent>
 
 ConfigObjectTypeSelectionDialog::ConfigObjectTypeSelectionDialog(
     const QList<QMetaObject> &cls, QWidget *parent)
@@ -22,10 +24,13 @@ ConfigObjectTypeSelectionDialog::ConfigObjectTypeSelectionDialog(
   ui->description->setTextFormat(Qt::RichText);
 
   connect(ui->typeSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionChanged(int)));
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
 ConfigObjectTypeSelectionDialog::~ConfigObjectTypeSelectionDialog()
 {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 

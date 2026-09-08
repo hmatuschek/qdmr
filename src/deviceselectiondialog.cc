@@ -1,5 +1,8 @@
 #include "deviceselectiondialog.hh"
 #include "ui_deviceselectiondialog.h"
+#include "settings.hh"
+#include <QCloseEvent>
+
 
 DeviceSelectionDialog::DeviceSelectionDialog(const QList<USBDeviceDescriptor> &interfaces, QWidget *parent) :
   QDialog(parent), ui(new Ui::DeviceSelectionDialog), _interfaces(interfaces)
@@ -18,9 +21,12 @@ DeviceSelectionDialog::DeviceSelectionDialog(const QList<USBDeviceDescriptor> &i
 
   connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
   connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
 DeviceSelectionDialog::~DeviceSelectionDialog() {
+  Settings().setWindowState(objectName(), saveGeometry());
   delete ui;
 }
 

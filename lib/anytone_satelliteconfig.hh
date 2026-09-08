@@ -38,7 +38,7 @@ public:
 
     static constexpr unsigned int size() { return 0x200; }
 
-    void clear();
+    void clear() override;
 
     /** Sets the satellite name. */
     void setName(const QString &name);

@@ -4,6 +4,7 @@
 #include "config.hh"
 #include "m17contactdialog.hh"
 #include "ui_channeldialog.h"
+#include "settings.hh"
 
 
 /* ****************************************************************************************** *
@@ -44,6 +45,8 @@ M17ChannelDialog::M17ChannelDialog(Config *config, QWidget *parent)
   : ChannelDialog(config, parent), _channel(), _mode(nullptr), _access(nullptr),
   _contact(nullptr)
 {
+  setObjectName("M17ChannelDialog");
+
   ui->rightForm->addRow(tr("Channel mode"),
                         _mode = new M17ChannelModeSelect());
   ui->rightForm->addRow(tr("Access number"),
@@ -53,6 +56,8 @@ M17ChannelDialog::M17ChannelDialog(Config *config, QWidget *parent)
                         _contact = new M17ContactSelect(config));
   ui->rightForm->addRow(tr("Send position"),
                         _aprs = new QCheckBox(""));
+
+  restoreGeometry(Settings().windowState(objectName()));
 }
 
 

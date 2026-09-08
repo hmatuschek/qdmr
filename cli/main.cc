@@ -40,7 +40,12 @@ int main(int argc, char *argv[])
   parser.addVersionOption();
   parser.addOption({
                      {"V","verbose"},
-                     QCoreApplication::translate("main", "Verbose output.")
+                     QCoreApplication::translate("main", "Verbose output (alias for --loglevel debug).")
+                   });
+  parser.addOption({
+                     "loglevel",
+                     QCoreApplication::translate("main", "Specifies the log-level to stderr. Must be one of `trace`, `debug`, `info`, `warning`, `error` or `fatal`."),
+                     "loglevel", "warning"
                    });
   parser.addOption({
                      {"c", "csv"},
@@ -168,8 +173,17 @@ int main(int argc, char *argv[])
   if (1 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  if (parser.isSet("verbose"))
+  if (parser.isSet("loglevel")) {
+    QString lvl = parser.value("loglevel").toLower();
+    if ("trace" == lvl)        handler->setMinLevel(LogMessage::TRACE);
+    else if ("debug" == lvl)   handler->setMinLevel(LogMessage::DEBUG);
+    else if ("info" == lvl)    handler->setMinLevel(LogMessage::INFO);
+    else if ("warning" == lvl) handler->setMinLevel(LogMessage::WARNING);
+    else if ("error" == lvl)   handler->setMinLevel(LogMessage::ERROR);
+    else if ("fatal" == lvl)   handler->setMinLevel(LogMessage::FATAL);
+  } else if (parser.isSet("verbose")) {
     handler->setMinLevel(LogMessage::DEBUG);
+  }
 
   int res = -1;
   QString command = parser.positionalArguments().at(0);

@@ -524,10 +524,15 @@ public:
     /** Resets the fixed position. */
     virtual void enableFixedPosition(bool enable);
 
-    /** Returns the posiiton reporting precision. */
+    /** Returns the position reporting precision. */
     virtual PositionPrecision positionPrecision() const;
     /** Sets the position reporting precision in degrees. */
     virtual void setPositionPrecision(PositionPrecision prec);
+
+    /** Returns  @c true if QSY text is added to the APRS message. */
+    virtual bool transmitQSY() const;
+    /** Enables adding QSY text to the APRS message. */
+    virtual void enableTransmitQSY(bool enable);
 
     /** Returns @c true, if the first via node is set. */
     virtual bool hasVia1() const;

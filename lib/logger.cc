@@ -142,6 +142,11 @@ StreamLogHandler::handle(const LogMessage &message) {
   if (message.level() < _minLevel)
     return;
   switch (message.level()) {
+  case LogMessage::TRACE:
+    if (_color)
+      _stream << "\033[37m";
+    _stream << "Trace ";
+    break;
   case LogMessage::DEBUG:
     if (_color)
       _stream << "\033[37m";
@@ -231,6 +236,7 @@ FileLogHandler::handle(const LogMessage &message) {
 
   _stream << QDateTime::currentDateTime().toString(Qt::ISODateWithMs) << ": ";
   switch (message.level()) {
+  case LogMessage::TRACE:   _stream << "Trace "; break;
   case LogMessage::DEBUG:   _stream << "Debug "; break;
   case LogMessage::INFO:    _stream << "Info "; break;
   case LogMessage::WARNING: _stream << "Warning "; break;

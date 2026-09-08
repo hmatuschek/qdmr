@@ -24,6 +24,8 @@ private slots:
   void testAESEncryption();
   void testARC4Encryption();
   void testMicGain();
+
+  void testHiddenZone(); ///< Regression test for #939
 };
 
 #endif // DMR6X2UVTEST_HH

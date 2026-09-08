@@ -1,12 +1,12 @@
 #include "utilstest.hh"
 
-#include <QTest>
-#include <QtEndian>
-#include "utils.hh"
-#include "frequency.hh"
 #include "chirpformat.hh"
 #include "config.hh"
-
+#include "frequency.hh"
+#include "ranges.hh"
+#include "utils.hh"
+#include <QTest>
+#include <QtEndian>
 
 UtilsTest::UtilsTest(QObject *parent)
   : QObject{parent}
@@ -164,5 +164,25 @@ UtilsTest::testFrequencyNearestMap() {
   QCOMPARE(map.value(Frequency::fromHz(410)), 3);
 }
 
+
+void
+UtilsTest::testLevel() {
+  // Levels are values from L=[1,10] including off (0) and invalid (infinite). They might be encoded
+  // by a smaller or larger value range (e.g. l=[0,4]). Obviously, we may not conserve the actual
+  // value of the level.
+  //
+  // Let U: L->L by mapping a level from L to l and than back again to L.
+  //
+  // We cannot ensure U(x)=x, but we must ensure U(U(l)) = U(l), that is idempotence.
+  QList<Codeplug::Element::Limit::Range<unsigned int>> ranges = {{0,4} };
+  for (auto range: ranges) {
+    for (int i=1; i<=10; i++) {
+      Level o = Level::fromValue(i);
+      Level l  = Level::fromValue(o.mapTo(range), range);
+      Level lp = Level::fromValue(l.mapTo(range), range);
+      QCOMPARE(lp.value(),l.value());
+    }
+  }
+}
 
 QTEST_GUILESS_MAIN(UtilsTest)

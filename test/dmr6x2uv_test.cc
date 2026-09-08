@@ -253,13 +253,31 @@ void
 DMR6X2UVTest::testMicGain() {
   ErrorStack err;
   Config copy, config; config.copy(_basicConfig);
-  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,1}, {4,3}, {5,3}, {6,5}, {7,5}, {8,7}, {9,7}, {10,10}};
+  QList<QPair<unsigned int,unsigned int>> pairs = {{1,1}, {2,1}, {3,3}, {4,3}, {5,5}, {6,5}, {7,7}, {8,7}, {9,9}, {10,9}};
   for (auto pair: pairs) {
     config.settings()->audio()->setMicGain(Level::fromValue(pair.first));
     encodeDecode(config, copy);
     QCOMPARE(copy.settings()->audio()->micGain(), Level::fromValue(pair.second));
   }
 }
+
+
+void
+DMR6X2UVTest::testHiddenZone() {
+  ErrorStack err;
+  Config decoded, config;
+  if (! config.readYAML(":/data/anytone_hidden_zones.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  encodeDecode(config, decoded);
+
+  QCOMPARE(decoded.zones()->count(), 1);
+  QVERIFY(decoded.zones()->zone(0)->anytoneExtension());
+  QVERIFY(decoded.zones()->zone(0)->anytoneExtension()->hidden());
+}
+
 
 
 

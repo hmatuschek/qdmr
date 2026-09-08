@@ -3,6 +3,7 @@
 
 #include "d168uv_limits.hh"
 #include "d168uv_codeplug.hh"
+#include "d168uv_satelliteconfig.hh"
 #include "d878uv2_callsigndb.hh"
 
 
@@ -12,7 +13,7 @@ D168UV::D168UV(AnytoneInterface *device, QObject *parent)
   _codeplug = new D168UVCodeplug(this);
   _codeplug->clear();
   _callsigns = new D878UV2CallsignDB(this);
-  _satellites = new AnytoneSatelliteConfig(this);
+  _satellites = new D168UVSatelliteConfig(this);
 
   // Get device info and determine supported TX frequency bands
   AnytoneInterface::RadioVariant info;

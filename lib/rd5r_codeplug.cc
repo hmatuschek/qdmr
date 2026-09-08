@@ -28,11 +28,11 @@ RD5RCodeplug::ChannelElement::clear() {
 
 Level
 RD5RCodeplug::ChannelElement::squelch() const {
-  return Level::fromValue(getUInt8(Offset::squelch()), {1,9});
+  return Level::fromValue(getUInt8(Offset::squelch()), {1,9}, 0);
 }
 void
 RD5RCodeplug::ChannelElement::setSquelch(Level level) {
-  setUInt8(Offset::squelch(), level.mapTo({1,9}));
+  setUInt8(Offset::squelch(), level.mapTo({1,9}, 0));
 }
 
 bool

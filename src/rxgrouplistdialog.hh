@@ -13,13 +13,14 @@
 class Config;
 
 
-class RXGroupListDialog: public QDialog, private Ui::RXGroupListDialog
+class RXGroupListDialog: public QDialog, private Ui::GroupListDialog
 {
 	Q_OBJECT
 
 public:
 	explicit RXGroupListDialog(Config *config, QWidget *parent=nullptr);
 	RXGroupListDialog(Config *config, RXGroupList *list, QWidget *parent=nullptr);
+  ~RXGroupListDialog();
 
 	RXGroupList *groupList();
 

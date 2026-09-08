@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en">
+<TS version="2.1" language="zh_Hans">
 <context>
     <name>AMChannelDialog</name>
     <message>
         <location filename="../src/amchanneldialog.cc" line="13"/>
         <source>Squelch</source>
-        <translation>Squelch</translation>
+        <translation>静噪</translation>
     </message>
 </context>
 <context>
@@ -14,7 +14,7 @@
     <message>
         <location filename="../src/aprsselect.cc" line="44"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
 </context>
 <context>
@@ -22,72 +22,72 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="103"/>
         <source>Create APRS system</source>
-        <translation>Create APRS system</translation>
+        <translation>创建 APRS 系统</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="111"/>
         <source>Edit APRS system</source>
-        <translation>Edit APRS system</translation>
+        <translation>编辑 APRS 系统</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="135"/>
         <source>[Selected]</source>
-        <translation>[Selected]</translation>
+        <translation>[已选]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="20"/>
         <source>Edit APRS System</source>
-        <translation type="unfinished">Edit APRS System</translation>
+        <translation type="unfinished">编辑 APRS 系统</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="30"/>
         <source>Basic</source>
-        <translation type="unfinished">Basic</translation>
+        <translation type="unfinished">基本</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="42"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation type="unfinished">名称</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="52"/>
         <source>Channel</source>
-        <translation type="unfinished">Channel</translation>
+        <translation type="unfinished">信道</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="62"/>
         <source>Source</source>
-        <translation type="unfinished">Source</translation>
+        <translation type="unfinished">来源</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="100"/>
         <source>Destination</source>
-        <translation type="unfinished">Destination</translation>
+        <translation type="unfinished">目标</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="138"/>
         <source>Path</source>
-        <translation type="unfinished">Path</translation>
+        <translation type="unfinished">路径</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="145"/>
         <source>Icon</source>
-        <translation type="unfinished">Icon</translation>
+        <translation type="unfinished">图标</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="152"/>
         <source>Update period [s]</source>
-        <translation type="unfinished">Update period [s]</translation>
+        <translation type="unfinished">更新周期 [秒]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="159"/>
         <source>Message</source>
-        <translation type="unfinished">Message</translation>
+        <translation type="unfinished">消息</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.ui" line="192"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation type="unfinished">扩展</translation>
     </message>
 </context>
 <context>
@@ -98,12 +98,12 @@
         <location filename="../shared/ui/aboutdialog.ui" line="37"/>
         <location filename="../shared/ui/aboutdialog.ui" line="55"/>
         <source>About qdmr</source>
-        <translation>About qdmr</translation>
+        <translation>关于 qdmr</translation>
     </message>
     <message>
         <location filename="../shared/ui/aboutdialog.ui" line="88"/>
         <source>Supported Radios</source>
-        <translation>Supported Radios</translation>
+        <translation>支持的电台</translation>
     </message>
 </context>
 <context>
@@ -113,26 +113,26 @@
         <location filename="../src/application.cc" line="199"/>
         <location filename="../src/application.cc" line="521"/>
         <source>Unsaved changes to codeplug.</source>
-        <translation>Unsaved changes to codeplug.</translation>
+        <translation>信道配置有未保存的更改。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="182"/>
         <location filename="../src/application.cc" line="200"/>
         <location filename="../src/application.cc" line="522"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
-        <translation>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
+        <translation>当前信道配置有未保存的更改。如果继续，这些更改将丢失。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="208"/>
         <source>Open codeplug</source>
-        <translation>Open codeplug</translation>
+        <translation>打开信道配置</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="287"/>
         <location filename="../src/application.cc" line="324"/>
         <location filename="../src/application.cc" line="363"/>
         <source>Cannot open file</source>
-        <translation>Cannot open file</translation>
+        <translation>无法打开文件</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="218"/>
@@ -140,85 +140,85 @@
         <location filename="../src/application.cc" line="251"/>
         <location filename="../src/application.cc" line="364"/>
         <source>Cannot read codeplug from file &apos;%1&apos;: %2</source>
-        <translation>Cannot read codeplug from file &apos;%1&apos;: %2</translation>
+        <translation>无法从文件 &apos;%1&apos; 读取信道配置：%2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="210"/>
         <source>Codeplug Files (*.yaml *.yml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</source>
-        <translation>Codeplug Files (*.yaml *.yml);;Codeplug Files, old format (*.conf *.csv *.txt);;All Files (*)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="217"/>
         <source>Cannot read codeplug.</source>
-        <translation>Cannot read codeplug.</translation>
+        <translation>无法读取信道配置。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="268"/>
         <source>Save codeplug</source>
-        <translation>Save codeplug</translation>
+        <translation>保存信道配置</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="269"/>
         <source>Codeplug Files (*.yaml *.yml)</source>
-        <translation>Codeplug Files (*.yaml *.yml)</translation>
+        <translation>信道配置文件 (*.yaml *.yml)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="275"/>
         <source>Please use new YAML format.</source>
-        <translation>Please use new YAML format.</translation>
+        <translation>请使用新的 YAML 格式。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="276"/>
         <source>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</source>
-        <translation>Saving in the old table-based conf format was disabled with 0.9.0. Reading these files still works.</translation>
+        <translation>0.9.0 版本已禁用旧的表格 conf 格式保存。读取这些文件仍然有效。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="288"/>
         <location filename="../src/application.cc" line="325"/>
         <source>Cannot save codeplug to file &apos;%1&apos;: %2</source>
-        <translation>Cannot save codeplug to file &apos;%1&apos;: %2</translation>
+        <translation>无法将信道配置保存到文件 &apos;%1&apos;：%2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="297"/>
         <source>Cannot save codeplug</source>
-        <translation>Cannot save codeplug</translation>
+        <translation>无法保存信道配置</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="298"/>
         <source>Cannot save codeplug to file &apos;%1&apos;.</source>
-        <translation>Cannot save codeplug to file &apos;%1&apos;.</translation>
+        <translation>无法将信道配置保存到文件 &apos;%1&apos;。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="315"/>
         <source>Export codeplug</source>
-        <translation>Export codeplug</translation>
+        <translation>导出信道配置</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="316"/>
         <source>CHIRP CSV Files (*.csv)</source>
-        <translation>CHIRP CSV Files (*.csv)</translation>
+        <translation>CHIRP CSV 文件 (*.csv)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="333"/>
         <source>Cannot export codeplug</source>
-        <translation>Cannot export codeplug</translation>
+        <translation>无法导出信道配置</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="334"/>
         <source>Cannot export codeplug to file &apos;%1&apos;:
 %2</source>
-        <translation>Cannot export codeplug to file &apos;%1&apos;:
+        <translation>无法将信道配置导出到文件 &apos;%1&apos;：
 %2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="350"/>
         <source>Import codeplug</source>
-        <translation>Import codeplug</translation>
+        <translation>导入信道配置</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="351"/>
         <source>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</source>
-        <translation>CHIRP CSV Files (*.csv);;YAML Files (*.yaml *.yml)</translation>
+        <translation>CHIRP CSV 文件 (*.csv);;YAML 文件 (*.yaml *.yml)</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="370"/>
@@ -226,44 +226,44 @@
         <location filename="../src/application.cc" line="384"/>
         <location filename="../src/application.cc" line="397"/>
         <source>Cannot import codeplug</source>
-        <translation>Cannot import codeplug</translation>
+        <translation>无法导入信道配置</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="371"/>
         <location filename="../src/application.cc" line="379"/>
         <location filename="../src/application.cc" line="398"/>
         <source>Cannot import codeplug from &apos;%1&apos;: %2</source>
-        <translation>Cannot import codeplug from &apos;%1&apos;: %2</translation>
+        <translation>无法从 &apos;%1&apos; 导入信道配置：%2</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="385"/>
         <source>Do not know, how to handle file &apos;%1&apos;.</source>
-        <translation>Do not know, how to handle file &apos;%1&apos;.</translation>
+        <translation>不知道如何处理文件 &apos;%1&apos;。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="419"/>
         <source>No matching devices found.</source>
-        <translation>No matching devices found.</translation>
+        <translation>未找到匹配的设备。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="445"/>
         <source>Cannot connect to radio</source>
-        <translation>Cannot connect to radio</translation>
+        <translation>无法连接到电台</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="446"/>
         <source>Cannot connect to radio: %1</source>
-        <translation>Cannot connect to radio: %1</translation>
+        <translation>无法连接到电台：%1</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="456"/>
         <source>Radio found</source>
-        <translation>Radio found</translation>
+        <translation>找到电台</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="456"/>
         <source>Found device &apos;%1&apos;.</source>
-        <translation>Found device &apos;%1&apos;.</translation>
+        <translation>找到设备 &apos;%1&apos;。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="459"/>
@@ -273,49 +273,49 @@
         <location filename="../src/application.cc" line="644"/>
         <location filename="../src/application.cc" line="725"/>
         <source>No radio found</source>
-        <translation>No radio found</translation>
+        <translation>未找到电台</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="500"/>
         <source>Verification success</source>
-        <translation>Verification success</translation>
+        <translation>验证成功</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="501"/>
         <source>The codeplug was successfully verified with the radio &apos;%1&apos;</source>
-        <translation>The codeplug was successfully verified with the radio &apos;%1&apos;.</translation>
+        <translation>已成功使用电台 &apos;%1&apos; 验证信道配置</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="545"/>
         <source>Read ...</source>
-        <translation>Read …</translation>
+        <translation>读取中…</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="555"/>
         <source>Read error</source>
-        <translation>Read error</translation>
+        <translation>读取错误</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="574"/>
         <source>Read complete</source>
-        <translation>Read complete</translation>
+        <translation>读取完成</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="630"/>
         <source>Upload ...</source>
-        <translation>Upload …</translation>
+        <translation>上传中…</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="651"/>
         <location filename="../src/application.cc" line="661"/>
         <location filename="../src/application.cc" line="673"/>
         <source>Cannot write call-sign DB.</source>
-        <translation>Cannot write call-sign DB.</translation>
+        <translation>无法写入呼号数据库。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="652"/>
         <source>The detected radio &apos;%1&apos; does not support a call-sign DB.</source>
-        <translation>The detected radio &apos;%1&apos; does not support a call-sign DB.</translation>
+        <translation>检测到的电台 &apos;%1&apos; 不支持呼号数据库。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="460"/>
@@ -325,58 +325,58 @@
         <location filename="../src/application.cc" line="645"/>
         <location filename="../src/application.cc" line="726"/>
         <source>No matching device was found.</source>
-        <translation>No matching device was found.</translation>
+        <translation>未找到匹配的设备。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="662"/>
         <source>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</source>
-        <translation>The detected radio &apos;%1&apos; does support a call-sign DB. This feature, however, is not implemented yet.</translation>
+        <translation>检测到的电台 &apos;%1&apos; 支持呼号数据库。但是，此功能尚未实现。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="674"/>
         <source>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</source>
-        <translation>QDMR selects the call-signs to be written based on the default DMR ID of the radio. No default ID set.</translation>
+        <translation>QDMR 根据电台的默认 DMR ID 选择要写入的呼号。未设置默认 ID。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="711"/>
         <source>Write call-sign DB ...</source>
-        <translation>Write call-sign DB …</translation>
+        <translation>写入呼号数据库中…</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="732"/>
         <location filename="../src/application.cc" line="742"/>
         <source>Cannot write satellite config.</source>
-        <translation>Cannot write satellite config.</translation>
+        <translation>无法写入卫星配置。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="733"/>
         <source>The detected radio &apos;%1&apos; does not support satellite tracking.</source>
-        <translation>The detected radio &apos;%1&apos; does not support satellite tracking.</translation>
+        <translation>检测到的电台 &apos;%1&apos; 不支持卫星追踪。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="743"/>
         <source>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</source>
-        <translation>The detected radio &apos;%1&apos; does support satellite tracking. This feature, however, is not implemented yet.</translation>
+        <translation>检测到的电台 &apos;%1&apos; 支持卫星追踪。但是，此功能尚未实现。</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="765"/>
         <source>Write satellite config ...</source>
-        <translation>Write satellite config …</translation>
+        <translation>写入卫星配置中…</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="784"/>
         <source>Write error</source>
-        <translation>Write error</translation>
+        <translation>写入错误</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="796"/>
         <source>Write complete</source>
-        <translation>Write complete</translation>
+        <translation>写入完成</translation>
     </message>
     <message>
         <location filename="../src/application.cc" line="857"/>
         <source>%1 (alias for %2 %3)</source>
-        <translation>%1 (alias for %2 %3)</translation>
+        <translation>%1（%2 %3 的别名）</translation>
     </message>
 </context>
 <context>
@@ -384,12 +384,12 @@
     <message>
         <location filename="../src/bandwidthselect.cc" line="8"/>
         <source>Narrow (12.5 kHz)</source>
-        <translation>Narrow (12.5 kHz)</translation>
+        <translation>窄带（12.5 kHz）</translation>
     </message>
     <message>
         <location filename="../src/bandwidthselect.cc" line="9"/>
         <source>Wide (25 kHz)</source>
-        <translation>Wide (25 kHz)</translation>
+        <translation>宽带（25 kHz）</translation>
     </message>
 </context>
 <context>
@@ -397,130 +397,130 @@
     <message>
         <location filename="../src/channeldialog.ui" line="14"/>
         <source>Edit Channel</source>
-        <translation>Edit Channel</translation>
+        <translation>编辑信道</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="26"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; qdmr provides some auto-completion for channels. That is, start typing the call-sign of a repeater. After three chars are entered, a request is sent to repeaterbook.com to retrieve matching repeaters. These requests may take some time. The results are stored locally in a cache.&lt;/p&gt;&lt;p&gt;A drop-down list will appear, allowing to select a repeater. Once one repeater is selected, the RX/TX frequencies and CTCSS tones are filled in (if applicable).&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;注意：&lt;/span&gt; qdmr 为信道提供了一些自动补全功能。即，开始输入中继台的呼号。输入三个字符后，会向 repeaterbook.com 发送请求以检索匹配的中继台。这些请求可能需要一些时间。结果存储在本地缓存中。&lt;/p&gt;&lt;p&gt;将出现一个下拉列表，允许选择中继台。选择一个中继台后，接收/发射频率和 CTCSS 亚音频将自动填充（如果适用）。&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;隐藏&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="49"/>
         <source>Basic</source>
-        <translation type="unfinished">Basic</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="57"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="76"/>
         <source>Enter a repeater call-sign.</source>
-        <translation>Enter a repeater call-sign.</translation>
+        <translation>输入中继台呼号。</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="83"/>
         <source>Rx Frequency</source>
-        <translation>RX Frequency</translation>
+        <translation>接收频率</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="100"/>
         <source>Tx Frequency</source>
-        <translation>TX Frequency</translation>
+        <translation>发射频率</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="117"/>
         <source>Tx Offset</source>
-        <translation>TX Offset</translation>
+        <translation>发射偏移</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="175"/>
         <source>Power</source>
-        <translation>Power</translation>
+        <translation>功率</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="191"/>
         <source>Max</source>
-        <translation>Max</translation>
+        <translation>最大</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="196"/>
         <source>High</source>
-        <translation type="unfinished">High</translation>
+        <translation>高</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="201"/>
         <source>Mid</source>
-        <translation type="unfinished">Mid</translation>
+        <translation>中</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="206"/>
         <source>Low</source>
-        <translation type="unfinished">Low</translation>
+        <translation>低</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="211"/>
         <source>Min</source>
-        <translation type="unfinished">Min</translation>
+        <translation>最小</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="225"/>
         <location filename="../src/channeldialog.ui" line="268"/>
         <location filename="../src/channeldialog.ui" line="308"/>
         <source>Default</source>
-        <translation type="unfinished">Default</translation>
+        <translation>默认</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="234"/>
         <source>Tx Timeout</source>
-        <translation>TX Timeout</translation>
+        <translation>发射超时</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="249"/>
         <location filename="../src/channeldialog.ui" line="292"/>
         <source>Off</source>
-        <translation type="unfinished">Off</translation>
+        <translation>关</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="277"/>
         <source>VOX Level</source>
-        <translation type="unfinished">VOX Level</translation>
+        <translation>VOX 等级</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="317"/>
         <source>Rx Only</source>
-        <translation type="unfinished">RX Only</translation>
+        <translation>仅接收</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="334"/>
         <source>Scan List</source>
-        <translation>Scan List</translation>
+        <translation>扫描列表</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.ui" line="364"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="25"/>
         <source>No offset</source>
-        <translation type="unfinished">No offset</translation>
+        <translation>无偏移</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="27"/>
         <source>Positive offset</source>
-        <translation type="unfinished">Positive offset</translation>
+        <translation>正偏移</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="29"/>
         <source>Negative offset</source>
-        <translation type="unfinished">Negative offset</translation>
+        <translation>负偏移</translation>
     </message>
     <message>
         <location filename="../src/channeldialog.cc" line="50"/>
         <source>[None]</source>
-        <translation type="unfinished">[None]</translation>
+        <translation>[无]</translation>
     </message>
 </context>
 <context>
@@ -528,38 +528,38 @@
     <message>
         <location filename="../src/channellistview.cc" line="102"/>
         <source>Select a single channel first</source>
-        <translation>Select a single channel first</translation>
+        <translation>请先选择单个信道</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="103"/>
         <source>To clone a channel, please select a single channel to clone.</source>
-        <translation>To clone a channel, please select a single channel to clone.</translation>
+        <translation>要复制信道，请先选择单个信道。</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="159"/>
         <source>Cannot delete channel</source>
-        <translation>Cannot delete channel</translation>
+        <translation>无法删除信道</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="160"/>
         <source>Cannot delete channel: You have to select a channel first.</source>
-        <translation>Cannot delete channel: You have to select a channel first.</translation>
+        <translation>无法删除信道：请先选择一个信道。</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="170"/>
         <location filename="../src/channellistview.cc" line="174"/>
         <source>Delete channel?</source>
-        <translation>Delete channel?</translation>
+        <translation>删除信道？</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="170"/>
         <source>Delete channel %1?</source>
-        <translation>Delete channel &apos;%1&apos;?</translation>
+        <translation>删除信道 &apos;%1&apos;？</translation>
     </message>
     <message>
         <location filename="../src/channellistview.cc" line="174"/>
         <source>Delete %1 channels?</source>
-        <translation>Delete %1 channels?</translation>
+        <translation>删除 %1 个信道？</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="35"/>
@@ -569,12 +569,12 @@
     <message>
         <location filename="../src/channellistview.ui" line="32"/>
         <source>Add Channel ...</source>
-        <translation>Add Channel …</translation>
+        <translation>添加信道…</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="42"/>
         <source>Clone Channel</source>
-        <translation>Clone Channel</translation>
+        <translation>复制信道</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="45"/>
@@ -584,7 +584,7 @@
     <message>
         <location filename="../src/channellistview.ui" line="52"/>
         <source>Delete Channel</source>
-        <translation>Delete Channel</translation>
+        <translation>删除信道</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="55"/>
@@ -594,32 +594,32 @@
     <message>
         <location filename="../src/channellistview.ui" line="64"/>
         <source>Add FM Channel</source>
-        <translation>Add FM Channel</translation>
+        <translation>添加 FM 信道</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="67"/>
         <source>Adds a new FM channel</source>
-        <translation>Adds a new FM channel</translation>
+        <translation>添加一个新的 FM 信道</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="75"/>
         <source>Add DMR Channel</source>
-        <translation>Add DMR Channel</translation>
+        <translation>添加 DMR 信道</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="78"/>
         <source>Adds a new DMR channel.</source>
-        <translation>Adds a new DMR channel.</translation>
+        <translation>添加一个新的 DMR 信道。</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="86"/>
         <source>Add AM Channel</source>
-        <translation>Add AM Channel</translation>
+        <translation>添加 AM 信道</translation>
     </message>
     <message>
         <location filename="../src/channellistview.ui" line="89"/>
         <source>Adds a new AM channel.</source>
-        <translation>Adds a new AM channel.</translation>
+        <translation>添加一个新的 AM 信道。</translation>
     </message>
 </context>
 <context>
@@ -647,65 +647,65 @@
         <location filename="../src/configitemwrapper.cc" line="418"/>
         <location filename="../src/configitemwrapper.cc" line="425"/>
         <source>[Default]</source>
-        <translation>[Default]</translation>
+        <translation>[默认]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="294"/>
         <source>Max</source>
-        <translation>Max</translation>
+        <translation>最大</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="295"/>
         <source>High</source>
-        <translation>High</translation>
+        <translation>高</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="296"/>
         <source>Mid</source>
-        <translation>Mid</translation>
+        <translation>中</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="297"/>
         <source>Low</source>
-        <translation>Low</translation>
+        <translation>低</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="298"/>
         <source>Min</source>
-        <translation>Min</translation>
+        <translation>最小</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="305"/>
         <location filename="../src/configitemwrapper.cc" line="308"/>
         <source>Off</source>
-        <translation>Off</translation>
+        <translation>关</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="308"/>
         <source>On</source>
-        <translation>On</translation>
+        <translation>开</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="312"/>
         <location filename="../src/configitemwrapper.cc" line="318"/>
         <source>Always</source>
-        <translation>Always</translation>
+        <translation>总是</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="313"/>
         <location filename="../src/configitemwrapper.cc" line="319"/>
         <source>Free</source>
-        <translation>Free</translation>
+        <translation>空闲</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="314"/>
         <source>Color</source>
-        <translation>Color</translation>
+        <translation>色码</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="320"/>
         <source>Tone</source>
-        <translation>Tone</translation>
+        <translation>亚音</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="323"/>
@@ -721,88 +721,88 @@
         <location filename="../src/configitemwrapper.cc" line="448"/>
         <location filename="../src/configitemwrapper.cc" line="459"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="420"/>
         <location filename="../src/configitemwrapper.cc" line="427"/>
         <source>Open</source>
-        <translation>Open</translation>
+        <translation>开放</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="451"/>
         <source>Wide</source>
-        <translation>Wide</translation>
+        <translation>宽带</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="453"/>
         <source>Narrow</source>
-        <translation>Narrow</translation>
+        <translation>窄带</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="474"/>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation>类型</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="475"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="476"/>
         <source>Rx Frequency</source>
-        <translation>RX Frequency</translation>
+        <translation>接收频率</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="477"/>
         <source>Tx Frequency</source>
-        <translation>TX Frequency</translation>
+        <translation>发射频率</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="478"/>
         <source>Power</source>
-        <translation>Power</translation>
+        <translation>功率</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="479"/>
         <source>Timeout</source>
-        <translation>Timeout</translation>
+        <translation>超时</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="480"/>
         <source>Rx Only</source>
-        <translation>RX Only</translation>
+        <translation>仅接收</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="481"/>
         <source>Admit</source>
-        <translation>Admit</translation>
+        <translation>发射许可</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="482"/>
         <source>Scanlist</source>
-        <translation>Scanlist</translation>
+        <translation>扫描列表</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="484"/>
         <source>CC</source>
-        <translation>CC</translation>
+        <translation>色码</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="485"/>
         <source>TS</source>
-        <translation>TS</translation>
+        <translation>时隙</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="486"/>
         <source>RX Group List</source>
-        <translation>Group List</translation>
+        <translation>接收组列表</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="487"/>
         <source>TX Contact</source>
-        <translation>TX Contact</translation>
+        <translation>发射联系人</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="488"/>
@@ -817,37 +817,37 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="490"/>
         <source>Roaming</source>
-        <translation>Roaming</translation>
+        <translation>漫游</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="491"/>
         <source>Squelch</source>
-        <translation>Squelch</translation>
+        <translation>静噪</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="492"/>
         <source>Rx Tone</source>
-        <translation>RX Tone</translation>
+        <translation>接收亚音</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="493"/>
         <source>Tx Tone</source>
-        <translation>TX Tone</translation>
+        <translation>发射亚音</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="495"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="483"/>
         <source>Zones</source>
-        <translation>Zones</translation>
+        <translation>区域</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="494"/>
         <source>Bandwidth</source>
-        <translation>Bandwidth</translation>
+        <translation>带宽</translation>
     </message>
 </context>
 <context>
@@ -855,7 +855,7 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="523"/>
         <source>Channel</source>
-        <translation>Channel</translation>
+        <translation>信道</translation>
     </message>
 </context>
 <context>
@@ -863,7 +863,7 @@
     <message>
         <location filename="../src/channelselectiondialog.cc" line="24"/>
         <source>Select a channel:</source>
-        <translation>Select a channel:</translation>
+        <translation>选择一个信道：</translation>
     </message>
 </context>
 <context>
@@ -871,7 +871,7 @@
     <message>
         <location filename="../src/channel_type_edit.cc" line="53"/>
         <source>Select channel types</source>
-        <translation>Select channel types</translation>
+        <translation type="unfinished">选择信道类型</translation>
     </message>
 </context>
 <context>
@@ -879,90 +879,90 @@
     <message>
         <location filename="../src/configmergedialog.ui" line="17"/>
         <source>Merging codeplugs ...</source>
-        <translation>Merging codeplugs …</translation>
+        <translation>合并信道配置中…</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="32"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, ...) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Conflict resolution strategies:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If some of the imported objects (channels, contacts, …) already exist, select how these conflicts are resolved for items and sets.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;冲突解决策略：&lt;/span&gt;&lt;/p&gt;&lt;p&gt;如果某些导入的对象（信道、联系人等）已经存在，请选择如何解决项目和集合的这些冲突。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="48"/>
         <source>Items are all atomic objects like radio IDs, channels, contacts and roaming channels.</source>
-        <translation>Items are all atomic objects like radio IDs, channels, contacts and roaming channels.</translation>
+        <translation>项目是所有原子对象，如电台 ID、信道、联系人和漫游信道。</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="51"/>
         <source>Items</source>
-        <translation>Items</translation>
+        <translation>项目</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="58"/>
         <location filename="../src/configmergedialog.ui" line="111"/>
         <source>Ignore</source>
-        <translation>Ignore</translation>
+        <translation>忽略</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="63"/>
         <location filename="../src/configmergedialog.ui" line="116"/>
         <source>Override</source>
-        <translation>Override</translation>
+        <translation>覆盖</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="68"/>
         <location filename="../src/configmergedialog.ui" line="121"/>
         <source>Duplicate</source>
-        <translation>Duplicate</translation>
+        <translation>重复</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="101"/>
         <source>Sets are all objects, containing other elements like group lists, zones, scan lists and roaming zones.</source>
-        <translation>Sets are all objects, containing other elements like group lists, zones, scan lists and roaming zones.</translation>
+        <translation>集合是包含其他元素的所有对象，如群组列表、区域、扫描列表和漫游区域。</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="104"/>
         <source>Sets</source>
-        <translation>Sets</translation>
+        <translation>集合</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.ui" line="126"/>
         <source>Merge</source>
-        <translation>Merge</translation>
+        <translation>合并</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="75"/>
         <source>Ignores any duplicate item.</source>
-        <translation>Ignores any duplicate item.</translation>
+        <translation>忽略任何重复项目。</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="78"/>
         <source>Replaces any duplicate item with the imported one.</source>
-        <translation>Replaces any duplicate item with the imported one.</translation>
+        <translation>用导入的项目替换任何重复项目。</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="81"/>
         <source>Imports any duplicate item with a modified name.</source>
-        <translation>Imports any duplicate item with a modified name.</translation>
+        <translation>以修改后的名称导入任何重复项目。</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="93"/>
         <source>Ignores any duplicate set.</source>
-        <translation>Ignores any duplicate set.</translation>
+        <translation>忽略任何重复集合。</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="96"/>
         <source>Replaces any duplicate set with the imported one.</source>
-        <translation>Replaces any duplicate set with the imported one.</translation>
+        <translation>用导入的集合替换任何重复集合。</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="99"/>
         <source>Imports any duplicate set with a modified name.</source>
-        <translation>Imports any duplicate set with a modified name.</translation>
+        <translation>以修改后的名称导入任何重复集合。</translation>
     </message>
     <message>
         <location filename="../src/configmergedialog.cc" line="102"/>
         <source>Merges duplicate sets.</source>
-        <translation>Merges duplicate sets.</translation>
+        <translation>合并重复集合。</translation>
     </message>
 </context>
 <context>
@@ -975,7 +975,7 @@
         <location filename="../src/configobjectlistview.cc" line="168"/>
         <location filename="../src/configobjectlistview.cc" line="191"/>
         <source>Cannot move items.</source>
-        <translation>Cannot move items.</translation>
+        <translation>无法移动项目。</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.cc" line="76"/>
@@ -985,37 +985,37 @@
         <location filename="../src/configobjectlistview.cc" line="169"/>
         <location filename="../src/configobjectlistview.cc" line="192"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation>Cannot move items: You have to select at least one item first.</translation>
+        <translation>无法移动项目：请先至少选择一个项目。</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="25"/>
         <source>Move selected item(s) to the top.</source>
-        <translation>Move selected item(s) to the top.</translation>
+        <translation>将选定项目移到顶部。</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="45"/>
         <source>Move selected item(s) ten positions up.</source>
-        <translation>Move selected item(s) ten positions up.</translation>
+        <translation>将选定项目上移十位。</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="65"/>
         <source>Move selected item(s) one position up.</source>
-        <translation>Move selected item(s) one position up.</translation>
+        <translation>将选定项目上移一位。</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="85"/>
         <source>Move selected item(s) one position down.</source>
-        <translation>Move selected item(s) one position down.</translation>
+        <translation>将选定项目下移一位。</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="105"/>
         <source>Move selected item(s) ten positions down.</source>
-        <translation>Move selected item(s) ten positions down.</translation>
+        <translation>将选定项目下移十位。</translation>
     </message>
     <message>
         <location filename="../src/configobjectlistview.ui" line="125"/>
         <source>Move selected item(s) to the bottom.</source>
-        <translation>Move selected item(s) to the bottom.</translation>
+        <translation>将选定项目移到底部。</translation>
     </message>
 </context>
 <context>
@@ -1024,57 +1024,57 @@
         <location filename="../src/configobjecttableview.cc" line="255"/>
         <location filename="../src/configobjecttableview.cc" line="262"/>
         <source>Cannot move items.</source>
-        <translation>Cannot move items.</translation>
+        <translation>无法移动项目。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.cc" line="256"/>
         <source>Cannot move items: You have to select at least one item first.</source>
-        <translation>Cannot move items: You have to select at least one item first.</translation>
+        <translation>无法移动项目：请先至少选择一个项目。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.cc" line="263"/>
         <source>Cannot move items as long as there is some filter or sorting applied.</source>
-        <translation>Cannot move items as long as there is some filter or sorting applied.</translation>
+        <translation>应用了筛选或排序时无法移动项目。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="50"/>
         <source>Move selected item(s) to the top.</source>
-        <translation>Move selected item(s) to the top.</translation>
+        <translation>将选定项目移到顶部。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="64"/>
         <source>Move selected item(s) ten positions up.</source>
-        <translation>Move selected item(s) ten positions up.</translation>
+        <translation>将选定项目上移十位。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="78"/>
         <source>Move selected item(s) one position up.</source>
-        <translation>Move selected item(s) one position up.</translation>
+        <translation>将选定项目上移一位。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="92"/>
         <source>Move selected item(s) one position down.</source>
-        <translation>Move selected item(s) one position down.</translation>
+        <translation>将选定项目下移一位。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="106"/>
         <source>Move selected item(s) ten positions down.</source>
-        <translation>Move selected item(s) ten positions down.</translation>
+        <translation>将选定项目下移十位。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="120"/>
         <source>Move selected item(s) to the bottom.</source>
-        <translation>Move selected item(s) to the bottom.</translation>
+        <translation>将选定项目移到底部。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="188"/>
         <source>Toggle Filter and Sorting</source>
-        <translation>Toggle Filter and Sorting</translation>
+        <translation>切换筛选和排序</translation>
     </message>
     <message>
         <location filename="../src/configobjecttableview.ui" line="199"/>
         <source>Close Sort and Filter</source>
-        <translation>Close Sort and Filter</translation>
+        <translation>关闭排序和筛选</translation>
     </message>
 </context>
 <context>
@@ -1082,7 +1082,7 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.cc" line="49"/>
         <source>An instance of %1.</source>
-        <translation>An instance of &apos;%1&apos;.</translation>
+        <translation>%1 的一个实例。</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.cc" line="60"/>
@@ -1092,12 +1092,12 @@
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="20"/>
         <source>Create extension object</source>
-        <translation>Create extension object</translation>
+        <translation>创建扩展对象</translation>
     </message>
     <message>
         <location filename="../src/configobjecttypeselectiondialog.ui" line="26"/>
         <source>Select the class of object to create</source>
-        <translation>Select the class of object to create.</translation>
+        <translation>选择要创建的对象类别</translation>
     </message>
 </context>
 <context>
@@ -1105,37 +1105,37 @@
     <message>
         <location filename="../src/contactlistview.cc" line="83"/>
         <source>Cannot delete contact</source>
-        <translation>Cannot delete contact</translation>
+        <translation>无法删除联系人</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="84"/>
         <source>Cannot delete contact: You have to select a contact first.</source>
-        <translation>Cannot delete contact: You have to select a contact first.</translation>
+        <translation>无法删除联系人：请先选择一个联系人。</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="94"/>
         <source>Delete contact?</source>
-        <translation>Delete contact?</translation>
+        <translation>删除联系人？</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="94"/>
         <source>Delete contact %1?</source>
-        <translation>Delete contact &apos;%1&apos;?</translation>
+        <translation>删除联系人 &apos;%1&apos;？</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="98"/>
         <source>Delete contacts?</source>
-        <translation>Delete contacts?</translation>
+        <translation>删除联系人？</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.cc" line="98"/>
         <source>Delete %1 contacts?</source>
-        <translation>Delete %1 contacts?</translation>
+        <translation>删除 %1 个联系人？</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="32"/>
         <source>Adds a contact to the list.</source>
-        <translation>Adds a contact to the list.</translation>
+        <translation>向列表添加联系人。</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="38"/>
@@ -1145,47 +1145,47 @@
     <message>
         <location filename="../src/contactlistview.ui" line="60"/>
         <source>Add M17 Contact</source>
-        <translation>Add M17 Contact</translation>
+        <translation>添加 M17 联系人</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="63"/>
         <source>Adds an M17 contact to the list.</source>
-        <translation>Adds an M17 contact to the list.</translation>
+        <translation>向列表添加一个 M17 联系人。</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="68"/>
         <source>Add DTMF Contact</source>
-        <translation>Add DTMF Contact</translation>
+        <translation>添加 DTMF 联系人</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="71"/>
         <source>Adds an DTMF (analog) contact to the list.</source>
-        <translation>Adds a DTMF (analog) contact to the list.</translation>
+        <translation>向列表添加一个 DTMF（模拟）联系人。</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="76"/>
         <source>Add DMR Contact</source>
-        <translation>Add DMR Contact</translation>
+        <translation>添加 DMR 联系人</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="79"/>
         <source>Adds an DMR contact to the list.</source>
-        <translation>Adds a DMR contact to the list.</translation>
+        <translation>向列表添加一个 DMR 联系人。</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="45"/>
         <source>Delete contact button</source>
-        <translation>Delete contact button.</translation>
+        <translation>删除联系人按钮</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="35"/>
         <source>Add Contact</source>
-        <translation type="unfinished">Add Contact</translation>
+        <translation>添加联系人</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="48"/>
         <source>Delete Contact</source>
-        <translation>Delete Contact</translation>
+        <translation>删除联系人</translation>
     </message>
     <message>
         <location filename="../src/contactlistview.ui" line="51"/>
@@ -1205,34 +1205,34 @@
         <location filename="../src/configitemwrapper.cc" line="684"/>
         <location filename="../src/configitemwrapper.cc" line="706"/>
         <source>On</source>
-        <translation>On</translation>
+        <translation>开</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="663"/>
         <location filename="../src/configitemwrapper.cc" line="684"/>
         <location filename="../src/configitemwrapper.cc" line="706"/>
         <source>Off</source>
-        <translation>Off</translation>
+        <translation>关</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="674"/>
         <source>Private Call</source>
-        <translation>Private Call</translation>
+        <translation>私密呼叫</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="675"/>
         <source>Group Call</source>
-        <translation>Group Call</translation>
+        <translation>群组呼叫</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="676"/>
         <source>All Call</source>
-        <translation>All Call</translation>
+        <translation>全呼</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="688"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="698"/>
@@ -1242,32 +1242,32 @@
     <message>
         <location filename="../src/configitemwrapper.cc" line="703"/>
         <source>[Broadcast]</source>
-        <translation>[Broadcast]</translation>
+        <translation>[广播]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="723"/>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation>类型</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="725"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="727"/>
         <source>Number</source>
-        <translation>Number</translation>
+        <translation>编号</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="729"/>
         <source>RX Tone</source>
-        <translation>RX Tone</translation>
+        <translation>接收亚音</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="731"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
 </context>
 <context>
@@ -1275,17 +1275,17 @@
     <message>
         <location filename="../src/admitselect.cc" line="35"/>
         <source>Always</source>
-        <translation type="unfinished">Always</translation>
+        <translation>总是</translation>
     </message>
     <message>
         <location filename="../src/admitselect.cc" line="36"/>
         <source>Channel Free</source>
-        <translation type="unfinished">Channel Free</translation>
+        <translation>信道空闲</translation>
     </message>
     <message>
         <location filename="../src/admitselect.cc" line="37"/>
         <source>Other Color-code</source>
-        <translation>Other Color-code</translation>
+        <translation>其他色码</translation>
     </message>
 </context>
 <context>
@@ -1293,42 +1293,42 @@
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="37"/>
         <source>Radio Id</source>
-        <translation>Radio Id</translation>
+        <translation>电台 ID</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="39"/>
         <source>Tx Admit</source>
-        <translation type="unfinished">TX Admit</translation>
+        <translation>发射许可</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="41"/>
         <source>Color-code</source>
-        <translation>Color-code</translation>
+        <translation>色码</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="44"/>
         <source>Time-slot</source>
-        <translation>Time-slot</translation>
+        <translation>时隙</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="46"/>
         <source>Group list</source>
-        <translation>Group list</translation>
+        <translation>群组列表</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="48"/>
         <source>Tx Contact</source>
-        <translation type="unfinished">TX Contact</translation>
+        <translation>发射联系人</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="50"/>
         <source>APRS</source>
-        <translation type="unfinished">APRS</translation>
+        <translation>APRS</translation>
     </message>
     <message>
         <location filename="../src/dmrchanneldialog.cc" line="52"/>
         <source>Roaming zone</source>
-        <translation type="unfinished">Roaming zone</translation>
+        <translation>漫游区域</translation>
     </message>
 </context>
 <context>
@@ -1336,57 +1336,57 @@
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="27"/>
         <source>Create DMR Contact</source>
-        <translation>Create DMR Contact</translation>
+        <translation>创建 DMR 联系人</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="52"/>
         <source>Edit DMR Contact</source>
-        <translation>Edit DMR Contact</translation>
+        <translation>编辑 DMR 联系人</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="83"/>
         <source>Private Call</source>
-        <translation>Private Call</translation>
+        <translation>私密呼叫</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="84"/>
         <source>Group Call</source>
-        <translation>Group Call</translation>
+        <translation>群组呼叫</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="85"/>
         <source>All Call</source>
-        <translation>All Call</translation>
+        <translation>全呼</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="30"/>
         <source>Basic</source>
-        <translation>Basic</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="36"/>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation>类型</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="53"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="63"/>
         <source>Number</source>
-        <translation>Number</translation>
+        <translation>编号</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="73"/>
         <source>Ring</source>
-        <translation>Ring</translation>
+        <translation>铃声</translation>
     </message>
     <message>
         <location filename="../src/dmrcontactdialog.ui" line="84"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
 </context>
 <context>
@@ -1394,7 +1394,7 @@
     <message>
         <location filename="../src/dmrcontactdialog.cc" line="184"/>
         <source>[None]</source>
-        <translation type="unfinished">[None]</translation>
+        <translation>[无]</translation>
     </message>
 </context>
 <context>
@@ -1402,12 +1402,12 @@
     <message>
         <location filename="../src/dmriddialog.ui" line="30"/>
         <source>Basic</source>
-        <translation>Basic</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="36"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/dmriddialog.ui" line="46"/>
@@ -1417,7 +1417,7 @@
     <message>
         <location filename="../src/dmriddialog.ui" line="57"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
 </context>
 <context>
@@ -1425,7 +1425,7 @@
     <message>
         <location filename="../src/idselect.cc" line="9"/>
         <source>[Default]</source>
-        <translation type="unfinished">[Default]</translation>
+        <translation>[默认]</translation>
     </message>
 </context>
 <context>
@@ -1433,37 +1433,37 @@
     <message>
         <location filename="../src/dtmfcontactdialog.cc" line="12"/>
         <source>Create DTMF Contact</source>
-        <translation>Create DTMF Contact</translation>
+        <translation>创建 DTMF 联系人</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.cc" line="20"/>
         <source>Edit DMR Contact</source>
-        <translation>Edit DMR Contact</translation>
+        <translation>编辑 DMR 联系人</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="30"/>
         <source>Basic</source>
-        <translation>Basic</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="36"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="46"/>
         <source>Number</source>
-        <translation>Number</translation>
+        <translation>编号</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="56"/>
         <source>Ring</source>
-        <translation>Ring</translation>
+        <translation>铃声</translation>
     </message>
     <message>
         <location filename="../src/dtmfcontactdialog.ui" line="67"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
 </context>
 <context>
@@ -1471,12 +1471,12 @@
     <message>
         <location filename="../src/deviceselectiondialog.ui" line="14"/>
         <source>Select a device</source>
-        <translation>Select a device</translation>
+        <translation>选择设备</translation>
     </message>
     <message>
         <location filename="../src/deviceselectiondialog.ui" line="20"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There is either more than one device detected or the one found is not considered save to access. Either way, select the device to use.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There is either more than one device detected or the one found is not considered save to access. Either way, select the device to use.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;检测到多个设备，或者找到的唯一设备被认为不安全无法访问。无论哪种情况，请选择要使用的设备。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -1484,7 +1484,7 @@
     <message>
         <location filename="../src/repeaterdatabase.cc" line="542"/>
         <source>Cannot download repeater list from &apos;%1&apos;: %2</source>
-        <translation>Cannot download repeater list from &apos;%1&apos;: %2</translation>
+        <translation type="unfinished">无法从 &apos;%1&apos; 下载中继台列表：%2</translation>
     </message>
 </context>
 <context>
@@ -1492,17 +1492,17 @@
     <message>
         <location filename="../src/errormessageview.cc" line="12"/>
         <source>Error: Unknown.</source>
-        <translation>Error: Unknown.</translation>
+        <translation>错误：未知。</translation>
     </message>
     <message>
         <location filename="../src/errormessageview.cc" line="18"/>
         <source>Error: %1</source>
-        <translation>Error: %1</translation>
+        <translation>错误：%1</translation>
     </message>
     <message>
         <location filename="../src/errormessageview.ui" line="30"/>
         <source>Traceback:</source>
-        <translation>Traceback:</translation>
+        <translation>回溯：</translation>
     </message>
 </context>
 <context>
@@ -1510,32 +1510,32 @@
     <message>
         <location filename="../src/extensionview.cc" line="110"/>
         <source>Cannot create extension.</source>
-        <translation>Cannot create extension.</translation>
+        <translation>无法创建扩展。</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="111"/>
         <source>Cannot create extension, consider reporting a bug.</source>
-        <translation>Cannot create extension, consider reporting a bug.</translation>
+        <translation>无法创建扩展，请考虑报告一个 Bug。</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="114"/>
         <source>Cannot create list element.</source>
-        <translation>Cannot create list element.</translation>
+        <translation>无法创建列表元素。</translation>
     </message>
     <message>
         <location filename="../src/extensionview.cc" line="115"/>
         <source>Cannot create list element, consider reporting a bug.</source>
-        <translation>Cannot create list element, consider reporting a bug.</translation>
+        <translation>无法创建列表元素，请考虑报告一个 Bug。</translation>
     </message>
     <message>
         <location filename="../src/extensionview.ui" line="25"/>
         <source>Create</source>
-        <translation>Create</translation>
+        <translation>创建</translation>
     </message>
     <message>
         <location filename="../src/extensionview.ui" line="32"/>
         <source>Remove</source>
-        <translation>Remove</translation>
+        <translation>移除</translation>
     </message>
 </context>
 <context>
@@ -1543,7 +1543,7 @@
     <message>
         <location filename="../src/aprsselect.cc" line="11"/>
         <source>[None]</source>
-        <translation type="unfinished">[None]</translation>
+        <translation>[无]</translation>
     </message>
 </context>
 <context>
@@ -1551,67 +1551,67 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="8"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="9"/>
         <source>Police station</source>
-        <translation>Police station</translation>
+        <translation>警察局</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="10"/>
         <source>Digipeater</source>
-        <translation>Digipeater</translation>
+        <translation>数字中继</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="11"/>
         <source>Phone</source>
-        <translation>Phone</translation>
+        <translation>电话</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="12"/>
         <source>DX cluster</source>
-        <translation>DX cluster</translation>
+        <translation>DX 集群</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="13"/>
         <source>HF gateway</source>
-        <translation>HF gateway</translation>
+        <translation>HF 网关</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="14"/>
         <source>Plane small</source>
-        <translation>Plane small</translation>
+        <translation>小型飞机</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="15"/>
         <source>Mobile Satellite station</source>
-        <translation>Mobile satellite station</translation>
+        <translation>移动卫星台</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="16"/>
         <source>Wheel Chair</source>
-        <translation>Wheel chair</translation>
+        <translation>轮椅</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="17"/>
         <source>Snowmobile</source>
-        <translation>Snowmobile</translation>
+        <translation>雪地摩托</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="18"/>
         <source>Red cross</source>
-        <translation>Red cross</translation>
+        <translation>红十字会</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="19"/>
         <source>Boy scout</source>
-        <translation>Boy scout</translation>
+        <translation>童子军</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="20"/>
         <source>Home</source>
-        <translation>Home</translation>
+        <translation>首页</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="21"/>
@@ -1621,57 +1621,57 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="22"/>
         <source>Red dot</source>
-        <translation>Red dot</translation>
+        <translation>红点</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="23"/>
         <source>Circle 0</source>
-        <translation>Circle 0</translation>
+        <translation>圆圈 0</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="24"/>
         <source>Circle 1</source>
-        <translation>Circle 1</translation>
+        <translation>圆圈 1</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="25"/>
         <source>Circle 2</source>
-        <translation>Circle 2</translation>
+        <translation>圆圈 2</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="26"/>
         <source>Circle 3</source>
-        <translation>Circle 3</translation>
+        <translation>圆圈 3</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="27"/>
         <source>Circle 4</source>
-        <translation>Circle 4</translation>
+        <translation>圆圈 4</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="28"/>
         <source>Circle 5</source>
-        <translation>Circle 5</translation>
+        <translation>圆圈 5</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="29"/>
         <source>Circle 6</source>
-        <translation>Circle 6</translation>
+        <translation>圆圈 6</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="30"/>
         <source>Circle 7</source>
-        <translation>Circle 7</translation>
+        <translation>圆圈 7</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="31"/>
         <source>Circle 8</source>
-        <translation>Circle 8</translation>
+        <translation>圆圈 8</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="32"/>
         <source>Circle 9</source>
-        <translation>Circle 9</translation>
+        <translation>圆圈 9</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="33"/>
@@ -1681,27 +1681,27 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="34"/>
         <source>Campground</source>
-        <translation>Campground</translation>
+        <translation>营地</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="35"/>
         <source>Motorcycle</source>
-        <translation>Motorcycle</translation>
+        <translation>摩托车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="36"/>
         <source>Rail engine</source>
-        <translation>Rail engine</translation>
+        <translation>机车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="37"/>
         <source>Car</source>
-        <translation>Car</translation>
+        <translation>汽车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="38"/>
         <source>File server</source>
-        <translation>File server</translation>
+        <translation>文件服务器</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="39"/>
@@ -1711,7 +1711,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="40"/>
         <source>Aid station</source>
-        <translation>Aid station</translation>
+        <translation>救助站</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="41"/>
@@ -1721,27 +1721,27 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="42"/>
         <source>Canoe</source>
-        <translation>Canoe</translation>
+        <translation>独木舟</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="43"/>
         <source>Eyeball</source>
-        <translation>Eyeball</translation>
+        <translation>面对面</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="44"/>
         <source>Tractor</source>
-        <translation>Tractor</translation>
+        <translation>拖拉机</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="45"/>
         <source>Grid Square</source>
-        <translation>Grid Square</translation>
+        <translation>网格坐标</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="46"/>
         <source>Hotel</source>
-        <translation>Hotel</translation>
+        <translation>酒店</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="47"/>
@@ -1751,12 +1751,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="48"/>
         <source>School</source>
-        <translation>School</translation>
+        <translation>学校</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="49"/>
         <source>Logon</source>
-        <translation>Logon</translation>
+        <translation>登录</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="50"/>
@@ -1766,32 +1766,32 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="51"/>
         <source>NTS station</source>
-        <translation>NTS station</translation>
+        <translation>NTS 台站</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="52"/>
         <source>Balloon</source>
-        <translation>Balloon</translation>
+        <translation>气球</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="53"/>
         <source>Police car</source>
-        <translation>Police car</translation>
+        <translation>警车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="54"/>
         <source>TBD</source>
-        <translation>TBD</translation>
+        <translation>待定</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="55"/>
         <source>RV</source>
-        <translation>RV</translation>
+        <translation>房车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="56"/>
         <source>Shuttle</source>
-        <translation>Shuttle</translation>
+        <translation>航天飞机</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="57"/>
@@ -1801,7 +1801,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="58"/>
         <source>Bus</source>
-        <translation>Bus</translation>
+        <translation>巴士</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="59"/>
@@ -1811,17 +1811,17 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="60"/>
         <source>Weather service</source>
-        <translation>Weather service</translation>
+        <translation>气象服务</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="61"/>
         <source>Helo</source>
-        <translation>Helicopter</translation>
+        <translation>直升机</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="62"/>
         <source>Yacht</source>
-        <translation>Yacht</translation>
+        <translation>游艇</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="63"/>
@@ -1831,12 +1831,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="64"/>
         <source>Jogger</source>
-        <translation>Jogger</translation>
+        <translation>慢跑者</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="65"/>
         <source>Triangle</source>
-        <translation>Triangle</translation>
+        <translation>三角形</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="66"/>
@@ -1846,27 +1846,27 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="67"/>
         <source>Plane large</source>
-        <translation>Plane large</translation>
+        <translation>大型飞机</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="68"/>
         <source>Weather station</source>
-        <translation>Weather station</translation>
+        <translation>气象站</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="69"/>
         <source>Dish antenna</source>
-        <translation>Dish antenna</translation>
+        <translation>碟形天线</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="70"/>
         <source>Ambulance</source>
-        <translation>Ambulance</translation>
+        <translation>救护车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="71"/>
         <source>Bike</source>
-        <translation>Bike</translation>
+        <translation>自行车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="72"/>
@@ -1876,27 +1876,27 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="73"/>
         <source>Fire station</source>
-        <translation>Fire station</translation>
+        <translation>消防站</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="74"/>
         <source>Horse</source>
-        <translation>Horse</translation>
+        <translation>马</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="75"/>
         <source>Fire truck</source>
-        <translation>Fire truck</translation>
+        <translation>消防车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="76"/>
         <source>Glider</source>
-        <translation>Glider</translation>
+        <translation>滑翔机</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="77"/>
         <source>Hospital</source>
-        <translation>Hospital</translation>
+        <translation>医院</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="78"/>
@@ -1906,17 +1906,17 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="79"/>
         <source>Jeep</source>
-        <translation>Jeep</translation>
+        <translation>吉普车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="80"/>
         <source>Truck small</source>
-        <translation>Truck small</translation>
+        <translation>小型卡车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="81"/>
         <source>Laptop</source>
-        <translation>Laptop</translation>
+        <translation>笔记本电脑</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="82"/>
@@ -1926,7 +1926,7 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="83"/>
         <source>Node</source>
-        <translation>Node</translation>
+        <translation>节点</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="84"/>
@@ -1936,42 +1936,42 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="85"/>
         <source>Rover</source>
-        <translation>Rover</translation>
+        <translation>漫游车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="86"/>
         <source>Grid</source>
-        <translation>Grid</translation>
+        <translation>网格</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="87"/>
         <source>Antenna</source>
-        <translation>Antenna</translation>
+        <translation>天线</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="88"/>
         <source>Power boat</source>
-        <translation>Power boat</translation>
+        <translation>动力船</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="89"/>
         <source>Truck stop</source>
-        <translation>Truck stop</translation>
+        <translation>卡车停靠站</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="90"/>
         <source>Truck large</source>
-        <translation>Truck large</translation>
+        <translation>大型卡车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="91"/>
         <source>Van</source>
-        <translation>Van</translation>
+        <translation>面包车</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="92"/>
         <source>Water</source>
-        <translation>Water</translation>
+        <translation>水</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="93"/>
@@ -1981,12 +1981,12 @@
     <message>
         <location filename="../src/aprssystemdialog.cc" line="94"/>
         <source>Yagi</source>
-        <translation>Yagi</translation>
+        <translation>八木天线</translation>
     </message>
     <message>
         <location filename="../src/aprssystemdialog.cc" line="95"/>
         <source>Shelter</source>
-        <translation>Shelter</translation>
+        <translation>避难所</translation>
     </message>
 </context>
 <context>
@@ -1994,17 +1994,17 @@
     <message>
         <location filename="../src/admitselect.cc" line="9"/>
         <source>Always</source>
-        <translation type="unfinished">Always</translation>
+        <translation>总是</translation>
     </message>
     <message>
         <location filename="../src/admitselect.cc" line="10"/>
         <source>Channel Free</source>
-        <translation type="unfinished">Channel Free</translation>
+        <translation>信道空闲</translation>
     </message>
     <message>
         <location filename="../src/admitselect.cc" line="11"/>
         <source>Other Tone</source>
-        <translation>Other Tone</translation>
+        <translation>其他亚音</translation>
     </message>
 </context>
 <context>
@@ -2012,32 +2012,32 @@
     <message>
         <location filename="../src/fmchanneldialog.cc" line="34"/>
         <source>Squelch</source>
-        <translation>Squelch</translation>
+        <translation>静噪</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="36"/>
         <source>Tx Admit</source>
-        <translation type="unfinished">TX Admit</translation>
+        <translation>发射许可</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="38"/>
         <source>Rx Tone</source>
-        <translation type="unfinished">RX Tone</translation>
+        <translation>接收亚音</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="40"/>
         <source>Tx Tone</source>
-        <translation type="unfinished">TX Tone</translation>
+        <translation>发射亚音</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="42"/>
         <source>Bandwidth</source>
-        <translation type="unfinished">Bandwidth</translation>
+        <translation>带宽</translation>
     </message>
     <message>
         <location filename="../src/fmchanneldialog.cc" line="44"/>
         <source>APRS</source>
-        <translation type="unfinished">APRS</translation>
+        <translation>APRS</translation>
     </message>
 </context>
 <context>
@@ -2045,7 +2045,7 @@
     <message>
         <location filename="../src/flageditdialog.ui" line="14"/>
         <source>Select Flags</source>
-        <translation>Select Flags</translation>
+        <translation>选择标志</translation>
     </message>
 </context>
 <context>
@@ -2053,52 +2053,52 @@
     <message>
         <location filename="../src/gpssystemdialog.cc" line="8"/>
         <source>Create DMR APRS System</source>
-        <translation>Create DMR APRS System</translation>
+        <translation>创建 DMR APRS 系统</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="15"/>
         <source>Edit DMR APRS System</source>
-        <translation>Edit DMR APRS System</translation>
+        <translation>编辑 DMR APRS 系统</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.cc" line="46"/>
         <source>[Selected]</source>
-        <translation>[Selected]</translation>
+        <translation>[已选]</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="20"/>
         <source>Edit GPS System</source>
-        <translation>Edit GPS System</translation>
+        <translation>编辑 GPS 系统</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="30"/>
         <source>Basic</source>
-        <translation>Basic</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="36"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="56"/>
         <source>Destination</source>
-        <translation>Destination</translation>
+        <translation>目标</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="63"/>
         <source>Update period</source>
-        <translation>Update period</translation>
+        <translation>更新周期</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="89"/>
         <source>Revert Channel</source>
-        <translation>Revert Channel</translation>
+        <translation>恢复信道</translation>
     </message>
     <message>
         <location filename="../src/gpssystemdialog.ui" line="107"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
 </context>
 <context>
@@ -2106,188 +2106,188 @@
     <message>
         <location filename="../src/generalsettingsview.ui" line="26"/>
         <source>Boot Settings</source>
-        <translation>Boot Settings</translation>
+        <translation>启动设置</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="34"/>
         <source>Intro Line 1</source>
-        <translation>Intro Line 1</translation>
+        <translation>欢迎语第一行</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="47"/>
         <source>First greeting line (if supported by the radio).</source>
-        <translation>First greeting line (if supported by the radio).</translation>
+        <translation>第一行欢迎语（如电台支持）。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="50"/>
         <source>Intro line 1</source>
-        <translation>Intro line 1</translation>
+        <translation>欢迎语第一行</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="57"/>
         <source>Intro Line 2</source>
-        <translation>Intro Line 2</translation>
+        <translation>欢迎语第二行</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="70"/>
         <source>Second greeting line (if supported by the radio).</source>
-        <translation>Second greeting line (if supported by the radio).</translation>
+        <translation>第二行欢迎语（如电台支持）。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="76"/>
         <source>Intro line 2</source>
-        <translation>Intro line 2</translation>
+        <translation>欢迎语第二行</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="89"/>
         <source>Audio Settings</source>
-        <translation>Audio Settings</translation>
+        <translation>音频设置</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="97"/>
         <source>Default Microphone Amplification</source>
-        <translation>Default Microphone Amplification</translation>
+        <translation type="unfinished">默认麦克风放大率</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="110"/>
         <source>Specifies the default (DMR) microphone amplifiction level.</source>
-        <translation>Specifies the default (DMR) microphone amplification level.</translation>
+        <translation type="unfinished">指定默认 (DMR) 麦克风放大级别。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="123"/>
         <source>FM Microphone Amplifiction</source>
-        <translation>FM Microphone Amplification</translation>
+        <translation type="unfinished">FM 麦克风放大率</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="136"/>
         <source>default</source>
         <extracomment>Special value indicating, that the global default mic gain should be used.</extracomment>
-        <translation>default</translation>
+        <translation type="unfinished">特殊值，指示应使用全局默认麦克风增益。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="146"/>
         <source>Default Squelch</source>
-        <translation>Default Squelch</translation>
+        <translation type="unfinished">默认静噪</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="159"/>
         <location filename="../src/generalsettingsview.ui" line="187"/>
         <source>open</source>
         <extracomment>Special value for the squelch setting, disabling/opening the squelch.</extracomment>
-        <translation>open</translation>
+        <translation type="unfinished">静噪设置的特殊值，用于禁用/打开静噪。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="172"/>
         <source>DMR Squelch</source>
-        <translation>DMR Squelch</translation>
+        <translation type="unfinished">DMR 静噪</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="203"/>
         <source>Disables a separate squelch level for DMR. Uses the default one.</source>
-        <translation>Disables a separate squelch level for DMR. Uses the default one.</translation>
+        <translation type="unfinished">禁用 DMR 的独立静噪级别。使用默认级别。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="206"/>
         <source>Default</source>
         <extracomment>Label for a checkbox that disables a separate DMR squelch setting. The default squelch is then used.</extracomment>
-        <translation type="unfinished">Default</translation>
+        <translation>默认</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="215"/>
         <source>VOX Sensitivity</source>
-        <translation>VOX Sensitivity</translation>
+        <translation type="unfinished">VOX 灵敏度</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="228"/>
         <source>Specifies the VOX sensitivity.</source>
-        <translation>Specifies the VOX sensitivity.</translation>
+        <translation type="unfinished">指定 VOX 灵敏度。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="241"/>
         <source>VOX Delay</source>
-        <translation>VOX Delay</translation>
+        <translation type="unfinished">VOX 延迟</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="254"/>
         <source>Specifies the delay between voice detection and transmission. E.g. 500 ms.</source>
-        <translation>Specifies the delay between voice detection and transmission. E.g. 500 ms.</translation>
+        <translation type="unfinished">指定语音检测与传输之间的延迟。例如：500 毫秒。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="261"/>
         <source>Maximum Speaker Volume</source>
-        <translation>Maximum Speaker Volume</translation>
+        <translation type="unfinished">最大扬声器音量</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="274"/>
         <source>Limits the maximum speaker volume.</source>
-        <translation>Limits the maximum speaker volume.</translation>
+        <translation type="unfinished">限制最大扬声器音量。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="290"/>
         <source>Maximum Headphone Volume</source>
-        <translation>Maximum Headphone Volume</translation>
+        <translation type="unfinished">最大耳机音量</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="303"/>
         <source>Limits the maximum headphone volume.</source>
-        <translation>Limits the maximum headphone volume.</translation>
+        <translation type="unfinished">限制最大耳机音量。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="345"/>
         <source>Tone Settings</source>
-        <translation>Tone Settings</translation>
+        <translation type="unfinished">提示音设置</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="353"/>
         <source>Disable all</source>
         <extracomment>Label for a checkbox disabling all tones.</extracomment>
-        <translation>Disable all</translation>
+        <translation type="unfinished">全部禁用</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="366"/>
         <source>Disables all tones.</source>
-        <translation>Disables all tones.</translation>
+        <translation type="unfinished">禁用所有提示音。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="376"/>
         <source>Key tone volume</source>
-        <translation>Key tone volume</translation>
+        <translation type="unfinished">按键音量</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="389"/>
         <source>off</source>
         <extracomment>Special value of a spin box indicating that keytones are disabled.</extracomment>
-        <translation>off</translation>
+        <translation type="unfinished">关</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="399"/>
         <source>SMS tone</source>
-        <translation>SMS tone</translation>
+        <translation type="unfinished">短信提示音</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="412"/>
         <source>Enables a tone on SMS reception.</source>
-        <translation>Enables a tone on SMS reception.</translation>
+        <translation type="unfinished">接收到短信时启用提示音。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="422"/>
         <source>Ringtone</source>
-        <translation>Ringtone</translation>
+        <translation type="unfinished">铃声</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="435"/>
         <source>Enables the ringtone on incoming private calls.</source>
-        <translation>Enables the ringtone on incoming private calls.</translation>
+        <translation type="unfinished">来电私密呼叫时启用铃声。</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="445"/>
         <source>Talk permit</source>
-        <translation>Talk permit</translation>
+        <translation type="unfinished">通话许可音</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="458"/>
         <source>Boot melody</source>
-        <translation>Boot melody</translation>
+        <translation type="unfinished">开机旋律</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="479"/>
@@ -2296,83 +2296,83 @@
         <extracomment>Label for a checkbox, enabling the boot melody
 ----------
 Label for a checkbox enabling the call-reset tone.</extracomment>
-        <translation>Enabled</translation>
+        <translation type="unfinished">启用</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="495"/>
         <source>Call Start</source>
-        <translation>Call Start</translation>
+        <translation type="unfinished">通话开始</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="508"/>
         <source>Call End</source>
-        <translation>Call End</translation>
+        <translation type="unfinished">通话结束</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="521"/>
         <source>Channel Idle</source>
-        <translation>Channel Idle</translation>
+        <translation type="unfinished">信道空闲</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="531"/>
         <source>Call Reset</source>
-        <translation>Call Reset</translation>
+        <translation type="unfinished">通话重置</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="609"/>
         <source>Default Values</source>
-        <translation>Default Values</translation>
+        <translation type="unfinished">默认值</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="319"/>
         <source>Speech Synthesis</source>
-        <translation>Speech Synthesis</translation>
+        <translation>语音合成</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="617"/>
         <source>Power</source>
-        <translation>Power</translation>
+        <translation>功率</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="631"/>
         <source>Max</source>
-        <translation>Max</translation>
+        <translation>最大</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="636"/>
         <source>High</source>
-        <translation>High</translation>
+        <translation>高</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="641"/>
         <source>Mid</source>
-        <translation>Mid</translation>
+        <translation>中</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="646"/>
         <source>Low</source>
-        <translation>Low</translation>
+        <translation>低</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="651"/>
         <source>Min</source>
-        <translation>Min</translation>
+        <translation>最小</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="659"/>
         <source>Transmit Timeout</source>
-        <translation>Transmit Timeout</translation>
+        <translation>发射超时</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="231"/>
         <location filename="../src/generalsettingsview.ui" line="672"/>
         <source>Off</source>
-        <translation>Off</translation>
+        <translation>关</translation>
     </message>
     <message>
         <location filename="../src/generalsettingsview.ui" line="691"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
 </context>
 <context>
@@ -2380,17 +2380,17 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="30"/>
         <source>Basic</source>
-        <translation type="unfinished">Basic</translation>
+        <translation type="unfinished">基本</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="38"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation type="unfinished">名称</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="65"/>
         <source>Add Contact</source>
-        <translation type="unfinished">Add Contact</translation>
+        <translation type="unfinished">添加联系人</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="68"/>
@@ -2400,7 +2400,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="75"/>
         <source>Remove Contact</source>
-        <translation type="unfinished">Remove Contact</translation>
+        <translation type="unfinished">移除联系人</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="78"/>
@@ -2410,7 +2410,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/rxgrouplistdialog.ui" line="88"/>
         <source>Extensions</source>
-        <translation type="unfinished">Extensions</translation>
+        <translation type="unfinished">扩展</translation>
     </message>
 </context>
 <context>
@@ -2418,7 +2418,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/configitemwrapper.cc" line="935"/>
         <source>Contact</source>
-        <translation>Contact</translation>
+        <translation>联系人</translation>
     </message>
 </context>
 <context>
@@ -2426,33 +2426,33 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/grouplistsview.cc" line="46"/>
         <source>Cannot delete RX group list</source>
-        <translation>Cannot delete group list</translation>
+        <translation>无法删除接收组列表</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="47"/>
         <source>Cannot delete RX group lists: You have to select a group list first.</source>
-        <translation>Cannot delete group lists: You have to select a group list first.</translation>
+        <translation>无法删除接收组列表：请先选择一个组列表。</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="56"/>
         <location filename="../src/grouplistsview.cc" line="60"/>
         <source>Delete RX group list?</source>
-        <translation>Delete group list?</translation>
+        <translation>删除接收组列表？</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="56"/>
         <source>Delete RX group list %1?</source>
-        <translation>Delete group list &apos;%1&apos;?</translation>
+        <translation>删除接收组列表 &apos;%1&apos;？</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.cc" line="60"/>
         <source>Delete %1 RX group lists?</source>
-        <translation>Delete %1 group lists?</translation>
+        <translation>删除 %1 个接收组列表？</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="32"/>
         <source>Add RX Group</source>
-        <translation>Add Group List</translation>
+        <translation>添加接收组</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="35"/>
@@ -2462,7 +2462,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/grouplistsview.ui" line="42"/>
         <source>Delete RX Group</source>
-        <translation>Delete Group List</translation>
+        <translation>删除接收组</translation>
     </message>
     <message>
         <location filename="../src/grouplistsview.ui" line="45"/>
@@ -2475,7 +2475,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/configitemwrapper.cc" line="911"/>
         <source>RX Group Lists</source>
-        <translation>Group Lists</translation>
+        <translation>接收组列表</translation>
     </message>
 </context>
 <context>
@@ -2483,22 +2483,22 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/m17channeldialog.cc" line="50"/>
         <source>Channel mode</source>
-        <translation>Channel mode</translation>
+        <translation>信道模式</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="52"/>
         <source>Access number</source>
-        <translation>Access number</translation>
+        <translation>接入号码</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="55"/>
         <source>Tx contact</source>
-        <translation>Tx contact</translation>
+        <translation>发射联系人</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="57"/>
         <source>Send position</source>
-        <translation>Send position</translation>
+        <translation>发送位置</translation>
     </message>
 </context>
 <context>
@@ -2506,17 +2506,17 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/m17channeldialog.cc" line="16"/>
         <source>Voice</source>
-        <translation>Voice</translation>
+        <translation>语音</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="17"/>
         <source>Data</source>
-        <translation>Data</translation>
+        <translation>数据</translation>
     </message>
     <message>
         <location filename="../src/m17channeldialog.cc" line="18"/>
         <source>Voice + Data</source>
-        <translation>Voice + Data</translation>
+        <translation>语音 + 数据</translation>
     </message>
 </context>
 <context>
@@ -2525,57 +2525,57 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/m17contactdialog.ui" line="14"/>
         <location filename="../src/m17contactdialog.cc" line="43"/>
         <source>Edit M17 Contact</source>
-        <translation>Edit M17 Contact</translation>
+        <translation>编辑 M17 联系人</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="24"/>
         <source>Basic</source>
-        <translation type="unfinished">Basic</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="30"/>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="37"/>
         <source>The name of the contact.</source>
-        <translation>The name of the contact.</translation>
+        <translation>联系人名称。</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="44"/>
         <source>Call</source>
-        <translation>Call</translation>
+        <translation>呼号</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="51"/>
         <source>The callsign of the contact. Must be not longer than 9 chars, A-Z, 0-9, ., /, -.</source>
-        <translation>The call-sign of the contact. Must not be longer than 9 chars, A-Z, 0-9, ., /, -.</translation>
+        <translation>联系人的呼号。不超过 9 个字符，可用 A-Z, 0-9, ., /, -。</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="58"/>
         <source>Ring</source>
-        <translation type="unfinished">Ring</translation>
+        <translation>铃声</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="68"/>
         <source>Broadcast</source>
-        <translation>Broadcast</translation>
+        <translation>广播</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="75"/>
         <source>Sets this contact to be the M17 broadcast contact, the specified call is then ignored.</source>
-        <translation>Sets this contact to be the M17 broadcast contact, the specified call is then ignored.</translation>
+        <translation>将此联系人设为 M17 广播联系人，指定的呼号将被忽略。</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.ui" line="86"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
     <message>
         <location filename="../src/m17contactdialog.cc" line="49"/>
         <source>Create M17 Contact</source>
-        <translation>Create M17 Contact</translation>
+        <translation>创建 M17 联系人</translation>
     </message>
 </context>
 <context>
@@ -2583,7 +2583,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/m17contactdialog.cc" line="102"/>
         <source>[None]</source>
-        <translation type="unfinished">[None]</translation>
+        <translation>[无]</translation>
     </message>
 </context>
 <context>
@@ -2591,38 +2591,38 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.ui" line="74"/>
         <source>File</source>
-        <translation>File</translation>
+        <translation>文件</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="86"/>
         <source>Device</source>
-        <translation>Device</translation>
+        <translation>设备</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="98"/>
         <location filename="../src/mainwindow.ui" line="266"/>
         <source>Help</source>
-        <translation>Help</translation>
+        <translation>帮助</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="105"/>
         <source>Databases</source>
-        <translation>Databases</translation>
+        <translation>数据库</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="127"/>
         <source>Toolbar</source>
-        <translation></translation>
+        <translation>工具栏</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="155"/>
         <source>New</source>
-        <translation>New</translation>
+        <translation>新建</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="158"/>
         <source>Creates a new Codeplug.</source>
-        <translation>Creates a new Codeplug.</translation>
+        <translation>创建新的信道配置。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="161"/>
@@ -2632,12 +2632,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.ui" line="169"/>
         <source>Open ...</source>
-        <translation>Open …</translation>
+        <translation>打开…</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="172"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Imports a codeplug from &amp;quot;conf&amp;quot; files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Imports a codeplug from &amp;quot;conf&amp;quot; files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;从 &amp;quot;conf&amp;quot; 文件导入信道配置。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="175"/>
@@ -2647,12 +2647,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.ui" line="183"/>
         <source>Save ...</source>
-        <translation>Save …</translation>
+        <translation>保存…</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="186"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saves the codeplug in a &amp;quot;conf&amp;quot; file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Saves the codeplug in a &amp;quot;conf&amp;quot; file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;将信道配置保存在 &amp;quot;conf&amp;quot; 文件中。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="189"/>
@@ -2662,12 +2662,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.ui" line="197"/>
         <source>Quit</source>
-        <translation>Quit</translation>
+        <translation>退出</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="200"/>
         <source>Quits the application.</source>
-        <translation>Quits the application.</translation>
+        <translation>退出应用程序。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="203"/>
@@ -2677,22 +2677,22 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.ui" line="211"/>
         <source>Detect</source>
-        <translation>Detect</translation>
+        <translation>检测</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="214"/>
         <source>Detect connected radios.</source>
-        <translation>Detect connected radios.</translation>
+        <translation>检测连接的电台。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="222"/>
         <source>Verify</source>
-        <translation>Verify</translation>
+        <translation>验证</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="225"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Verifies the current codeplug with connected radios.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Verifies the current codeplug with connected radios.</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;与连接的电台验证当前的信道配置。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="228"/>
@@ -2702,32 +2702,32 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.ui" line="236"/>
         <source>Read</source>
-        <translation>Read</translation>
+        <translation>读取</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="239"/>
         <source>Reads a codeplug from connected radios.</source>
-        <translation>Reads a codeplug from connected radios.</translation>
+        <translation>从连接的电台读取信道配置。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="247"/>
         <source>Write</source>
-        <translation>Write</translation>
+        <translation>写入</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="250"/>
         <source>Writes the codeplug to the connected radio.</source>
-        <translation>Writes the codeplug to the connected radio.</translation>
+        <translation>将信道配置写入连接的电台。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="258"/>
         <source>About qdmr</source>
-        <translation>About qdmr</translation>
+        <translation>关于 qdmr</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="269"/>
         <source>Read the handbook.</source>
-        <translation>Read the handbook.</translation>
+        <translation>阅读手册。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="272"/>
@@ -2738,172 +2738,172 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/mainwindow.ui" line="280"/>
         <location filename="../src/mainwindow.cc" line="124"/>
         <source>Settings</source>
-        <translation>Settings</translation>
+        <translation>设置</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="283"/>
         <source>Shows settings dialog</source>
-        <translation>Shows settings dialog.</translation>
+        <translation>显示设置对话框</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="291"/>
         <source>Write Callsign DB</source>
-        <translation>Write call-sign DB</translation>
+        <translation>写入呼号数据库</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="294"/>
         <source>Writes call-sign DB to radio.</source>
-        <translation>Writes call-sign DB to radio.</translation>
+        <translation>将呼号数据库写入电台。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="299"/>
         <source>Refresh Callsign DB</source>
-        <translation>Refresh call-sign DB</translation>
+        <translation>刷新呼号数据库</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="302"/>
         <source>Refreshes the downloaded callsign DB</source>
-        <translation>Refreshes the downloaded call-sign DB</translation>
+        <translation>刷新下载的呼号数据库</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="310"/>
         <source>Refresh Talkgroup DB</source>
-        <translation>Refresh talk-group DB</translation>
+        <translation>刷新通话组数据库</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="313"/>
         <source>Refreshes the downloaded talkgroup DB</source>
-        <translation>Refreshes the downloaded talk-group DB</translation>
+        <translation>刷新下载的通话组数据库</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="318"/>
         <source>Export to CHIRP ...</source>
-        <translation>Export to CHIRP …</translation>
+        <translation>导出到 CHIRP…</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="321"/>
         <source>Exports all FM channels to CHIRP CSV.</source>
-        <translation>Exports all FM channels to CHIRP CSV.</translation>
+        <translation>将所有 FM 信道导出为 CHIRP CSV。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="326"/>
         <source>Import ...</source>
-        <translation>Import …</translation>
+        <translation>导入…</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="329"/>
         <source>Imports and merges a codeplug into the current one.</source>
-        <translation>Imports and merges a codeplug into the current one.</translation>
+        <translation>导入并合并信道配置到当前配置中。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="334"/>
         <source>Refresh Orbital Elements</source>
-        <translation>Refresh Orbital Elements</translation>
+        <translation>刷新轨道参数</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="337"/>
         <source>Refreshes the orbital elements.</source>
-        <translation>Refreshes the orbital elements.</translation>
+        <translation>刷新下载的轨道参数。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="345"/>
         <source>Edit Satellites ...</source>
-        <translation>Edit Satellites …</translation>
+        <translation>编辑卫星…</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="348"/>
         <source>Opens an editor to edit your satellite database.</source>
-        <translation>Opens an editor to edit your satellite database.</translation>
+        <translation>打开编辑器编辑您的卫星数据库。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="356"/>
         <source>Write satellites</source>
-        <translation>Write satellites</translation>
+        <translation>写入卫星</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.ui" line="359"/>
         <source>Writes the orbital elements and transponder information onto the connected device.</source>
-        <translation>Writes the orbital elements and transponder information onto the connected device.</translation>
+        <translation>将轨道参数和转发器信息写入连接的设备。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="70"/>
         <source>Cannot update callsign DB: %1</source>
-        <translation>Cannot update call-sign DB: %1</translation>
+        <translation>无法更新呼号数据库：%1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="73"/>
         <source>Callsign database updated &amp; loaded.</source>
-        <translation>Call-sign database updated &amp; loaded.</translation>
+        <translation>呼号数据库已更新并加载。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="77"/>
         <source>Download call-sign DB ... %1%</source>
-        <translation>Download call-sign DB … %1%</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="79"/>
         <source>Download call-sign DB ... (%1MB)</source>
-        <translation>Download call-sign DB … (%1MB)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="84"/>
         <source>Cannot update talkgroup DB: %1</source>
-        <translation>Cannot update talk-group DB: %1</translation>
+        <translation>无法更新通话组数据库：%1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="87"/>
         <source>Talkgroup database updated &amp; loaded.</source>
-        <translation>Talk-group database updated &amp; loaded.</translation>
+        <translation>通话组数据库已更新并加载。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="91"/>
         <source>Download talkgroup DB ... %1%</source>
-        <translation>Download talkgroup DB … %1%</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="93"/>
         <source>Download talkgroup DB ... (%1MB)</source>
-        <translation>Download talkgroup DB … (%1MB)</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="99"/>
         <source>Cannot update orbital elements: %1</source>
-        <translation>Cannot update orbital elements: %1</translation>
+        <translation>无法更新轨道参数：%1</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="102"/>
         <source>Orbital elements updated &amp; loaded.</source>
-        <translation>Orbital elements updated &amp; loaded.</translation>
+        <translation>轨道参数已更新并加载。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="128"/>
         <source>Radio IDs</source>
-        <translation>Radio IDs</translation>
+        <translation>电台 ID</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="130"/>
         <source>Contacts</source>
-        <translation>Contacts</translation>
+        <translation>联系人</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="132"/>
         <source>Group Lists</source>
-        <translation>Group Lists</translation>
+        <translation>群组列表</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="134"/>
         <source>Channels</source>
-        <translation>Channels</translation>
+        <translation>信道</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="136"/>
         <source>Zones</source>
-        <translation>Zones</translation>
+        <translation>区域</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="138"/>
         <source>Scan Lists</source>
-        <translation>Scan Lists</translation>
+        <translation>扫描列表</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="140"/>
@@ -2913,27 +2913,27 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/mainwindow.cc" line="142"/>
         <source>Roaming Channels</source>
-        <translation>Roaming Channels</translation>
+        <translation>漫游信道</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="145"/>
         <source>Roaming Zones</source>
-        <translation>Roaming Zones</translation>
+        <translation>漫游区域</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="149"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="162"/>
         <source>Unsaved changes to codeplug.</source>
-        <translation>Unsaved changes to codeplug.</translation>
+        <translation>信道配置有未保存的更改。</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cc" line="163"/>
         <source>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</source>
-        <translation>There are unsaved changes to the current codeplug. These changes are lost if you proceed.</translation>
+        <translation>当前信道配置有未保存的更改。如果继续，这些更改将丢失。</translation>
     </message>
 </context>
 <context>
@@ -2942,18 +2942,18 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/melody_edit.cc" line="16"/>
         <source>bpm</source>
         <comment>Beats per minute. Unit in a spin box.</comment>
-        <translation>bpm</translation>
+        <translation type="unfinished">拍/分钟</translation>
     </message>
     <message>
         <location filename="../src/melody_edit.cc" line="17"/>
         <source>Specify the melody in Lilypond format.</source>
         <comment>Tooltip for a melody entry field.</comment>
-        <translation>Specify the melody in Lilypond format.</translation>
+        <translation type="unfinished">以 Lilypond 格式指定旋律。</translation>
     </message>
     <message>
         <location filename="../src/melody_edit.cc" line="23"/>
         <source>Melody</source>
-        <translation>Melody</translation>
+        <translation type="unfinished">旋律</translation>
     </message>
 </context>
 <context>
@@ -2961,12 +2961,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/channelselectiondialog.cc" line="46"/>
         <source>[Selected]</source>
-        <translation>[Selected]</translation>
+        <translation>[已选]</translation>
     </message>
     <message>
         <location filename="../src/channelselectiondialog.cc" line="69"/>
         <source>Select a channel:</source>
-        <translation>Select a channel:</translation>
+        <translation>选择一个信道：</translation>
     </message>
 </context>
 <context>
@@ -2974,12 +2974,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/contactselectiondialog.cc" line="18"/>
         <source>Show private calls</source>
-        <translation>Show private calls</translation>
+        <translation>显示私密呼叫</translation>
     </message>
     <message>
         <location filename="../src/contactselectiondialog.cc" line="42"/>
         <source>Select a group call:</source>
-        <translation>Select a group call:</translation>
+        <translation>选择一个群组呼叫：</translation>
     </message>
 </context>
 <context>
@@ -2987,7 +2987,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingchannelselectiondialog.cc" line="12"/>
         <source>Select roaming channels</source>
-        <translation>Select roaming channels</translation>
+        <translation>选择漫游信道</translation>
     </message>
 </context>
 <context>
@@ -2995,38 +2995,38 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="73"/>
         <source>Cannot delete GPS system</source>
-        <translation>Cannot delete GPS system</translation>
+        <translation>无法删除 GPS 系统</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="74"/>
         <source>Cannot delete GPS system: You have to select a GPS system first.</source>
-        <translation>Cannot delete GPS system: You have to select a GPS system first.</translation>
+        <translation>无法删除 GPS 系统：请先选择一个 GPS 系统。</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="83"/>
         <location filename="../src/positioningsystemlistview.cc" line="87"/>
         <source>Delete positioning system?</source>
-        <translation>Delete positioning system?</translation>
+        <translation>删除定位系统？</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="83"/>
         <source>Delete positioning system %1?</source>
-        <translation>Delete positioning system &apos;%1&apos;?</translation>
+        <translation>删除定位系统 &apos;%1&apos;？</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.cc" line="87"/>
         <source>Delete %1 positioning systems?</source>
-        <translation>Delete %1 positioning systems?</translation>
+        <translation>删除 %1 个定位系统？</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="35"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support GPS or APRS. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support GPS or APRS. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;注意：&lt;/span&gt; QDMR 是一个与设备无关的 CPS。但是，并非所有电台都支持 GPS 或 APRS。因此，在将信道配置写入设备时，这些设置可能会被忽略。 &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;隐藏&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="72"/>
         <source>Add GPS System</source>
-        <translation>Add GPS System</translation>
+        <translation>添加 GPS 系统</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="75"/>
@@ -3036,7 +3036,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="85"/>
         <source>Add APRS System</source>
-        <translation>Add APRS System</translation>
+        <translation>添加 APRS 系统</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="88"/>
@@ -3046,7 +3046,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="95"/>
         <source>Delete Position System</source>
-        <translation>Delete Positioning System</translation>
+        <translation>删除定位系统</translation>
     </message>
     <message>
         <location filename="../src/positioningsystemlistview.ui" line="98"/>
@@ -3071,48 +3071,48 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/configitemwrapper.cc" line="829"/>
         <location filename="../src/configitemwrapper.cc" line="837"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="818"/>
         <location filename="../src/configitemwrapper.cc" line="822"/>
         <source>[Selected]</source>
-        <translation>[Selected]</translation>
+        <translation>[已选]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="853"/>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation>类型</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="854"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="855"/>
         <source>Destination</source>
-        <translation>Destination</translation>
+        <translation>目标</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="856"/>
         <source>Period</source>
-        <translation>Period</translation>
+        <translation>周期</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="857"/>
         <source>Channel</source>
-        <translation>Channel</translation>
+        <translation>信道</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="858"/>
         <source>Message</source>
-        <translation>Message</translation>
+        <translation>消息</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="859"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
 </context>
 <context>
@@ -3120,27 +3120,27 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/propertydelegate.cc" line="74"/>
         <source>None</source>
-        <translation>None</translation>
+        <translation>无</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="75"/>
         <source>Off</source>
-        <translation>Off</translation>
+        <translation>关</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="112"/>
         <source>False</source>
-        <translation>False</translation>
+        <translation>否</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="113"/>
         <source>True</source>
-        <translation>True</translation>
+        <translation>是</translation>
     </message>
     <message>
         <location filename="../src/propertydelegate.cc" line="142"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
 </context>
 <context>
@@ -3148,59 +3148,59 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/extensionwrapper.cc" line="352"/>
         <source>new element</source>
-        <translation>new element</translation>
+        <translation>新元素</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="528"/>
         <source>Property</source>
-        <translation>Property</translation>
+        <translation>属性</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="529"/>
         <source>Value</source>
-        <translation>Value</translation>
+        <translation>值</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="530"/>
         <source>Description</source>
-        <translation>Description</translation>
+        <translation>描述</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="592"/>
         <source>true</source>
-        <translation>true</translation>
+        <translation>是</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="593"/>
         <source>false</source>
-        <translation>false</translation>
+        <translation>否</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="614"/>
         <source>None</source>
-        <translation>None</translation>
+        <translation>无</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="616"/>
         <source>Off</source>
-        <translation>Off</translation>
+        <translation>关</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="627"/>
         <location filename="../src/extensionwrapper.cc" line="635"/>
         <location filename="../src/extensionwrapper.cc" line="643"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="645"/>
         <source>Instance of %1</source>
-        <translation>Instance of &apos;%1&apos;</translation>
+        <translation>%1 实例</translation>
     </message>
     <message>
         <location filename="../src/extensionwrapper.cc" line="650"/>
         <source>List of %1 instances</source>
-        <translation>List of %1 instances</translation>
+        <translation>%1 实例列表</translation>
     </message>
 </context>
 <context>
@@ -3208,7 +3208,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="132"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
 </context>
 <context>
@@ -3216,22 +3216,22 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="17"/>
         <source>Create Group List</source>
-        <translation>Create group list</translation>
+        <translation>创建群组列表</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="24"/>
         <source>Edit Group List</source>
-        <translation>Edit group list</translation>
+        <translation>编辑群组列表</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="88"/>
         <source>Cannot remove group call</source>
-        <translation>Cannot remove group call</translation>
+        <translation>无法移除群组呼叫</translation>
     </message>
     <message>
         <location filename="../src/rxgrouplistdialog.cc" line="89"/>
         <source>Cannot remove group call: You have to select at least one group call first.</source>
-        <translation>Cannot remove group call: You have to select at least one group call first.</translation>
+        <translation>无法移除群组呼叫：请先至少选择一个群组呼叫。</translation>
     </message>
 </context>
 <context>
@@ -3239,47 +3239,47 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/radioidlistview.cc" line="61"/>
         <source>Cannot delete radio IDs</source>
-        <translation>Cannot delete radio IDs</translation>
+        <translation>无法删除电台 ID</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="62"/>
         <source>Cannot delete radio IDs: You have to select a radio ID first.</source>
-        <translation>Cannot delete radio IDs: You have to select a radio ID first.</translation>
+        <translation>无法删除电台 ID：请先选择一个电台 ID。</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="71"/>
         <source>Delete radio ID?</source>
-        <translation>Delete radio ID?</translation>
+        <translation>删除电台 ID？</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="71"/>
         <source>Delete radio ID %1?</source>
-        <translation>Delete radio ID &apos;%1&apos;?</translation>
+        <translation>删除电台 ID &apos;%1&apos;？</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="75"/>
         <source>Delete scan lists?</source>
-        <translation>Delete scan lists?</translation>
+        <translation>删除扫描列表？</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.cc" line="75"/>
         <source>Delete %1 scan lists?</source>
-        <translation>Delete %1 scan lists?</translation>
+        <translation>删除 %1 个扫描列表？</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="22"/>
         <source>Default Radio ID</source>
-        <translation>Default Radio ID</translation>
+        <translation>默认电台 ID</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="46"/>
         <source>Add Radio ID</source>
-        <translation>Add Radio ID</translation>
+        <translation>添加电台 ID</translation>
     </message>
     <message>
         <location filename="../src/radioidlistview.ui" line="53"/>
         <source>Delete Radio ID</source>
-        <translation>Delete Radio ID</translation>
+        <translation>删除电台 ID</translation>
     </message>
 </context>
 <context>
@@ -3292,22 +3292,22 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/configitemwrapper.cc" line="1013"/>
         <source>Type</source>
-        <translation>Type</translation>
+        <translation>类型</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="1014"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="1015"/>
         <source>Number</source>
-        <translation>Number</translation>
+        <translation>编号</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="1016"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
 </context>
 <context>
@@ -3315,12 +3315,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/radioselectiondialog.ui" line="14"/>
         <source>Cannot auto-detect radio</source>
-        <translation>Cannot auto-detect radio</translation>
+        <translation>无法自动检测电台</translation>
     </message>
     <message>
         <location filename="../src/radioselectiondialog.ui" line="20"/>
         <source>Select a specific radio</source>
-        <translation>Select a specific radio</translation>
+        <translation>选择特定电台</translation>
     </message>
 </context>
 <context>
@@ -3329,27 +3329,27 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/releasenotes.cc" line="31"/>
         <source>Cannot download release notes from https://github.com/hmatuschek/qdmr
 	 %1</source>
-        <translation>Cannot download release notes from https://github.com/hmatuschek/qdmr
-	 %1</translation>
+        <translation>无法从 https://github.com/hmatuschek/qdmr 下载更新说明
+	%1</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="43"/>
         <source>Cannot read release notes from https://github.com/hmatuschek/qdmr
 	Release is not a JSON object!</source>
-        <translation>Cannot read release notes from https://github.com/hmatuschek/qdmr
-	Release is not a JSON object!</translation>
+        <translation>无法从 https://github.com/hmatuschek/qdmr 读取更新说明
+	发布版本不是 JSON 对象！</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="48"/>
         <source>Cannot read release notes from https://github.com/hmatuschek/qdmr
 	Release does not contain a release note.</source>
-        <translation>Cannot read release notes from https://github.com/hmatuschek/qdmr
-	Release does not contain a release note.</translation>
+        <translation>无法从 https://github.com/hmatuschek/qdmr 读取发布说明
+	发布版本未包含发布说明。</translation>
     </message>
     <message>
         <location filename="../src/releasenotes.cc" line="59"/>
         <source>qDMR was updated to version %1</source>
-        <translation>qdmr was updated to version %1.</translation>
+        <translation>qDMR 已更新到版本 %1</translation>
     </message>
 </context>
 <context>
@@ -3357,7 +3357,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/repeaterbooksource.cc" line="70"/>
         <source>Cannot query repeaterbook.com: %1</source>
-        <translation>Cannot query repeaterbook.com: %1</translation>
+        <translation type="unfinished">无法查询 repeaterbook.com：%1</translation>
     </message>
 </context>
 <context>
@@ -3365,53 +3365,53 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="28"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="35"/>
         <source>RX Frequency [MHz]</source>
-        <translation>RX Frequency [MHz]</translation>
+        <translation>接收频率 [MHz]</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="42"/>
         <source>TX Frequency [MHz]</source>
-        <translation>TX Frequency [MHz]</translation>
+        <translation>发射频率 [MHz]</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="49"/>
         <source>Time Slot</source>
-        <translation>Time Slot</translation>
+        <translation>时隙</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="56"/>
         <source>Color Code</source>
-        <translation>Color Code</translation>
+        <translation>色码</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.ui" line="74"/>
         <location filename="../src/roamingchanneldialog.ui" line="95"/>
         <source>Selected</source>
-        <translation>Selected</translation>
+        <translation>已选</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="40"/>
         <source>Edit roaming channel</source>
-        <translation>Edit roaming channel</translation>
+        <translation>编辑漫游信道</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="42"/>
         <source>Create roaming channel</source>
-        <translation>Create roaming channel</translation>
+        <translation>创建漫游信道</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="49"/>
         <source>TS 1</source>
-        <translation>TS 1</translation>
+        <translation>时隙 1</translation>
     </message>
     <message>
         <location filename="../src/roamingchanneldialog.cc" line="50"/>
         <source>TS 2</source>
-        <translation>TS 2</translation>
+        <translation>时隙 2</translation>
     </message>
 </context>
 <context>
@@ -3419,43 +3419,43 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingchannellistview.ui" line="26"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hint:&lt;/span&gt; You do not need to add roaming channel explicitly, just create roaming zones and add channels there. These channels are then added to this list.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Hint:&lt;/span&gt; You do not need to add roaming channel explicitly, just create roaming zones and add channels there. These channels are then added to this list.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;注意：&lt;/span&gt; QDMR 是一个与设备无关的 CPS。但是，并非所有电台都支持漫游。因此，在将信道配置写入设备时，这些设置可能会被忽略。 &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;提示：&lt;/span&gt; 您不需要显式添加漫游信道，只需创建漫游区域并在那里添加信道即可。这些信道随后将被添加到此列表中。&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;隐藏&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.ui" line="51"/>
         <source>Add Roaming Channel</source>
-        <translation>Add Roaming Channel</translation>
+        <translation>添加漫游信道</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.ui" line="58"/>
         <source>Delete Roaming Channel</source>
-        <translation>Delete Roaming Channel</translation>
+        <translation>删除漫游信道</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="63"/>
         <source>Cannot delete roaming channel</source>
-        <translation>Cannot delete roaming channel</translation>
+        <translation>无法删除漫游信道</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="64"/>
         <source>Cannot delete roaming channel: You have to select a channel first.</source>
-        <translation>Cannot delete roaming channel: You have to select a channel first.</translation>
+        <translation>无法删除漫游信道：请先选择一个信道。</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
         <source>Delete roaming channel?</source>
-        <translation>Delete roaming channel?</translation>
+        <translation>删除漫游信道？</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="74"/>
         <source>Delete roaming channel %1?</source>
-        <translation>Delete roaming channel %1?</translation>
+        <translation>删除漫游信道 &apos;%1&apos;？</translation>
     </message>
     <message>
         <location filename="../src/roamingchannellistview.cc" line="78"/>
         <source>Delete %1 roaming channel?</source>
-        <translation>Delete %1 roaming channel?</translation>
+        <translation>删除 %1 个漫游信道？</translation>
     </message>
 </context>
 <context>
@@ -3464,47 +3464,47 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/configitemwrapper.cc" line="557"/>
         <location filename="../src/configitemwrapper.cc" line="565"/>
         <source>[Selected]</source>
-        <translation>[Selected]</translation>
+        <translation>[已选]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="579"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="594"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="595"/>
         <source>RX Frequency</source>
-        <translation>RX Frequency</translation>
+        <translation>接收频率</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="596"/>
         <source>TX Frequency</source>
-        <translation>TX Frequency</translation>
+        <translation>发射频率</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="598"/>
         <source>TS</source>
-        <translation>TS</translation>
+        <translation>时隙</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="599"/>
         <source>Zones</source>
-        <translation>Zones</translation>
+        <translation>区域</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="600"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="597"/>
         <source>CC</source>
-        <translation>CC</translation>
+        <translation>色码</translation>
     </message>
 </context>
 <context>
@@ -3512,7 +3512,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/configitemwrapper.cc" line="627"/>
         <source>Roaming Channel</source>
-        <translation>Roaming Channel</translation>
+        <translation>漫游信道</translation>
     </message>
 </context>
 <context>
@@ -3520,12 +3520,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/configitemwrapper.cc" line="953"/>
         <source>%1 (containing %2 channels)</source>
-        <translation>%1 (containing %2 channels)</translation>
+        <translation>%1（包含 %2 个信道）</translation>
     </message>
     <message>
         <location filename="../src/configitemwrapper.cc" line="960"/>
         <source>Roaming zone</source>
-        <translation>Roaming zone</translation>
+        <translation>漫游区域</translation>
     </message>
 </context>
 <context>
@@ -3533,42 +3533,42 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingzonedialog.cc" line="15"/>
         <source>Create Roaming Zone</source>
-        <translation>Create roaming zone</translation>
+        <translation>创建漫游区域</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.cc" line="22"/>
         <source>Set Roaming Zone</source>
-        <translation>Edit roaming zone</translation>
+        <translation>设置漫游区域</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.cc" line="87"/>
         <source>Cannot remove channels.</source>
-        <translation>Cannot remove channels.</translation>
+        <translation>无法移除信道。</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.cc" line="88"/>
         <source>Cannot remove channels. Select at least one channel first.</source>
-        <translation>Cannot remove channels. Select at least one channel first.</translation>
+        <translation>无法移除信道。请先至少选择一个信道。</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="30"/>
         <source>Basic</source>
-        <translation>Basic</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="38"/>
         <source>Name:</source>
-        <translation>Name:</translation>
+        <translation>名称：</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="62"/>
         <source>Add Roaming Channel</source>
-        <translation>Add Roaming Channel</translation>
+        <translation>添加漫游信道</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="69"/>
         <source>Add DMR Channel</source>
-        <translation>Add DMR Channel</translation>
+        <translation>添加 DMR 信道</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="72"/>
@@ -3578,7 +3578,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="79"/>
         <source>Remove Channel</source>
-        <translation>Remove Channel</translation>
+        <translation>移除信道</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="82"/>
@@ -3588,7 +3588,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingzonedialog.ui" line="92"/>
         <source>Extension</source>
-        <translation>Extension</translation>
+        <translation>扩展</translation>
     </message>
 </context>
 <context>
@@ -3596,52 +3596,52 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingzonelistview.cc" line="52"/>
         <source>Generate roaming zone</source>
-        <translation>Generate roaming zone</translation>
+        <translation>生成漫游区域</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.cc" line="53"/>
         <source>Create a roaming zone by collecting all channels with these group calls.</source>
-        <translation>Create a roaming zone by collecting all channels with these group calls.</translation>
+        <translation>通过收集具有这些群组呼叫的所有信道来创建漫游区域。</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.cc" line="87"/>
         <source>Cannot delete roaming zone</source>
-        <translation>Cannot delete roaming zone</translation>
+        <translation>无法删除漫游区域</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.cc" line="88"/>
         <source>Cannot delete roaming zone: You have to select a zone first.</source>
-        <translation>Cannot delete roaming zone: You have to select a zone first.</translation>
+        <translation>无法删除漫游区域：请先选择一个区域。</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.cc" line="98"/>
         <source>Delete roaming zone?</source>
-        <translation>Delete roaming zone?</translation>
+        <translation>删除漫游区域？</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.cc" line="98"/>
         <source>Delete roaming zone %1?</source>
-        <translation>Delete roaming zone &apos;%1&apos;?</translation>
+        <translation>删除漫游区域 &apos;%1&apos;？</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.cc" line="102"/>
         <source>Delete roaming zones?</source>
-        <translation>Delete roaming zones?</translation>
+        <translation>删除漫游区域？</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.cc" line="102"/>
         <source>Delete %1 roaming zones?</source>
-        <translation>Delete %1 roaming zones?</translation>
+        <translation>删除 %1 个漫游区域？</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="23"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; QDMR is a device independent CPS. However, not all radios support Roaming. Hence these settings might be ignored when programming the code-plug to the device. &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;注意：&lt;/span&gt; QDMR 是一个与设备无关的 CPS。但是，并非所有电台都支持漫游。因此，在将信道配置写入设备时，这些设置可能会被忽略。 &lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;隐藏&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="48"/>
         <source>Add Roaming Zone</source>
-        <translation>Add Roaming Zone</translation>
+        <translation>添加漫游区域</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="51"/>
@@ -3651,12 +3651,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="58"/>
         <source>Generate Roaming Zone</source>
-        <translation>Generate Roaming Zone</translation>
+        <translation>生成漫游区域</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="65"/>
         <source>Delete Roaming Zone</source>
-        <translation>Delete Roaming Zone</translation>
+        <translation>删除漫游区域</translation>
     </message>
     <message>
         <location filename="../src/roamingzonelistview.ui" line="68"/>
@@ -3669,12 +3669,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/roamingzonedialog.cc" line="125"/>
         <source>[None]</source>
-        <translation type="unfinished">[None]</translation>
+        <translation>[无]</translation>
     </message>
     <message>
         <location filename="../src/roamingzonedialog.cc" line="126"/>
         <source>[Default]</source>
-        <translation type="unfinished">[Default]</translation>
+        <translation>[默认]</translation>
     </message>
 </context>
 <context>
@@ -3682,17 +3682,17 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="20"/>
         <source>Edit satellite database</source>
-        <translation>Edit satellite database</translation>
+        <translation>编辑卫星数据库</translation>
     </message>
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="48"/>
         <source>Add</source>
-        <translation>Add</translation>
+        <translation>添加</translation>
     </message>
     <message>
         <location filename="../src/satellitedatabasedialog.ui" line="55"/>
         <source>Delete</source>
-        <translation>Delete</translation>
+        <translation>删除</translation>
     </message>
 </context>
 <context>
@@ -3701,7 +3701,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/satelliteselectiondialog.ui" line="20"/>
         <location filename="../src/satelliteselectiondialog.ui" line="26"/>
         <source>Select a satellite</source>
-        <translation>Select a satellite</translation>
+        <translation>选择一颗卫星</translation>
     </message>
 </context>
 <context>
@@ -3709,71 +3709,71 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="14"/>
         <source>Edit Satellite Transponder</source>
-        <translation>Edit Satellite Transponder</translation>
+        <translation>编辑卫星转发器</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="20"/>
         <source>Satellite</source>
-        <translation>Satellite</translation>
+        <translation type="unfinished">卫星</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="26"/>
         <source>Satellite Name</source>
-        <translation>Satellite Name</translation>
+        <translation type="unfinished">卫星名称</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="55"/>
         <source>FM Voice Transponder</source>
-        <translation>FM Voice Transponder</translation>
+        <translation>FM 语音转发器</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="61"/>
         <location filename="../src/satellitetransponderdialog.ui" line="134"/>
         <source>Uplink Frequency</source>
-        <translation>Uplink Frequency</translation>
+        <translation>上行频率</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="71"/>
         <location filename="../src/satellitetransponderdialog.ui" line="150"/>
         <source>Uplink Tone</source>
-        <translation>Uplink Tone</translation>
+        <translation>上行亚音</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="87"/>
         <location filename="../src/satellitetransponderdialog.ui" line="172"/>
         <source>Downlink Frequency</source>
-        <translation>Downlink Frequency</translation>
+        <translation>下行频率</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="97"/>
         <location filename="../src/satellitetransponderdialog.ui" line="188"/>
         <source>Downlink Tone</source>
-        <translation>Downlink Tone</translation>
+        <translation>下行亚音</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="122"/>
         <source>APRS Transponder</source>
-        <translation>APRS Transponder</translation>
+        <translation>APRS 转发器</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="213"/>
         <source>Beacon</source>
-        <translation>Beacon</translation>
+        <translation>信标</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.ui" line="225"/>
         <source>Beacon Frequency</source>
-        <translation>Beacon Frequency</translation>
+        <translation>信标频率</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.cc" line="51"/>
         <source>Invalid name</source>
-        <translation>Invalid name</translation>
+        <translation type="unfinished">无效名称</translation>
     </message>
     <message>
         <location filename="../src/satellitetransponderdialog.cc" line="52"/>
         <source>Please set a satellite name.</source>
-        <translation>Please set a satellite name.</translation>
+        <translation type="unfinished">请设置卫星名称。</translation>
     </message>
 </context>
 <context>
@@ -3782,37 +3782,37 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/scanlistdialog.ui" line="20"/>
         <location filename="../src/scanlistdialog.cc" line="13"/>
         <source>Edit Scan List</source>
-        <translation>Edit scan list</translation>
+        <translation>编辑扫描列表</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="30"/>
         <source>Basic</source>
-        <translation>Basic</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="38"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="48"/>
         <source>Primary Channel (50%)</source>
-        <translation>Primary Channel (50%)</translation>
+        <translation>主信道（50%）</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="65"/>
         <source>Secondary Channel (25%)</source>
-        <translation>Secondary Channel (25%)</translation>
+        <translation>次信道（25%）</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="82"/>
         <source>Transmit Channel</source>
-        <translation>Transmit Channel</translation>
+        <translation>发射信道</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="113"/>
         <source>Add Channel</source>
-        <translation>Add Channel</translation>
+        <translation>添加信道</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="116"/>
@@ -3822,7 +3822,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/scanlistdialog.ui" line="123"/>
         <source>Remove Channel</source>
-        <translation>Remove Channel</translation>
+        <translation>移除信道</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.ui" line="126"/>
@@ -3832,30 +3832,30 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/scanlistdialog.ui" line="136"/>
         <source>Extensions</source>
-        <translation>Extensions</translation>
+        <translation>扩展</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="24"/>
         <source>Create Scan List</source>
-        <translation>Create scan list</translation>
+        <translation>创建扫描列表</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="38"/>
         <location filename="../src/scanlistdialog.cc" line="40"/>
         <source>[None]</source>
-        <translation>[None]</translation>
+        <translation>[无]</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="39"/>
         <location filename="../src/scanlistdialog.cc" line="41"/>
         <location filename="../src/scanlistdialog.cc" line="43"/>
         <source>[Selected]</source>
-        <translation>[Selected]</translation>
+        <translation>[已选]</translation>
     </message>
     <message>
         <location filename="../src/scanlistdialog.cc" line="42"/>
         <source>[Last]</source>
-        <translation>[Last]</translation>
+        <translation>[上次]</translation>
     </message>
 </context>
 <context>
@@ -3863,37 +3863,37 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/scanlistsview.cc" line="42"/>
         <source>Cannot delete scanlist</source>
-        <translation>Cannot delete scanlist</translation>
+        <translation>无法删除扫描列表</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="43"/>
         <source>Cannot delete scanlist: You have to select a scanlist first.</source>
-        <translation>Cannot delete scanlist: You have to select a scanlist first.</translation>
+        <translation>无法删除扫描列表：请先选择一个扫描列表。</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="53"/>
         <source>Delete scan list?</source>
-        <translation>Delete scan list?</translation>
+        <translation>删除扫描列表？</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="53"/>
         <source>Delete scan list %1?</source>
-        <translation>Delete scan list &apos;%1&apos;?</translation>
+        <translation>删除扫描列表 &apos;%1&apos;？</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="57"/>
         <source>Delete scan lists?</source>
-        <translation>Delete scan lists?</translation>
+        <translation>删除扫描列表？</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.cc" line="57"/>
         <source>Delete %1 scan lists?</source>
-        <translation>Delete %1 scan lists?</translation>
+        <translation>删除 %1 个扫描列表？</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="35"/>
         <source>Add Scan List</source>
-        <translation>Add Scan List</translation>
+        <translation>添加扫描列表</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="38"/>
@@ -3903,7 +3903,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/scanlistsview.ui" line="45"/>
         <source>Delete Scan List</source>
-        <translation>Delete Scan List</translation>
+        <translation>删除扫描列表</translation>
     </message>
     <message>
         <location filename="../src/scanlistsview.ui" line="48"/>
@@ -3916,7 +3916,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/configitemwrapper.cc" line="887"/>
         <source>Scan-List</source>
-        <translation>Scanlist</translation>
+        <translation>扫描列表</translation>
     </message>
 </context>
 <context>
@@ -3938,7 +3938,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/selectivecallbox.cc" line="16"/>
         <source>None</source>
-        <translation>None</translation>
+        <translation>无</translation>
     </message>
     <message>
         <location filename="../src/selectivecallbox.cc" line="17"/>
@@ -3958,7 +3958,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/selectivecallbox.cc" line="50"/>
         <source>Inverted</source>
-        <translation>Inverted</translation>
+        <translation>反转</translation>
     </message>
 </context>
 <context>
@@ -3966,82 +3966,82 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/settings.cc" line="509"/>
         <source>Warning!</source>
-        <translation>Warning!</translation>
+        <translation>警告！</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="20"/>
         <source>Settings</source>
-        <translation>Settings</translation>
+        <translation>设置</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="42"/>
         <source>Location</source>
-        <translation>Location</translation>
+        <translation>位置</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="48"/>
         <source>System location</source>
-        <translation>System location</translation>
+        <translation>系统位置</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="62"/>
         <source>Locator</source>
-        <translation>Locator</translation>
+        <translation>定位器</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="113"/>
         <source>Repeater Info Sources</source>
-        <translation>Repeater Info Sources</translation>
+        <translation>中继台信息源</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="319"/>
         <source>Radio Programming</source>
-        <translation>Radio Programming</translation>
+        <translation>电台编程</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="328"/>
         <source>Update codeplug</source>
-        <translation>Update codeplug</translation>
+        <translation>更新信道配置</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="335"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Update the codeplug on the radio. If not selected, the codeplug on the radio gets overridden with possibly incomplete default values.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If selected, QDMR downloads the codeplug from the radio and updates only those settings specified. The remaining settings within the radio are not touched (recommended).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Update the codeplug on the radio. If not selected, the codeplug on the radio gets overridden with possibly incomplete default values.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;If selected, QDMR downloads the codeplug from the radio and updates only those settings specified. The remaining settings within the radio are not touched (recommended).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;更新电台上的信道配置。如果未选中，电台上的信道配置将被可能不完整的默认值覆盖。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;如果选中，QDMR 将从电台下载信道配置，并仅更新指定的设置。电台内的其余设置不会被改动（推荐）。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="345"/>
         <source>Auto-enable GPS</source>
-        <translation>Auto-enable GPS</translation>
+        <translation>自动启用 GPS</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="352"/>
         <source>When a GPS or APRS system is defined and used for any channel, the GPS module gets enabled automatically.</source>
-        <translation>When a GPS or APRS system is defined and used for any channel, the GPS module gets enabled automatically.</translation>
+        <translation>当定义了 GPS 或 APRS 系统并被任何信道使用时，GPS 模块将自动启用。</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="369"/>
         <source>When a roaming zone is defined and used by any channel, the automatic roaming gets enabled.</source>
-        <translation>When a roaming zone is defined and used by any channel, the automatic roaming gets enabled.</translation>
+        <translation>当定义了漫游区域并被任何信道使用时，将启用自动漫游。</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="362"/>
         <source>Auto-enable roaming</source>
-        <translation>Auto-enable roaming</translation>
+        <translation>自动启用漫游</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="30"/>
         <source>Data Sources</source>
-        <translation>Data Sources</translation>
+        <translation>数据源</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="72"/>
         <source>Search radius</source>
-        <translation>Search radius</translation>
+        <translation>搜索半径</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="79"/>
         <source>Some data sources require a search area specified by the location and this radius.</source>
-        <translation>Some data sources require a search area specified by the location and this radius.</translation>
+        <translation>某些数据源需要由此位置和半径指定的搜索区域。</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="129"/>
@@ -4049,119 +4049,119 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/settingsdialog.ui" line="235"/>
         <location filename="../src/settingsdialog.ui" line="256"/>
         <source>Enable</source>
-        <translation>Enable</translation>
+        <translation>启用</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="143"/>
         <source>Area</source>
-        <translation>Area</translation>
+        <translation>区域</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="157"/>
         <source>World</source>
-        <translation>World</translation>
+        <translation>世界</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="162"/>
         <source>North America</source>
-        <translation>North America</translation>
+        <translation>北美洲</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="170"/>
         <location filename="../src/settingsdialog.ui" line="211"/>
         <source>API Token</source>
-        <translation>API Token</translation>
+        <translation>API 令牌</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="183"/>
         <location filename="../src/settingsdialog.ui" line="221"/>
         <source>paste token here</source>
-        <translation>paste token here</translation>
+        <translation>在此粘贴令牌</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="278"/>
         <source>Programming</source>
-        <translation>Programming</translation>
+        <translation>编程</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="290"/>
         <source>Radio Interfaces</source>
-        <translation>Radio Interfaces</translation>
+        <translation>电台接口</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="296"/>
         <source>disable auto-detect</source>
-        <translation>disable auto-detect</translation>
+        <translation>禁用自动检测</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="379"/>
         <source>Ignore verification warnings</source>
-        <translation>Ignore verification warnings</translation>
+        <translation>忽略验证警告</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="386"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As the communication interface to the radio is kept open after verification, time-outs may occur and the code-plug upload may fail when the verification dialog pops up. To prevent this, verification warnings can be ignored, eliminating the time-gap between verification and upload. Verification errors still prevent the upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;As the communication interface to the radio is kept open after verification, time-outs may occur and the code-plug upload may fail when the verification dialog pops up. To prevent this, verification warnings can be ignored, eliminating the time-gap between verification and upload. Verification errors still prevent the upload.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;由于验证后会保持与电台的通信接口打开，因此在弹出验证对话框时可能会发生超时，并且可能导致上传信道配置失败。为了防止这种情况，可以忽略验证警告，从而消除验证和上传之间的时间间隔。验证错误仍然会阻止上传。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="396"/>
         <source>Ignore frequency limits</source>
-        <translation>Ignore frequency limits</translation>
+        <translation>忽略频率限制</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="403"/>
         <source>Do not set this option unless you know what you are doing.</source>
-        <translation>Do not set this option unless you know what you are doing.</translation>
+        <translation>除非您知道自己在做什么，否则不要设置此选项。</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="413"/>
         <source>Update Device Clock</source>
-        <translation>Update Device Clock</translation>
+        <translation>更新设备时钟</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="436"/>
         <source>Call-Sign DB</source>
-        <translation>Call-Sign DB</translation>
+        <translation>呼号数据库</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="442"/>
         <source>Limit number of DB entries</source>
-        <translation>Limit number of DB entries</translation>
+        <translation>限制数据库条目数</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="449"/>
         <source>When enabled, the number of DB entries will be limited. Otherwise the maximum number of entries are generated (device dependent).</source>
-        <translation>When enabled, the number of DB entries will be limited. Otherwise the maximum number of entries are generated (device dependent).</translation>
+        <translation>启用后，数据库条目数将被限制。否则将生成最大条目数（取决于设备）。</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="459"/>
         <source>Number of DB entries</source>
-        <translation>Number of DB entries</translation>
+        <translation>数据库条目数</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="472"/>
         <source>Specifies the number of DB entries (if enabled above).</source>
-        <translation>Specifies the number of DB entries (if enabled above).</translation>
+        <translation>指定数据库条目数（如果上面已启用）。</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="485"/>
         <source>Select using my DMR ID</source>
-        <translation>Select using my DMR ID</translation>
+        <translation>使用我的 DMR ID 选择</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="492"/>
         <source>If enabled, the entries are selected using the users DMR ID.</source>
-        <translation>If enabled, the entries are selected using the users DMR ID.</translation>
+        <translation>启用后，将使用用户的 DMR ID 选择条目。</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="502"/>
         <source>Select using prefixes</source>
-        <translation>Select using prefixes</translation>
+        <translation>使用前缀选择</translation>
     </message>
     <message>
         <location filename="../src/settingsdialog.ui" line="509"/>
         <source>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</source>
-        <translation>If enabled, these comma separated DMR ID prefixes are used to select the call-sign DB entries.</translation>
+        <translation>启用后，将使用这些逗号分隔的 DMR ID 前缀来选择呼号数据库条目。</translation>
     </message>
 </context>
 <context>
@@ -4169,17 +4169,17 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/squelchedit.ui" line="32"/>
         <source>Open</source>
-        <translation type="unfinished">Open</translation>
+        <translation>开放</translation>
     </message>
     <message>
         <location filename="../src/squelchedit.ui" line="45"/>
         <source>Uses the global squelch setting if enabled.</source>
-        <translation>Uses the global squelch setting if enabled.</translation>
+        <translation>如果启用，使用全局静噪设置。</translation>
     </message>
     <message>
         <location filename="../src/squelchedit.ui" line="48"/>
         <source>Default</source>
-        <translation type="unfinished">Default</translation>
+        <translation>默认</translation>
     </message>
 </context>
 <context>
@@ -4187,12 +4187,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/timeslotselect.cc" line="6"/>
         <source>Slot 1</source>
-        <translation>Slot 1</translation>
+        <translation>时隙 1</translation>
     </message>
     <message>
         <location filename="../src/timeslotselect.cc" line="7"/>
         <source>Slot 2</source>
-        <translation>Slot 2</translation>
+        <translation>时隙 2</translation>
     </message>
 </context>
 <context>
@@ -4200,7 +4200,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/transponderfrequencydelegate.cc" line="28"/>
         <source>None</source>
-        <translation>None</translation>
+        <translation>无</translation>
     </message>
 </context>
 <context>
@@ -4208,12 +4208,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/verifydialog.ui" line="14"/>
         <source>Verify Codeplug</source>
-        <translation>Verify Codeplug</translation>
+        <translation>验证信道配置</translation>
     </message>
     <message>
         <location filename="../src/verifydialog.ui" line="20"/>
         <source>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</source>
-        <translation>The codeplug cannot be uploaded, unless all critical issues (red) are resolved.</translation>
+        <translation>除非所有关键问题（红色）都已解决，否则信道配置无法上传。</translation>
     </message>
 </context>
 <context>
@@ -4222,66 +4222,66 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
         <location filename="../src/zonedialog.ui" line="20"/>
         <location filename="../src/zonedialog.cc" line="18"/>
         <source>Edit Zone</source>
-        <translation>Edit zone</translation>
+        <translation>编辑区域</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="30"/>
         <source>Basic</source>
-        <translation>Basic</translation>
+        <translation>基本</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="39"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Zones are collections of channels that are usually valid for a specific region. I.e., a collection of channels for repeaters within a certain region. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR manages zones by allowing for two independent channel lists for each VFO of the radio (if it has two). Many radios however, allow one to assign zones to each VFO individually. In these cases, QDMR will split the zone into two (A &amp;amp; B) and program them individually into the radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note:&lt;/span&gt; Zones are collections of channels that are usually valid for a specific region. I.e., a collection of channels for repeaters within a certain region. &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR manages zones by allowing for two independent channel lists for each VFO of the radio (if it has two). Many radios however, allow one to assign zones to each VFO individually. In these cases, QDMR will split the zone into two (A &amp;amp; B) and program them individually into the radio.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Hide&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;注意：&lt;/span&gt; 区域是信道的集合，通常对特定区域有效。即，某个区域内中继台的信道集合。 &lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;QDMR 通过允许为电台的每个 VFO（如果有两个）提供两个独立的信道列表来管理区域。然而，许多电台允许单独为每个 VFO 分配区域。在这些情况下，QDMR 会将区域分为两个（A 和 B）并分别写入电台。&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;&lt;a href=&quot;#hide&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;隐藏&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="54"/>
         <source>Name</source>
-        <translation>Name</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="77"/>
         <source>Channels A</source>
-        <translation>Channels A</translation>
+        <translation>信道 A</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="95"/>
         <location filename="../src/zonedialog.ui" line="138"/>
         <source>add</source>
-        <translation>add</translation>
+        <translation>添加</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="102"/>
         <location filename="../src/zonedialog.ui" line="145"/>
         <source>remove</source>
-        <translation>remove</translation>
+        <translation>移除</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="120"/>
         <source>Channels B</source>
-        <translation>Channels B</translation>
+        <translation>信道 B</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.ui" line="160"/>
         <source>Extension</source>
-        <translation>Extension</translation>
+        <translation>扩展</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.cc" line="28"/>
         <source>Create Zone</source>
-        <translation>Create zone</translation>
+        <translation>创建区域</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.cc" line="79"/>
         <location filename="../src/zonedialog.cc" line="110"/>
         <source>Cannot remove channel</source>
-        <translation>Cannot remove channel</translation>
+        <translation>无法移除信道</translation>
     </message>
     <message>
         <location filename="../src/zonedialog.cc" line="80"/>
         <location filename="../src/zonedialog.cc" line="111"/>
         <source>Select at least one channel first.</source>
-        <translation>Select at least one channel first.</translation>
+        <translation>请先至少选择一个信道。</translation>
     </message>
 </context>
 <context>
@@ -4289,37 +4289,37 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/zonelistview.cc" line="41"/>
         <source>Cannot delete zone</source>
-        <translation>Cannot delete zone</translation>
+        <translation>无法删除区域</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="42"/>
         <source>Cannot delete zone: You have to select a zone first.</source>
-        <translation>Cannot delete zone: You have to select a zone first.</translation>
+        <translation>无法删除区域：请先选择一个区域。</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="52"/>
         <source>Delete zone?</source>
-        <translation>Delete zone?</translation>
+        <translation>删除区域？</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="52"/>
         <source>Delete zone %1?</source>
-        <translation>Delete zone &apos;%1&apos;?</translation>
+        <translation>删除区域 &apos;%1&apos;？</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="56"/>
         <source>Delete zones?</source>
-        <translation>Delete zones?</translation>
+        <translation>删除区域？</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.cc" line="56"/>
         <source>Delete %1 zones?</source>
-        <translation>Delete %1 zones?</translation>
+        <translation>删除 %1 个区域？</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.ui" line="32"/>
         <source>Add Zone</source>
-        <translation>Add Zone</translation>
+        <translation>添加区域</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.ui" line="35"/>
@@ -4329,7 +4329,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/zonelistview.ui" line="42"/>
         <source>Delete Zone</source>
-        <translation>Delete Zone</translation>
+        <translation>删除区域</translation>
     </message>
     <message>
         <location filename="../src/zonelistview.ui" line="45"/>
@@ -4342,7 +4342,7 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/configitemwrapper.cc" line="758"/>
         <source>Zone</source>
-        <translation>Zone</translation>
+        <translation>区域</translation>
     </message>
 </context>
 <context>
@@ -4350,12 +4350,12 @@ Label for a checkbox enabling the call-reset tone.</extracomment>
     <message>
         <location filename="../src/main.cc" line="25"/>
         <source>Codeplug file to load.</source>
-        <translation>Codeplug file to load.</translation>
+        <translation>要加载的信道配置文件。</translation>
     </message>
     <message>
         <location filename="../src/main.cc" line="26"/>
         <source>Specifies applications log-level to stdout. Must be one of `trace`, `debug`, `info`, `warning`, `error` or `fatal`.</source>
-        <translation>Specifies applications log-level to stdout. Must be one of `trace`, `debug`, `info`, `warning`, `error` or `fatal`.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>
