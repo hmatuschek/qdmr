@@ -7,6 +7,7 @@
 #include <QNetworkReply>
 #include <QDir>
 
+#include "task_progress.hh"
 
 /* ********************************************************************************************* *
  * Implementation of TalkGroupDatabase::TalkGroup
@@ -58,14 +59,12 @@ TalkGroupDatabase::talkgroup(int index) const {
   return _talkgroups[index];
 }
 
-void
+TaskProgress *
 TalkGroupDatabase::download() {
   QUrl url("https://api.brandmeister.network/v2/talkgroup/");
   QNetworkRequest request(url);
   auto reply = _network.get(request);
-  // just forward the signal
-  connect(reply, &QNetworkReply::downloadProgress,
-    this, &TalkGroupDatabase::downloadProgress);
+  return new DownloadTaskProgress(tr("Download talkgroup db"), reply);
 }
 
 void
