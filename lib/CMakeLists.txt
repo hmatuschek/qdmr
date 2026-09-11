@@ -47,7 +47,7 @@ qt_add_library(libdmrconf SHARED
   dmr6x2uv2.cc dmr6x2uv2_codeplug.cc dmr6x2uv2_limits.cc
   auctus_a6_interface.cc
   dr1801uv.cc dr1801uv_interface.cc dr1801uv_codeplug.cc dr1801uv_filereader.cc dr1801uv_limits.cc
-  dm32uv.cc dm32uv_interface.cc dm32uv_limits.cc dm32uv_codeplug.cc dm32uv_callsigndb.cc
+  dm32uv.cc dm32uv_interface.cc dm32uv_limits.cc dm32uv_codeplug.cc dm32uv_callsigndb.cc dm32uv_extensions.cc
         task_progress.cc
         task_progress.hh)
 
@@ -70,7 +70,7 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   md390.hh md390_codeplug.hh md390_filereader.hh md390_limits.hh
   uv390.hh uv390_codeplug.hh uv390_callsigndb.hh uv390_filereader.hh uv390_limits.hh
   dm1701.hh dm1701_codeplug.hh dm1701_callsigndb.hh dm1701_filereader.hh dm1701_limits.hh
-  radioddity_radio.hh radioddity_codeplug.hh radioddity_extensions.hh radioddity_interface.hh
+  radioddity_radio.hh radioddity_codeplug.hh radioddity_extensions.hh radioddity_interface.hh dm32uv_extensions.hh
   rd5r.hh rd5r_codeplug.hh rd5r_filereader.hh rd5r_limits.hh
   gd77.hh gd77_codeplug.hh gd77_callsigndb.hh gd77_filereader.hh gd77_limits.hh
   opengd77_interface.hh opengd77base.hh opengd77base_codeplug.hh opengd77base_callsigndb.hh

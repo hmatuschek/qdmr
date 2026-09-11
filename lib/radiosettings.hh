@@ -12,6 +12,7 @@
 #include "radioddity_extensions.hh"
 #include "anytone_settingsextension.hh"
 #include "tyt_extensions.hh"
+#include "dm32uv_extensions.hh"
 
 
 /** Represents the common radio-global settings.
@@ -41,6 +42,8 @@ class RadioSettings : public ConfigItem
   Q_PROPERTY(RadiodditySettingsExtension * radioddity READ radioddityExtension WRITE setRadioddityExtension)
   /** Settings for AnyTone devices. */
   Q_PROPERTY(AnytoneSettingsExtension *anytone READ anytoneExtension WRITE setAnytoneExtension)
+  /** Settings for Baofeng DM-32UV devices. */
+  Q_PROPERTY(DM32UVSettingsExtension *dm32uv READ dm32uvExtension WRITE setDM32UVExtension)
 
 public:
   /** Default constructor. */
@@ -99,6 +102,11 @@ public:
   /** Sets the AnyTone device specific radio settings. */
   void setAnytoneExtension(AnytoneSettingsExtension *ext);
 
+  /** Returns the Baofeng DM-32UV device-specific settings. */
+  DM32UVSettingsExtension *dm32uvExtension() const;
+  /** Sets the Baofeng DM-32UV device-specific settings. */
+  void setDM32UVExtension(DM32UVSettingsExtension *ext);
+
   bool parse(const YAML::Node &node, Context &ctx, const ErrorStack &err=ErrorStack());
 
 protected:
@@ -131,6 +139,8 @@ protected:
   RadiodditySettingsExtension *_radioddityExtension;
   /** Device specific settings extension for AnyTone devices. */
   AnytoneSettingsExtension *_anytoneExtension;
+  /** Device specific settings extension for Baofeng DM-32UV devices. */
+  DM32UVSettingsExtension *_dm32uvExtension;
 };
 
 #endif // RADIOCONFIG_HH

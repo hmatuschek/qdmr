@@ -17,6 +17,7 @@ private slots:
   void testBasicConfigReencoding();
   void testProstProcessingOfEmptyCodeplug();
   void testAMChannelReencoding();
+  void testButtonSettingsReencoding();
   /** Regression test for #873 */
   void testChannelBankEncoding();
   /** Regression test fo #967 */
