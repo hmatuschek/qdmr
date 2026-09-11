@@ -3399,6 +3399,20 @@ DM32UVCodeplug::GeneralSettingsElement::decode(Context &ctx, const ErrorStack &e
   ctx.config()->settings()->dmr()->setTalkerAliasEncoding(talkerAliasEncoding());
   ctx.config()->settings()->dmr()->setPreamble(dmrPreambleDuration());
 
+  if (!ctx.config()->settings()->dm32uvExtension())
+    ctx.config()->settings()->setDM32UVExtension(new DM32UVSettingsExtension());
+  auto *buttons = ctx.config()->settings()->dm32uvExtension()->buttons();
+  buttons->setLongPressDuration(longPressDuration());
+  buttons->setSK1Short(static_cast<DM32UVButtonSettingsExtension::Function>(sk1Short()));
+  buttons->setSK1Long(static_cast<DM32UVButtonSettingsExtension::Function>(sk1Long()));
+  buttons->setSK2Short(static_cast<DM32UVButtonSettingsExtension::Function>(sk2Short()));
+  buttons->setSK2Long(static_cast<DM32UVButtonSettingsExtension::Function>(sk2Long()));
+  buttons->setP1Short(static_cast<DM32UVButtonSettingsExtension::Function>(p1Short()));
+  buttons->setP1Long(static_cast<DM32UVButtonSettingsExtension::Function>(p1Long()));
+  buttons->setP2Short(static_cast<DM32UVButtonSettingsExtension::Function>(p2Short()));
+  buttons->setP2Long(static_cast<DM32UVButtonSettingsExtension::Function>(p2Long()));
+  buttons->enableSideKeyLock(sideKeyLockEnabled());
+
   return true;
 }
 
@@ -3453,6 +3467,20 @@ DM32UVCodeplug::GeneralSettingsElement::encode(Context &ctx, const ErrorStack &e
   enableTXTalkerAlias(ctx.config()->settings()->dmr()->sendTalkerAliasEnabled());
   setTalkerAliasEncoding(ctx.config()->settings()->dmr()->talkerAliasEncoding());
   setDmrPreambleDuration(ctx.config()->settings()->dmr()->preamble());
+
+  if (auto *extension = ctx.config()->settings()->dm32uvExtension()) {
+    auto *buttons = extension->buttons();
+    setLongPressDuration(buttons->longPressDuration());
+    setSK1Short(static_cast<KeyFunction::Function>(buttons->sk1Short()));
+    setSK1Long(static_cast<KeyFunction::Function>(buttons->sk1Long()));
+    setSK2Short(static_cast<KeyFunction::Function>(buttons->sk2Short()));
+    setSK2Long(static_cast<KeyFunction::Function>(buttons->sk2Long()));
+    setP1Short(static_cast<KeyFunction::Function>(buttons->p1Short()));
+    setP1Long(static_cast<KeyFunction::Function>(buttons->p1Long()));
+    setP2Short(static_cast<KeyFunction::Function>(buttons->p2Short()));
+    setP2Long(static_cast<KeyFunction::Function>(buttons->p2Long()));
+    enableSideKeyLock(buttons->sideKeyLock());
+  }
 
   return true;
 }

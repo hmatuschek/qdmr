@@ -119,6 +119,47 @@ DM32UVTest::testAMChannelReencoding() {
 
 
 void
+DM32UVTest::testButtonSettingsReencoding() {
+  ErrorStack err;
+  Config config;
+  QVERIFY2(config.readYAML(":/data/config_test.yaml", err),
+           qPrintable(err.format()));
+  auto *extension = new DM32UVSettingsExtension();
+  config.settings()->setDM32UVExtension(extension);
+  auto *buttons = extension->buttons();
+  buttons->setLongPressDuration(Interval::fromSeconds(3));
+  buttons->setSK1Short(DM32UVButtonSettingsExtension::Function::Monitor);
+  buttons->setSK1Long(DM32UVButtonSettingsExtension::Function::ZoneUp);
+  buttons->setSK2Short(DM32UVButtonSettingsExtension::Function::Scan);
+  buttons->setSK2Long(DM32UVButtonSettingsExtension::Function::ZoneDown);
+  buttons->setP1Short(DM32UVButtonSettingsExtension::Function::PowerSelect);
+  buttons->setP1Long(DM32UVButtonSettingsExtension::Function::ChannelType);
+  buttons->setP2Short(DM32UVButtonSettingsExtension::Function::VOX);
+  buttons->setP2Long(DM32UVButtonSettingsExtension::Function::Flashlight);
+  buttons->enableSideKeyLock(true);
+
+  DM32UVCodeplug codeplug;
+  QVERIFY2(codeplug.encode(&config, Codeplug::Flags(), err),
+           qPrintable(err.format()));
+
+  Config decoded;
+  QVERIFY2(codeplug.decode(&decoded, err), qPrintable(err.format()));
+  QVERIFY(decoded.settings()->dm32uvExtension());
+  auto *decodedButtons = decoded.settings()->dm32uvExtension()->buttons();
+  QCOMPARE(decodedButtons->longPressDuration(), Interval::fromSeconds(3));
+  QCOMPARE(decodedButtons->sk1Short(), DM32UVButtonSettingsExtension::Function::Monitor);
+  QCOMPARE(decodedButtons->sk1Long(), DM32UVButtonSettingsExtension::Function::ZoneUp);
+  QCOMPARE(decodedButtons->sk2Short(), DM32UVButtonSettingsExtension::Function::Scan);
+  QCOMPARE(decodedButtons->sk2Long(), DM32UVButtonSettingsExtension::Function::ZoneDown);
+  QCOMPARE(decodedButtons->p1Short(), DM32UVButtonSettingsExtension::Function::PowerSelect);
+  QCOMPARE(decodedButtons->p1Long(), DM32UVButtonSettingsExtension::Function::ChannelType);
+  QCOMPARE(decodedButtons->p2Short(), DM32UVButtonSettingsExtension::Function::VOX);
+  QCOMPARE(decodedButtons->p2Long(), DM32UVButtonSettingsExtension::Function::Flashlight);
+  QVERIFY(decodedButtons->sideKeyLock());
+}
+
+
+void
 DM32UVTest::testChannelBankEncoding() {
   static const uint32_t bank0=0x12000, bank1 = 0x13000, bank2 = 0x14000;
   Config config;

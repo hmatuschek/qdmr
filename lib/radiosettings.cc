@@ -11,7 +11,7 @@ RadioSettings::RadioSettings(QObject *parent)
     _tone(new ToneSettings(this)),
     _gnss(new GNSSSettings(this)), _dmr(new DMRSettings(this)),
     _tytExtension(nullptr), _radioddityExtension(nullptr),
-    _anytoneExtension(nullptr)
+    _anytoneExtension(nullptr), _dm32uvExtension(nullptr)
 {
   connect(_boot, &BootSettings::modified, this, &RadioSettings::modified);
   connect(_audio, &AudioSettings::modified, this, &RadioSettings::modified);
@@ -52,6 +52,7 @@ RadioSettings::clear() {
   setTyTExtension(nullptr);
   setRadioddityExtension(nullptr);
   setAnytoneExtension(nullptr);
+  setDM32UVExtension(nullptr);
 }
 
 Channel::Power
@@ -184,6 +185,26 @@ RadioSettings::setAnytoneExtension(AnytoneSettingsExtension *ext) {
   if (_anytoneExtension) {
     _anytoneExtension->setParent(this);
     connect(_anytoneExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+  }
+  emit modified(this);
+}
+
+
+DM32UVSettingsExtension *
+RadioSettings::dm32uvExtension() const {
+  return _dm32uvExtension;
+}
+
+void
+RadioSettings::setDM32UVExtension(DM32UVSettingsExtension *ext) {
+  if (_dm32uvExtension) {
+    disconnect(_dm32uvExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
+    _dm32uvExtension->deleteLater();
+  }
+  _dm32uvExtension = ext;
+  if (_dm32uvExtension) {
+    _dm32uvExtension->setParent(this);
+    connect(_dm32uvExtension, SIGNAL(modified(ConfigItem*)), this, SLOT(onExtensionModified()));
   }
   emit modified(this);
 }
