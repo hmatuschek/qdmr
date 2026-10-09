@@ -51,9 +51,9 @@ D878UV2::D878UV2(AnytoneInterface *device, QObject *parent)
     break;
   case 0x05:
     _limits = new D878UV2Limits({ {Frequency::fromMHz(144.), Frequency::fromMHz(146.)},
-                                  {Frequency::fromMHz(434.), Frequency::fromMHz(437.)} },
+                                  {Frequency::fromMHz(434.), Frequency::fromMHz(447.)} },
                                 { {Frequency::fromMHz(144.), Frequency::fromMHz(146.)},
-                                  {Frequency::fromMHz(434.), Frequency::fromMHz(437.)} }, info.version, this);
+                                  {Frequency::fromMHz(434.), Frequency::fromMHz(447.)} }, info.version, this);
     break;
   case 0x06:
     _limits = new D878UV2Limits({ {Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
