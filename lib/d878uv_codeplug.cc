@@ -2070,8 +2070,11 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setSMSFormat(ctx.config()->smsExtension()->format());
 
   AnytoneSettingsExtension *ext = ctx.config()->settings()->anytoneExtension();
-  if (nullptr == ext)
+  if (nullptr == ext) { // <- if extension is not set
+    setPriorityZoneAIndex(0xff);
+    setPriorityZoneBIndex(0xff);
     return true;
+  }
 
   // Encode boot settings
   if (ext->bootSettings()->priorityZoneA()->isNull())
