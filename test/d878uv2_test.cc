@@ -44,7 +44,7 @@ void
 D878UV2Test::testChannelFrequency() {
   ErrorStack err;
   Codeplug::Flags flags; flags.setUpdateCodeplug(false);
-  D868UVCodeplug codeplug;
+  D878UV2Codeplug codeplug;
   codeplug.clear();
   if (! codeplug.encode(&_channelFrequencyConfig, flags, err)) {
     QFAIL(QString("Cannot encode codeplug for AnyTone D878UV II: {}")
