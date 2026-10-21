@@ -21,9 +21,9 @@ D878UVLimits::D878UVLimits(const std::initializer_list<std::pair<Frequency, Freq
   _numCallSignDBEntries   = 200000;
 
   // Define limits for satellite config
-  _hasSatelliteConfig          = false;
-  _satelliteConfigImplemented  = false;
-  _numSatellites               = 0;
+  _hasSatelliteConfig          = true;
+  _satelliteConfigImplemented  = true;
+  _numSatellites               = 200;
 
   /* Define limits for the general settings. */
   add("settings",
