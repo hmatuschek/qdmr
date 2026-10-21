@@ -20,6 +20,7 @@
 #include "dr1801uv.hh"
 #include "dm32uv.hh"
 #include "rt4d.hh"
+#include "hd1.hh"
 
 
 QHash<QString, RadioInfo::Radio>
@@ -51,7 +52,8 @@ RadioInfo::_radiosByName = QHash<QString, RadioInfo::Radio>{
   {"d168uv",    RadioInfo::D168UV},
   {"dr1801uv",  RadioInfo::DR1801UV},
   {"dm32uv",    RadioInfo::DM32UV},
-  {"rt4d",      RadioInfo::RT4D}
+  {"rt4d",      RadioInfo::RT4D},
+  {"hd1",       RadioInfo::HD1}
 };
 
 QHash<unsigned, RadioInfo>
@@ -75,7 +77,8 @@ RadioInfo::_radiosById = QHash<unsigned, RadioInfo>{
   {RadioInfo::DMR6X2UV2, DMR6X2UV2::defaultRadioInfo()},
   {RadioInfo::DR1801UV,  DR1801UV::defaultRadioInfo()},
   {RadioInfo::DM32UV,    DM32UV::defaultRadioInfo()},
-  {RadioInfo::RT4D,      RT4D::defaultRadioInfo()}
+  {RadioInfo::RT4D,      RT4D::defaultRadioInfo()},
+  {RadioInfo::HD1,       HD1::defaultRadioInfo()}
 };
 
 
