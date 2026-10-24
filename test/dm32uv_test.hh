@@ -31,6 +31,8 @@ private slots:
   void testAddressMapAllocation();
   /** Disabled encryption keys (the CPS's default "Encrypt 1") survive an encode. */
   void testEncryptionKeysKeepDisabled();
+  /** A scan list holds 16 channels. */
+  void testScanListChannels();
 };
 
 #endif // DR1801TEST_HH

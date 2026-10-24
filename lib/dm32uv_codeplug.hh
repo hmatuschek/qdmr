@@ -1000,7 +1000,7 @@ public:
       /** Maximum name length. */
       static constexpr unsigned int nameLength() { return 11; }
       /** Maximum number of channels. */
-      static constexpr unsigned int channels()   { return 15; }
+      static constexpr unsigned int channels()   { return 16; }
     };
 
   protected:

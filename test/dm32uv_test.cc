@@ -387,6 +387,52 @@ DM32UVTest::testEncryptionKeysKeepDisabled() {
 }
 
 
+void
+DM32UVTest::testScanListChannels() {
+  auto issueCount = [](const Config &config) -> int {
+    RadioLimitContext issues;
+    DM32UVLimits().verifyConfig(&config, issues);
+    return issues.count();
+  };
+
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("test", 123456));
+  auto zone = new Zone(); zone->setName("Zone");
+  auto list = new ScanList("Scan");
+  for (int i=0; i<17; i++) {
+    auto ch = new FMChannel();
+    ch->setName(QString("Ch %1").arg(i+1));
+    ch->setRXFrequency(Frequency::fromMHz(439.0+i/100.));
+    ch->setTXFrequency(Frequency::fromMHz(439.0+i/100.));
+    config.channelList()->add(ch);
+    zone->A()->add(ch);
+    if (i < 16)
+      list->addChannel(ch);
+  }
+  config.zones()->add(zone);
+  config.scanlists()->add(list);
+
+  int baseIssues = issueCount(config);
+  list->addChannel(config.channelList()->channel(16));
+  QVERIFY(issueCount(config) > baseIssues);
+  list->remChannel(config.channelList()->channel(16));
+
+  DM32UVCodeplug codeplug; ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  // Scan list 1 starts at 0x11001, its channel count at +0x0b
+  QCOMPARE((unsigned int)*codeplug.data(0x1100c), 16U);
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(decoded.scanlists()->scanlist(0)->count(), 16);
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 
