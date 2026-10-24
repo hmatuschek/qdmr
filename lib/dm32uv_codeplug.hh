@@ -1000,7 +1000,7 @@ public:
       /** Maximum name length. */
       static constexpr unsigned int nameLength() { return 11; }
       /** Maximum number of channels. */
-      static constexpr unsigned int channels()   { return 15; }
+      static constexpr unsigned int channels()   { return 16; }
     };
 
   protected:
@@ -2430,7 +2430,7 @@ public:
     static constexpr unsigned int blockSize() { return 0x1000; }
     static constexpr Range<unsigned int> channelBanks() { return {1, 49}; }
     static constexpr Range<unsigned int> contactBanks() { return {1, 5}; }
-    static constexpr Range<unsigned int> zoneBanks()    { return {1, 8}; }
+    static constexpr Range<unsigned int> zoneBanks()    { return {1, 9}; }
   };
 
 protected:
