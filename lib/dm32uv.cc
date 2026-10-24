@@ -353,7 +353,7 @@ DM32UV::upload(const ErrorStack &err) {
   // and write them to the associated pyhsical address or to 0xff000 if not yet allocated.
   for (unsigned int blk=0; blk<(unsigned int)_codeplug.image(0).numElements(); blk++) {
     emit uploadProgress(50 + (50*blk)/_codeplug.image(0).numElements());
-    auto element = _codeplug.image(0).element(blk);
+    auto &element = _codeplug.image(0).element(blk);
     auto virtualBlockAddress = element.address();
     element.data()[Offset::blockSize()-1] = (virtualBlockAddress>>12);
     auto physicalBlockAddress = addressMap.virtualIsMapped(virtualBlockAddress)
