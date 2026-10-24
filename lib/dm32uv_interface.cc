@@ -592,7 +592,7 @@ DM32UVInterface::enter_program_mode(const ErrorStack &err) {
     return false;
   }
 
-  if (_firmwareVersion.isEmpty() && !DM32UV::supportedFirmwareVersions().contains(_firmwareVersion)) {
+  if ((! _firmwareVersion.isEmpty()) && !DM32UV::supportedFirmwareVersions().contains(_firmwareVersion)) {
     logWarn() << "Firmware version " << _firmwareVersion << " is currently not supported by qdmr. "
               << "Supported versions: " << DM32UV::supportedFirmwareVersions().values().join(", ") << ".";
   }
