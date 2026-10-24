@@ -541,6 +541,13 @@ DM32UVTest::testChannelPowerMid() {
 }
 
 
+void
+DM32UVTest::testSupportedFirmware() {
+  QVERIFY(DM32UV::supportedFirmwareVersions().contains("DM32.01.L01.048"));
+  QVERIFY(DM32UV::supportedFirmwareVersions().contains("DM32.NRF.01.049"));
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 

@@ -39,6 +39,8 @@ private slots:
   void testNamesKeepTrailingBytes();
   /** Channels take the radio's middle power level. */
   void testChannelPowerMid();
+  /** Firmware DM32.NRF.01.049 is supported (read and write tested against CPS v1.45). */
+  void testSupportedFirmware();
 };
 
 #endif // DR1801TEST_HH

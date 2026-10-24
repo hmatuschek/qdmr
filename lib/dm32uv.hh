@@ -107,7 +107,7 @@ public:
 
 public:
   /** Returns a set of supported firmware versions. */
-  static inline QSet<QByteArray> supportedFirmwareVersions() { return {"DM32.01.L01.048"}; }
+  static inline QSet<QByteArray> supportedFirmwareVersions() { return {"DM32.01.L01.048", "DM32.NRF.01.049"}; }
 
 public:
   /** Some constants. */
