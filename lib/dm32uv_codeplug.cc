@@ -769,12 +769,17 @@ DM32UVCodeplug::ChannelExtensionElement::decode(Channel *ch, Context &ctx, const
 
 bool
 DM32UVCodeplug::ChannelExtensionElement::link(Channel *ch, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err);
   if (!ch->is<DMRChannel>() || !hasContactIndex())
     return true;
 
+  // The CPS's talk group import replaces the contact list but keeps the channels' contact
+  // indices, so a channel may point at a contact that no longer exists. The radio and the CPS
+  // accept that; the channel gets no contact.
   if (! ctx.has<DMRContact>(contactIndex())) {
-    errMsg(err) << "Cannot resolve contact index " << contactIndex() << ".";
-    return false;
+    logWarn() << "Cannot resolve contact index " << contactIndex() << " of channel '"
+              << ch->name() << "', the channel gets no contact.";
+    return true;
   }
 
   ch->as<DMRChannel>()->setContact(ctx.get<DMRContact>(contactIndex()));

@@ -43,6 +43,8 @@ private slots:
   void testSupportedFirmware();
   /** Without roaming zones and channels, the CPS's default ones are written. */
   void testRoamingDefaults();
+  /** A channel whose contact index points at no contact decodes without a contact. */
+  void testDanglingChannelContact();
 };
 
 #endif // DR1801TEST_HH

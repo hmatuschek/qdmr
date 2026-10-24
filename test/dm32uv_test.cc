@@ -578,6 +578,39 @@ DM32UVTest::testRoamingDefaults() {
 }
 
 
+void
+DM32UVTest::testDanglingChannelContact() {
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("test", 123456));
+  auto cnt = new DMRContact(DMRContact::GroupCall, "Group", 91);
+  config.contacts()->add(cnt);
+  auto ch1 = new DMRChannel(); ch1->setName("CH1"); ch1->setContact(cnt);
+  ch1->setRXFrequency(Frequency::fromMHz(439.1)); ch1->setTXFrequency(Frequency::fromMHz(439.1));
+  auto ch2 = new DMRChannel(); ch2->setName("CH2"); ch2->setContact(cnt);
+  ch2->setRXFrequency(Frequency::fromMHz(439.2)); ch2->setTXFrequency(Frequency::fromMHz(439.2));
+  config.channelList()->add(ch1); config.channelList()->add(ch2);
+
+  DM32UVCodeplug codeplug; ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // As after a talk group import in the CPS: channel 2 keeps the index of a contact that is gone
+  DM32UVCodeplug::ChannelExtensionElement(codeplug.data(0x42000 + 2)).setContactIndex(30);
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(decoded.contacts()->count(), 1);
+  QVERIFY(decoded.channelList()->channel(0)->as<DMRChannel>()->contact()
+          == decoded.contacts()->contact(0));
+  QVERIFY(nullptr == decoded.channelList()->channel(1)->as<DMRChannel>()->contact());
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 
