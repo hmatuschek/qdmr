@@ -2022,6 +2022,19 @@ DM32UVCodeplug::RoamingChannelBankElement::decode(Context &ctx, const ErrorStack
 
 bool
 DM32UVCodeplug::RoamingChannelBankElement::encode(Context &ctx, const ErrorStack &err) {
+  // Without roaming channels, write the CPS's default one: the radio puts one back anyway.
+  if (0 == ctx.count<RoamingChannel>()) {
+    setCount(1);
+    memset(_data + Offset::channels(), 0x00, RoamingChannelElement::size());
+    auto ch = channel(0);
+    ch.setName("Roam CH 1");
+    ch.setRXFrequency(Frequency::fromMHz(400.0));
+    ch.setTXFrequency(Frequency::fromMHz(410.0));
+    ch.setColorCode(0);
+    ch.setTimeSlot(DMRChannel::TimeSlot::TS1);
+    return true;
+  }
+
   setCount(std::min(Limit::channels(), ctx.count<RoamingChannel>()));
   for (unsigned int i=0; i<count(); i++) {
     if (! channel(i).encode(ctx.get<RoamingChannel>(i), err)) {
@@ -2221,6 +2234,18 @@ DM32UVCodeplug::RoamingZoneBankElement::link(Context &ctx, const ErrorStack &err
 
 bool
 DM32UVCodeplug::RoamingZoneBankElement::encode(Context &ctx, const ErrorStack &err) {
+  // Without roaming zones, write the CPS's default one with the default roaming channel: the
+  // radio puts one back anyway.
+  if (0 == ctx.count<RoamingZone>()) {
+    setCount(1);
+    memset(_data + Offset::zones(), 0x00, RoamingZoneElement::size());
+    auto z = zone(0);
+    z.setName("Roam Zone 1");
+    z.setCount(1);
+    z.setChannelIndex(0, 0);
+    return true;
+  }
+
   setCount(std::min(Limit::zones(), ctx.count<RoamingZone>()));
   for (unsigned int i=0; i<count(); i++) {
     if (! zone(i).encode(ctx.get<RoamingZone>(i), ctx, err)) {

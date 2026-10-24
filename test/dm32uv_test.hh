@@ -41,6 +41,8 @@ private slots:
   void testChannelPowerMid();
   /** Firmware DM32.NRF.01.049 is supported (read and write tested against CPS v1.45). */
   void testSupportedFirmware();
+  /** Without roaming zones and channels, the CPS's default ones are written. */
+  void testRoamingDefaults();
 };
 
 #endif // DR1801TEST_HH

@@ -548,6 +548,36 @@ DM32UVTest::testSupportedFirmware() {
 }
 
 
+void
+DM32UVTest::testRoamingDefaults() {
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("test", 123456));
+  DM32UVCodeplug codeplug; ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // As in the CPS's default codeplug: one roaming zone "Roam Zone 1" with roaming channel 1,
+  // "Roam CH 1" on 400/410 MHz
+  QCOMPARE((unsigned int)*codeplug.data(0x65000), 1U);
+  QCOMPARE(QByteArray((const char *)codeplug.data(0x65010), 0x13),
+           QByteArray("Roam Zone 1\0\0\0\0\0\x01\x01\x00", 0x13));
+  QCOMPARE(QByteArray((const char *)codeplug.data(0x66000), 0x1a),
+           QByteArray("Roam CH 1\0\0\0\0\0\0\0\x00\x00\x00\x40\x00\x00\x00\x41\x00\x00", 0x1a));
+  QCOMPARE((unsigned int)*codeplug.data(0x66ff0), 1U);
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(decoded.roamingZones()->count(), 1);
+  QCOMPARE(decoded.roamingChannels()->count(), 1);
+  QCOMPARE(decoded.roamingZones()->zone(0)->count(), 1);
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 
