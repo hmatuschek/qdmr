@@ -1327,9 +1327,9 @@ DM32UVCodeplug::RadioIdBankElement::decode(Context &ctx, const ErrorStack &err) 
 
 bool
 DM32UVCodeplug::RadioIdBankElement::encode(Context &ctx, const ErrorStack &err) {
-  setIdCount(ctx.count<DMRRadioID>());
+  setIdCount(std::min(ctx.count<DMRRadioID>(), Limit::ids()));
 
-  for (unsigned int i=0; i<std::min(ctx.count<DMRRadioID>(), Limit::ids()); i++) {
+  for (unsigned int i=0; i<idCount(); i++) {
     if (! id(i).encode(ctx.get<DMRRadioID>(i), err)) {
       errMsg(err) << "Cannot encode DMR radio ID '" << ctx.get<DMRRadioID>(i)->name()
                   << "' at idx " << i << ".";

@@ -3,6 +3,7 @@
 #include "dm32uv_codeplug.hh"
 #include "errorstack.hh"
 #include "logger.hh"
+#include "dm32uv_limits.hh"
 #include <QTest>
 
 
@@ -283,6 +284,51 @@ DM32UVTest::testContactIndexEncoding() {
   QCOMPARE(entry(0xbffc), 0xffffU);
 }
 
+
+void
+DM32UVTest::testRadioIdLimits() {
+  auto issueCount = [](const Config &config) -> int {
+    RadioLimitContext issues;
+    DM32UVLimits().verifyConfig(&config, issues);
+    return issues.count();
+  };
+
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("First ID", 123456));
+  auto cnt = new DMRContact(DMRContact::GroupCall, "Group", 91);
+  config.contacts()->add(cnt);
+  auto ch = new DMRChannel();
+  ch->setName("Channel");
+  ch->setRXFrequency(Frequency::fromMHz(439.0));
+  ch->setTXFrequency(Frequency::fromMHz(439.0));
+  ch->setContact(cnt);
+  config.channelList()->add(ch);
+  auto zone = new Zone(); zone->setName("Zone");
+  zone->A()->add(ch);
+  config.zones()->add(zone);
+
+  int baseIssues = issueCount(config);
+  auto second = new DMRRadioID("Second ID", 1234567);
+  config.radioIDs()->add(second);
+  ch->setRadioId(second);
+  QCOMPARE(issueCount(config), baseIssues);
+
+  DM32UVCodeplug codeplug; ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(decoded.radioIDs()->count(), 2);
+  auto dch = decoded.channelList()->channel(0)->as<DMRChannel>();
+  QVERIFY(nullptr != dch);
+  QVERIFY(nullptr != dch->radioId());
+  QCOMPARE(dch->radioId()->number(), 1234567U);
+}
 
 QTEST_GUILESS_MAIN(DM32UVTest)
 

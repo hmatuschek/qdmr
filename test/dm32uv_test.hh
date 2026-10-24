@@ -25,6 +25,8 @@ private slots:
   void testZoneBankEncoding();
   /** The contact index as the CPS writes it. */
   void testContactIndexEncoding();
+  /** The radio holds more than one radio ID. */
+  void testRadioIdLimits();
 };
 
 #endif // DR1801TEST_HH

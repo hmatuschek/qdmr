@@ -43,7 +43,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
 
   /* Define limits for radio IDs. */
   add("radioIDs", new RadioLimitList{
-        { DMRRadioID::staticMetaObject, 1, 1, new RadioLimitObject {
+        { DMRRadioID::staticMetaObject, 1, DM32UVCodeplug::RadioIdBankElement::Limit::ids(), new RadioLimitObject {
             {"name", new RadioLimitString(
              1, DM32UVCodeplug::RadioIdElement::Limit::nameLength(), RadioLimitString::ASCII) },
             {"number", new RadioLimitDMRId(RadioLimitIssue::Severity::Critical)}
