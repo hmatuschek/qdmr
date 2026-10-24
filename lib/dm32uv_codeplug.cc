@@ -1010,27 +1010,38 @@ bool
 DM32UVCodeplug::ContactIndexElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
+  // The CPS fills unused index entries with 0xff
+  memset(_data + Offset::index(), 0xff, size() - Offset::index());
+
   setContactCount(ctx.count<DigitalContact>());
-  unsigned int privatCallCount = 0, groupCallCount = 0;
+  unsigned int groupCallCount = 0;
 
   unsigned int cc = contactCount();
   QVector<unsigned int> indices; indices.reserve(cc);
   for (unsigned int idx=0; idx<contactCount(); idx++) {
-    if (DMRContact::Type::PrivateCall == ctx.get<DMRContact>(idx)->type())
-      privatCallCount++;
-    else if (DMRContact::Type::GroupCall == ctx.get<DMRContact>(idx)->type())
+    if (DMRContact::Type::GroupCall == ctx.get<DMRContact>(idx)->type())
       groupCallCount++;
-    indexEntry(idx).setCallType(ctx.get<DMRContact>(idx)->type());
-    indexEntry(idx).setIndex(idx);
     indices.append(idx);
   }
 
-  setPrivateCallCount(privatCallCount);
+  // The CPS writes 0 here, even if there are private calls.
+  setPrivateCallCount(0);
   setGroupCallCount(groupCallCount);
   bitmap().enableFirst(ctx.count<DigitalContact>());
 
+  // Sort indices w.r.t. the encoded names, as the CPS does (case sensitive):
+  auto byName = indices;
+  std::stable_sort(byName.begin(), byName.end(), [&ctx](unsigned ia, unsigned ib)->bool {
+    return ctx.get<DMRContact>(ia)->name().left(ContactElement::Limit::nameLength())
+        < ctx.get<DMRContact>(ib)->name().left(ContactElement::Limit::nameLength());
+  });
+  for (unsigned int sidx=0; sidx<contactCount(); sidx++) {
+    indexEntry(sidx).setCallType(ctx.get<DMRContact>(byName[sidx])->type());
+    indexEntry(sidx).setIndex(byName[sidx]);
+  }
+
   // Sort indices w.r.t. associated DMR id:
-  std::sort(indices.begin(), indices.end(), [&ctx](unsigned ia, unsigned ib)->bool {
+  std::stable_sort(indices.begin(), indices.end(), [&ctx](unsigned ia, unsigned ib)->bool {
     return ctx.get<DMRContact>(ia)->number() < ctx.get<DMRContact>(ib)->number();
   });
   for (unsigned int sidx=0; sidx<contactCount(); sidx++) {

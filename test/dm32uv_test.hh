@@ -23,6 +23,8 @@ private slots:
   void testCTCSSHigherFrequencies();
   /** All 250 zones need the 9th zone bank. */
   void testZoneBankEncoding();
+  /** The contact index as the CPS writes it. */
+  void testContactIndexEncoding();
 };
 
 #endif // DR1801TEST_HH

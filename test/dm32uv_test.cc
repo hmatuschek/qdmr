@@ -248,6 +248,42 @@ DM32UVTest::testZoneBankEncoding() {
 }
 
 
+void
+DM32UVTest::testContactIndexEncoding() {
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("test", 123456));
+  config.contacts()->add(new DMRContact(DMRContact::GroupCall, "b", 3));
+  config.contacts()->add(new DMRContact(DMRContact::PrivateCall, "a", 1));
+  config.contacts()->add(new DMRContact(DMRContact::GroupCall, "B", 2));
+
+  DM32UVCodeplug codeplug; ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  auto entry = [&codeplug](uint32_t addr) -> unsigned int {
+    const uint8_t *ptr = codeplug.data(addr);
+    return ((unsigned int)ptr[1] << 8) | ptr[0];
+  };
+  // Header: 3 contacts, 2 group calls, then 0 (the CPS writes 0, even with private calls)
+  QCOMPARE(entry(0xb000), 3U);
+  QCOMPARE(entry(0xb002), 2U);
+  QCOMPARE(entry(0xb004), 0U);
+  // Sorted by name, case sensitive: "B", "a", "b"
+  QCOMPARE(entry(0xb100), 0x4003U);
+  QCOMPARE(entry(0xb102), 0x3002U);
+  QCOMPARE(entry(0xb104), 0x4001U);
+  QCOMPARE(entry(0xb106), 0xffffU);
+  // Sorted by number: 1, 2, 3
+  QCOMPARE(entry(0xb740), 0x3002U);
+  QCOMPARE(entry(0xb742), 0x4003U);
+  QCOMPARE(entry(0xb744), 0x4001U);
+  QCOMPARE(entry(0xb746), 0xffffU);
+  QCOMPARE(entry(0xbffc), 0xffffU);
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 
