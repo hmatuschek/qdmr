@@ -33,6 +33,8 @@ private slots:
   void testEncryptionKeysKeepDisabled();
   /** A scan list holds 16 channels. */
   void testScanListChannels();
+  /** The CPS's default APRS destination adds no contact on decode and survives an encode. */
+  void testAPRSDefaultDestination();
 };
 
 #endif // DR1801TEST_HH

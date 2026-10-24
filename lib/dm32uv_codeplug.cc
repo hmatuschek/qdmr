@@ -3651,6 +3651,19 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
       return this->destinationId() == qobject_cast<DMRContact*>(item)->number();
     }));
   if (nullptr == cont) {
+    // No contact with this ID, as in the CPS's defaults (private call to ID 1). Only if a channel
+    // sends DMR APRS, a contact is created for it. Otherwise the unused system is dropped, so that
+    // a read and write does not add a contact to the radio.
+    bool used = false;
+    for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+      auto ch = ctx.config()->channelList()->channel(i);
+      if (ch->is<DMRChannel>() && (aprs == ch->as<DMRChannel>()->aprs()))
+        used = true;
+    }
+    if (! used) {
+      ctx.config()->posSystems()->del(aprs);
+      return true;
+    }
     cont = new DMRContact(callType(), "DMR APRS Contact", destinationId());
     ctx.config()->contacts()->add(cont);
   }
@@ -3684,10 +3697,9 @@ DM32UVCodeplug::APRSSettingsElement::encode(Context &ctx, const ErrorStack &err)
     enableFixedLocation(ctx.config()->settings()->gnss()->fixedPositionEnabled());
   }
 
-  if (0 == ctx.count<DMRAPRSSystem>()) {
-    setDestinationId(0);
+  // Without a system, the destination is kept as it is: no channel sends DMR APRS then.
+  if (0 == ctx.count<DMRAPRSSystem>())
     return true;
-  }
 
   // We can only encode a single system -> use the first
   auto sys = ctx.get<DMRAPRSSystem>(0);

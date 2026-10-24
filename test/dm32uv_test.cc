@@ -433,6 +433,36 @@ DM32UVTest::testScanListChannels() {
 }
 
 
+void
+DM32UVTest::testAPRSDefaultDestination() {
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("test", 123456));
+  config.contacts()->add(new DMRContact(DMRContact::GroupCall, "Group", 91));
+  DM32UVCodeplug codeplug; ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // The CPS's default APRS destination: private call to ID 1, no such contact, no channel uses it
+  *codeplug.data(0x4331) = 0x00;
+  *codeplug.data(0x4332) = 0x01;
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(decoded.posSystems()->count(), 0);
+  QCOMPARE(decoded.contacts()->count(), 1);
+
+  if (! codeplug.encode(&decoded, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot re-encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE((unsigned int)*codeplug.data(0x4332), 0x01U);
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 
