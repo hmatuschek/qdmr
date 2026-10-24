@@ -35,6 +35,8 @@ private slots:
   void testScanListChannels();
   /** The CPS's default APRS destination adds no contact on decode and survives an encode. */
   void testAPRSDefaultDestination();
+  /** Names are written as the CPS does: text and a terminating 0, the rest is kept. */
+  void testNamesKeepTrailingBytes();
 };
 
 #endif // DR1801TEST_HH

@@ -463,6 +463,43 @@ DM32UVTest::testAPRSDefaultDestination() {
 }
 
 
+void
+DM32UVTest::testNamesKeepTrailingBytes() {
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("test", 123456));
+  auto ch = new FMChannel();
+  ch->setName("Channel");
+  ch->setRXFrequency(Frequency::fromMHz(439.0));
+  ch->setTXFrequency(Frequency::fromMHz(439.0));
+  config.channelList()->add(ch);
+  auto zone = new Zone(); zone->setName("Zuege");
+  zone->A()->add(ch);
+  config.zones()->add(zone);
+
+  DM32UVCodeplug codeplug; ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  // Zone 1's name as the CPS left it on a radio: "Zone 1", then renamed to "Zuege"
+  uint8_t *name = codeplug.data(0x5c010);
+  QByteArray before = QByteArray("Zone 1\0", 7) + QByteArray(9, '\xff');
+  memcpy(name, before.constData(), 16);
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot re-encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(QByteArray((const char *)name, 16), QByteArray("Zuege\0\0", 7) + QByteArray(9, '\xff'));
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(decoded.zones()->zone(0)->name(), QString("Zuege"));
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 

@@ -5,6 +5,18 @@
 #include <QRegularExpression>
 
 
+/** Writes a name as the CPS does: the text, then a terminating 0 if there is room. The bytes after
+ * it keep what they held, so a name read from the radio and written back leaves its slot unchanged. */
+static void
+writeName(uint8_t *ptr, const QString &name, unsigned int maxlen) {
+  unsigned int n = std::min(maxlen, (unsigned int)name.length());
+  for (unsigned int i=0; i<n; i++)
+    ptr[i] = name.at(i).toLatin1();
+  if (n < maxlen)
+    ptr[n] = 0x00;
+}
+
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::ChannelElement
@@ -33,7 +45,7 @@ DM32UVCodeplug::ChannelElement::name() const {
 
 void
 DM32UVCodeplug::ChannelElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -813,7 +825,7 @@ DM32UVCodeplug::ContactElement::name() const {
 
 void
 DM32UVCodeplug::ContactElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1077,7 +1089,7 @@ DM32UVCodeplug::GroupListElement::name() const {
 
 void
 DM32UVCodeplug::GroupListElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1261,7 +1273,7 @@ DM32UVCodeplug::RadioIdElement::name() const {
 
 void
 DM32UVCodeplug::RadioIdElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1357,7 +1369,7 @@ DM32UVCodeplug::ZoneElement::name() const {
 
 void
 DM32UVCodeplug::ZoneElement::setName(const QString &name) {
-  return writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1550,7 +1562,7 @@ DM32UVCodeplug::ScanListElement::name() const {
 
 void
 DM32UVCodeplug::ScanListElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1890,7 +1902,7 @@ DM32UVCodeplug::RoamingChannelElement::name() const {
 
 void
 DM32UVCodeplug::RoamingChannelElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 Frequency
@@ -2039,7 +2051,7 @@ DM32UVCodeplug::RoamingZoneElement::name() const {
 
 void
 DM32UVCodeplug::RoamingZoneElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 unsigned int
