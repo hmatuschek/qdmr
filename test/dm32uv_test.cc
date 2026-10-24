@@ -213,6 +213,41 @@ DM32UVTest::testCTCSSHigherFrequencies() {
 }
 
 
+void
+DM32UVTest::testZoneBankEncoding() {
+  static const uint32_t lastBank = 0x64000;
+  Config config;
+
+  config.radioIDs()->add(new DMRRadioID("test", 123456));
+  auto ch = new FMChannel();
+  ch->setName("Channel");
+  ch->setRXFrequency(Frequency::fromMHz(144.0));
+  ch->setTXFrequency(Frequency::fromMHz(144.0));
+  config.channelList()->add(ch);
+  for (int i=0; i<250; i++) {
+    auto zone = new Zone();
+    zone->setName(QString("Zone %1").arg(i));
+    zone->A()->add(ch);
+    config.zones()->add(zone);
+  }
+
+  DM32UVCodeplug codeplug; ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QVERIFY(codeplug.isAllocated(lastBank));
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(decoded.zones()->count(), 250);
+  QCOMPARE(decoded.zones()->zone(249)->name(), QString("Zone 249"));
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 

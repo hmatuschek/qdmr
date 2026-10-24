@@ -21,6 +21,8 @@ private slots:
   void testChannelBankEncoding();
   /** Regression test fo #967 */
   void testCTCSSHigherFrequencies();
+  /** All 250 zones need the 9th zone bank. */
+  void testZoneBankEncoding();
 };
 
 #endif // DR1801TEST_HH
