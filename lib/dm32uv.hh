@@ -8,6 +8,7 @@
 #include "dm32uv_callsigndb.hh"
 #include <QObject>
 #include <QHash>
+#include <QSet>
 
 // Forward declaration
 class DM32UVInterface;
@@ -32,6 +33,13 @@ public:
 
     /** Adds an address mapping. */
     void map(uint32_t phys, uint32_t virt);
+
+    /** Marks the physical page at the given address as free (its tag reads 00h or ffh). */
+    void addFree(uint32_t phys);
+    /** Maps the given virtual address to the lowest free physical page and returns that page's
+     * address, as the CPS does for a block the radio has no page for. If no page is free,
+     * @c std::numeric_limits<uint32_t>::max() gets returned. */
+    uint32_t allocate(uint32_t virt);
 
     /** Returns @c true, if the virtual address is mapped. */
     bool virtualIsMapped(uint32_t virt) const;
@@ -70,6 +78,8 @@ public:
     /** Holds only the prefix address mapping from virtual to physical addresses. That is
      *  @c addr>>12. */
     QMap<uint32_t, uint32_t> _toPhysical;
+    /** Holds the prefixes (@c addr>>12) of the free physical pages. */
+    QSet<uint32_t> _free;
   };
 
 public:

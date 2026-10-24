@@ -4,6 +4,7 @@
 #include "errorstack.hh"
 #include "logger.hh"
 #include "dm32uv_limits.hh"
+#include "dm32uv.hh"
 #include <QTest>
 
 
@@ -338,6 +339,26 @@ DM32UVTest::testRadioIdLimits() {
   QVERIFY(nullptr != dch->radioId());
   QCOMPARE(dch->radioId()->number(), 1234567U);
 }
+
+
+void
+DM32UVTest::testAddressMapAllocation() {
+  DM32UV::AddressMap map;
+  map.map(0x02000, 0x03000);
+  map.addFree(0x23000);
+  map.addFree(0x05000);
+
+  // Unmapped blocks get the lowest free page, each its own
+  QCOMPARE(map.allocate(0x0b000), 0x05000U);
+  QCOMPARE(map.toPhysical(0x0b000), 0x05000U);
+  QCOMPARE(map.toVirtual(0x05000), 0x0b000U);
+  QCOMPARE(map.allocate(0x0c000), 0x23000U);
+  // None left
+  QCOMPARE(map.allocate(0x0d000), std::numeric_limits<uint32_t>::max());
+  QVERIFY(! map.virtualIsMapped(0x0d000));
+  QCOMPARE(map.toPhysical(0x03000), 0x02000U);
+}
+
 
 QTEST_GUILESS_MAIN(DM32UVTest)
 

@@ -8,7 +8,7 @@
  * Implementation of Baofeng DM32UV weird address mapping
  * ********************************************************************************************* */
 DM32UV::AddressMap::AddressMap()
-  : _toVirtual(), _toPhysical()
+  : _toVirtual(), _toPhysical(), _free()
 {
   // pass...
 }
@@ -18,6 +18,21 @@ DM32UV::AddressMap::map(uint32_t phys, uint32_t virt) {
   phys >>= 12; virt >>= 12;
   _toVirtual[phys] = virt;
   _toPhysical[virt] = phys;
+}
+
+void
+DM32UV::AddressMap::addFree(uint32_t phys) {
+  _free.insert(phys>>12);
+}
+
+uint32_t
+DM32UV::AddressMap::allocate(uint32_t virt) {
+  if (_free.isEmpty())
+    return std::numeric_limits<uint32_t>::max();
+  uint32_t page = *std::min_element(_free.begin(), _free.end());
+  _free.remove(page);
+  map(page<<12, virt);
+  return page<<12;
 }
 
 bool
@@ -344,20 +359,35 @@ DM32UV::upload(const ErrorStack &err) {
     return false;
   }
 
+  // A block the radio has no page for yet goes to the lowest free page, as the CPS does. Allocate
+  // them all before writing anything.
+  for (unsigned int blk=0; blk<(unsigned int)_codeplug.image(0).numElements(); blk++) {
+    auto virtualBlockAddress = _codeplug.image(0).element(blk).address();
+    if (addressMap.virtualIsMapped(virtualBlockAddress))
+      continue;
+    auto physicalBlockAddress = addressMap.allocate(virtualBlockAddress);
+    if (std::numeric_limits<uint32_t>::max() == physicalBlockAddress) {
+      errMsg(err) << "No free memory page left for codeplug block "
+                  << Qt::hex << virtualBlockAddress << "h.";
+      return false;
+    }
+    logDebug() << "Allocated page " << Qt::hex << physicalBlockAddress
+               << "h for codeplug block " << virtualBlockAddress << "h.";
+  }
+
   if (! _dev->write_start(0,0,err)) {
     errMsg(err) << "Cannot start codeplug write´.";
     return false;
   }
 
-  // Now mark all blocks with their virtual address
-  // and write them to the associated pyhsical address or to 0xff000 if not yet allocated.
+  // Now mark all blocks with their virtual address and write them to the associated physical
+  // address.
   for (unsigned int blk=0; blk<(unsigned int)_codeplug.image(0).numElements(); blk++) {
     emit uploadProgress(50 + (50*blk)/_codeplug.image(0).numElements());
     auto &element = _codeplug.image(0).element(blk);
     auto virtualBlockAddress = element.address();
     element.data()[Offset::blockSize()-1] = (virtualBlockAddress>>12);
-    auto physicalBlockAddress = addressMap.virtualIsMapped(virtualBlockAddress)
-        ? addressMap.toPhysical(virtualBlockAddress) : 0xff<<12;
+    auto physicalBlockAddress = addressMap.toPhysical(virtualBlockAddress);
     if (! _dev->write(0, physicalBlockAddress, _codeplug.data(virtualBlockAddress), Offset::blockSize())) {
       errMsg(err) << "Cannot write codeplug block to "
                   << Qt::hex << physicalBlockAddress << "h (virt. "

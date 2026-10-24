@@ -27,6 +27,8 @@ private slots:
   void testContactIndexEncoding();
   /** The radio holds more than one radio ID. */
   void testRadioIdLimits();
+  /** Blocks the radio has no page for get the lowest free page. */
+  void testAddressMapAllocation();
 };
 
 #endif // DR1801TEST_HH
