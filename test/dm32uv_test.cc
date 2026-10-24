@@ -360,6 +360,33 @@ DM32UVTest::testAddressMapAllocation() {
 }
 
 
+void
+DM32UVTest::testEncryptionKeysKeepDisabled() {
+  Config config;
+  config.radioIDs()->add(new DMRRadioID("test", 123456));
+  DM32UVCodeplug codeplug; ErrorStack err;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // Key 1 as in the CPS's defaults: ID 1, "Encrypt 1", disabled. Key 2: an AES-128 key.
+  uint8_t *key1 = codeplug.data(0x10300), *key2 = codeplug.data(0x1032c);
+  QByteArray cpsDefault = QByteArray("\x01" "Encrypt 1", 10) + QByteArray(0x2c-10, '\x00');
+  memcpy(key1, cpsDefault.constData(), 0x2c);
+  memset(key2, 0, 0x2c); key2[0] = 2; key2[1] = 'x'; key2[0x0b] = 3; key2[0x0c] = 0x55;
+
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot re-encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  // The disabled key is kept, the AES key (not in the config) is cleared
+  QCOMPARE(QByteArray((const char *)key1, 0x2c), cpsDefault);
+  QCOMPARE((unsigned int)key2[0x0b], 0U);
+  QCOMPARE((unsigned int)key2[0x0c], 0U);
+}
+
+
 QTEST_GUILESS_MAIN(DM32UVTest)
 
 

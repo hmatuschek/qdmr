@@ -3976,9 +3976,14 @@ DM32UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack 
 bool
 DM32UVCodeplug::EncryptionKeyBankElement::encode(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::keys(); i++) {
-    key(i).clear();
-    if (i >= ctx.count<EncryptionKey>())
+    if (i >= ctx.count<EncryptionKey>()) {
+      // Clear only keys qdmr can decode. Disabled and custom ones are kept as they are, e.g., the
+      // CPS's default "Encrypt 1".
+      if (keyValid(i))
+        key(i).clear();
       continue;
+    }
+    key(i).clear();
     if (! key(i).encode(ctx.get<EncryptionKey>(i), ctx, err)) {
       errMsg(err) << "Cannot encode encryption key.";
       return false;

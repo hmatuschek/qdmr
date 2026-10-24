@@ -29,6 +29,8 @@ private slots:
   void testRadioIdLimits();
   /** Blocks the radio has no page for get the lowest free page. */
   void testAddressMapAllocation();
+  /** Disabled encryption keys (the CPS's default "Encrypt 1") survive an encode. */
+  void testEncryptionKeysKeepDisabled();
 };
 
 #endif // DR1801TEST_HH
