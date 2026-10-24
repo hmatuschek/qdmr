@@ -282,6 +282,15 @@ DM32UVTest::testContactIndexEncoding() {
   QCOMPARE(entry(0xb744), 0x4001U);
   QCOMPARE(entry(0xb746), 0xffffU);
   QCOMPARE(entry(0xbffc), 0xffffU);
+
+  // The padding must keep the block tag (last byte), as read from the radio
+  *codeplug.data(0xbfff) = 0x0b;
+  if (! codeplug.encode(&config, Codeplug::Flags(), err)) {
+    QFAIL(QString("Cannot re-encode codeplug for BTECH DM32UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE((unsigned int)*codeplug.data(0xbfff), 0x0bU);
+  QCOMPARE((unsigned int)*codeplug.data(0xbffe), 0xffU);
 }
 
 

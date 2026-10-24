@@ -1010,8 +1010,8 @@ bool
 DM32UVCodeplug::ContactIndexElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
-  // The CPS fills unused index entries with 0xff
-  memset(_data + Offset::index(), 0xff, size() - Offset::index());
+  // The CPS fills unused index entries with 0xff. The last byte is the block tag, keep it.
+  memset(_data + Offset::index(), 0xff, size() - Offset::index() - 1);
 
   setContactCount(ctx.count<DigitalContact>());
   unsigned int groupCallCount = 0;
