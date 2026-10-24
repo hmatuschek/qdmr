@@ -88,7 +88,10 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
                                                          {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
                                                                  {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
-              {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
+              {"power", new RadioLimitEnum{
+                 unsigned(Channel::Power::Low),
+                 unsigned(Channel::Power::Mid),
+                 unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
               {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
@@ -118,6 +121,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
                                                                  {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum {
                  unsigned(Channel::Power::Low),
+                 unsigned(Channel::Power::Mid),
                  unsigned(Channel::Power::High),
                }},
               {"timeout", new RadioLimitInterval()},

@@ -37,6 +37,8 @@ private slots:
   void testAPRSDefaultDestination();
   /** Names are written as the CPS does: text and a terminating 0, the rest is kept. */
   void testNamesKeepTrailingBytes();
+  /** Channels take the radio's middle power level. */
+  void testChannelPowerMid();
 };
 
 #endif // DR1801TEST_HH
