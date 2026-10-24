@@ -43,7 +43,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
 
   /* Define limits for radio IDs. */
   add("radioIDs", new RadioLimitList{
-        { DMRRadioID::staticMetaObject, 1, 1, new RadioLimitObject {
+        { DMRRadioID::staticMetaObject, 1, DM32UVCodeplug::RadioIdBankElement::Limit::ids(), new RadioLimitObject {
             {"name", new RadioLimitString(
              1, DM32UVCodeplug::RadioIdElement::Limit::nameLength(), RadioLimitString::ASCII) },
             {"number", new RadioLimitDMRId(RadioLimitIssue::Severity::Critical)}
@@ -88,7 +88,10 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
                                                          {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}}, RadioLimitIssue::Severity::Critical)},
               {"txFrequency", new RadioLimitTransmitFrequencies({{Frequency::fromMHz(136.), Frequency::fromMHz(174.)},
                                                                  {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
-              {"power", new RadioLimitEnum{unsigned(Channel::Power::Low), unsigned(Channel::Power::High)}},
+              {"power", new RadioLimitEnum{
+                 unsigned(Channel::Power::Low),
+                 unsigned(Channel::Power::Mid),
+                 unsigned(Channel::Power::High)}},
               {"timeout", new RadioLimitInterval()},
               {"scanlist", new RadioLimitObjRef(ScanList::staticMetaObject)},
               {"vox", new RadioLimitIgnored(RadioLimitIssue::Silent)},
@@ -118,6 +121,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
                                                                  {Frequency::fromMHz(400.), Frequency::fromMHz(480.)}})},
               {"power", new RadioLimitEnum {
                  unsigned(Channel::Power::Low),
+                 unsigned(Channel::Power::Mid),
                  unsigned(Channel::Power::High),
                }},
               {"timeout", new RadioLimitInterval()},
@@ -164,7 +168,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
         } ) );
 
   /* Define limits for scan lists. */
-  add("scanlists", new RadioLimitList(
+  add("scanLists", new RadioLimitList(
         ScanList::staticMetaObject, 0, DM32UVCodeplug::ScanListBankElement::Limit::scanLists(),
         new RadioLimitObject{
           { "name", new RadioLimitString(
@@ -173,7 +177,7 @@ DM32UVLimits::DM32UVLimits(QObject *parent)
           { "secondary", new RadioLimitObjRef(Channel::staticMetaObject, true) },
           { "revert", new RadioLimitObjRef(Channel::staticMetaObject, true) },
           { "channels", new RadioLimitRefList(
-            0, DM32UVCodeplug::ScanListBankElement::Limit::scanLists(), Channel::staticMetaObject) }
+            0, DM32UVCodeplug::ScanListElement::Limit::channels(), Channel::staticMetaObject) }
         }) );
 
   /* Define limits for positioning systems. */

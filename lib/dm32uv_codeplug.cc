@@ -5,6 +5,18 @@
 #include <QRegularExpression>
 
 
+/** Writes a name as the CPS does: the text, then a terminating 0 if there is room. The bytes after
+ * it keep what they held, so a name read from the radio and written back leaves its slot unchanged. */
+static void
+writeName(uint8_t *ptr, const QString &name, unsigned int maxlen) {
+  unsigned int n = std::min(maxlen, (unsigned int)name.length());
+  for (unsigned int i=0; i<n; i++)
+    ptr[i] = name.at(i).toLatin1();
+  if (n < maxlen)
+    ptr[n] = 0x00;
+}
+
+
 
 /* ******************************************************************************************** *
  * Implementation of DM32UVCodeplug::ChannelElement
@@ -21,6 +33,16 @@ DM32UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
   // pass...
 }
 
+bool
+DM32UVCodeplug::ChannelElement::isValid() const {
+  if (! Element::isValid())
+    return false;
+  for (unsigned int i=0; i<_size; i++)
+    if (0 != _data[i])
+      return true;
+  return false;
+}
+
 void
 DM32UVCodeplug::ChannelElement::clear() {
   fill(0x00);
@@ -33,7 +55,7 @@ DM32UVCodeplug::ChannelElement::name() const {
 
 void
 DM32UVCodeplug::ChannelElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -757,12 +779,17 @@ DM32UVCodeplug::ChannelExtensionElement::decode(Channel *ch, Context &ctx, const
 
 bool
 DM32UVCodeplug::ChannelExtensionElement::link(Channel *ch, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err);
   if (!ch->is<DMRChannel>() || !hasContactIndex())
     return true;
 
+  // The CPS's talk group import replaces the contact list but keeps the channels' contact
+  // indices, so a channel may point at a contact that no longer exists. The radio and the CPS
+  // accept that; the channel gets no contact.
   if (! ctx.has<DMRContact>(contactIndex())) {
-    errMsg(err) << "Cannot resolve contact index " << contactIndex() << ".";
-    return false;
+    logWarn() << "Cannot resolve contact index " << contactIndex() << " of channel '"
+              << ch->name() << "', the channel gets no contact.";
+    return true;
   }
 
   ch->as<DMRChannel>()->setContact(ctx.get<DMRContact>(contactIndex()));
@@ -813,7 +840,7 @@ DM32UVCodeplug::ContactElement::name() const {
 
 void
 DM32UVCodeplug::ContactElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1010,27 +1037,38 @@ bool
 DM32UVCodeplug::ContactIndexElement::encode(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(err);
 
+  // The CPS fills unused index entries with 0xff. The last byte is the block tag, keep it.
+  memset(_data + Offset::index(), 0xff, size() - Offset::index() - 1);
+
   setContactCount(ctx.count<DigitalContact>());
-  unsigned int privatCallCount = 0, groupCallCount = 0;
+  unsigned int groupCallCount = 0;
 
   unsigned int cc = contactCount();
   QVector<unsigned int> indices; indices.reserve(cc);
   for (unsigned int idx=0; idx<contactCount(); idx++) {
-    if (DMRContact::Type::PrivateCall == ctx.get<DMRContact>(idx)->type())
-      privatCallCount++;
-    else if (DMRContact::Type::GroupCall == ctx.get<DMRContact>(idx)->type())
+    if (DMRContact::Type::GroupCall == ctx.get<DMRContact>(idx)->type())
       groupCallCount++;
-    indexEntry(idx).setCallType(ctx.get<DMRContact>(idx)->type());
-    indexEntry(idx).setIndex(idx);
     indices.append(idx);
   }
 
-  setPrivateCallCount(privatCallCount);
+  // The CPS writes 0 here, even if there are private calls.
+  setPrivateCallCount(0);
   setGroupCallCount(groupCallCount);
   bitmap().enableFirst(ctx.count<DigitalContact>());
 
+  // Sort indices w.r.t. the encoded names, as the CPS does (case sensitive):
+  auto byName = indices;
+  std::stable_sort(byName.begin(), byName.end(), [&ctx](unsigned ia, unsigned ib)->bool {
+    return ctx.get<DMRContact>(ia)->name().left(ContactElement::Limit::nameLength())
+        < ctx.get<DMRContact>(ib)->name().left(ContactElement::Limit::nameLength());
+  });
+  for (unsigned int sidx=0; sidx<contactCount(); sidx++) {
+    indexEntry(sidx).setCallType(ctx.get<DMRContact>(byName[sidx])->type());
+    indexEntry(sidx).setIndex(byName[sidx]);
+  }
+
   // Sort indices w.r.t. associated DMR id:
-  std::sort(indices.begin(), indices.end(), [&ctx](unsigned ia, unsigned ib)->bool {
+  std::stable_sort(indices.begin(), indices.end(), [&ctx](unsigned ia, unsigned ib)->bool {
     return ctx.get<DMRContact>(ia)->number() < ctx.get<DMRContact>(ib)->number();
   });
   for (unsigned int sidx=0; sidx<contactCount(); sidx++) {
@@ -1066,7 +1104,7 @@ DM32UVCodeplug::GroupListElement::name() const {
 
 void
 DM32UVCodeplug::GroupListElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1250,7 +1288,7 @@ DM32UVCodeplug::RadioIdElement::name() const {
 
 void
 DM32UVCodeplug::RadioIdElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1316,9 +1354,9 @@ DM32UVCodeplug::RadioIdBankElement::decode(Context &ctx, const ErrorStack &err) 
 
 bool
 DM32UVCodeplug::RadioIdBankElement::encode(Context &ctx, const ErrorStack &err) {
-  setIdCount(ctx.count<DMRRadioID>());
+  setIdCount(std::min(ctx.count<DMRRadioID>(), Limit::ids()));
 
-  for (unsigned int i=0; i<std::min(ctx.count<DMRRadioID>(), Limit::ids()); i++) {
+  for (unsigned int i=0; i<idCount(); i++) {
     if (! id(i).encode(ctx.get<DMRRadioID>(i), err)) {
       errMsg(err) << "Cannot encode DMR radio ID '" << ctx.get<DMRRadioID>(i)->name()
                   << "' at idx " << i << ".";
@@ -1346,7 +1384,7 @@ DM32UVCodeplug::ZoneElement::name() const {
 
 void
 DM32UVCodeplug::ZoneElement::setName(const QString &name) {
-  return writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1393,10 +1431,11 @@ DM32UVCodeplug::ZoneElement::link(Zone *zone, Context &ctx, const ErrorStack &er
   for (unsigned int i=0; i<channelCount(); i++) {
     if (! channelIndexValid(i))
       continue;
+    // An empty channel record is not decoded, so a zone may point at no channel.
     if (! ctx.has<Channel>(channelIndex(i))) {
-      errMsg(err) << "Cannot link zone, " << i << "-th channel index " << channelIndex(i)
-                  << " not defined.";
-      return false;
+      logWarn() << "Zone '" << zone->name() << "': channel index " << channelIndex(i)
+                << " is not defined, the entry is dropped.";
+      continue;
     }
     zone->A()->add(ctx.get<Channel>(channelIndex(i)));
   }
@@ -1539,7 +1578,7 @@ DM32UVCodeplug::ScanListElement::name() const {
 
 void
 DM32UVCodeplug::ScanListElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 
@@ -1693,41 +1732,45 @@ DM32UVCodeplug::ScanListElement::decode(Context &ctx, const ErrorStack &err) {
 
 bool
 DM32UVCodeplug::ScanListElement::link(ScanList *lst, Context &ctx, const ErrorStack &err) {
+  Q_UNUSED(err);
+  // An empty channel record is not decoded, so a scan list may point at no channel.
   // Link primary, secondary and revert channels if set
   if (primaryChannelIndexValid()) {
     if (! ctx.has<Channel>(primaryChannelIndex())) {
-      errMsg(err) << "Cannot link primary priority channel for scan list '" << lst->name()
-                  << "': Channel with index " << primaryChannelIndex() << " not defined.";
-      return false;
+      logWarn() << "Scan list '" << lst->name() << "': primary priority channel index "
+                << primaryChannelIndex() << " is not defined, the scan list gets none.";
+    } else {
+      lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
     }
-    lst->setPrimaryChannel(ctx.get<Channel>(primaryChannelIndex()));
   }
 
   if (secondaryChannelIndexValid()) {
     if (! ctx.has<Channel>(secondaryChannelIndex())) {
-      errMsg(err) << "Cannot link secondary priority channel for scan list '" << lst->name()
-      << "': Channel with index " << secondaryChannelIndex() << " not defined.";
-      return false;
+      logWarn() << "Scan list '" << lst->name() << "': secondary priority channel index "
+                << secondaryChannelIndex() << " is not defined, the scan list gets none.";
+    } else {
+      lst->setSecondaryChannel(ctx.get<Channel>(secondaryChannelIndex()));
     }
-    lst->setSecondaryChannel(ctx.get<Channel>(secondaryChannelIndex()));
   }
 
   if (revertChannelIndexValid()) {
     if (! ctx.has<Channel>(revertChannelIndex())) {
-      errMsg(err) << "Cannot link revert channel for scan list '" << lst->name()
-      << "': Channel with index " << revertChannelIndex() << " not defined.";
-      return false;
+      logWarn() << "Scan list '" << lst->name() << "': revert channel index "
+                << revertChannelIndex() << " is not defined, the scan list gets none.";
+    } else {
+      lst->setRevertChannel(ctx.get<Channel>(revertChannelIndex()));
     }
-    lst->setRevertChannel(ctx.get<Channel>(revertChannelIndex()));
   }
 
   for (unsigned int i=0; i<channelCount(); i++) {
     if (isCurrentChannel(i)) {
       lst->addChannel(SelectedChannel::get());
-    } else if (! ctx.has<Channel>(channelIndex(i))) {
-      errMsg(err) << "Cannot link scan list '" << lst->name()
-                  << "': Channel with index " << channelIndex(i) << "not defined";
-      return false;
+      continue;
+    }
+    if (! ctx.has<Channel>(channelIndex(i))) {
+      logWarn() << "Scan list '" << lst->name() << "': channel index " << channelIndex(i)
+                << " is not defined, the entry is dropped.";
+      continue;
     }
     lst->addChannel(ctx.get<Channel>(channelIndex(i)));
   }
@@ -1879,7 +1922,7 @@ DM32UVCodeplug::RoamingChannelElement::name() const {
 
 void
 DM32UVCodeplug::RoamingChannelElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 Frequency
@@ -1999,6 +2042,19 @@ DM32UVCodeplug::RoamingChannelBankElement::decode(Context &ctx, const ErrorStack
 
 bool
 DM32UVCodeplug::RoamingChannelBankElement::encode(Context &ctx, const ErrorStack &err) {
+  // Without roaming channels, write the CPS's default one: the radio puts one back anyway.
+  if (0 == ctx.count<RoamingChannel>()) {
+    setCount(1);
+    memset(_data + Offset::channels(), 0x00, RoamingChannelElement::size());
+    auto ch = channel(0);
+    ch.setName("Roam CH 1");
+    ch.setRXFrequency(Frequency::fromMHz(400.0));
+    ch.setTXFrequency(Frequency::fromMHz(410.0));
+    ch.setColorCode(0);
+    ch.setTimeSlot(DMRChannel::TimeSlot::TS1);
+    return true;
+  }
+
   setCount(std::min(Limit::channels(), ctx.count<RoamingChannel>()));
   for (unsigned int i=0; i<count(); i++) {
     if (! channel(i).encode(ctx.get<RoamingChannel>(i), err)) {
@@ -2028,7 +2084,7 @@ DM32UVCodeplug::RoamingZoneElement::name() const {
 
 void
 DM32UVCodeplug::RoamingZoneElement::setName(const QString &name) {
-  writeASCII(Offset::name(), name, Limit::nameLength(), 0x00);
+  writeName(_data + Offset::name(), name, Limit::nameLength());
 }
 
 unsigned int
@@ -2198,6 +2254,18 @@ DM32UVCodeplug::RoamingZoneBankElement::link(Context &ctx, const ErrorStack &err
 
 bool
 DM32UVCodeplug::RoamingZoneBankElement::encode(Context &ctx, const ErrorStack &err) {
+  // Without roaming zones, write the CPS's default one with the default roaming channel: the
+  // radio puts one back anyway.
+  if (0 == ctx.count<RoamingZone>()) {
+    setCount(1);
+    memset(_data + Offset::zones(), 0x00, RoamingZoneElement::size());
+    auto z = zone(0);
+    z.setName("Roam Zone 1");
+    z.setCount(1);
+    z.setChannelIndex(0, 0);
+    return true;
+  }
+
   setCount(std::min(Limit::zones(), ctx.count<RoamingZone>()));
   for (unsigned int i=0; i<count(); i++) {
     if (! zone(i).encode(ctx.get<RoamingZone>(i), ctx, err)) {
@@ -3640,6 +3708,19 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
       return this->destinationId() == qobject_cast<DMRContact*>(item)->number();
     }));
   if (nullptr == cont) {
+    // No contact with this ID, as in the CPS's defaults (private call to ID 1). Only if a channel
+    // sends DMR APRS, a contact is created for it. Otherwise the unused system is dropped, so that
+    // a read and write does not add a contact to the radio.
+    bool used = false;
+    for (int i=0; i<ctx.config()->channelList()->count(); i++) {
+      auto ch = ctx.config()->channelList()->channel(i);
+      if (ch->is<DMRChannel>() && (aprs == ch->as<DMRChannel>()->aprs()))
+        used = true;
+    }
+    if (! used) {
+      ctx.config()->posSystems()->del(aprs);
+      return true;
+    }
     cont = new DMRContact(callType(), "DMR APRS Contact", destinationId());
     ctx.config()->contacts()->add(cont);
   }
@@ -3648,9 +3729,12 @@ DM32UVCodeplug::APRSSettingsElement::link(Context &ctx, const ErrorStack &err) {
   if (revertChannelIsCurrent(0)) {
     aprs->resetRevertChannel();
   } else {
+    // An empty channel record is not decoded, so the revert channel may be undefined.
     if (! ctx.has<Channel>(revertChannelIndex(0))) {
-      errMsg(err) << "Cannot resolve revert channel index " << revertChannelIndex(0) << ".";
-      return false;
+      logWarn() << "Cannot resolve APRS revert channel index " << revertChannelIndex(0)
+                << ", the selected channel is used.";
+      aprs->resetRevertChannel();
+      return true;
     }
     if (! ctx.get<Channel>(revertChannelIndex(0))->is<DMRChannel>()) {
       errMsg(err) << "Revert channel with index " << revertChannelIndex(0) << " must be DMR channel.";
@@ -3673,10 +3757,9 @@ DM32UVCodeplug::APRSSettingsElement::encode(Context &ctx, const ErrorStack &err)
     enableFixedLocation(ctx.config()->settings()->gnss()->fixedPositionEnabled());
   }
 
-  if (0 == ctx.count<DMRAPRSSystem>()) {
-    setDestinationId(0);
+  // Without a system, the destination is kept as it is: no channel sends DMR APRS then.
+  if (0 == ctx.count<DMRAPRSSystem>())
     return true;
-  }
 
   // We can only encode a single system -> use the first
   auto sys = ctx.get<DMRAPRSSystem>(0);
@@ -3965,9 +4048,14 @@ DM32UVCodeplug::EncryptionKeyBankElement::decode(Context &ctx, const ErrorStack 
 bool
 DM32UVCodeplug::EncryptionKeyBankElement::encode(Context &ctx, const ErrorStack &err) {
   for (unsigned int i=0; i<Limit::keys(); i++) {
-    key(i).clear();
-    if (i >= ctx.count<EncryptionKey>())
+    if (i >= ctx.count<EncryptionKey>()) {
+      // Clear only keys qdmr can decode. Disabled and custom ones are kept as they are, e.g., the
+      // CPS's default "Encrypt 1".
+      if (keyValid(i))
+        key(i).clear();
       continue;
+    }
+    key(i).clear();
     if (! key(i).encode(ctx.get<EncryptionKey>(i), ctx, err)) {
       errMsg(err) << "Cannot encode encryption key.";
       return false;
@@ -4341,8 +4429,14 @@ DM32UVCodeplug::decodeChannels(Context &ctx, const ErrorStack &err) {
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
                     + indexInBlock * ChannelElement::size();
+    // The CPS may leave an empty record within the channel count; it is no channel.
+    ChannelElement element(data(addr));
+    if (! element.isValid()) {
+      logInfo() << "Channel at index " << i << " is empty, skipped.";
+      continue;
+    }
     // Create channel
-    auto ch = ChannelElement(data(addr)).decode(ctx, err);
+    auto ch = element.decode(ctx, err);
     if (nullptr == ch) {
       errMsg(err) << "Cannot decode channel at index " << i << ".";
       return false;
@@ -4352,8 +4446,10 @@ DM32UVCodeplug::decodeChannels(Context &ctx, const ErrorStack &err) {
     ctx.add(ch, i);
   }
 
-  // Link channel extensions
-  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+  // Decode channel extensions, at the index of their channel
+  for (unsigned int i=0; i<bank.channelCount(); i++) {
+    if (! ctx.has<Channel>(i))
+      continue;
     unsigned int blockNumber  = i / ChannelExtensionBankElement::Limit::count();
     unsigned int indexInBlock = i % ChannelExtensionBankElement::Limit::count();
     uint32_t addr = Offset::channelExtensionBanks()
@@ -4379,6 +4475,9 @@ DM32UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
                     + (0 == blockNumber ? ChannelBankElement::Offset::channelBlock0()
                                         : blockNumber * ChannelBankElement::Offset::betweenChannelBlocks())
                     + indexInBlock * ChannelElement::size();
+    // skip empty records
+    if (! ctx.has<Channel>(i))
+      continue;
     // get channel
     auto ch = ctx.get<Channel>(i);
     // link channel
@@ -4389,7 +4488,9 @@ DM32UVCodeplug::linkChannels(Context &ctx, const ErrorStack &err) {
   }
 
   // Link channel extensions
-  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+  for (unsigned int i=0; i<bank.channelCount(); i++) {
+    if (! ctx.has<Channel>(i))
+      continue;
     unsigned int blockNumber  = i / ChannelExtensionBankElement::Limit::count();
     unsigned int indexInBlock = i % ChannelExtensionBankElement::Limit::count();
     uint32_t addr = Offset::channelExtensionBanks()

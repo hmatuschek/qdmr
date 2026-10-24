@@ -342,9 +342,11 @@ DM32UVInterface::getAddressMap(DM32UV::AddressMap &map, const ErrorStack &err, v
     }
     // Unpack prefix
     uint8_t prefix = (uint8_t)mapRes.payload()[0];
-    // If prefix is invalid -> do not map
-    if ((0x00 == prefix) || (0xff == prefix))
+    // If prefix is invalid -> do not map, but remember the page as free
+    if ((0x00 == prefix) || (0xff == prefix)) {
+      map.addFree(addr);
       continue;
+    }
     // add to address map
     uint32_t vaddr = ((uint32_t)prefix) << 12;
     //logDebug() << "Map " << Qt::hex << addr << "h -> " << vaddr << "h.";
@@ -592,7 +594,7 @@ DM32UVInterface::enter_program_mode(const ErrorStack &err) {
     return false;
   }
 
-  if (_firmwareVersion.isEmpty() && !DM32UV::supportedFirmwareVersions().contains(_firmwareVersion)) {
+  if ((! _firmwareVersion.isEmpty()) && !DM32UV::supportedFirmwareVersions().contains(_firmwareVersion)) {
     logWarn() << "Firmware version " << _firmwareVersion << " is currently not supported by qdmr. "
               << "Supported versions: " << DM32UV::supportedFirmwareVersions().values().join(", ") << ".";
   }
