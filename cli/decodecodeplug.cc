@@ -37,6 +37,7 @@
 #include "dr1801uv_filereader.hh"
 #include "dm32uv_codeplug.hh"
 #include "rt4d_codeplug.hh"
+#include "hd1_codeplug.hh"
 
 
 template <class Cpl, class Rdr>
@@ -189,6 +190,11 @@ decodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     } break;
   case RadioInfo::RT4D:
     if (! decode<RT4DCodeplug, DummyFileReader>(config, filename, parser, err)) {
+      logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
+      return -1;
+    } break;
+  case RadioInfo::HD1:
+    if (! decode<HD1Codeplug, DummyFileReader>(config, filename, parser, err)) {
       logError() << "Cannot decode codeplug '" << filename << "':\n" << err.format();
       return -1;
     } break;

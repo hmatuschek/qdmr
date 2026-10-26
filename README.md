@@ -36,6 +36,7 @@ Currently, there are only few radios that are supported
   * BTECH DMR-6x2 PRO (since version 0.13.0)
   * Baofeng DM-32UV (since version 0.14.0)
   * Radtel RT-4D (since version 0.16.0)
+  * Ailunce HD1 (since version 0.16.0)
 
 A more [detailed list](https://dm3mat.de/software/qdmr) is also available. 
 

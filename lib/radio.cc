@@ -6,6 +6,7 @@
 #include "dr1801uv_interface.hh"
 #include "gd73_interface.hh"
 #include "dm32uv_interface.hh"
+#include "hd1_interface.hh"
 #include "openrtx_interface.hh"
 
 #include "rd5r.hh"
@@ -16,6 +17,7 @@
 #include "md2017.hh"
 #include "dm1701.hh"
 #include "dm32uv.hh"
+#include "hd1.hh"
 #include "dr1801uv.hh"
 #include "opengd77.hh"
 #include "openuv380.hh"
@@ -272,6 +274,20 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     rt4d->deleteLater();
+    return nullptr;
+  } else if ((HD1Interface::interfaceInfo() == descr) && force.isValid() && (RadioInfo::HD1 == force.id())) {
+    // The CH340 cable is a generic USB-serial adapter: only probe it when asked to.
+    HD1Interface *hd1if = new HD1Interface(descr, err);
+    if (hd1if->isOpen()) {
+      RadioInfo id = hd1if->identifier(err);
+      if (id.isValid() && (RadioInfo::HD1 == id.id()))
+        return new HD1(hd1if);
+      errMsg(err) << "Cannot identify device as an Ailunce HD1.";
+      hd1if->close();
+      hd1if->deleteLater();
+      return nullptr;
+    }
+    hd1if->deleteLater();
     return nullptr;
   }
   return nullptr;

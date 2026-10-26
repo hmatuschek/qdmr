@@ -56,6 +56,7 @@ Currently supported devices are:
  * Open GD77 firmware (GD77, RD-5R, DM-1801, MD-UV390, RT-3S & DM1701)
  * AnyTone AT-D868UVE, AT-D878UV, AT-878UVII, AT-D578UV, AT-D578UVII
  * BTech DMR-6X2, DMR-6X2PRO, DM-1701, DR-1801UVA6, DM-32UV
+ * Ailunce HD1
 
 %package -n libdmrconf%{sover}
 Summary:        Graphical code-plug programming tool for DMR radios

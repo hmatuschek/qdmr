@@ -467,6 +467,15 @@
           </para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term><option>hd1</option></term>
+        <listitem>
+          <para>
+            Ailunce HD1. It uses a generic CH340 cable, so the radio is never detected
+            automatically: always pass <option>--radio</option>=hd1.
+          </para>
+        </listitem>
+      </varlistentry>
     </variablelist>
   </refsect1>
 

@@ -43,7 +43,9 @@ public:
     DM1701, RT84 = DM1701,
     DR1801UV,
     DM32UV,
-    RT4D
+    RT4D,
+    // Ailunce
+    HD1
   };
 
 public:

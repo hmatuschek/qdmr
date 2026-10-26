@@ -16,6 +16,7 @@
 #include "dfufile.hh"
 #include "dm1701.hh"
 #include "dm32uv.hh"
+#include "hd1.hh"
 #include "dmr6x2uv.hh"
 #include "dmr6x2uv2.hh"
 #include "dr1801uv.hh"
@@ -103,6 +104,7 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
   case RadioInfo::DM1701: if (! verify<DM1701>(config, ctx)) return -1; break;
   case RadioInfo::DR1801UV: if (! verify<DR1801UV>(config, ctx)) return -1; break;
   case RadioInfo::DM32UV: if (! verify<DM32UV>(config, ctx)) return -1; break;
+  case RadioInfo::HD1: if (! verify<HD1>(config, ctx)) return -1; break;
   case RadioInfo::D868UV: if (! verify<D868UV>(config, ctx)) return -1; break;
   case RadioInfo::D878UV: if (! verify<D878UV>(config, ctx)) return -1; break;
   case RadioInfo::D878UVII: if (! verify<D878UV2>(config, ctx)) return -1; break;

@@ -27,6 +27,7 @@
 #include "dr1801uv_codeplug.hh"
 #include "dm32uv_codeplug.hh"
 #include "rt4d_codeplug.hh"
+#include "hd1_codeplug.hh"
 
 
 
@@ -195,6 +196,10 @@ int encodeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     break;
   case RadioInfo::RT4D:
     if (! encode<RT4DCodeplug>(config, flags, parser))
+      return -1;
+    break;
+  case RadioInfo::HD1:
+    if (! encode<HD1Codeplug>(config, flags, parser))
       return -1;
     break;
   default:
