@@ -541,7 +541,8 @@ DFUFile::Image::addElement(uint32_t addr, uint32_t size, int index) {
 void
 DFUFile::Image::addElement(const Element &element) {
   _elements.append(element);
-  _addressmap.add(element.address(), element.size());
+  // Element::size() includes the element prefix in the DFU file, the memory is memSize().
+  _addressmap.add(element.address(), element.memSize());
 }
 
 void

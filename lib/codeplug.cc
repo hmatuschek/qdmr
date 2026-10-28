@@ -10,7 +10,7 @@
  * Implementation of CodePlug::Flags
  * ********************************************************************************************* */
 Codeplug::Flags::Flags()
-  : TransferFlags(), _updateCodeplug(true), _autoEnableGPS(false), _autoEnableRoaming(false)
+  : TransferFlags(), _updateCodeplug(true), _autoEnableGPS(false), _autoEnableRoaming(false), _dryRun(false)
 {
   // pass...
 }
@@ -46,6 +46,17 @@ Codeplug::Flags::autoEnableRoaming() const {
 void
 Codeplug::Flags::setAutoEnableRoaming(bool enable) {
   _autoEnableRoaming = enable;
+}
+
+
+bool
+Codeplug::Flags::dryRun() const {
+  return _dryRun;
+}
+
+void
+Codeplug::Flags::setDryRun(bool enable) {
+  _dryRun = enable;
 }
 
 

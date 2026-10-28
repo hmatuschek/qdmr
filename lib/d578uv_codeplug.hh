@@ -208,7 +208,7 @@ public:
 
   /** Represents the general config of the radio within the D578UV binary codeplug.
    * This covers the CPS version 1.21. */
-  class GeneralSettingsElement: public AnytoneCodeplug::GeneralSettingsElement
+  class GeneralSettingsElement: public AnytoneCodeplugGen1::GeneralSettingsElement
   {
   protected:
     /** Device specific time zones. */
@@ -747,7 +747,7 @@ public:
 
   protected:
     /** Some internal offsets. */
-    struct Offset: AnytoneCodeplug::GeneralSettingsElement::Offset {
+    struct Offset: AnytoneCodeplugGen1::GeneralSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int enableKeyTone()       { return 0x0000; }
       static constexpr unsigned int transmitTimeout()     { return 0x0004; }
@@ -900,7 +900,7 @@ public:
 
 
   /** General settings extension element for the D578UV. */
-  class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
+  class ExtendedSettingsElement: public AnytoneCodeplugGen1::ExtendedSettingsElement
   {
   protected:
     /* Encoding of possible speakers. */
@@ -1238,7 +1238,7 @@ public:
 
   public:
     /** Some limits for the settings. */
-    struct Limit: AnytoneCodeplug::ExtendedSettingsElement::Limit {
+    struct Limit: AnytoneCodeplugGen1::ExtendedSettingsElement::Limit {
       static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }     ///< Maximum delay in minutes.
       static constexpr unsigned int maxWeatherChannelIndex()    { return 9; }     ///< Maximum weather channel index.
       static constexpr Range<unsigned int> micGain()            { return {1,5}; } ///< Valid range for mic gain settings.
@@ -1246,7 +1246,7 @@ public:
 
   protected:
     /** Internal used offset within the element. */
-    struct Offset : public AnytoneCodeplug::ExtendedSettingsElement::Offset {
+    struct Offset : public AnytoneCodeplugGen1::ExtendedSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int talkerAliasDisplay()           { return 0x001e; }
       static constexpr unsigned int talkerAliasEncoding()          { return 0x001f; }
@@ -1319,9 +1319,9 @@ public:
 
   /** Represents the hot-key settings of the radio within the D578UV binary codeplug.
    *
-   * This class extends the common @c AnytoneCodeplug::HotKeySettings element, encoding 24 instead
+   * This class extends the common @c AnytoneCodeplugGen1::HotKeySettings element, encoding 24 instead
    * of 17 @c HotKeySettingsElement. */
-  class HotKeySettingsElement: public AnytoneCodeplug::HotKeySettingsElement
+  class HotKeySettingsElement: public AnytoneCodeplugGen1::HotKeySettingsElement
   {
   protected:
     /** Hidden constructor. */

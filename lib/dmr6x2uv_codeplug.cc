@@ -1191,13 +1191,13 @@ DMR6X2UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const Error
  * Implementation of DMR6X2UVCodeplug::ExtendedSettingsElement
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::ExtendedSettingsElement(ptr, size)
+  : AnytoneCodeplugGen1::ExtendedSettingsElement(ptr, size)
 {
   // pass...
 }
 
 DMR6X2UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::ExtendedSettingsElement(ptr, ExtendedSettingsElement::size())
+  : AnytoneCodeplugGen1::ExtendedSettingsElement(ptr, ExtendedSettingsElement::size())
 {
   // pass...
 }
@@ -1430,7 +1430,7 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::setChannelBNameColor(AnytoneDisplaySe
 bool
 DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err)
 {
-  if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err)) {
+  if (! AnytoneCodeplugGen1::ExtendedSettingsElement::fromConfig(flags, ctx, err)) {
     errMsg(err) << "Cannot encode extended settings for DMR-6X2UV codeplug.";
     return false;
   }
@@ -1480,7 +1480,7 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Contex
 
 bool
 DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err)) {
+  if (! AnytoneCodeplugGen1::ExtendedSettingsElement::updateConfig(ctx, err)) {
     errMsg(err) << "Cannot decode extended settings for DMR-6X2UV codeplug";
     return false;
   }
@@ -1525,7 +1525,7 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const Erro
 
 bool
 DMR6X2UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::ExtendedSettingsElement::linkConfig(ctx, err)) {
+  if (! AnytoneCodeplugGen1::ExtendedSettingsElement::linkConfig(ctx, err)) {
     errMsg(err) << "Cannot link extended settings for DMR-6X2UV codeplug";
     return false;
   }
@@ -1552,13 +1552,13 @@ DMR6X2UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorS
  * Implementation of DMR6X2UVCodeplug::ChannelElement
  * ********************************************************************************************* */
 DMR6X2UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::ChannelElement(ptr, size)
+  : AnytoneCodeplugGen1::ChannelElement(ptr, size)
 {
   // pass...
 }
 
 DMR6X2UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : AnytoneCodeplug::ChannelElement(ptr)
+  : AnytoneCodeplugGen1::ChannelElement(ptr)
 {
   // pass...
 }
@@ -1723,7 +1723,7 @@ DMR6X2UVCodeplug::ChannelElement::setAPRSType(APRSType aprstype) {
 
 bool
 DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+  if (! AnytoneCodeplugGen1::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
   if (const FMChannel *fm = c->as<FMChannel>()) {
@@ -1782,7 +1782,7 @@ DMR6X2UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx)
 
 bool
 DMR6X2UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+  if (! AnytoneCodeplugGen1::ChannelElement::linkChannelObj(c, ctx))
     return false;
   if (FMChannel *fm = c->as<FMChannel>()) {
     auto ext = fm->anytoneChannelExtension();
@@ -2386,7 +2386,7 @@ DMR6X2UVCodeplug::DMR6X2UVCodeplug(QObject *parent)
 Config *
 DMR6X2UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   // Apply base preprocessing
-  auto intermediate = AnytoneCodeplug::preprocess(config, err);
+  auto intermediate = AnytoneCodeplugGen1::preprocess(config, err);
   if (nullptr == intermediate) {
     errMsg(err) << "Cannot apply preprocessing for DMR-6X2UV.";
     return nullptr;

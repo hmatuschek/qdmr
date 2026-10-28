@@ -25,6 +25,7 @@
 #include "d878uv2.hh"
 #include "d578uv.hh"
 #include "d168uv.hh"
+#include "d890uv.hh"
 #include "dmr6x2uv.hh"
 #include "dmr6x2uv2.hh"
 
@@ -134,6 +135,25 @@ Radio::detect(const USBDeviceDescriptor &descr, const RadioInfo &force, const Er
       return nullptr;
     }
     ogd77->deleteLater();
+  } else if ((D890UVInterface::interfaceInfo() == descr) && force.isValid() && (RadioInfo::D890UV==force.id())) {
+    // The AT-D890UV uses the generic STM32 CDC-ACM VID/PID, also used by OpenRTX radios. Hence it
+    // is only handled if selected explicitly, and must be tried before the OpenRTX branch below.
+    D890UVInterface *d890if = new D890UVInterface(descr, err);
+    if (d890if->isOpen()) {
+      RadioInfo id = d890if->identifier(err);
+      if (id.isValid() && (RadioInfo::D890UV == id.id())) {
+        return new D890UV(d890if);
+      } else if (id.isValid()) {
+        errMsg(err) << "Unhandled device " << id.manufacturer() << " " << id.name()
+                    << ". Device known but not implemented yet.";
+      } else {
+        errMsg(err) << "Cannot identify device.";
+      }
+      d890if->close();
+      d890if->deleteLater();
+      return nullptr;
+    }
+    d890if->deleteLater();
   } else if (OpenRTXInterface::interfaceInfo() == descr) {
     auto rtxIf = new OpenRTXInterface(descr, err);
     if (rtxIf->isOpen()) {

@@ -453,3 +453,38 @@ AnytoneSTM32Interface::detect(bool saveOnly) {
   Q_UNUSED(saveOnly);
   return USBSerial::detect(USB_VID_STM32, USB_PID_STM32, true);
 }
+
+
+
+/* ********************************************************************************************* *
+ * Implementation of D890UVInterface
+ * ********************************************************************************************* */
+D890UVInterface::D890UVInterface(const USBDeviceDescriptor &descriptor, const ErrorStack &err, QObject *parent)
+  : AnytoneInterface(descriptor, err, parent)
+{
+  // pass...
+}
+
+RadioInfo
+D890UVInterface::identifier(const ErrorStack &err) {
+  if (! _info.isValid())
+    return RadioInfo();
+  if ("D890UV" == _info.name)
+    return RadioInfo::byID(RadioInfo::D890UV);
+
+  errMsg(err) << tr("Unsupported AnyTone radio '%1', HW rev. '%2'.")
+                 .arg(_info.name).arg(_info.version);
+  return RadioInfo();
+}
+
+USBDeviceInfo
+D890UVInterface::interfaceInfo() {
+  return USBDeviceInfo(USBDeviceInfo::Class::Serial, 0, 0, false);
+}
+
+QList<USBDeviceDescriptor>
+D890UVInterface::detect(bool saveOnly) {
+  if (saveOnly)
+    return QList<USBDeviceDescriptor>();
+  return USBSerial::detect();
+}

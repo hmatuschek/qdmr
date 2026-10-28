@@ -49,6 +49,11 @@ AddressMap::rem(uint32_t idx) {
   if (_items.end() == at)
     return false;
   _items.erase(at);
+  // The indices of all subsequent elements shift by one.
+  for (auto &item : _items) {
+    if (item.index > idx)
+      item.index--;
+  }
   return true;
 }
 

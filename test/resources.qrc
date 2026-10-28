@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>data/config_test.yaml</file>
+        <file>data/d890uv_factory.dfu</file>
         <file>data/channel_frequency_test.yaml</file>
         <file>data/anytone_auto_repeater_extension.yaml</file>
         <file>data/audio_settings_extension.yaml</file>

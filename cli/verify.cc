@@ -9,6 +9,7 @@
 #include "config.hh"
 #include "csvreader.hh"
 #include "d168uv.hh"
+#include "d890uv.hh"
 #include "d578uv.hh"
 #include "d868uv.hh"
 #include "d878uv.hh"
@@ -108,6 +109,7 @@ int verify(QCommandLineParser &parser, QCoreApplication &app)
   case RadioInfo::D878UVII: if (! verify<D878UV2>(config, ctx)) return -1; break;
   case RadioInfo::D578UV: if (! verify<D578UV>(config, ctx)) return -1; break;
   case RadioInfo::D168UV: if (! verify<D168UV>(config, ctx)) return -1; break;
+  case RadioInfo::D890UV: if (! verify<D890UV>(config, ctx)) return -1; break;
   case RadioInfo::DMR6X2UV: if (! verify<DMR6X2UV>(config, ctx)) return -1; break;
   case RadioInfo::DMR6X2UV2: if (! verify<DMR6X2UV2>(config, ctx)) return -1; break;
   default:

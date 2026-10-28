@@ -64,7 +64,7 @@ protected:
 public:
   /** General settings element for the DMR-6X2UV.
    *
-   * Extends the @c AnytoneCodeplug::GeneralSettingsElement by the device specific settings for
+   * Extends the @c AnytoneCodeplugGen1::GeneralSettingsElement by the device specific settings for
    * the BTECH DMR-6X2UV.
    *
    * Memory representation of the encoded settings element (size 0x0e0 bytes):
@@ -507,7 +507,7 @@ public:
    *
    * Memory representation of the encoded settings element (size 0x0e0 bytes):
    * @verbinclude dmr6x2uv_settingsextension.txt */
-  class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
+  class ExtendedSettingsElement: public AnytoneCodeplugGen1::ExtendedSettingsElement
   {
   protected:
     /** Talker alias encoding. */
@@ -628,7 +628,7 @@ public:
 
   public:
     /** Some limits for entries. */
-    struct Limit: AnytoneCodeplug::ExtendedSettingsElement::Limit {
+    struct Limit: AnytoneCodeplugGen1::ExtendedSettingsElement::Limit {
       /// Out of range reminder count limits.
       static constexpr IntRange repRangeReminder()    { return {1, 10}; }
       /// Repeater range check interval limits.
@@ -682,12 +682,12 @@ public:
   };
 
   /** Implements the channel element for the BTECH DMR-6X2UV.
-   *  Extends the AnytoneCodeplug::ChannelElement by the device specific features, like multiple
+   *  Extends the AnytoneCodeplugGen1::ChannelElement by the device specific features, like multiple
    *  scan lists associated with the channel.
    *
    *  Memory representation of the encoded channel element (size 0x040 bytes):
    *  @verbinclude dmr6x2uv_channel.txt */
-  class ChannelElement: public AnytoneCodeplug::ChannelElement
+  class ChannelElement: public AnytoneCodeplugGen1::ChannelElement
   {
   public:
     /** Possible PTT modes for FM APRS. */
@@ -803,7 +803,7 @@ public:
 
 protected:
     /// @cond DO_NOT_DOCUMENT
-    struct Offset: AnytoneCodeplug::ChannelElement::Offset {
+    struct Offset: AnytoneCodeplugGen1::ChannelElement::Offset {
       static constexpr unsigned int aesEncryptionKeyIndex()        { return 0x0013; }
       static constexpr Bit roaming()                               { return {0x001b, 2}; }
       static constexpr Bit ranging()                               { return {0x001b, 0}; }

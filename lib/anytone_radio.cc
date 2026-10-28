@@ -36,6 +36,11 @@ AnytoneRadio::name() const {
   return _name;
 }
 
+DFUFile &
+AnytoneRadio::dryRunOriginal() {
+  return _dryRunOriginal;
+}
+
 const Codeplug &
 AnytoneRadio::codeplug() const {
   return *_codeplug;
@@ -330,6 +335,31 @@ AnytoneRadio::upload() {
 
   // Sort all elements before uploading
   _codeplug->image(0).sort();
+
+  // On a dry run, read what is currently stored at every element that would be written, then stop
+  if (_codeplugFlags.dryRun()) {
+    while (_dryRunOriginal.numImages())
+      _dryRunOriginal.remImage(0);
+    _dryRunOriginal.addImage(_codeplug->image(0).name());
+    for (int n=0; n<_codeplug->image(0).numElements(); n++) {
+      unsigned addr = _codeplug->image(0).element(n).address();
+      unsigned size = _codeplug->image(0).element(n).data().size();
+      _dryRunOriginal.image(0).addElement(addr, size);
+      uint8_t *orig = (uint8_t *)_dryRunOriginal.image(0).element(n).data().data();
+      if (! _dev->read(0, addr, orig, size, _errorStack)) {
+        errMsg(_errorStack) << "Cannot read codeplug for dry run.";
+        return false;
+      }
+      unsigned changed = 0;
+      for (unsigned i=0; i<size; i++)
+        if (orig[i] != _codeplug->data(addr)[i])
+          changed++;
+      logInfo() << "Dry run: would write " << size << " bytes at 0x" << QString::number(addr, 16)
+                << ", " << changed << " bytes differ.";
+      emit uploadProgress(50+float(n*50)/_codeplug->image(0).numElements());
+    }
+    return true;
+  }
 
   // Upload all elements back to the device
   for (int n=0; n<_codeplug->image(0).numElements(); n++) {

@@ -47,10 +47,17 @@ public:
     /** Sets if roaming gets enabled automatically. */
     void setAutoEnableRoaming(bool enable);
 
+    /** If @c true, the codeplug gets read from the device and encoded, but nothing is written
+     * to the device. Default @c false. Not all radios support this. */
+    bool dryRun() const;
+    /** Sets if the upload is a dry run. */
+    void setDryRun(bool enable);
+
   protected:
     bool _updateCodeplug;
     bool _autoEnableGPS;
     bool _autoEnableRoaming;
+    bool _dryRun;
   };
 
 

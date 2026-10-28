@@ -101,6 +101,15 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate(
                        "main", "Initializes the code-plug in the radio. If not present (default) "
                                "the code-plug gets updated, maintaining all settings made earlier.")));
+  parser.addOption({
+                     "dry-run",
+                     QCoreApplication::translate(
+                       "main", "Only with 'write' on AnyTone radios: Reads the codeplug from the "
+                               "radio and encodes it, but does not write anything. Saves what is "
+                               "on the radio to BASENAME-orig.dfu and what would be written to "
+                               "BASENAME-new.dfu."),
+                     "BASENAME"
+                   });
   parser.addOption(QCommandLineOption(
                      "update-device-clock",
                      QCoreApplication::translate(

@@ -83,7 +83,7 @@ protected:
 public:
   /** Represents the actual channel encoded within the binary D878UV codeplug.
    *
-   * This class implements only the differences to the generic @c AnytoneCodeplug::ChannelElement
+   * This class implements only the differences to the generic @c AnytoneCodeplugGen1::ChannelElement
    * (i.e. D868UVII).
    *
    * Memory layout of encoded channel (size 0x40 bytes):
@@ -910,7 +910,7 @@ public:
    *
    * Memory representation of the encoded settings element (size 0x200 bytes):
    * @verbinclude d878uv_generalsettingsextension.txt */
-  class ExtendedSettingsElement: public AnytoneCodeplug::ExtendedSettingsElement
+  class ExtendedSettingsElement: public AnytoneCodeplugGen1::ExtendedSettingsElement
   {
   protected:
     /** Encoding of possible GNSSs. Could someone explain those AnyTone engineers the concept of
@@ -1110,14 +1110,14 @@ public:
 
   public:
     /** Some limits for the settings. */
-    struct Limit: AnytoneCodeplug::ExtendedSettingsElement::Limit {
+    struct Limit: AnytoneCodeplugGen1::ExtendedSettingsElement::Limit {
       static constexpr unsigned int maxBluetoothPTTSleepDelay() { return 4; }    ///< Maximum delay in minutes.
       static constexpr Range<unsigned int> micGain() { return {0,4}; }
     };
 
   protected:
     /** Internal used offset within the element. */
-    struct Offset: public AnytoneCodeplug::ExtendedSettingsElement::Offset {
+    struct Offset: public AnytoneCodeplugGen1::ExtendedSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int sendTalkerAlias()              { return 0x0000; }
       static constexpr unsigned int talkerAliasDisplay()           { return 0x001e; }

@@ -519,13 +519,13 @@ D578UVCodeplug::GeneralSettingsElement::TimeZone::encode(const QTimeZone &zone) 
  * Implementation of D578UVCodeplug::GeneralSettingsElement
  * ******************************************************************************************** */
 D578UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
+  : AnytoneCodeplugGen1::GeneralSettingsElement(ptr, size)
 {
   // pass...
 }
 
 D578UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
+  : AnytoneCodeplugGen1::GeneralSettingsElement(ptr, GeneralSettingsElement::size())
 {
   // pass...
 }
@@ -1876,7 +1876,7 @@ D578UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
 
 bool
 D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
+  if (! AnytoneCodeplugGen1::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   // Encode tone settings
@@ -1986,7 +1986,7 @@ D578UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
 bool
 D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
+  if (! AnytoneCodeplugGen1::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
@@ -2084,7 +2084,7 @@ D578UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
 
 bool
 D578UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::linkSettings(settings, ctx, err))
+  if (! AnytoneCodeplugGen1::GeneralSettingsElement::linkSettings(settings, ctx, err))
     return false;
 
   AnytoneSettingsExtension *ext = settings->anytoneExtension();
@@ -2117,13 +2117,13 @@ D578UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
  * Implementation of D578UVCodeplug::ExtendedSettingsElement
  * ******************************************************************************************** */
 D578UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr, unsigned int size)
-  : AnytoneCodeplug::ExtendedSettingsElement(ptr, size)
+  : AnytoneCodeplugGen1::ExtendedSettingsElement(ptr, size)
 {
   // pass...
 }
 
 D578UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::ExtendedSettingsElement(ptr, size())
+  : AnytoneCodeplugGen1::ExtendedSettingsElement(ptr, size())
 {
   // pass...
 }
@@ -2131,7 +2131,7 @@ D578UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
 
 void
 D578UVCodeplug::ExtendedSettingsElement::clear() {
-  AnytoneCodeplug::ExtendedSettingsElement::clear();
+  AnytoneCodeplugGen1::ExtendedSettingsElement::clear();
 }
 
 
@@ -2978,7 +2978,7 @@ D578UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! flags.updateCodeplug())
     this->clear();
 
-  if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
+  if (! AnytoneCodeplugGen1::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   // Encode tone settings
@@ -3077,7 +3077,7 @@ bool
 D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
 
-  if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err))
+  if (! AnytoneCodeplugGen1::ExtendedSettingsElement::updateConfig(ctx, err))
     return false;
 
   // Store GPS settings
@@ -3176,13 +3176,13 @@ D578UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
  * Implementation of D578UVCodeplug::HotKeySettingsElement
  * ******************************************************************************************** */
 D578UVCodeplug::HotKeySettingsElement::HotKeySettingsElement(uint8_t *ptr, size_t size)
-  : AnytoneCodeplug::HotKeySettingsElement(ptr, size)
+  : AnytoneCodeplugGen1::HotKeySettingsElement(ptr, size)
 {
   // pass...
 }
 
 D578UVCodeplug::HotKeySettingsElement::HotKeySettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::HotKeySettingsElement(ptr, HotKeySettingsElement::size())
+  : AnytoneCodeplugGen1::HotKeySettingsElement(ptr, HotKeySettingsElement::size())
 {
   // pass...
 }

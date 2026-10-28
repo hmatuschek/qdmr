@@ -137,7 +137,7 @@ AnytoneSatelliteConfig::SatelliteElement::setDownlinkTone(const SelectiveCall &t
     setUInt8(Offset::downlinkToneType(), (int)ToneType::None);
   } else if (tone.isCTCSS()) {
     setUInt8(Offset::downlinkToneType(), (int)ToneType::CTCSS);
-    setUInt8(Offset::downlinkCTCSS(), AnytoneCodeplug::CTCSS::encode(tone));
+    setUInt8(Offset::downlinkCTCSS(), AnytoneCodeplugGen1::CTCSS::encode(tone));
   } else if (tone.isDCS()) {
     uint16_t val = tone.binCode();
     if (tone.isInverted()) val |= (1<<9);
@@ -157,7 +157,7 @@ AnytoneSatelliteConfig::SatelliteElement::setUplinkTone(const SelectiveCall &ton
     setUInt8(Offset::uplinkToneType(), (int)ToneType::None);
   } else if (tone.isCTCSS()) {
     setUInt8(Offset::uplinkToneType(), (int)ToneType::CTCSS);
-    setUInt8(Offset::uplinkCTCSS(), AnytoneCodeplug::CTCSS::encode(tone));
+    setUInt8(Offset::uplinkCTCSS(), AnytoneCodeplugGen1::CTCSS::encode(tone));
   } else if (tone.isDCS()) {
     uint16_t val = tone.binCode();
     if (tone.isInverted()) val |= (1<<9);

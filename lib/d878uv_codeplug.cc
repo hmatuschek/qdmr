@@ -346,7 +346,7 @@ D878UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
 bool
 D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+  if (! AnytoneCodeplugGen1::ChannelElement::linkChannelObj(c, ctx))
     return false;
 
   if (c->is<DMRChannel>()) {
@@ -437,7 +437,7 @@ D878UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
 
 bool
 D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+  if (! AnytoneCodeplugGen1::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
   AnytoneChannelExtension *ch_ext = nullptr;
@@ -1023,7 +1023,7 @@ D878UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
 
 void
 D878UVCodeplug::GeneralSettingsElement::clear() {
-  AnytoneCodeplug::GeneralSettingsElement::clear();
+  AnytoneCodeplugGen1::GeneralSettingsElement::clear();
 }
 
 QTimeZone
@@ -2048,7 +2048,7 @@ D878UVCodeplug::GeneralSettingsElement::setBTRXDelay(Interval delay) {
 
 bool
 D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
+  if (! AnytoneCodeplugGen1::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   // Set transmit timeout
@@ -2155,7 +2155,7 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
 bool
 D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
+  if (! AnytoneCodeplugGen1::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
@@ -2259,7 +2259,7 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
 
 bool
 D878UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::linkSettings(settings, ctx, err))
+  if (! AnytoneCodeplugGen1::GeneralSettingsElement::linkSettings(settings, ctx, err))
     return false;
 
   AnytoneSettingsExtension *ext = settings->anytoneExtension();
@@ -2293,13 +2293,13 @@ D878UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
  * Implementation of D878UVCodeplug::GeneralSettingsExtensionElement
  * ******************************************************************************************** */
 D878UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::ExtendedSettingsElement(ptr, size)
+  : AnytoneCodeplugGen1::ExtendedSettingsElement(ptr, size)
 {
   // pass...
 }
 
 D878UVCodeplug::ExtendedSettingsElement::ExtendedSettingsElement(uint8_t *ptr)
-  : AnytoneCodeplug::ExtendedSettingsElement(ptr, ExtendedSettingsElement::size())
+  : AnytoneCodeplugGen1::ExtendedSettingsElement(ptr, ExtendedSettingsElement::size())
 {
   // pass...
 }
@@ -2728,7 +2728,7 @@ D878UVCodeplug::ExtendedSettingsElement::fromConfig(const Flags &flags, Context 
   if (! flags.updateCodeplug())
     this->clear();
 
-  if (! AnytoneCodeplug::ExtendedSettingsElement::fromConfig(flags, ctx, err))
+  if (! AnytoneCodeplugGen1::ExtendedSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   // Encode audio settings
@@ -2810,7 +2810,7 @@ bool
 D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
   Q_UNUSED(ctx); Q_UNUSED(err);
 
-  if (! AnytoneCodeplug::ExtendedSettingsElement::updateConfig(ctx, err))
+  if (! AnytoneCodeplugGen1::ExtendedSettingsElement::updateConfig(ctx, err))
     return false;
 
   // Store GPS settings
@@ -2875,7 +2875,7 @@ D878UVCodeplug::ExtendedSettingsElement::updateConfig(Context &ctx, const ErrorS
 
 bool
 D878UVCodeplug::ExtendedSettingsElement::linkConfig(Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::ExtendedSettingsElement::linkConfig(ctx, err))
+  if (! AnytoneCodeplugGen1::ExtendedSettingsElement::linkConfig(ctx, err))
     return false;
 
   // Store FM mic gain separately, if different
@@ -4004,7 +4004,7 @@ D878UVCodeplug::setBitmaps(Context& ctx)
 Config *
 D878UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   // Apply base preprocessing
-  auto intermediate = AnytoneCodeplug::preprocess(config, err);
+  auto intermediate = AnytoneCodeplugGen1::preprocess(config, err);
   if (nullptr == intermediate) {
     errMsg(err) << "Cannot apply preprocessing for D868UVE.";
     return nullptr;

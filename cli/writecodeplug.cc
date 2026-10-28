@@ -10,6 +10,7 @@
 #include "progressbar.hh"
 #include "autodetect.hh"
 #include "radiolimits.hh"
+#include "anytone_radio.hh"
 
 
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -50,8 +51,9 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
     return -1;
   }
 
-  bool verified = true;
   radio->limits().verifyConfig(intermediate, ctx);
+  // Refuse to write codeplugs with critical issues, these would not work on the radio.
+  bool verified = (ctx.maxSeverity() < RadioLimitIssue::Critical);
 
   // Only print warnings
   for (int i=0; i<ctx.count(); i++) {
@@ -85,6 +87,16 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   flags.setAutoEnableGPS(parser.isSet("auto-enable-gps"));
   flags.setAutoEnableRoaming(parser.isSet("auto-enable-roaming"));
 
+  // Only AnyTone radios implement the dry run, any other radio would actually write.
+  AnytoneRadio *anytone = dynamic_cast<AnytoneRadio *>(radio);
+  if (parser.isSet("dry-run")) {
+    if (nullptr == anytone) {
+      logError() << "Dry run is not supported for " << radio->name() << ".";
+      return -1;
+    }
+    flags.setDryRun(true);
+  }
+
   logDebug() << "Start upload to " << radio->name() << ".";
   if (! radio->startUpload(intermediate, flags, err)) {
     logError() << "Codeplug upload error: " << err.format();
@@ -94,6 +106,20 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   if (Radio::StatusError == radio->status()) {
     logError() << "Codeplug upload error: " << err.format();
     return -1;
+  }
+
+  if (parser.isSet("dry-run")) {
+    QString basename = parser.value("dry-run");
+    if (! anytone->dryRunOriginal().write(basename + "-orig.dfu", err)) {
+      logError() << "Cannot write '" << basename << "-orig.dfu': " << err.format();
+      return -1;
+    }
+    if (! anytone->codeplug().write(basename + "-new.dfu", err)) {
+      logError() << "Cannot write '" << basename << "-new.dfu': " << err.format();
+      return -1;
+    }
+    logInfo() << "Dry run completed, nothing was written to the radio.";
+    return 0;
   }
 
   logDebug() << "Upload completed.";

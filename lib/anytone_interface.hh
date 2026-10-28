@@ -186,4 +186,35 @@ public:
   static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
 };
 
+
+
+/** Implements the interface to the AnyTone AT-D890UV.
+ *
+ * The protocol is identical to the previous ones. The radio, however, enumerates with the
+ * generic VID/PID of STM32 CDC-ACM devices (@c 0x0483:@c 0x5740), which is shared by many other
+ * devices, e.g., OpenRTX radios. Hence this interface is marked as not safe: It is never selected
+ * automatically, the user has to select the serial port and the radio explicitly.
+ *
+ * @ingroup anytone */
+class D890UVInterface: public AnytoneInterface
+{
+  Q_OBJECT
+
+public:
+  /** Constructs a new interface to the AT-D890UV. If a matching device was found, @c isOpen
+   * returns @c true. */
+  explicit D890UVInterface(const USBDeviceDescriptor &descriptor,
+                           const ErrorStack &err=ErrorStack(), QObject *parent=nullptr);
+
+  /** Returns an identifier of the radio. */
+  RadioInfo identifier(const ErrorStack &err=ErrorStack());
+
+public:
+  /** Returns some information about this interface. */
+  static USBDeviceInfo interfaceInfo();
+  /** Tries to find all interfaces. As this interface is not safe, no interfaces are returned if
+   * @c saveOnly is set. Otherwise, all serial ports are returned. */
+  static QList<USBDeviceDescriptor> detect(bool saveOnly=true);
+};
+
 #endif // ANYTONEINTERFACE_HH

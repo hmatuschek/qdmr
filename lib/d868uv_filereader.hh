@@ -113,7 +113,7 @@ public:
     /** Returns the number of channels in the scan list. */
     uint8_t numChannels() const;
     /** Returns the priority channel selection. */
-    AnytoneCodeplug::ScanListElement::PriChannel prioChannelSelect() const;
+    AnytoneCodeplugGen1::ScanListElement::PriChannel prioChannelSelect() const;
     /** Returns the priority channel 1 index. */
     uint16_t prioChannel1() const;
     /** Returns the priority channel 2 index. */

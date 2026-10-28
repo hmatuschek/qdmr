@@ -49,13 +49,13 @@ D868UVCodeplug::Color::encode(AnytoneDisplaySettingsExtension::Color color) {
  * Implementation of D868UVCodeplug::ChannelElement
  * ******************************************************************************************** */
 D868UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::ChannelElement(ptr, size)
+  : AnytoneCodeplugGen1::ChannelElement(ptr, size)
 {
   // pass...
 }
 
 D868UVCodeplug::ChannelElement::ChannelElement(uint8_t *ptr)
-  : AnytoneCodeplug::ChannelElement(ptr)
+  : AnytoneCodeplugGen1::ChannelElement(ptr)
 {
   // pass...
 }
@@ -164,7 +164,7 @@ D868UVCodeplug::ChannelElement::enableSMS(bool enable) {
 
 Channel *
 D868UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
-  Channel *ch = AnytoneCodeplug::ChannelElement::toChannelObj(ctx);
+  Channel *ch = AnytoneCodeplugGen1::ChannelElement::toChannelObj(ctx);
   if (nullptr == ch)
     return nullptr;
 
@@ -183,7 +183,7 @@ D868UVCodeplug::ChannelElement::toChannelObj(Context &ctx) const {
 
 bool
 D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
-  if (! AnytoneCodeplug::ChannelElement::linkChannelObj(c, ctx))
+  if (! AnytoneCodeplugGen1::ChannelElement::linkChannelObj(c, ctx))
     return false;
 
   if (c->is<DMRChannel>()) {
@@ -212,7 +212,7 @@ D868UVCodeplug::ChannelElement::linkChannelObj(Channel *c, Context &ctx) const {
 
 bool
 D868UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
-  if (! AnytoneCodeplug::ChannelElement::fromChannelObj(c, ctx))
+  if (! AnytoneCodeplugGen1::ChannelElement::fromChannelObj(c, ctx))
     return false;
 
   if (c->is<DMRChannel>()) {
@@ -354,7 +354,7 @@ D868UVCodeplug::GeneralSettingsElement::KeyFunction::decode(uint8_t code) {
  * Implementation of D868UVCodeplug::GeneralSettingsElement
  * ******************************************************************************************** */
 D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr, unsigned size)
-  : AnytoneCodeplug::GeneralSettingsElement(ptr, size)
+  : AnytoneCodeplugGen1::GeneralSettingsElement(ptr, size)
 {
   // pass....
 }
@@ -367,7 +367,7 @@ D868UVCodeplug::GeneralSettingsElement::GeneralSettingsElement(uint8_t *ptr)
 
 void
 D868UVCodeplug::GeneralSettingsElement::clear() {
-  AnytoneCodeplug::GeneralSettingsElement::clear();
+  AnytoneCodeplugGen1::GeneralSettingsElement::clear();
 }
 
 bool
@@ -1195,7 +1195,7 @@ D868UVCodeplug::GeneralSettingsElement::enableKeepLastCaller(bool enable) {
 
 bool
 D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
+  if (! AnytoneCodeplugGen1::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
   setGPSUpdatePeriod(Interval::fromSeconds(5));
@@ -1241,7 +1241,7 @@ D868UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
 
 bool
 D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::updateConfig(ctx, err))
+  if (! AnytoneCodeplugGen1::GeneralSettingsElement::updateConfig(ctx, err))
     return false;
 
   ctx.config()->settings()->audio()->setVox(voxLevel());
@@ -1288,7 +1288,7 @@ D868UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
 
 bool
 D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Context &ctx, const ErrorStack &err) {
-  if (! AnytoneCodeplug::GeneralSettingsElement::linkSettings(settings, ctx, err))
+  if (! AnytoneCodeplugGen1::GeneralSettingsElement::linkSettings(settings, ctx, err))
     return false;
 
   // Get or add settings extension
@@ -1309,13 +1309,13 @@ D868UVCodeplug::GeneralSettingsElement::linkSettings(RadioSettings *settings, Co
  * Implementation of D868UVCodeplug
  * ******************************************************************************************** */
 D868UVCodeplug::D868UVCodeplug(const QString &label, QObject *parent)
-  : AnytoneCodeplug(label, parent)
+  : AnytoneCodeplugGen1(label, parent)
 {
   // pass...
 }
 
 D868UVCodeplug::D868UVCodeplug(QObject *parent)
-  : AnytoneCodeplug("AnyTone AT-D868UV Codeplug", parent)
+  : AnytoneCodeplugGen1("AnyTone AT-D868UV Codeplug", parent)
 {
   // pass...
 }
@@ -1470,7 +1470,7 @@ D868UVCodeplug::setBitmaps(Context& ctx)
 Config *
 D868UVCodeplug::preprocess(Config *config, const ErrorStack &err) const {
   // Apply base preprocessing
-  auto intermediate = AnytoneCodeplug::preprocess(config, err);
+  auto intermediate = AnytoneCodeplugGen1::preprocess(config, err);
   if (nullptr == intermediate) {
     errMsg(err) << "Cannot apply preprocessing for D868UVE.";
     return nullptr;

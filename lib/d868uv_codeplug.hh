@@ -33,7 +33,7 @@ class DMRAPRSSystem;
  *
  *
  * @ingroup d868uv */
-class D868UVCodeplug : public AnytoneCodeplug
+class D868UVCodeplug : public AnytoneCodeplugGen1
 {
   Q_OBJECT
 
@@ -56,12 +56,12 @@ protected:
 
 public:
   /** Represents the channel element for AnyTone D868UV devices.
-   *  This class derives from @c AnytoneCodeplug::ChannelElement and implements the device-specific
+   *  This class derives from @c AnytoneCodeplugGen1::ChannelElement and implements the device-specific
    *  encoding of channels for the AnyTone D868UV.
    *
    *  Memory layout of the encoded channel element (size 0x0040 bytes):
    *  @verbinclude d868uv_channel.txt */
-  class ChannelElement: public AnytoneCodeplug::ChannelElement
+  class ChannelElement: public AnytoneCodeplugGen1::ChannelElement
   {
   public:
     /** Possible encryption types. */
@@ -140,7 +140,7 @@ public:
 
   protected:
     /** Internal used offsets within the channel element. */
-    struct Offset: public AnytoneCodeplug::ChannelElement::Offset {
+    struct Offset: public AnytoneCodeplugGen1::ChannelElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static Bit dmrEncryptionType()               { return {0x0021, 6}; }
       static unsigned int dmrEncryptionKey()       { return 0x0022; }
@@ -159,12 +159,12 @@ public:
   /** Represents the general config of the radio within the D868UV binary codeplug.
    *
    * This class only implements the differences to the generic
-   * @c AnytoneCodeplug::GeneralSettingsElement.
+   * @c AnytoneCodeplugGen1::GeneralSettingsElement.
    *
    * Memory layout of encoded general settings (size 0x00d0 bytes):
    * @verbinclude d868uv_generalsettings.txt
    */
-  class GeneralSettingsElement: public AnytoneCodeplug::GeneralSettingsElement
+  class GeneralSettingsElement: public AnytoneCodeplugGen1::GeneralSettingsElement
   {
   protected:
     /** Device specific key functions. */
@@ -437,7 +437,7 @@ public:
 
   protected:
     /** Some internal used offsets within the element. */
-    struct Offset: public AnytoneCodeplug::GeneralSettingsElement::Offset {
+    struct Offset: public AnytoneCodeplugGen1::GeneralSettingsElement::Offset {
       /// @cond DO_NOT_DOCUMENT
       static constexpr unsigned int enableKeyTone()     { return 0x0000; }
       static constexpr unsigned int powerSaveMode()     { return 0x000b; }
