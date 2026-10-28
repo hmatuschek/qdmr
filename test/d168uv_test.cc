@@ -43,5 +43,47 @@ D168UVTest::testFixedLocation() {
 }
 
 
+void
+D168UVTest::testKeyFunctions() {
+  ErrorStack err;
+  Config config; config.copy(_basicConfig);
+
+  if (nullptr == config.settings()->anytoneExtension())
+    config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+  auto keys = config.settings()->anytoneExtension()->keySettings();
+  keys->setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction::RoamingSet);
+  keys->setFuncKeyBLong(AnytoneKeySettingsExtension::KeyFunction::Reverse);
+  keys->setFuncKeyAVeryLong(AnytoneKeySettingsExtension::KeyFunction::Mute);
+  keys->setFuncKeyBVeryLong(AnytoneKeySettingsExtension::KeyFunction::VOX);
+
+  D168UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D168UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // Check device specific codes and offsets of long and very-long key functions
+  uint8_t *settings = codeplug.data(0x02500000);
+  QCOMPARE(settings[0x12], (uint8_t)0x2a); // PF1 long: RoamingSet
+  QCOMPARE(settings[0x13], (uint8_t)0x04); // PF2 long: Reverse
+  QCOMPARE(settings[0x41], (uint8_t)0x2c); // PF1 very long: Mute
+  QCOMPARE(settings[0x42], (uint8_t)0x07); // PF2 very long: VOX
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D168UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY2(decoded.settings()->anytoneExtension(), "Expected AnyTone settings extension.");
+  keys = decoded.settings()->anytoneExtension()->keySettings();
+  QCOMPARE(keys->funcKeyALong(), AnytoneKeySettingsExtension::KeyFunction::RoamingSet);
+  QCOMPARE(keys->funcKeyBLong(), AnytoneKeySettingsExtension::KeyFunction::Reverse);
+  QCOMPARE(keys->funcKeyAVeryLong(), AnytoneKeySettingsExtension::KeyFunction::Mute);
+  QCOMPARE(keys->funcKeyBVeryLong(), AnytoneKeySettingsExtension::KeyFunction::VOX);
+}
+
+
 QTEST_GUILESS_MAIN(D168UVTest)
 
