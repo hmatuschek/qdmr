@@ -43,5 +43,41 @@ D168UVTest::testFixedLocation() {
 }
 
 
+void
+D168UVTest::testShortKeyFunctions() {
+  ErrorStack err;
+  Config config; config.copy(_basicConfig);
+
+  if (nullptr == config.settings()->anytoneExtension())
+    config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+  auto keys = config.settings()->anytoneExtension()->keySettings();
+  keys->setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction::Squelch);
+  keys->setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction::DIMShut);
+
+  D168UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D168UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // Check device specific codes of short key functions
+  uint8_t *settings = codeplug.data(0x02500000);
+  QCOMPARE(settings[0x10], (uint8_t)0x37); // PF1 short: Squelch
+  QCOMPARE(settings[0x11], (uint8_t)0x34); // PF2 short: DIMShut
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D168UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY2(decoded.settings()->anytoneExtension(), "Expected AnyTone settings extension.");
+  keys = decoded.settings()->anytoneExtension()->keySettings();
+  QCOMPARE(keys->funcKeyAShort(), AnytoneKeySettingsExtension::KeyFunction::Squelch);
+  QCOMPARE(keys->funcKeyBShort(), AnytoneKeySettingsExtension::KeyFunction::DIMShut);
+}
+
+
 QTEST_GUILESS_MAIN(D168UVTest)
 

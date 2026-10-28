@@ -16,6 +16,7 @@ protected:
 
 private slots:
   void testFixedLocation();
+  void testShortKeyFunctions();
 
 protected:
   QTextStream _stderr;
