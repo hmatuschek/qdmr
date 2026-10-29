@@ -301,50 +301,46 @@ D168UVCodeplug::GeneralSettingsElement::setFuncKey2Long(
 
 AnytoneKeySettingsExtension::KeyFunction
 D168UVCodeplug::GeneralSettingsElement::funcKeyALong() const {
-  return static_cast<AnytoneKeySettingsExtension::KeyFunction>(
-    getUInt8(Offset::progFuncKeyALong()));
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyALong()));
 }
 
 void
 D168UVCodeplug::GeneralSettingsElement::setFuncKeyALong(
   AnytoneKeySettingsExtension::KeyFunction func) {
-  setUInt8(Offset::progFuncKeyALong(), static_cast<unsigned int>(func));
+  setUInt8(Offset::progFuncKeyALong(), KeyFunction::encode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
 D168UVCodeplug::GeneralSettingsElement::funcKeyBLong() const {
-  return static_cast<AnytoneKeySettingsExtension::KeyFunction>(
-    getUInt8(Offset::progFuncKeyBLong()));
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyBLong()));
 }
 
 void
 D168UVCodeplug::GeneralSettingsElement::setFuncKeyBLong(
   AnytoneKeySettingsExtension::KeyFunction func) {
-  setUInt8(Offset::progFuncKeyBLong(), static_cast<unsigned int>(func));
+  setUInt8(Offset::progFuncKeyBLong(), KeyFunction::encode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
 D168UVCodeplug::GeneralSettingsElement::funcKeyAVeryLong() const {
-  return static_cast<AnytoneKeySettingsExtension::KeyFunction>(
-    getUInt8(Offset::progFuncKeyAVeryLong()));
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyAVeryLong()));
 }
 
 void
 D168UVCodeplug::GeneralSettingsElement::setFuncKeyAVeryLong(
   AnytoneKeySettingsExtension::KeyFunction func) {
-  setUInt8(Offset::progFuncKeyAVeryLong(), static_cast<unsigned int>(func));
+  setUInt8(Offset::progFuncKeyAVeryLong(), KeyFunction::encode(func));
 }
 
 AnytoneKeySettingsExtension::KeyFunction
 D168UVCodeplug::GeneralSettingsElement::funcKeyBVeryLong() const {
-  return static_cast<AnytoneKeySettingsExtension::KeyFunction>(
-    getUInt8(Offset::progFuncKeyBVeryLong()));
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyBVeryLong()));
 }
 
 void
 D168UVCodeplug::GeneralSettingsElement::setFuncKeyBVeryLong(
   AnytoneKeySettingsExtension::KeyFunction func) {
-  setUInt8(Offset::progFuncKeyBLong(), static_cast<unsigned int>(func));
+  setUInt8(Offset::progFuncKeyBVeryLong(), KeyFunction::encode(func));
 }
 
 bool
