@@ -121,6 +121,11 @@ public:
     AnytoneKeySettingsExtension::KeyFunction funcKeyCLong() const override;
     void setFuncKeyCLong(AnytoneKeySettingsExtension::KeyFunction func) override;
 
+    AnytoneKeySettingsExtension::KeyFunction funcKeyAShort() const override;
+    void setFuncKeyAShort(AnytoneKeySettingsExtension::KeyFunction func) override;
+    AnytoneKeySettingsExtension::KeyFunction funcKeyBShort() const override;
+    void setFuncKeyBShort(AnytoneKeySettingsExtension::KeyFunction func) override;
+
     AnytoneKeySettingsExtension::KeyFunction funcKeyALong() const override;
     void setFuncKeyALong(AnytoneKeySettingsExtension::KeyFunction func) override;
     AnytoneKeySettingsExtension::KeyFunction funcKeyBLong() const override;

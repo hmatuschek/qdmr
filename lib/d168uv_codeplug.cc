@@ -300,6 +300,28 @@ D168UVCodeplug::GeneralSettingsElement::setFuncKey2Long(
 }
 
 AnytoneKeySettingsExtension::KeyFunction
+D168UVCodeplug::GeneralSettingsElement::funcKeyAShort() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyAShort()));
+}
+
+void
+D168UVCodeplug::GeneralSettingsElement::setFuncKeyAShort(
+  AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyAShort(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
+D168UVCodeplug::GeneralSettingsElement::funcKeyBShort() const {
+  return KeyFunction::decode(getUInt8(Offset::progFuncKeyBShort()));
+}
+
+void
+D168UVCodeplug::GeneralSettingsElement::setFuncKeyBShort(
+  AnytoneKeySettingsExtension::KeyFunction func) {
+  setUInt8(Offset::progFuncKeyBShort(), KeyFunction::encode(func));
+}
+
+AnytoneKeySettingsExtension::KeyFunction
 D168UVCodeplug::GeneralSettingsElement::funcKeyALong() const {
   return static_cast<AnytoneKeySettingsExtension::KeyFunction>(
     getUInt8(Offset::progFuncKeyALong()));
