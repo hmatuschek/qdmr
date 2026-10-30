@@ -2132,6 +2132,7 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   setGPSUpdatePeriod(ext->gpsSettings()->updatePeriod());
 
   // Encode ranging/roaming settings.
+  enableRoaming(ext->roamingSettings()->autoRoam());
   setAutoRoamPeriod(ext->roamingSettings()->autoRoamPeriod());
   setAutoRoamDelay(ext->roamingSettings()->autoRoamDelay());
   enableRepeaterRangeCheck(ext->roamingSettings()->repeaterRangeCheckEnabled());
@@ -2236,6 +2237,7 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   ext->gpsSettings()->setUpdatePeriod(this->gpsUpdatePeriod());
 
   // Encode ranging/roaming settings
+  ext->roamingSettings()->enableAutoRoam(this->roaming());
   ext->roamingSettings()->setAutoRoamPeriod(this->autoRoamPeriod());
   ext->roamingSettings()->setAutoRoamDelay(this->autoRoamDelay());
   ext->roamingSettings()->enableRepeaterRangeCheck(this->repeaterRangeCheck());

@@ -652,6 +652,36 @@ D878UVTest::testCustomCTCSS() {
   QCOMPARE(decoded.channelList()->channel(0)->as<FMChannel>()->txTone(), SelectiveCall(206.6));
 }
 
+void
+D878UVTest::testSettingsAutoRoam() {
+  ErrorStack err;
+  Config config;
+  if (! config.readYAML(":/data/roaming_channel_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+  for (bool enabled: {true, false}) {
+    config.settings()->anytoneExtension()->roamingSettings()->enableAutoRoam(enabled);
+
+    D878UVCodeplug codeplug;
+    Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+    if (! codeplug.encode(&config, flags, err)) {
+      QFAIL(QString("Cannot encode codeplug: %1")
+              .arg(err.format()).toStdString().c_str());
+    }
+
+    Config decoded;
+    if (! codeplug.decode(&decoded, err)) {
+      QFAIL(QString("Cannot decode codeplug: %1")
+              .arg(err.format()).toStdString().c_str());
+    }
+
+    QCOMPARE(decoded.settings()->anytoneExtension()->roamingSettings()->autoRoam(), enabled);
+  }
+}
+
 
 QTEST_GUILESS_MAIN(D878UVTest)
 
