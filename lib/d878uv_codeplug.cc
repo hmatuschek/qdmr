@@ -454,9 +454,8 @@ D878UVCodeplug::ChannelElement::fromChannelObj(const Channel *c, Context &ctx) {
       setTXAPRSType(APRSType::FM);
     }
 
-    // Enable roaming
-    if (dc->roamingRef())
-      enableRoaming(true);
+    // Enable roaming only for channels linked to a roaming zone
+    enableRoaming(nullptr != dc->roaming());
 
     enableDataACK(dc->extended()->dataConfirm());
     /// Handles bug in AnyTone firmware.

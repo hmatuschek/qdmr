@@ -653,5 +653,38 @@ D878UVTest::testCustomCTCSS() {
 }
 
 
+void
+D878UVTest::testChannelRoamingFlag() {
+  ErrorStack err;
+  Config config;
+  if (! config.readYAML(":/data/roaming_channel_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // Only the first channel takes part in roaming
+  config.channelList()->channel(0)->as<DMRChannel>()->setRoaming(DefaultRoamingZone::get());
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY(D878UVCodeplug::ChannelElement(codeplug.data(0x00800000)).roamingEnabled());
+  QVERIFY(! D878UVCodeplug::ChannelElement(codeplug.data(0x00800040)).roamingEnabled());
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QVERIFY(DefaultRoamingZone::get() == decoded.channelList()->channel(0)->as<DMRChannel>()->roaming());
+  QVERIFY(nullptr == decoded.channelList()->channel(1)->as<DMRChannel>()->roaming());
+}
+
+
 QTEST_GUILESS_MAIN(D878UVTest)
 
