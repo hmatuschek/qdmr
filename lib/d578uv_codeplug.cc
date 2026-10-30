@@ -509,9 +509,19 @@ D578UVCodeplug::GeneralSettingsElement::TimeZone::decode(uint8_t code) {
 }
 uint8_t
 D578UVCodeplug::GeneralSettingsElement::TimeZone::encode(const QTimeZone &zone) {
-  if (! _timeZones.contains(zone))
-    return 13; //<- UTC
-  return _timeZones.indexOf(zone);
+  // Match by UTC offset: zones with the same offset do not compare equal when built differently,
+  // e.g., from an IANA name or by another Qt version. Falls back to UTC.
+  QDateTime now = QDateTime::currentDateTimeUtc();
+  int offset = zone.isValid() ? zone.offsetFromUtc(now) : 0;
+  unsigned int utc = 0;
+  for (int i=0; i<_timeZones.size(); i++) {
+    int entry = _timeZones.at(i).offsetFromUtc(now);
+    if (offset == entry)
+      return i;
+    if (0 == entry)
+      utc = i;
+  }
+  return utc;
 }
 
 

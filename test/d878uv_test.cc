@@ -652,6 +652,51 @@ D878UVTest::testCustomCTCSS() {
   QCOMPARE(decoded.channelList()->channel(0)->as<FMChannel>()->txTone(), SelectiveCall(206.6));
 }
 
+void
+D878UVTest::testGPSTimeZoneFallback() {
+  ErrorStack err;
+  Config decoded, config;
+  if (! config.readYAML(":/data/roaming_channel_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+  // UTC+05:45 is not in the radio's table of time zones, falls back to UTC
+  config.settings()->anytoneExtension()->gpsSettings()->setTimeZone(QTimeZone(20700));
+  encodeDecode(config, decoded);
+  QCOMPARE(decoded.settings()->anytoneExtension()->gpsSettings()->timeZone(), QTimeZone(0));
+}
+
+void
+D878UVTest::testGPSTimeZoneByOffset() {
+  ErrorStack err;
+  Config config;
+  if (! config.readYAML(":/data/roaming_channel_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+
+  // A named zone matches the table entry with the same UTC offset (+05:30, no DST)
+  config.settings()->anytoneExtension()->gpsSettings()->setTimeZone(QTimeZone("Asia/Kolkata"));
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  QCOMPARE(decoded.settings()->anytoneExtension()->gpsSettings()->timeZone().offsetFromUtc(
+             QDateTime::currentDateTimeUtc()), 19800);
+}
+
 
 QTEST_GUILESS_MAIN(D878UVTest)
 
