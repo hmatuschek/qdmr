@@ -652,6 +652,18 @@ D878UVTest::testCustomCTCSS() {
   QCOMPARE(decoded.channelList()->channel(0)->as<FMChannel>()->txTone(), SelectiveCall(206.6));
 }
 
+void
+D878UVTest::testAPRSTXDCS() {
+  uint8_t data[D878UVCodeplug::APRSSettingsElement::size()];
+  D878UVCodeplug::APRSSettingsElement aprs(data);
+
+  aprs.setTXTone(SelectiveCall(23, false));
+  QCOMPARE(aprs.txTone(), SelectiveCall(23, false));
+
+  aprs.setTXTone(SelectiveCall(23, true));
+  QCOMPARE(aprs.txTone(), SelectiveCall(23, true));
+}
+
 
 QTEST_GUILESS_MAIN(D878UVTest)
 

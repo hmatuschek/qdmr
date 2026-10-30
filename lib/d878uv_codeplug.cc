@@ -2966,7 +2966,7 @@ D878UVCodeplug::APRSSettingsElement::txTone() const {
     return CTCSS::decode(getUInt8(Offset::fmCTCSS()));
   } else if ((uint8_t)SignalingType::DCS == getUInt8(Offset::fmSigType())) { // DCS
     uint16_t code = getUInt16_le(Offset::fmDCS());
-    if (512 < code)
+    if (512 > code)
       return SelectiveCall::fromBinaryDCS(code, false);
     return SelectiveCall::fromBinaryDCS(code-512, true);
   }
