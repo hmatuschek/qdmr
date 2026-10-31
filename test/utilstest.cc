@@ -185,4 +185,16 @@ UtilsTest::testLevel() {
   }
 }
 
+void
+UtilsTest::testLevelRoundTrip() {
+  // Decoding a value from a range with at most 10 steps and encoding it again must give the same
+  // value, otherwise every read-write cycle changes the setting on the device.
+  QList<Codeplug::Element::Limit::Range<unsigned int>> ranges = {{0,4}, {0,8}, {0,9}, {1,3}, {1,5}};
+  for (auto range: ranges) {
+    for (unsigned int v=range.min; v<=range.max; v++) {
+      QCOMPARE(Level::fromValue(v, range).mapTo(range), v);
+    }
+  }
+}
+
 QTEST_GUILESS_MAIN(UtilsTest)

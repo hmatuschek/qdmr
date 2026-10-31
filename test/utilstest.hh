@@ -24,6 +24,7 @@ private slots:
   void testEndianess();
   void testFrequencyNearestMap();
   void testLevel();
+  void testLevelRoundTrip();
 };
 
 #endif // UTILSTEST_HH

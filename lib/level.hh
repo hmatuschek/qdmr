@@ -93,7 +93,18 @@ public:
       return null();
     if (invalidValue == value || ! range.in(value))
       return invalid();
-    return Level(range.mapTo({1,10}, value));
+    // Pick the level that maps back to the same value (see mapTo), if there is one. Otherwise,
+    // a decode-encode round trip would lower the value whenever the range has fewer than 10 steps.
+    const Codeplug::Element::Limit::Range<unsigned int> levels{1,10};
+    unsigned int level = range.mapTo(levels, value);
+    for (unsigned int l=level; l<=levels.max; l++) {
+      unsigned int mapped = levels.mapTo(range, l);
+      if (value == mapped)
+        return Level(l);
+      if (value < mapped)
+        break;
+    }
+    return Level(level);
   }
 
 protected:
