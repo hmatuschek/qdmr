@@ -334,8 +334,10 @@ AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen, 
   // Try to write command to device
   if (clen != QSerialPort::write(cmd, clen)) {
     errMsg(err) << "Cannot send command to device.";
-    close();
+    // Do not use close() here, it would try to leave the program mode with the same failing
+    // device, call this method again and recurse until the stack overflows.
     _state = STATE_ERROR;
+    USBSerial::close();
     return false;
   }
 
@@ -345,16 +347,16 @@ AnytoneInterface::send_receive(const char *cmd, int clen, char *resp, int rlen, 
   while (len > 0) {
     if (! waitForReadyRead(1000)) {
       errMsg(err) << "No response from device: Timeout.";
-      close();
       _state = STATE_ERROR;
+      USBSerial::close();
       return false;
     }
 
     int r = QSerialPort::read(p, len);
     if (r < 0) {
       errMsg(err) << "Cannot read response from device.";
-      close();
       _state = STATE_ERROR;
+      USBSerial::close();
       return false;
     }
     p += r;

@@ -68,6 +68,9 @@ target_link_libraries(md2017_test PRIVATE Qt6::Core Qt6::Network Qt6::Positionin
 
 
 # Unit tests for AnyTone devices
+qt_add_executable(anytone_interface_test anytone_interface_test.cc anytone_interface_test.hh)
+target_link_libraries(anytone_interface_test PRIVATE Qt6::Core Qt6::SerialPort Qt6::Test libdmrconf ${ADDITIONAL_LIBS})
+
 qt_add_executable(d868uve_test d868uve_test.cc d868uve_test.hh ${TESTDATA})
 target_link_libraries(d868uve_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
 
@@ -123,6 +126,7 @@ add_test(NAME MD390     COMMAND md390_test)
 add_test(NAME UV390     COMMAND uv390_test)
 add_test(NAME MD2017    COMMAND md2017_test)
 
+add_test(NAME AnytoneInterface COMMAND anytone_interface_test)
 add_test(NAME D868UVE   COMMAND d868uve_test)
 add_test(NAME D878UV    COMMAND d878uv_test)
 add_test(NAME D878UV2   COMMAND d878uv2_test)
