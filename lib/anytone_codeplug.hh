@@ -247,10 +247,14 @@ public:
     /** Sets the 2-tone decode index (0-based). */
     virtual void setTwoToneDecodeIndex(unsigned idx);
 
+    /** Returns @c true, if a transmit contact index is set. */
+    virtual bool hasContactIndex() const;
     /** Returns the transmit contact index (0-based). */
     virtual unsigned contactIndex() const;
     /** Sets the transmit contact index (0-based). */
     virtual void setContactIndex(unsigned idx);
+    /** Clears the transmit contact index. */
+    virtual void clearContactIndex();
 
     /** Returns the radio ID index (0-based). */
     virtual unsigned radioIDIndex() const;

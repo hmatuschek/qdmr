@@ -653,5 +653,47 @@ D878UVTest::testCustomCTCSS() {
 }
 
 
+void
+D878UVTest::testChannelNoContact() {
+  ErrorStack err;
+  Config decoded, config;
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // A DMR channel without a transmit contact, sending FM APRS reports
+  DMRChannel *channel = new DMRChannel();
+  channel->setName("No contact");
+  channel->setRXFrequency(Frequency::fromMHz(439.0));
+  channel->setTXFrequency(Frequency::fromMHz(439.0));
+  channel->setAPRS(config.posSystems()->get(0)->as<FMAPRSSystem>());
+  config.channelList()->add(channel);
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  // Third channel: no contact is stored as 0xffffffff, not as index 0
+  const unsigned char *element = codeplug.data(0x00800000 + 2*0x40);
+  QCOMPARE(element[0x14], (unsigned char)0xff);
+  QCOMPARE(element[0x15], (unsigned char)0xff);
+  QCOMPARE(element[0x16], (unsigned char)0xff);
+  QCOMPARE(element[0x17], (unsigned char)0xff);
+
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  // The rest of the channel must still be linked
+  DMRChannel *decodedChannel = decoded.channelList()->channel(2)->as<DMRChannel>();
+  QVERIFY(nullptr != decodedChannel);
+  QVERIFY(nullptr == decodedChannel->contact());
+  QVERIFY(nullptr != decodedChannel->aprs());
+  QVERIFY(decodedChannel->aprs()->is<FMAPRSSystem>());
+}
+
 QTEST_GUILESS_MAIN(D878UVTest)
 
