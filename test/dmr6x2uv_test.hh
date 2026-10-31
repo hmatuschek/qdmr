@@ -26,6 +26,8 @@ private slots:
   void testMicGain();
 
   void testHiddenZone(); ///< Regression test for #939
+  void testShortAESKeyDecoding();   ///< CPS leaves unused AES key slots with a key shorter than 128 bit
+  void testErasedARC4KeyIndex();    ///< CPS leaves the channel ARC4 key index at 0xff (no key)
 };
 
 #endif // DMR6X2UVTEST_HH

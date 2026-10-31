@@ -4,6 +4,20 @@
 #include "errorstack.hh"
 #include <QTest>
 
+/** Gives the tests access to the codeplug layout, to recreate what the manufacturer CPS writes. */
+class DMR6X2UVLayoutCodeplug: public DMR6X2UVCodeplug
+{
+public:
+  uint32_t aesKeyAddress(unsigned int n) const {
+    return Offset::aesEncryptionKeys() + n*D878UVCodeplug::AESEncryptionKeyElement::size();
+  }
+  uint32_t channelExtensionAddress(unsigned int n) const {
+    uint16_t bank = n/Limit::channelsPerBank(), idx = n%Limit::channelsPerBank();
+    return Offset::channelBanks() + bank*Offset::betweenChannelBanks() + idx*ChannelElement::size()
+        + Offset::toChannelExtension();
+  }
+};
+
 DMR6X2UVTest::DMR6X2UVTest(QObject *parent)
   : UnitTestBase(parent)
 {
@@ -279,6 +293,56 @@ DMR6X2UVTest::testHiddenZone() {
 }
 
 
+void
+DMR6X2UVTest::testShortAESKeyDecoding() {
+  ErrorStack err;
+  DMR6X2UVLayoutCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&_basicConfig, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // An unused key slot as the manufacturer CPS writes it: valid index, 1 byte key '00'.
+  D878UVCodeplug::AESEncryptionKeyElement key(codeplug.data(codeplug.aesKeyAddress(0)));
+  key.setIndex(0);
+  key.setKey(QByteArray::fromHex("00"));
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug with a short AES key for BTECH DMR-6X2UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  // The short key is skipped, not turned into a key object.
+  if (decoded.commercialExtension())
+    QCOMPARE(decoded.commercialExtension()->encryptionKeys()->count(), 0);
+}
+
+void
+DMR6X2UVTest::testErasedARC4KeyIndex() {
+  ErrorStack err;
+  DMR6X2UVLayoutCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&_basicConfig, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Channel extension ARC4 key index left erased (0xff) by the manufacturer CPS.
+  for (int i=0; i<_basicConfig.channelList()->count(); i++)
+    *codeplug.data(codeplug.channelExtensionAddress(i)) = 0xff;
+
+  Config decoded;
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug with erased ARC4 key index for BTECH DMR-6X2UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  for (int i=0; i<decoded.channelList()->count(); i++) {
+    if (auto dc = decoded.channelList()->channel(i)->as<DMRChannel>()) {
+      QVERIFY((nullptr == dc->commercialExtension()) || (nullptr == dc->commercialExtension()->encryptionKey()));
+    }
+  }
+}
 
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)
