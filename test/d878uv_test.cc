@@ -653,5 +653,33 @@ D878UVTest::testCustomCTCSS() {
 }
 
 
+void
+D878UVTest::testAPRSPeriodOff() {
+  ErrorStack err;
+  Config decoded, config;
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
+
+  // A disabled period is stored as infinite and must be encoded as 0 = off
+  config.posSystems()->get(0)->as<FMAPRSSystem>()->setPeriod(Interval::infinity());
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(codeplug.data(0x02501000)[0x0a], (unsigned char)0);
+  QCOMPARE(codeplug.data(0x02501000)[0x0b], (unsigned char)0);
+
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  QVERIFY(decoded.posSystems()->get(0)->as<FMAPRSSystem>()->periodDisabled());
+}
+
 QTEST_GUILESS_MAIN(D878UVTest)
 

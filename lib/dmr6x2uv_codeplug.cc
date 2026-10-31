@@ -2009,7 +2009,11 @@ DMR6X2UVCodeplug::APRSSettingsElement::manualTXInterval() const {
 }
 void
 DMR6X2UVCodeplug::APRSSettingsElement::setManualTXInterval(Interval sec) {
-  setUInt8(Offset::manualTXInterval(), sec.seconds());
+  // 0 = off, also for an unset (infinite) period
+  if (! sec.isFinite())
+    setUInt8(Offset::manualTXInterval(), 0);
+  else
+    setUInt8(Offset::manualTXInterval(), std::min(255ULL, sec.seconds()));
 }
 
 bool
@@ -2022,7 +2026,11 @@ DMR6X2UVCodeplug::APRSSettingsElement::autoTXInterval() const {
 }
 void
 DMR6X2UVCodeplug::APRSSettingsElement::setAutoTXInterval(Interval sec) {
-  setUInt8(Offset::autoTXInterval(), sec.seconds()/30);
+  // 0 = off, also for an unset (infinite) period
+  if (! sec.isFinite())
+    setUInt8(Offset::autoTXInterval(), 0);
+  else
+    setUInt8(Offset::autoTXInterval(), std::min(255ULL, sec.seconds()/30));
 }
 void
 DMR6X2UVCodeplug::APRSSettingsElement::disableAutoTX() {

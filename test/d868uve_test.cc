@@ -376,6 +376,17 @@ D868UVETest::testMicGain() {
 }
 
 
+void
+D868UVETest::testDMRAPRSPeriodOff() {
+  uint8_t data[AnytoneCodeplug::DMRAPRSSettingsElement::size()];
+  AnytoneCodeplug::DMRAPRSSettingsElement gps(data);
+
+  // A disabled period is stored as infinite and must be encoded as 0 = off
+  gps.setManualInterval(Interval::infinity());
+  gps.setAutomaticInterval(Interval::infinity());
+  QVERIFY(gps.manualInterval().isNull());
+  QVERIFY(! gps.automatic());
+}
 
 QTEST_GUILESS_MAIN(D868UVETest)
 

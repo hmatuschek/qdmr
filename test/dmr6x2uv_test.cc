@@ -280,6 +280,17 @@ DMR6X2UVTest::testHiddenZone() {
 
 
 
+void
+DMR6X2UVTest::testAPRSPeriodOff() {
+  uint8_t data[DMR6X2UVCodeplug::APRSSettingsElement::size()];
+  DMR6X2UVCodeplug::APRSSettingsElement aprs(data);
+
+  // A disabled period is stored as infinite and must be encoded as 0 = off
+  aprs.setManualTXInterval(Interval::infinity());
+  aprs.setAutoTXInterval(Interval::infinity());
+  QVERIFY(aprs.manualTXInterval().isNull());
+  QVERIFY(aprs.autoTXInterval().isNull());
+}
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)
 

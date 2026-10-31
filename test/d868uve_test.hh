@@ -28,6 +28,7 @@ private slots:
   void testRegressionDefaultChannel();
   void testChannelDataACK(); ///< Regression test for #813
   void testMicGain();
+  void testDMRAPRSPeriodOff();
 };
 
 #endif // D878UV2TEST_HH

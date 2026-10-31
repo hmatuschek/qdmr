@@ -2296,7 +2296,11 @@ AnytoneCodeplug::DMRAPRSSettingsElement::manualInterval() const {
 }
 void
 AnytoneCodeplug::DMRAPRSSettingsElement::setManualInterval(const Interval &sec) {
-  setUInt8(Offset::manualInterval(), sec.seconds());
+  // 0 = off, also for an unset (infinite) period
+  if (! sec.isFinite())
+    setUInt8(Offset::manualInterval(), 0);
+  else
+    setUInt8(Offset::manualInterval(), std::min(255ULL, sec.seconds()));
 }
 
 bool
@@ -2309,7 +2313,11 @@ AnytoneCodeplug::DMRAPRSSettingsElement::automaticInterval() const {
 }
 void
 AnytoneCodeplug::DMRAPRSSettingsElement::setAutomaticInterval(const Interval &sec) {
-  unsigned int s = sec.seconds();
+  if (! sec.isFinite()) {
+    disableAutomatic();
+    return;
+  }
+  unsigned int s = std::min(45ULL+255*15, sec.seconds());
   if (s < 60) s = 60;
   setUInt8(Offset::automaticInterval(), (s-45)/15);
 }
