@@ -995,9 +995,10 @@ DMR6X2UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
 
 void
 DMR6X2UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval dur) {
-  if (dur.isFinite() || dur > Interval::fromSeconds(30))
+  if ((! dur.isFinite()) || (dur > Interval::fromSeconds(30)))
     setUInt8(Offset::rxBacklightDuration(), 0);
-  setUInt8(Offset::rxBacklightDuration(), dur.seconds());
+  else
+    setUInt8(Offset::rxBacklightDuration(), dur.seconds());
 }
 
 

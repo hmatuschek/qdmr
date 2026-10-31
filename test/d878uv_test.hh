@@ -43,6 +43,7 @@ private slots:
   void testFixedLocation();
   void testHiddenZone(); ///< Regression test for #203
   void testCustomCTCSS(); ///< Regression test fpr #1004
+  void testRXBacklightDuration();
 
 protected:
   Config _micGainConfig;

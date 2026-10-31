@@ -1952,9 +1952,10 @@ D878UVCodeplug::GeneralSettingsElement::rxBacklightDuration() const {
 
 void
 D878UVCodeplug::GeneralSettingsElement::setRXBacklightDuration(Interval intv) {
-  if (intv.isFinite() || intv > Interval::fromSeconds(30))
+  if ((! intv.isFinite()) || (intv > Interval::fromSeconds(30)))
     setUInt8(Offset::rxBacklightDuration(), 0);
-  setUInt8(Offset::rxBacklightDuration(), intv.seconds());
+  else
+    setUInt8(Offset::rxBacklightDuration(), intv.seconds());
 }
 
 

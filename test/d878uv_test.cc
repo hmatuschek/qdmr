@@ -653,5 +653,24 @@ D878UVTest::testCustomCTCSS() {
 }
 
 
+void
+D878UVTest::testRXBacklightDuration() {
+  Config decoded, config; config.copy(_basicConfig);
+  if (nullptr == config.settings()->anytoneExtension())
+    config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+  auto display = config.settings()->anytoneExtension()->displaySettings();
+
+  // Always on (the default) is encoded as 0
+  display->setBacklightDurationRX(Interval::infinity());
+  encodeDecode(config, decoded);
+  QVERIFY(! decoded.settings()->anytoneExtension()->displaySettings()->backlightDurationRX().isFinite());
+
+  display->setBacklightDurationRX(Interval::fromSeconds(10));
+  encodeDecode(config, decoded);
+  QCOMPARE(decoded.settings()->anytoneExtension()->displaySettings()->backlightDurationRX(),
+           Interval::fromSeconds(10));
+}
+
+
 QTEST_GUILESS_MAIN(D878UVTest)
 
