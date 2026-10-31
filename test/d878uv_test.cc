@@ -653,5 +653,30 @@ D878UVTest::testCustomCTCSS() {
 }
 
 
+void
+D878UVTest::testMelodyDuration() {
+  ErrorStack err;
+  Config decoded, config; config.copy(_basicConfig);
+  config.settings()->tone()->callStartMelody()->fromLilypond("a8 b e2 cis4 d");
+
+  D878UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  // Durations are stored in units of 10ms: 300ms -> 30, 1200ms -> 120
+  const unsigned char *durations = codeplug.data(0x02500000+0x007c);
+  QCOMPARE(durations[0], (unsigned char)30);
+  QCOMPARE(durations[4], (unsigned char)120);
+
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for AnyTone AT-D878UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  QCOMPARE(decoded.settings()->tone()->callStartMelody()->toLilypond(), "a8 b e2 cis4 d");
+}
+
+
 QTEST_GUILESS_MAIN(D878UVTest)
 

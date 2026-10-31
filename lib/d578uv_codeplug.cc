@@ -1164,7 +1164,7 @@ D578UVCodeplug::GeneralSettingsElement::callToneMelody(Melody &melody) const {
   QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
   for (int i=0; i<5; i++) {
     double freq = getUInt16_le(Offset::callToneTones()+2*i);
-    unsigned int duration = getUInt16_le(Offset::callToneDurations()+2*i);
+    unsigned int duration = 10*(unsigned int)getUInt16_le(Offset::callToneDurations()+2*i); // units of 10ms
     if (duration) tones.append({freq, duration});
   }
   melody.infer(tones);
@@ -1175,7 +1175,7 @@ D578UVCodeplug::GeneralSettingsElement::setCallToneMelody(const Melody &melody) 
   QVector<QPair<double, unsigned int>> tones = melody.toTones();
   for (unsigned int i=0; i<n; i++) {
     setUInt16_le(Offset::callToneTones()+2*i, tones.at(i).first);
-    setUInt16_le(Offset::callToneDurations()+2*i, tones.at(i).second);
+    setUInt16_le(Offset::callToneDurations()+2*i, tones.at(i).second/10); // units of 10ms
   }
 }
 
@@ -1184,7 +1184,7 @@ D578UVCodeplug::GeneralSettingsElement::idleToneMelody(Melody &melody) const {
   QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
   for (int i=0; i<5; i++) {
     double frequency = getUInt16_le(Offset::idleToneTones()+2*i);
-    unsigned int duration  = getUInt16_le(Offset::idleToneDurations()+2*i);
+    unsigned int duration  = 10*(unsigned int)getUInt16_le(Offset::idleToneDurations()+2*i); // units of 10ms
     if (duration) tones.append({frequency, duration});
   }
   melody.infer(tones);
@@ -1195,7 +1195,7 @@ D578UVCodeplug::GeneralSettingsElement::setIdleToneMelody(const Melody &melody) 
   QVector<QPair<double, unsigned int>> tones = melody.toTones();
   for (unsigned int i=0; i<n; i++) {
     setUInt16_le(Offset::idleToneTones()+2*i, tones.at(i).first);
-    setUInt16_le(Offset::idleToneDurations()+2*i, tones.at(i).second);
+    setUInt16_le(Offset::idleToneDurations()+2*i, tones.at(i).second/10); // units of 10ms
   }
 }
 
@@ -1204,7 +1204,7 @@ D578UVCodeplug::GeneralSettingsElement::resetToneMelody(Melody &melody) const {
   QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
   for (int i=0; i<5; i++) {
     double frequency = getUInt16_le(Offset::resetToneTones()+2*i);
-    unsigned int duration  = getUInt16_le(Offset::resetToneDurations()+2*i);
+    unsigned int duration  = 10*(unsigned int)getUInt16_le(Offset::resetToneDurations()+2*i); // units of 10ms
     if (duration) tones.append({frequency, duration});
   }
   melody.infer(tones);
@@ -1215,7 +1215,7 @@ D578UVCodeplug::GeneralSettingsElement::setResetToneMelody(const Melody &melody)
   QVector<QPair<double, unsigned int>> tones = melody.toTones();
   for (unsigned int i=0; i<n; i++) {
     setUInt16_le(Offset::resetToneTones()+2*i, tones.at(i).first);
-    setUInt16_le(Offset::resetToneDurations()+2*i, tones.at(i).second);
+    setUInt16_le(Offset::resetToneDurations()+2*i, tones.at(i).second/10); // units of 10ms
   }
 }
 
@@ -2933,7 +2933,7 @@ D578UVCodeplug::ExtendedSettingsElement::callEndToneMelody(Melody &melody) const
   QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
   for (int i=0; i<5; i++) {
     double freq = getUInt16_le(Offset::callEndTones()+2*i);
-    unsigned int duration = getUInt16_le(Offset::callEndDurations()+2*i);
+    unsigned int duration = 10*(unsigned int)getUInt16_le(Offset::callEndDurations()+2*i); // units of 10ms
     if (duration) tones.append({freq, duration});
   }
   melody.infer(tones);
@@ -2945,7 +2945,7 @@ D578UVCodeplug::ExtendedSettingsElement::setCallEndToneMelody(const Melody &melo
   QVector<QPair<double, unsigned int>> tones = melody.toTones();
   for (unsigned int i=0; i<n; i++) {
     setUInt16_le(Offset::callEndTones()+2*i, tones.at(i).first);
-    setUInt16_le(Offset::callEndDurations()+2*i, tones.at(i).second);
+    setUInt16_le(Offset::callEndDurations()+2*i, tones.at(i).second/10); // units of 10ms
   }
 }
 
@@ -2954,7 +2954,7 @@ D578UVCodeplug::ExtendedSettingsElement::allCallToneMelody(Melody &melody) const
   QVector<QPair<double, unsigned int>> tones; tones.reserve(5);
   for (int i=0; i<5; i++) {
     double freq = getUInt16_le(Offset::allCallTones()+2*i);
-    unsigned int duration = getUInt16_le(Offset::allCallDurations()+2*i);
+    unsigned int duration = 10*(unsigned int)getUInt16_le(Offset::allCallDurations()+2*i); // units of 10ms
     if (duration) tones.append({freq, duration});
   }
   melody.infer(tones);
@@ -2966,7 +2966,7 @@ D578UVCodeplug::ExtendedSettingsElement::setAllCallToneMelody(const Melody &melo
   QVector<QPair<double, unsigned int>> tones = melody.toTones();
   for (unsigned int i=0; i<n; i++) {
     setUInt16_le(Offset::allCallTones()+2*i, tones.at(i).first);
-    setUInt16_le(Offset::allCallDurations()+2*i, tones.at(i).second);
+    setUInt16_le(Offset::allCallDurations()+2*i, tones.at(i).second/10); // units of 10ms
   }
 }
 
