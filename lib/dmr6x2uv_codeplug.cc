@@ -2288,9 +2288,15 @@ DMR6X2UVCodeplug::APRSSettingsElement::toFMAPRSSystem() {
 
 bool
 DMR6X2UVCodeplug::APRSSettingsElement::linkFMAPRSSystem(FMAPRSSystem *sys, Context &ctx) {
-  // First, try to find a matching analog channel in list
-  Frequency f = fmFrequency();
-  FMChannel *ch = ctx.config()->channelList()->findFMChannelByTxFreq(f);
+  // First, try to find a matching analog channel in list. Its TX tone and power must match too,
+  // as these settings are taken from the revert channel when encoding.
+  FMChannel *ch = nullptr;
+  for (int i=0; (nullptr == ch) && (i<ctx.config()->channelList()->count()); i++) {
+    FMChannel *fch = ctx.config()->channelList()->channel(i)->as<FMChannel>();
+    if (fch && (fch->txFrequency() == fmFrequency()) && (fch->txTone() == txTone())
+        && (fch->power() == power()))
+      ch = fch;
+  }
   if (! ch) {
     // If no channel is found, create one with the settings from APRS channel:
     ch = new FMChannel();

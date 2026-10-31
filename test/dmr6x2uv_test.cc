@@ -279,7 +279,41 @@ DMR6X2UVTest::testHiddenZone() {
 }
 
 
+void
+DMR6X2UVTest::testAPRSChannelTone() {
+  ErrorStack err;
+  Config decoded, config;
+  if (! config.readYAML(":/data/fm_aprs_test.yaml", err)) {
+    QFAIL(QString("Cannot open codeplug file: %1")
+            .arg(err.format()).toStdString().c_str());
+  }
 
+  // APRS revert channel on the same frequency as an existing channel, but with a TX tone
+  FMChannel *aprsChannel = new FMChannel();
+  aprsChannel->setName("APRS with tone");
+  aprsChannel->setRXFrequency(Frequency::fromMHz(145.8));
+  aprsChannel->setTXFrequency(Frequency::fromMHz(145.8));
+  aprsChannel->setPower(Channel::Power::High);
+  aprsChannel->setTXTone(SelectiveCall(88.5));
+  config.channelList()->add(aprsChannel);
+  config.posSystems()->get(0)->as<FMAPRSSystem>()->setRevertChannel(aprsChannel);
+
+  DMR6X2UVCodeplug codeplug;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err)) {
+    QFAIL(QString("Cannot encode codeplug for BTECH DMR-6X2UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+  if (! codeplug.decode(&decoded, err)) {
+    QFAIL(QString("Cannot decode codeplug for BTECH DMR-6X2UV: %1")
+          .arg(err.format()).toStdString().c_str());
+  }
+
+  // Must not link the first channel on 145.8 MHz, which has no TX tone
+  FMAPRSSystem *aprs = decoded.posSystems()->get(0)->as<FMAPRSSystem>();
+  QVERIFY(aprs->hasRevertChannel());
+  QCOMPARE(aprs->revertChannel()->txTone(), SelectiveCall(88.5));
+}
 
 QTEST_GUILESS_MAIN(DMR6X2UVTest)
 

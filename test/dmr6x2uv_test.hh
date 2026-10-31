@@ -26,6 +26,7 @@ private slots:
   void testMicGain();
 
   void testHiddenZone(); ///< Regression test for #939
+  void testAPRSChannelTone();
 };
 
 #endif // DMR6X2UVTEST_HH
