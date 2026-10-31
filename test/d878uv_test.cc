@@ -653,5 +653,40 @@ D878UVTest::testCustomCTCSS() {
 }
 
 
+void
+D878UVTest::testSettingsAudioPowerSave() {
+  Config decoded, config; config.copy(_basicConfig);
+  if (nullptr == config.settings()->anytoneExtension())
+    config.settings()->setAnytoneExtension(new AnytoneSettingsExtension());
+
+  config.settings()->audio()->setVox(Level::fromValue(10));
+  config.settings()->audio()->setVOXDelay(Interval::fromMilliseconds(1100));
+  config.settings()->audio()->setMaxHeadphoneVolume(Level::fromValue(5));
+  config.settings()->anytoneExtension()->powerSaveSettings()->setPowerSave(
+        AnytonePowerSaveSettingsExtension::PowerSave::Save66);
+  config.settings()->anytoneExtension()->audioSettings()->setVOXSource(
+        AnytoneAudioSettingsExtension::VoxSource::Both);
+
+  // VOX delay is encoded as 500ms + 100ms per step
+  D878UVCodeplug codeplug;
+  ErrorStack err;
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  if (! codeplug.encode(&config, flags, err))
+    QFAIL(QString("Cannot encode codeplug for AnyTone AT-D878UV: %1").arg(err.format()).toStdString().c_str());
+  QCOMPARE(codeplug.data(0x02500000)[0x0d], (unsigned char)6);
+
+  encodeDecode(config, decoded);
+
+  // Levels are quantized to the radio's ranges: VOX 1-3, volume 0-8
+  QCOMPARE(decoded.settings()->audio()->vox(), Level::fromValue(3, {1,3}));
+  QCOMPARE(decoded.settings()->audio()->voxDelay(), Interval::fromMilliseconds(1100));
+  QCOMPARE(decoded.settings()->audio()->maxHeadphoneVolume(), Level::fromValue(3, {0,8}));
+  QCOMPARE(decoded.settings()->anytoneExtension()->powerSaveSettings()->powerSave(),
+           AnytonePowerSaveSettingsExtension::PowerSave::Save66);
+  QCOMPARE(decoded.settings()->anytoneExtension()->audioSettings()->voxSource(),
+           AnytoneAudioSettingsExtension::VoxSource::Both);
+}
+
+
 QTEST_GUILESS_MAIN(D878UVTest)
 

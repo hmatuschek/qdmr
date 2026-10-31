@@ -1044,6 +1044,16 @@ D878UVCodeplug::GeneralSettingsElement::setTransmitTimeout(const Interval &tot) 
   setUInt8(Offset::transmitTimeout(), tot.seconds()/30);
 }
 
+Interval
+D878UVCodeplug::GeneralSettingsElement::voxDelay() const {
+  return Interval::fromMilliseconds(500 + 100*((unsigned)getUInt8(Offset::voxDelay())));
+}
+void
+D878UVCodeplug::GeneralSettingsElement::setVOXDelay(Interval intv) {
+  unsigned long long ms = std::min(std::max(500ULL, intv.milliseconds()), 500ULL+255*100);
+  setUInt8(Offset::voxDelay(), (ms-500)/100);
+}
+
 AnytoneDisplaySettingsExtension::Language
 D878UVCodeplug::GeneralSettingsElement::language() const {
   return (AnytoneDisplaySettingsExtension::Language)getUInt8(Offset::language());
@@ -2051,6 +2061,11 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   if (! AnytoneCodeplug::GeneralSettingsElement::fromConfig(flags, ctx, err))
     return false;
 
+  // Encode VOX and headphone settings
+  setVOXLevel(ctx.config()->settings()->audio()->vox());
+  setVOXDelay(ctx.config()->settings()->audio()->voxDelay());
+  setMaxHeadphoneVolume(ctx.config()->settings()->audio()->maxHeadphoneVolume());
+
   // Set transmit timeout
   setTransmitTimeout(ctx.config()->settings()->tot());
 
@@ -2092,8 +2107,12 @@ D878UVCodeplug::GeneralSettingsElement::fromConfig(const Flags &flags, Context &
   enableSidekeysLock(ext->keySettings()->sideKeysLockEnabled());
   enableKeyLockForced(ext->keySettings()->forcedKeyLockEnabled());
 
+  // Power save settings
+  setPowerSave(ext->powerSaveSettings()->powerSave());
+
   // Encode audio settings
   setMuteDelay(ext->audioSettings()->muteDelay());
+  setVOXSource(ext->audioSettings()->voxSource());
 
   // Encode display settings
   setCallDisplayColor(ext->displaySettings()->callColor());
@@ -2159,6 +2178,9 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
     return false;
 
   ctx.config()->settings()->setTOT(transmitTimeout());
+  ctx.config()->settings()->audio()->setVox(voxLevel());
+  ctx.config()->settings()->audio()->setVOXDelay(voxDelay());
+  ctx.config()->settings()->audio()->setMaxHeadphoneVolume(this->maxHeadphoneVolume());
 
   ctx.config()->settings()->boot()->enableReset(this->bootReset());
 
@@ -2196,8 +2218,12 @@ D878UVCodeplug::GeneralSettingsElement::updateConfig(Context &ctx, const ErrorSt
   ext->keySettings()->enableSideKeysLock(this->sidekeysLock());
   ext->keySettings()->enableForcedKeyLock(this->keyLockForced());
 
+  // Store power save settings
+  ext->powerSaveSettings()->setPowerSave(powerSave());
+
   // Store audio settings
   ext->audioSettings()->setMuteDelay(this->muteDelay());
+  ext->audioSettings()->setVOXSource(voxSource());
 
   // Decode display settings
   ext->displaySettings()->setCallColor(this->callDisplayColor());

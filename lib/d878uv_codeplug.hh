@@ -424,6 +424,11 @@ public:
     /** Sets the transmit timeout in seconds. */
     virtual void setTransmitTimeout(const Interval &tot);
 
+    /** Returns the VOX delay. Encoded as 500ms + 100ms per step, unlike the D868UV. */
+    Interval voxDelay() const override;
+    /** Sets the VOX delay. */
+    void setVOXDelay(Interval intv) override;
+
     /** Returns the UI language. */
     virtual AnytoneDisplaySettingsExtension::Language language() const;
     /** Sets the UI language. */
