@@ -14,6 +14,10 @@
  *     channels per byte, so this is done bit by bit, not byte by byte.
  *  5. Write only the 16-byte blocks that end up different from @c orig. A block the radio does
  *     not hold is written only if the edit touches it.
+ *  6. By default (wholeElements) every changed block is written together with the rest of the
+ *     codeplug element (memory area) it sits in, using the radio's own bytes for the unchanged
+ *     blocks. On radio B (D878UVII, 2026-11-02) a lone 16-byte block was acknowledged but not
+ *     kept; the CPS and qdmr always write whole areas. The bytes written are the same either way.
  *
  * The same planner is used for a real write and for an offline dry run on a memory file, so
  * the tests exercise exactly the code that writes the radio.
@@ -59,6 +63,8 @@ public:
     unsigned blocksToWrite = 0;    ///< blocks in the plan
     unsigned blocksNew = 0;        ///< planned blocks the radio copy did not hold
     unsigned bytesChanged = 0;     ///< bytes that differ between radio and plan
+    unsigned blocksChanged = 0;    ///< planned blocks whose content changes
+    unsigned blocksPadding = 0;    ///< planned blocks written unchanged to complete their area
   };
 
 public:
@@ -71,7 +77,7 @@ public:
   static bool plan(AnytoneCodeplug &cp, const Reader &read, Config *edited,
                    const Codeplug::Flags &flags, Plan &plan, Stats &stats,
                    const QString &currentYAML=QString(), Memory *radioMemory=nullptr,
-                   const ErrorStack &err=ErrorStack());
+                   const ErrorStack &err=ErrorStack(), bool wholeElements=true);
 
   /** Writes the plan as text: one line per block, "address before after" in hex
    * ("--" for a block the radio did not hold). Lines starting with '#' are comments. */

@@ -73,7 +73,8 @@ int planWrite(QCommandLineParser &parser, QCoreApplication &app) {
   AnytonePreservingWrite::Plan plan;
   AnytonePreservingWrite::Stats stats;
   bool ok = AnytonePreservingWrite::plan(*cp, AnytonePreservingWrite::memoryReader(mem), intermediate,
-                                         flags, plan, stats, parser.value("save-current"), nullptr, err);
+                                         flags, plan, stats, parser.value("save-current"), nullptr, err,
+                                         ! parser.isSet("blocks-only"));
   delete intermediate;
   if (! ok) {
     logError() << err.format();
@@ -87,7 +88,8 @@ int planWrite(QCommandLineParser &parser, QCoreApplication &app) {
   }
   QTextStream out(stdout);
   out << "blocks read " << stats.blocksRead << ", considered " << stats.blocksConsidered
-      << ", to write " << stats.blocksToWrite << " (new " << stats.blocksNew << "), bytes changed "
+      << ", to write " << stats.blocksToWrite << " (changed " << stats.blocksChanged << ", new "
+      << stats.blocksNew << ", padding " << stats.blocksPadding << "), bytes changed "
       << stats.bytesChanged << "\n";
   out.flush();
   return 0;

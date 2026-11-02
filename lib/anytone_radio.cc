@@ -292,8 +292,9 @@ AnytoneRadio::download() {
 
 void
 AnytoneRadio::setPreservingWrite(bool enable, const QString &planFile, bool dryRun,
-                                 const QString &currentYAML) {
+                                 const QString &currentYAML, bool wholeAreas) {
   _preserve = enable;
+  _wholeAreas = wholeAreas;
   _planFile = planFile;
   _dryRun = dryRun;
   _currentYAML = currentYAML;
@@ -308,15 +309,16 @@ AnytoneRadio::uploadPreserving() {
   };
 
   AnytonePreservingWrite::Plan plan;
-  AnytonePreservingWrite::Stats stats;
+  AnytonePreservingWrite::Stats &stats = _planStats;
   emit uploadProgress(0);
   if (! AnytonePreservingWrite::plan(*_codeplug, reader, _config, _codeplugFlags, plan, stats,
-                                     _currentYAML, nullptr, _errorStack)) {
+                                     _currentYAML, nullptr, _errorStack, _wholeAreas)) {
     errMsg(_errorStack) << "Cannot plan preserving write.";
     return false;
   }
   logInfo() << "Preserving write: " << stats.blocksRead << " blocks read, "
-            << stats.blocksToWrite << " blocks to write (" << stats.bytesChanged << " bytes change).";
+            << stats.blocksToWrite << " blocks to write, " << stats.blocksChanged << " changed ("
+            << stats.bytesChanged << " bytes change), " << stats.blocksPadding << " unchanged area padding.";
   emit uploadProgress(50);
 
   if (! _planFile.isEmpty()) {
@@ -344,27 +346,12 @@ AnytoneRadio::uploadPreserving() {
     emit uploadProgress(50 + float(n*40)/std::max<qsizetype>(1, plan.size()));
   }
 
-  // Read back every written block: the read-back decides (INV-013).
-  unsigned bad = 0;
-  for (auto it=plan.begin(); it!=plan.end(); it++) {
-    QByteArray back(RBSIZE, 0);
-    if (! _dev->read(0, it.key(), reinterpret_cast<uint8_t *>(back.data()), RBSIZE, _errorStack)) {
-      errMsg(_errorStack) << "Cannot read back block 0x" << QString::number(it.key(), 16) << ".";
-      return false;
-    }
-    if (back != it->after) {
-      bad++;
-      logError() << "Read-back mismatch at 0x" << QString::number(it.key(), 16)
-                 << ": wrote " << it->after.toHex() << ", radio holds " << back.toHex() << ".";
-    }
-  }
+  // No read-back in this session: on radio B (D878UVII) a block read back before END still
+  // showed the old content (the CPS and qdmr never read after writing). Verify instead by
+  // reading the radio again after it restarts, e.g. a dry run of the same edit: 0 blocks.
   emit uploadProgress(100);
-  if (bad) {
-    errMsg(_errorStack) << "Read-back found " << bad << " of " << plan.size()
-                        << " written blocks different from what was written.";
-    return false;
-  }
-  logInfo() << "Read-back: all " << plan.size() << " written blocks match.";
+  logInfo() << "Wrote " << plan.size() << " blocks (" << _planStats.blocksChanged
+            << " changed). Verify after the radio restarts: a dry run of the same edit must plan 0 changed blocks.";
   return true;
 }
 

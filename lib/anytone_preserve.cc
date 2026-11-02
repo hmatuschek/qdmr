@@ -95,7 +95,8 @@ AnytonePreservingWrite::encodeOn(AnytoneCodeplug &cp, const Memory &mem, Config 
 bool
 AnytonePreservingWrite::plan(AnytoneCodeplug &cp, const Reader &read, Config *edited,
                              const Codeplug::Flags &flags, Plan &plan, Stats &stats,
-                             const QString &currentYAML, Memory *radioMemory, const ErrorStack &err)
+                             const QString &currentYAML, Memory *radioMemory, const ErrorStack &err,
+                             bool wholeElements)
 {
   plan.clear();
   stats = Stats();
@@ -207,6 +208,34 @@ AnytonePreservingWrite::plan(AnytoneCodeplug &cp, const Reader &read, Config *ed
     }
     plan[addr] = blk;
   }
+  stats.blocksChanged = plan.size();
+
+  // 6. Complete each touched memory area with the radio's own bytes (cp holds E1's elements).
+  if (wholeElements && (! plan.isEmpty())) {
+    Plan extra;
+    for (int n=0; n<cp.image(0).numElements(); n++) {
+      unsigned addr = cp.image(0).element(n).address();
+      unsigned size = cp.image(0).element(n).data().size();
+      bool touched = false;
+      for (auto it=plan.lowerBound(addr); (it!=plan.end()) && (it.key()<(addr+size)); it++) {
+        touched = true; break;
+      }
+      if (! touched)
+        continue;
+      for (unsigned off=0; off<size; off+=BlockSize) {
+        if (plan.contains(addr+off) || extra.contains(addr+off))
+          continue;
+        auto o = orig.constFind(addr+off);
+        if (o == orig.cend())
+          continue; // never write a block the radio didn't give us, unless the edit needs it
+        Block blk; blk.before = o.value(); blk.after = o.value();
+        extra[addr+off] = blk;
+      }
+    }
+    stats.blocksPadding = extra.size();
+    for (auto it=extra.cbegin(); it!=extra.cend(); it++)
+      plan[it.key()] = it.value();
+  }
   stats.blocksToWrite = plan.size();
   logDebug() << "Preserving write: " << stats.blocksConsidered << " blocks considered, "
              << stats.blocksToWrite << " to write.";
@@ -229,10 +258,13 @@ AnytonePreservingWrite::writePlanFile(const QString &filename, const Plan &plan,
     out << "# " << header << "\n";
   out << "# blocks read: " << stats.blocksRead << "\n"
       << "# blocks considered: " << stats.blocksConsidered << "\n"
-      << "# blocks to write: " << stats.blocksToWrite << " (new: " << stats.blocksNew << ")\n"
+      << "# blocks to write: " << stats.blocksToWrite << " (changed: " << stats.blocksChanged
+      << ", new: " << stats.blocksNew << ", unchanged area padding: " << stats.blocksPadding << ")\n"
       << "# bytes changed: " << stats.bytesChanged << "\n"
       << "# address before after\n";
   for (auto it=plan.cbegin(); it!=plan.cend(); it++) {
+    if (it->before == it->after)
+      continue; // padding: written as the radio has it, not listed
     out << QString("%1").arg(it.key(), 8, 16, QChar('0')) << " "
         << (it->before.isEmpty() ? QString("--") : QString(it->before.toHex())) << " "
         << QString(it->after.toHex()) << "\n";

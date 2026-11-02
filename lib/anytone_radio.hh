@@ -11,6 +11,7 @@
 #define __ANYTONE_RADIO_HH__
 
 #include "radio.hh"
+#include "anytone_preserve.hh"
 #include "anytone_interface.hh"
 #include "anytone_codeplug.hh"
 #include "anytone_satelliteconfig.hh"
@@ -53,7 +54,7 @@ public:
    * @param dryRun If @c true, nothing is written to the radio (the radio is only read).
    * @param currentYAML If not empty, the radio's current set-up is saved there as YAML. */
   void setPreservingWrite(bool enable, const QString &planFile=QString(), bool dryRun=false,
-                          const QString &currentYAML=QString());
+                          const QString &currentYAML=QString(), bool wholeAreas=true);
 
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
@@ -103,6 +104,10 @@ protected:
   bool _dryRun = false;
   /** Where to save the radio's current set-up as YAML (may be empty). */
   QString _currentYAML;
+  /** If @c true, changed blocks are written with the rest of their memory area. */
+  bool _wholeAreas = true;
+  /** Counters of the last preserving-write plan. */
+  AnytonePreservingWrite::Stats _planStats;
   /** Owns the generic configuration. */
   Config *_config;
   /** A weak reference to the user-database. */

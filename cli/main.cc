@@ -113,6 +113,11 @@ int main(int argc, char *argv[])
                      QCoreApplication::translate(
                        "main", "With --preserve: read the radio and plan the write, but write "
                        "nothing.")));
+  parser.addOption(QCommandLineOption(
+                     "blocks-only",
+                     QCoreApplication::translate(
+                       "main", "With --preserve or plan-write: write only the changed 16-byte "
+                       "blocks, not their whole memory area (for diagnosis).")));
   parser.addOption({
                      "plan",
                      QCoreApplication::translate("main", "With --preserve or plan-write: save the "

@@ -104,7 +104,7 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     anytone->setPreservingWrite(true, parser.value("plan"), parser.isSet("dry-run"),
-                                parser.value("save-current"));
+                                parser.value("save-current"), ! parser.isSet("blocks-only"));
     logInfo() << (parser.isSet("dry-run") ? "Preserving write, dry run (nothing will be written)."
                                           : "Preserving write.");
   }

@@ -93,6 +93,13 @@ static bool readRadio(AnytoneCodeplug &cp, const APW::Memory &mem, QString &yaml
   return planYAML(cp, mem, QString::fromUtf8(f.readAll()), plan, yaml, msg);
 }
 
+/** Planned blocks whose content changes (padding blocks are written as the radio has them). */
+static int changed(const APW::Plan &plan) {
+  int n = 0;
+  for (auto it=plan.cbegin(); it!=plan.cend(); it++) if (it->before != it->after) n++;
+  return n;
+}
+
 static APW::Memory apply(const APW::Memory &mem, const APW::Plan &plan) {
   APW::Memory out(mem);
   for (auto it=plan.cbegin(); it!=plan.cend(); it++) out[it.key()] = it->after;
@@ -154,7 +161,8 @@ void AnytonePreserveTest::testNoEditWritesNothing() {
   QVERIFY2(readRadio(*cp, mem, c0, msg), qPrintable(msg));
   APW::Plan plan; QString again;
   QVERIFY2(planYAML(*cp, mem, c0, plan, again, msg), qPrintable(msg));
-  QCOMPARE(plan.size(), 0);
+  QCOMPARE(changed(plan), 0);
+  QCOMPARE(plan.size(), 0); // nothing changed, so no area is padded either
 }
 
 void AnytonePreserveTest::testAnalogEditLeavesDigitalAlone_data() { radios(); }
@@ -171,8 +179,13 @@ void AnytonePreserveTest::testAnalogEditLeavesDigitalAlone() {
   edited.replace("145.6125 MHz", "145.6375 MHz");
   APW::Plan plan; QString cur;
   QVERIFY2(planYAML(*cp, mem, edited, plan, cur, msg), qPrintable(msg));
-  QVERIFY2((plan.size() >= 1) && (plan.size() <= 2),
-           qPrintable(QString("expected 1-2 blocks, got %1").arg(plan.size())));
+  QVERIFY2((changed(plan) >= 1) && (changed(plan) <= 2),
+           qPrintable(QString("expected 1-2 changed blocks, got %1").arg(changed(plan))));
+  // Whole-area padding: more blocks written, but only with the radio's own bytes.
+  QVERIFY(plan.size() > changed(plan));
+  for (auto it=plan.cbegin(); it!=plan.cend(); it++)
+    if (it->before == it->after)
+      QCOMPARE(it->after, mem.value(it.key(), QByteArray(APW::BlockSize, 0)));
 
   // What the radio holds afterwards
   APW::Memory after = apply(mem, plan);
@@ -215,7 +228,7 @@ void AnytonePreserveTest::testAddAnalogChannelLeavesDigitalAlone() {
 
   APW::Plan plan; QString cur;
   QVERIFY2(planYAML(*cp, mem, edited, plan, cur, msg), qPrintable(msg));
-  QVERIFY(plan.size() >= 1);
+  QVERIFY(changed(plan) >= 1);
 
   APW::Memory after = apply(mem, plan);
   QString c2;
