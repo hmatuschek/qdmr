@@ -47,6 +47,14 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
+  /** Switches the next codeplug upload to a "preserving" write (see AnytonePreservingWrite):
+   * only the bits the edit changes are written, everything else stays as the radio holds it.
+   * @param planFile If not empty, the planned blocks are saved there before anything is written.
+   * @param dryRun If @c true, nothing is written to the radio (the radio is only read).
+   * @param currentYAML If not empty, the radio's current set-up is saved there as YAML. */
+  void setPreservingWrite(bool enable, const QString &planFile=QString(), bool dryRun=false,
+                          const QString &currentYAML=QString());
+
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
   bool startDownload(const TransferFlags &flags, const ErrorStack &err=ErrorStack());
@@ -70,6 +78,8 @@ private:
   virtual bool download();
   /** Uploads the encoded codeplug to the radio. This method block until the upload is complete. */
   virtual bool upload();
+  /** Preserving variant of @c upload(). */
+  virtual bool uploadPreserving();
   /** Uploads the encoded callsign database to the radio.
    * This method block until the upload is complete. */
   virtual bool uploadCallsigns();
@@ -85,6 +95,14 @@ protected:
   /** If @c true, the codeplug on the radio gets updated upon upload. If @c false, it gets
    * overridden. */
   Codeplug::Flags _codeplugFlags;
+  /** If @c true, the next upload is a preserving write. */
+  bool _preserve = false;
+  /** Where to save the preserving-write plan (may be empty). */
+  QString _planFile;
+  /** If @c true, the preserving write only plans and writes nothing. */
+  bool _dryRun = false;
+  /** Where to save the radio's current set-up as YAML (may be empty). */
+  QString _currentYAML;
   /** Owns the generic configuration. */
   Config *_config;
   /** A weak reference to the user-database. */

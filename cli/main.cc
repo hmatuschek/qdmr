@@ -9,6 +9,7 @@
 #include "radioinfo.hh"
 #include "readcodeplug.hh"
 #include "writecodeplug.hh"
+#include "planwrite.hh"
 #include "writecallsigndb.hh"
 #include "encodecodeplug.hh"
 #include "encodecallsigndb.hh"
@@ -102,6 +103,35 @@ int main(int argc, char *argv[])
                        "main", "Initializes the code-plug in the radio. If not present (default) "
                                "the code-plug gets updated, maintaining all settings made earlier.")));
   parser.addOption(QCommandLineOption(
+                     "preserve",
+                     QCoreApplication::translate(
+                       "main", "AnyTone only (write): preserving write. Only the bits the edit "
+                       "changes are written; everything else stays as the radio holds it. "
+                       "Every written block is read back and compared.")));
+  parser.addOption(QCommandLineOption(
+                     "dry-run",
+                     QCoreApplication::translate(
+                       "main", "With --preserve: read the radio and plan the write, but write "
+                       "nothing.")));
+  parser.addOption({
+                     "plan",
+                     QCoreApplication::translate("main", "With --preserve or plan-write: save the "
+                     "planned block writes (address, before, after) to this file."),
+                     "FILENAME"
+                   });
+  parser.addOption({
+                     "save-current",
+                     QCoreApplication::translate("main", "With --preserve or plan-write: save the "
+                     "radio's current set-up, as decoded before the write, to this YAML file."),
+                     "FILENAME"
+                   });
+  parser.addOption({
+                     "memory",
+                     QCoreApplication::translate("main", "plan-write: radio memory file (one line "
+                     "per 16-byte block: address data, in hex) used instead of a radio."),
+                     "FILENAME"
+                   });
+  parser.addOption(QCommandLineOption(
                      "update-device-clock",
                      QCoreApplication::translate(
                        "main", "If present, the device clock gets set to the system time on any "
@@ -124,7 +154,7 @@ int main(int argc, char *argv[])
                                                  "keys to be used with the --radio option.")));
   parser.addPositionalArgument(
         "command", QCoreApplication::translate(
-          "main", "Specifies the command to perform. Either detect, verify, read, write, "
+          "main", "Specifies the command to perform. Either detect, verify, read, write, plan-write, "
           "write-db, encode, encode-db, decode or info. Consult the man-page of dmrconf for a "
           "detailed description of these commands."),
         QCoreApplication::translate("main", "[command]"));
@@ -196,6 +226,8 @@ int main(int argc, char *argv[])
     res = readCodeplug(parser, app);
   else if ("write" == command)
     res = writeCodeplug(parser, app);
+  else if ("plan-write" == command)
+    res = planWrite(parser, app);
   else if ("write-db" == command)
     res = writeCallsignDB(parser, app);
   else if ("encode" == command)

@@ -3457,6 +3457,7 @@ protected:
 
   // Allow access to protected allocation methods.
   friend class AnytoneRadio;
+  friend class AnytonePreservingWrite;
 };
 
 #endif // ANYTONECODEPLUG_HH

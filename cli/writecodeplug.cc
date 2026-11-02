@@ -10,6 +10,7 @@
 #include "progressbar.hh"
 #include "autodetect.hh"
 #include "radiolimits.hh"
+#include "anytone_radio.hh"
 
 
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
@@ -84,6 +85,29 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   flags.setUpdateCodeplug(! parser.isSet("init-codeplug"));
   flags.setAutoEnableGPS(parser.isSet("auto-enable-gps"));
   flags.setAutoEnableRoaming(parser.isSet("auto-enable-roaming"));
+
+  if (parser.isSet("dry-run") && (! parser.isSet("preserve"))) {
+    logError() << "--dry-run needs --preserve.";
+    delete intermediate;
+    return -1;
+  }
+  if (parser.isSet("preserve")) {
+    AnytoneRadio *anytone = qobject_cast<AnytoneRadio *>(radio);
+    if (nullptr == anytone) {
+      logError() << "--preserve is only available for AnyTone radios; nothing was written.";
+      delete intermediate;
+      return -1;
+    }
+    if (parser.isSet("init-codeplug")) {
+      logError() << "--preserve cannot be combined with --init-codeplug.";
+      delete intermediate;
+      return -1;
+    }
+    anytone->setPreservingWrite(true, parser.value("plan"), parser.isSet("dry-run"),
+                                parser.value("save-current"));
+    logInfo() << (parser.isSet("dry-run") ? "Preserving write, dry run (nothing will be written)."
+                                          : "Preserving write.");
+  }
 
   logDebug() << "Start upload to " << radio->name() << ".";
   if (! radio->startUpload(intermediate, flags, err)) {

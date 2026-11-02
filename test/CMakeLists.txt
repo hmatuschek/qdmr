@@ -134,3 +134,8 @@ add_test(NAME DM1701    COMMAND dm1701_test)
 add_test(NAME DR1801    COMMAND dr1801_test)
 add_test(NAME DM32UV    COMMAND dm32uv_test)
 
+
+# Preserving AnyTone write (gsquared3d fork)
+qt_add_executable(anytone_preserve_test anytone_preserve_test.cc anytone_preserve_test.hh ${TESTDATA})
+target_link_libraries(anytone_preserve_test PRIVATE Qt6::Core Qt6::Network Qt6::Positioning Qt6::SerialPort Qt6::Test ${YAMLCPP_LIBRARIES} libdmrconf libdmrconfigtest ${ADDITIONAL_LIBS})
+add_test(NAME AnytonePreserve COMMAND anytone_preserve_test)

@@ -5,6 +5,8 @@
 #include "logger.hh"
 #include "configcopyvisitor.hh"
 
+#include "anytone_preserve.hh"
+#include "config.hh"
 #define RBSIZE 16
 #define WBSIZE 16
 
@@ -288,12 +290,94 @@ AnytoneRadio::download() {
   return true;
 }
 
+void
+AnytoneRadio::setPreservingWrite(bool enable, const QString &planFile, bool dryRun,
+                                 const QString &currentYAML) {
+  _preserve = enable;
+  _planFile = planFile;
+  _dryRun = dryRun;
+  _currentYAML = currentYAML;
+}
+
+
+bool
+AnytoneRadio::uploadPreserving() {
+  AnytonePreservingWrite::Reader reader =
+      [this](unsigned addr, uint8_t *dst, unsigned size, const ErrorStack &err) -> bool {
+    return _dev->read(0, addr, dst, size, err);
+  };
+
+  AnytonePreservingWrite::Plan plan;
+  AnytonePreservingWrite::Stats stats;
+  emit uploadProgress(0);
+  if (! AnytonePreservingWrite::plan(*_codeplug, reader, _config, _codeplugFlags, plan, stats,
+                                     _currentYAML, nullptr, _errorStack)) {
+    errMsg(_errorStack) << "Cannot plan preserving write.";
+    return false;
+  }
+  logInfo() << "Preserving write: " << stats.blocksRead << " blocks read, "
+            << stats.blocksToWrite << " blocks to write (" << stats.bytesChanged << " bytes change).";
+  emit uploadProgress(50);
+
+  if (! _planFile.isEmpty()) {
+    QString header = QString("radio: %1, %2").arg(_name, _dryRun ? "dry run (nothing written)" : "written");
+    if (! AnytonePreservingWrite::writePlanFile(_planFile, plan, stats, header, _errorStack)) {
+      errMsg(_errorStack) << "Cannot save the write plan; nothing was written.";
+      return false;
+    }
+  }
+
+  if (_dryRun) {
+    logInfo() << "Dry run: nothing was written to the radio.";
+    emit uploadProgress(100);
+    return true;
+  }
+
+  // Write only the planned blocks
+  unsigned n = 0;
+  for (auto it=plan.begin(); it!=plan.end(); it++, n++) {
+    if (! _dev->write(0, it.key(), reinterpret_cast<uint8_t *>(it->after.data()), WBSIZE, _errorStack)) {
+      errMsg(_errorStack) << "Cannot write block 0x" << QString::number(it.key(), 16)
+                          << " (" << n << " of " << plan.size() << " written).";
+      return false;
+    }
+    emit uploadProgress(50 + float(n*40)/std::max<qsizetype>(1, plan.size()));
+  }
+
+  // Read back every written block: the read-back decides (INV-013).
+  unsigned bad = 0;
+  for (auto it=plan.begin(); it!=plan.end(); it++) {
+    QByteArray back(RBSIZE, 0);
+    if (! _dev->read(0, it.key(), reinterpret_cast<uint8_t *>(back.data()), RBSIZE, _errorStack)) {
+      errMsg(_errorStack) << "Cannot read back block 0x" << QString::number(it.key(), 16) << ".";
+      return false;
+    }
+    if (back != it->after) {
+      bad++;
+      logError() << "Read-back mismatch at 0x" << QString::number(it.key(), 16)
+                 << ": wrote " << it->after.toHex() << ", radio holds " << back.toHex() << ".";
+    }
+  }
+  emit uploadProgress(100);
+  if (bad) {
+    errMsg(_errorStack) << "Read-back found " << bad << " of " << plan.size()
+                        << " written blocks different from what was written.";
+    return false;
+  }
+  logInfo() << "Read-back: all " << plan.size() << " written blocks match.";
+  return true;
+}
+
+
 bool
 AnytoneRadio::upload() {
   if (nullptr == _codeplug) {
     errMsg(_errorStack) << "Cannot write codeplug: Object not created yet.";
     return false;
   }
+
+  if (_preserve)
+    return uploadPreserving();
 
   // Download bitmaps first
   size_t nbitmaps = _codeplug->numImages();

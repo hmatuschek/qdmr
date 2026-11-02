@@ -36,7 +36,7 @@ qt_add_library(libdmrconf SHARED
   openrtx.cc openrtx_link.cc openrtx_interface.cc openrtx_codeplug.cc
   c7000device.cc
   gd73.cc gd73_interface.cc gd73_codeplug.cc gd73_filereader.cc gd73_limits.cc
-  anytone_interface.cc anytone_radio.cc anytone_codeplug.cc anytone_extension.cc anytone_limits.cc
+  anytone_interface.cc anytone_radio.cc anytone_preserve.cc anytone_codeplug.cc anytone_extension.cc anytone_limits.cc
   anytone_satelliteconfig.cc anytone_settingsextension.cc
   d868uv.cc d868uv_codeplug.cc d868uv_callsigndb.cc d868uv_limits.cc
   d878uv.cc d878uv_codeplug.cc d878uv_limits.cc
@@ -78,7 +78,7 @@ target_sources(libdmrconf PUBLIC FILE_SET HEADERS
   openrtx.hh openrtx_link.hh openrtx_interface.hh openrtx_codeplug.hh
   c7000device.hh
   gd73.hh gd73_interface.hh gd73_codeplug.hh gd73_filereader.hh gd73_limits.hh
-  anytone_interface.hh anytone_radio.hh anytone_codeplug.hh anytone_extension.hh anytone_limits.hh
+  anytone_interface.hh anytone_radio.hh anytone_preserve.hh anytone_codeplug.hh anytone_extension.hh anytone_limits.hh
   anytone_satelliteconfig.hh anytone_settingsextension.hh
   d868uv.hh d868uv_codeplug.hh d868uv_callsigndb.hh d868uv_limits.hh
   d878uv.hh d878uv_codeplug.hh d878uv_limits.hh
