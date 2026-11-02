@@ -1862,7 +1862,9 @@ DMR6X2UVCodeplug::ChannelExtensionElement::clear() {
 
 bool
 DMR6X2UVCodeplug::ChannelExtensionElement::hasARC4KeyIndex() const {
-  return 0 != getUInt8(Offset::arc4KeyIndex());
+  // 0x00 = no key; the manufacturer CPS also leaves 0xff (erased) on channels without a key
+  uint8_t idx = getUInt8(Offset::arc4KeyIndex());
+  return (0x00 != idx) && (0xff != idx);
 }
 
 unsigned int
@@ -1883,14 +1885,16 @@ DMR6X2UVCodeplug::ChannelExtensionElement::clearARC4KeyIndex() {
 
 bool
 DMR6X2UVCodeplug::ChannelExtensionElement::linkChannelObj(Channel *c, Context &ctx, const ErrorStack &err) const {
+  Q_UNUSED(err);
   if (auto dc = c->as<DMRChannel>()) {
     if (! hasARC4KeyIndex())
       return true;
 
     if (! ctx.has<ARC4EncryptionKey>(arc4KeyIndex())) {
-      errMsg(err) << "Cannot link channel '" << c->name()
-                  << "': Cannot resolve ARC4 key index " << arc4KeyIndex() << ".";
-      return false;
+      // CPS leaves unused entries at 0xff; like the D878UV, warn and keep the channel unencrypted.
+      logWarn() << "Cannot link encryption key of channel '" << c->name()
+                << "': no ARC4 key with index " << arc4KeyIndex() << " defined.";
+      return true;
     }
 
     auto cc = dc->commercialExtension();
@@ -2907,6 +2911,11 @@ DMR6X2UVCodeplug::createAESKeys(Context &ctx, const ErrorStack &err) {
     // if disabled -> skip
     if (! keyEl.isValid())
       continue;
+    if (keyEl.key().size() < 16) {
+      logInfo() << "Skip AES key at index " << i+1
+                << ": Key size " << keyEl.key().size()*8 << " < 128.";
+      continue;
+    }
     // Decode
     auto key = new AESEncryptionKey();
     key->setName(QString("AES Key %1").arg(i+1));
