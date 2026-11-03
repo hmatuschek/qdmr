@@ -17,10 +17,10 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
 
-  // TD-008: refuse a real preserving write before touching the radio at all.
-  if (parser.isSet("preserve") && (! parser.isSet("dry-run"))) {
-    logError() << "write --preserve without --dry-run is disabled (TD-008: a partial write erases "
-                  "the rest of each 16 KB flash block on AnyTone radios). Nothing was written.";
+  // A real preserving write must save the expected radio content, so it can be verified.
+  if (parser.isSet("preserve") && (! parser.isSet("dry-run")) && (! parser.isSet("expect"))) {
+    logError() << "write --preserve needs --expect=<file> (the radio's expected content, for the "
+                  "read-back after the radio restarts). Nothing was written.";
     return -1;
   }
 
@@ -111,9 +111,9 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
       return -1;
     }
     anytone->setPreservingWrite(true, parser.value("plan"), parser.isSet("dry-run"),
-                                parser.value("save-current"), ! parser.isSet("blocks-only"));
-    logInfo() << (parser.isSet("dry-run") ? "Preserving write, dry run (nothing will be written)."
-                                          : "Preserving write.");
+                                parser.value("save-current"), true, parser.value("expect"));
+    logInfo() << (parser.isSet("dry-run") ? "Write everything, dry run (nothing will be written)."
+                                          : "Write everything.");
   }
 
   logDebug() << "Start upload to " << radio->name() << ".";

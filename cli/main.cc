@@ -106,19 +106,28 @@ int main(int argc, char *argv[])
   parser.addOption(QCommandLineOption(
                      "preserve",
                      QCoreApplication::translate(
-                       "main", "AnyTone only (write): plan a preserving write, where only the "
-                       "bits the edit changes differ from what the radio holds. Currently "
-                       "requires --dry-run: real writes are disabled (TD-008).")));
+                       "main", "AnyTone only (write): write everything like the vendor CPS. Every "
+                       "flash page the CPS writes is read whole and sent back with every block "
+                       "holding data; only the bits the edit changes differ. Needs a write map "
+                       "for the model (D878UVII only so far) and, without --dry-run, --expect.")));
   parser.addOption(QCommandLineOption(
                      "dry-run",
                      QCoreApplication::translate(
                        "main", "With --preserve: read the radio and plan the write, but write "
                        "nothing.")));
+  parser.addOption({
+                     "expect",
+                     QCoreApplication::translate("main", "With --preserve or plan-write: save the "
+                     "radio's expected content after the write to this memory file (plus FILE.ranges, "
+                     "the pages written, and FILE.before, their content before). With read-addr: "
+                     "compare what is read with this file."),
+                     "FILENAME"
+                   });
   parser.addOption(QCommandLineOption(
-                     "blocks-only",
+                     "missing-blank",
                      QCoreApplication::translate(
-                       "main", "With --preserve or plan-write: write only the changed 16-byte "
-                       "blocks, not their whole memory area (for diagnosis).")));
+                       "main", "plan-write only (offline tests): treat blocks the memory file lacks "
+                       "as blank (0xFF) instead of failing.")));
   parser.addOption({
                      "plan",
                      QCoreApplication::translate("main", "With --preserve or plan-write: save the "

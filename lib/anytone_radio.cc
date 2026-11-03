@@ -6,6 +6,7 @@
 #include "configcopyvisitor.hh"
 
 #include "anytone_preserve.hh"
+#include "anytone_writeall.hh"
 #include "config.hh"
 #define RBSIZE 16
 #define WBSIZE 16
@@ -292,8 +293,10 @@ AnytoneRadio::download() {
 
 void
 AnytoneRadio::setPreservingWrite(bool enable, const QString &planFile, bool dryRun,
-                                 const QString &currentYAML, bool wholeAreas) {
+                                 const QString &currentYAML, bool wholeAreas,
+                                 const QString &expectFile) {
   _preserve = enable;
+  _expectFile = expectFile;
   _wholeAreas = wholeAreas;
   _planFile = planFile;
   _dryRun = dryRun;
@@ -342,28 +345,59 @@ AnytoneRadio::readAddresses(const QList<QPair<unsigned, unsigned>> &ranges,
 
 bool
 AnytoneRadio::uploadPreserving() {
+  // D-113 (ham-radio-coordinator): write everything like the CPS. The old write of changed
+  // blocks only erased channels 2 to 256 on radio B (TD-008) and is gone.
+  const AnytoneWriteAll::Map *map = AnytoneWriteAll::forCodeplug(*_codeplug);
+  if (nullptr == map) {
+    errMsg(_errorStack) << "No write map for " << _name << " yet: a model needs a USB capture of "
+                           "the vendor CPS writing it first (INV-020). Nothing was written.";
+    return false;
+  }
+
   AnytonePreservingWrite::Reader reader =
       [this](unsigned addr, uint8_t *dst, unsigned size, const ErrorStack &err) -> bool {
     return _dev->read(0, addr, dst, size, err);
   };
-
-  AnytonePreservingWrite::Plan plan;
-  AnytonePreservingWrite::Stats &stats = _planStats;
-  emit uploadProgress(0);
-  if (! AnytonePreservingWrite::plan(*_codeplug, reader, _config, _codeplugFlags, plan, stats,
-                                     _currentYAML, nullptr, _errorStack, _wholeAreas)) {
-    errMsg(_errorStack) << "Cannot plan preserving write.";
+  if (! _dev->read_start(0, 0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot enter programming mode; nothing was written.";
     return false;
   }
-  logInfo() << "Preserving write: " << stats.blocksRead << " blocks read, "
-            << stats.blocksToWrite << " blocks to write, " << stats.blocksChanged << " changed ("
-            << stats.bytesChanged << " bytes change), " << stats.blocksPadding << " unchanged area padding.";
-  emit uploadProgress(50);
 
+  emit uploadProgress(0);
+  AnytoneWriteAll::Result res;
+  if (! AnytoneWriteAll::build(*_codeplug, *map, reader, _config, _codeplugFlags, res, _currentYAML,
+                               [this](int p) { emit uploadProgress(p/2); }, _errorStack)) {
+    errMsg(_errorStack) << "Cannot plan the write; nothing was written.";
+    return false;
+  }
+  _planStats = res.planStats;
+  logInfo() << "Write everything (" << map->model << "): " << res.pages.size() << " pages of "
+            << map->pageSize/1024 << " KB read (" << res.blocksRead << " blocks), " << res.blocksChanged
+            << " blocks changed (" << res.bytesChanged << " bytes), " << res.send.size()
+            << " blocks to send (" << res.blocksSentNotCps << " beyond the CPS's own), "
+            << res.pagesAdded << " pages added by the edit.";
+
+  QString what = _dryRun ? "dry run (nothing written)" : "written";
   if (! _planFile.isEmpty()) {
-    QString header = QString("radio: %1, %2").arg(_name, _dryRun ? "dry run (nothing written)" : "written");
-    if (! AnytonePreservingWrite::writePlanFile(_planFile, plan, stats, header, _errorStack)) {
+    AnytonePreservingWrite::Stats s = res.planStats;
+    s.blocksToWrite = res.send.size();
+    s.blocksChanged = res.blocksChanged;
+    s.bytesChanged = res.bytesChanged;
+    s.blocksPadding = res.send.size() - res.blocksChanged;
+    QString header = QString("radio: %1, %2; write everything: %3 pages, %4 blocks sent, %5 changed "
+                             "(only changed blocks are listed)")
+        .arg(_name, what).arg(res.pages.size()).arg(res.send.size()).arg(res.blocksChanged);
+    if (! AnytonePreservingWrite::writePlanFile(_planFile, res.plan, s, header, _errorStack)) {
       errMsg(_errorStack) << "Cannot save the write plan; nothing was written.";
+      return false;
+    }
+  }
+  if (! _expectFile.isEmpty()) {
+    if ((! AnytonePreservingWrite::writeMemoryFile(_expectFile, res.expected, _errorStack))
+        || (! AnytoneWriteAll::writeRangesFile(_expectFile + ".ranges", res.pages, map->pageSize,
+                                               QString("pages of %1, %2").arg(_name, what), _errorStack))
+        || (! AnytonePreservingWrite::writeMemoryFile(_expectFile + ".before", res.image, _errorStack))) {
+      errMsg(_errorStack) << "Cannot save the expected radio content; nothing was written.";
       return false;
     }
   }
@@ -374,31 +408,22 @@ AnytoneRadio::uploadPreserving() {
     return true;
   }
 
-  // TD-008 (ham-radio-coordinator): the AnyTone erases a whole 16 KB flash block when any part
-  // of it is written, so sending only the planned blocks erased channels 2 to 256 on radio B
-  // (2026-11-02). Real preserving writes stay blocked until whole erase blocks are sent and
-  // that fix has been tested offline and approved by Tom.
-  errMsg(_errorStack) << "Preserving write to the radio is disabled (TD-008: a partial write erases "
-                         "the rest of each 16 KB flash block). Nothing was written. Use --dry-run.";
-  return false;
-
-  // Write only the planned blocks
+  // Send in ascending address order, as the CPS and qdmr do.
   unsigned n = 0;
-  for (auto it=plan.begin(); it!=plan.end(); it++, n++) {
-    if (! _dev->write(0, it.key(), reinterpret_cast<uint8_t *>(it->after.data()), WBSIZE, _errorStack)) {
-      errMsg(_errorStack) << "Cannot write block 0x" << QString::number(it.key(), 16)
-                          << " (" << n << " of " << plan.size() << " written).";
+  for (auto it = res.send.cbegin(); it != res.send.cend(); it++, n++) {
+    if (! _dev->write(0, it.key(), reinterpret_cast<uint8_t *>(const_cast<char *>(it->constData())),
+                      WBSIZE, _errorStack)) {
+      errMsg(_errorStack) << "Cannot write block 0x" << QString::number(it.key(), 16) << " (" << n
+                          << " of " << res.send.size() << " written). The radio may be incomplete: "
+                          "restore it from the CPS backup.";
       return false;
     }
-    emit uploadProgress(50 + float(n*40)/std::max<qsizetype>(1, plan.size()));
+    if (0 == (n % 64))
+      emit uploadProgress(50 + float(n*50)/std::max<qsizetype>(1, res.send.size()));
   }
-
-  // No read-back in this session: on radio B (D878UVII) a block read back before END still
-  // showed the old content (the CPS and qdmr never read after writing). Verify instead by
-  // reading the radio again after it restarts, e.g. a dry run of the same edit: 0 blocks.
   emit uploadProgress(100);
-  logInfo() << "Wrote " << plan.size() << " blocks (" << _planStats.blocksChanged
-            << " changed). Verify after the radio restarts: a dry run of the same edit must plan 0 changed blocks.";
+  logInfo() << "Sent " << res.send.size() << " blocks. Verify after the radio restarts: read the pages "
+               "again (read-addr with --expect) and compare.";
   return true;
 }
 

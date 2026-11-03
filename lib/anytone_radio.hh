@@ -48,13 +48,15 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
-  /** Switches the next codeplug upload to a "preserving" write (see AnytonePreservingWrite):
-   * only the bits the edit changes are written, everything else stays as the radio holds it.
+  /** Switches the next codeplug upload to a preserving "write everything" (AnytoneWriteAll,
+   * D-113): only the bits the edit changes differ; every page the CPS writes is read whole and
+   * sent back with every block that holds data.
    * @param planFile If not empty, the planned blocks are saved there before anything is written.
    * @param dryRun If @c true, nothing is written to the radio (the radio is only read).
    * @param currentYAML If not empty, the radio's current set-up is saved there as YAML. */
   void setPreservingWrite(bool enable, const QString &planFile=QString(), bool dryRun=false,
-                          const QString &currentYAML=QString(), bool wholeAreas=true);
+                          const QString &currentYAML=QString(), bool wholeAreas=true,
+                          const QString &expectFile=QString());
 
   /** Read-only: reads the given address ranges ([start, end), 16-byte aligned) from the radio
    * into @c mem, block by block. Stops at the first block the radio does not answer correctly
@@ -115,6 +117,9 @@ protected:
   QString _currentYAML;
   /** If @c true, changed blocks are written with the rest of their memory area. */
   bool _wholeAreas = true;
+  /** Where to save the radio's expected content after the write (and, with suffixes
+   * ".ranges" and ".before", the pages written and their content before). May be empty. */
+  QString _expectFile;
   /** Counters of the last preserving-write plan. */
   AnytonePreservingWrite::Stats _planStats;
   /** Owns the generic configuration. */

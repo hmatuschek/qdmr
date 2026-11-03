@@ -95,5 +95,31 @@ readAddresses(QCommandLineParser &parser, QCoreApplication &app) {
   }
   logInfo() << "Read " << mem.size() << " blocks into '" << outFile << "'. Nothing was written.";
   delete radio;
-  return saved ? 0 : -1;
+  if (! saved)
+    return -1;
+
+  if (parser.isSet("expect")) {
+    AnytonePreservingWrite::Memory want;
+    ErrorStack e;
+    if (! AnytonePreservingWrite::readMemoryFile(parser.value("expect"), want, e)) {
+      logError() << e.format();
+      return -1;
+    }
+    unsigned differ = 0, missing = 0;
+    QStringList first;
+    for (auto it = want.cbegin(); it != want.cend(); it++) {
+      if (! mem.contains(it.key())) { missing++; continue; }
+      if (mem[it.key()] != *it) {
+        if (first.size() < 20) first << QString::number(it.key(), 16);
+        differ++;
+      }
+    }
+    if (differ || missing || (mem.size() != want.size())) {
+      logError() << "VERIFY FAILED: " << differ << " of " << want.size() << " blocks differ from '"
+                 << parser.value("expect") << "', " << missing << " not read; first: " << first.join(" ");
+      return 3;
+    }
+    logInfo() << "VERIFIED: all " << want.size() << " blocks equal '" << parser.value("expect") << "'.";
+  }
+  return 0;
 }

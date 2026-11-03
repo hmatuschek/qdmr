@@ -9,6 +9,8 @@
 #include "config.hh"
 #include "radioinfo.hh"
 #include "anytone_preserve.hh"
+#include "anytone_writeall.hh"
+#include <cstring>
 #include "d868uv_codeplug.hh"
 #include "d878uv_codeplug.hh"
 #include "d878uv2_codeplug.hh"
@@ -70,27 +72,61 @@ int planWrite(QCommandLineParser &parser, QCoreApplication &app) {
   flags.setAutoEnableGPS(parser.isSet("auto-enable-gps"));
   flags.setAutoEnableRoaming(parser.isSet("auto-enable-roaming"));
 
-  AnytonePreservingWrite::Plan plan;
-  AnytonePreservingWrite::Stats stats;
-  bool ok = AnytonePreservingWrite::plan(*cp, AnytonePreservingWrite::memoryReader(mem), intermediate,
-                                         flags, plan, stats, parser.value("save-current"), nullptr, err,
-                                         ! parser.isSet("blocks-only"));
+  const AnytoneWriteAll::Map *map = AnytoneWriteAll::forCodeplug(*cp);
+  if (nullptr == map) {
+    logError() << "No write map for '" << key << "' yet (INV-020).";
+    delete intermediate;
+    return -1;
+  }
+  AnytonePreservingWrite::Reader reader = AnytonePreservingWrite::memoryReader(mem);
+  unsigned missing = 0;
+  if (parser.isSet("missing-blank")) {
+    reader = [&mem, &missing](unsigned addr, uint8_t *dst, unsigned size, const ErrorStack &) -> bool {
+      for (unsigned off = 0; off < size; off += AnytonePreservingWrite::BlockSize) {
+        auto it = mem.constFind(addr + off);
+        if (it == mem.cend()) { memset(dst + off, 0xff, AnytonePreservingWrite::BlockSize); missing++; }
+        else memcpy(dst + off, it->constData(), AnytonePreservingWrite::BlockSize);
+      }
+      return true;
+    };
+  }
+
+  AnytoneWriteAll::Result res;
+  bool ok = AnytoneWriteAll::build(*cp, *map, reader, intermediate, flags, res,
+                                   parser.value("save-current"), nullptr, err);
   delete intermediate;
   if (! ok) {
     logError() << err.format();
     return -1;
   }
-  QString header = QString("radio: %1, offline plan from memory file %2 (nothing written)")
-      .arg(key, QFileInfo(parser.value("memory")).fileName());
-  if (! AnytonePreservingWrite::writePlanFile(parser.value("plan"), plan, stats, header, err)) {
+  AnytonePreservingWrite::Stats s = res.planStats;
+  s.blocksToWrite = res.send.size();
+  s.blocksChanged = res.blocksChanged;
+  s.bytesChanged = res.bytesChanged;
+  s.blocksPadding = res.send.size() - res.blocksChanged;
+  QString header = QString("radio: %1, offline plan from memory file %2 (nothing written); write "
+                           "everything: %3 pages, %4 blocks sent, %5 changed (only changed blocks are listed)")
+      .arg(key, QFileInfo(parser.value("memory")).fileName()).arg(res.pages.size())
+      .arg(res.send.size()).arg(res.blocksChanged);
+  if (! AnytonePreservingWrite::writePlanFile(parser.value("plan"), res.plan, s, header, err)) {
     logError() << err.format();
     return -1;
   }
+  if (parser.isSet("expect")) {
+    QString f = parser.value("expect");
+    if ((! AnytonePreservingWrite::writeMemoryFile(f, res.expected, err))
+        || (! AnytoneWriteAll::writeRangesFile(f + ".ranges", res.pages, map->pageSize, header, err))
+        || (! AnytonePreservingWrite::writeMemoryFile(f + ".send", res.send, err))
+        || (! AnytonePreservingWrite::writeMemoryFile(f + ".before", res.image, err))) {
+      logError() << err.format();
+      return -1;
+    }
+  }
   QTextStream out(stdout);
-  out << "blocks read " << stats.blocksRead << ", considered " << stats.blocksConsidered
-      << ", to write " << stats.blocksToWrite << " (changed " << stats.blocksChanged << ", new "
-      << stats.blocksNew << ", padding " << stats.blocksPadding << "), bytes changed "
-      << stats.bytesChanged << "\n";
+  out << "pages " << res.pages.size() << " (" << res.pagesAdded << " added by the edit), blocks read "
+      << res.blocksRead << (parser.isSet("missing-blank") ? QString(" (%1 missing, taken as blank)").arg(missing) : QString())
+      << ", changed " << res.blocksChanged << " (" << res.bytesChanged << " bytes), sent "
+      << res.send.size() << " (" << res.blocksSentNotCps << " beyond the CPS's own)\n";
   out.flush();
   return 0;
 }
