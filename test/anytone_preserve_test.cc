@@ -338,6 +338,7 @@ void AnytonePreserveTest::testAPRSOnlyChannelTakesNoSlot() {
   std::unique_ptr<AnytoneCodeplug> cp(makeCodeplug(radio));
   QFile tf(":/data/anytone_preserve_test.yaml"); tf.open(QIODevice::ReadOnly);
   QString base = QString::fromUtf8(tf.readAll());
+  base.replace("\r\n", "\n"); // a Windows checkout may give the test file CRLF line ends
   // An FM APRS system whose revert channel is in no zone (so the radio holds it only in its
   // APRS settings).
   int cs = base.indexOf("\nchannels:");
