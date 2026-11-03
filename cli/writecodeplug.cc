@@ -10,11 +10,19 @@
 #include "progressbar.hh"
 #include "autodetect.hh"
 #include "radiolimits.hh"
+#include "anytone_radio.hh"
 
 
 int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   if (2 > parser.positionalArguments().size())
     parser.showHelp(-1);
+
+  // A real preserving write must save the expected radio content, so it can be verified.
+  if (parser.isSet("preserve") && (! parser.isSet("dry-run")) && (! parser.isSet("expect"))) {
+    logError() << "write --preserve needs --expect=<file> (the radio's expected content, for the "
+                  "read-back after the radio restarts). Nothing was written.";
+    return -1;
+  }
 
   QString filename = parser.positionalArguments().at(1);
   QFileInfo fileinfo(filename);
@@ -84,6 +92,29 @@ int writeCodeplug(QCommandLineParser &parser, QCoreApplication &app) {
   flags.setUpdateCodeplug(! parser.isSet("init-codeplug"));
   flags.setAutoEnableGPS(parser.isSet("auto-enable-gps"));
   flags.setAutoEnableRoaming(parser.isSet("auto-enable-roaming"));
+
+  if (parser.isSet("dry-run") && (! parser.isSet("preserve"))) {
+    logError() << "--dry-run needs --preserve.";
+    delete intermediate;
+    return -1;
+  }
+  if (parser.isSet("preserve")) {
+    AnytoneRadio *anytone = qobject_cast<AnytoneRadio *>(radio);
+    if (nullptr == anytone) {
+      logError() << "--preserve is only available for AnyTone radios; nothing was written.";
+      delete intermediate;
+      return -1;
+    }
+    if (parser.isSet("init-codeplug")) {
+      logError() << "--preserve cannot be combined with --init-codeplug.";
+      delete intermediate;
+      return -1;
+    }
+    anytone->setPreservingWrite(true, parser.value("plan"), parser.isSet("dry-run"),
+                                parser.value("save-current"), true, parser.value("expect"));
+    logInfo() << (parser.isSet("dry-run") ? "Write everything, dry run (nothing will be written)."
+                                          : "Write everything.");
+  }
 
   logDebug() << "Start upload to " << radio->name() << ".";
   if (! radio->startUpload(intermediate, flags, err)) {

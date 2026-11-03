@@ -5,6 +5,8 @@ qt_add_executable(dmrconf WIN32
   verify.cc verify.hh
   readcodeplug.cc readcodeplug.hh
   writecodeplug.cc writecodeplug.hh
+  planwrite.cc planwrite.hh
+  readaddresses.cc readaddresses.hh
   encodecodeplug.cc encodecodeplug.hh
   decodecodeplug.cc decodecodeplug.hh
   infofile.cc infofile.hh

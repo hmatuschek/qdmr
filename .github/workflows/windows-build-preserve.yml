@@ -1,0 +1,163 @@
+# Windows build of qdmr / dmrconf WITH our fixes (gsquared3d fork, DD-15 amended 2026-11-01).
+#
+# Unlike windows-build.yml on the `windows-build` branch (author's unchanged release tag), this
+# builds THIS branch of gsquared3d/qdmr: v0.15.1 + "keep each AnyTone channel in its memory
+# slot" + the preserving write (dmrconf write --preserve [--dry-run] --plan, and plan-write).
+# It runs qdmr's own test suite plus our preserving-write tests on Windows, smoke-tests the
+# program the way the tool will launch it, and uploads a zip.
+#
+# No personal radio data is used here: this fork is public. Tests against Tom's radio memory
+# run on his laptop from the ham-radio-coordinator repo (docs/qdmr-windows/).
+
+name: Windows build (our fixes, preserving write)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [windows-build-preserve]
+
+permissions:
+  contents: read
+
+env:
+  QDMR_BASE: v0.15.1   # author's release our branch starts from
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 75
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - name: Get this branch of gsquared3d/qdmr
+        uses: actions/checkout@v4
+        with:
+          path: qdmr
+
+      - name: Set up MSYS2 with Qt6, libusb and yaml-cpp
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-qt6-base
+            mingw-w64-ucrt-x86_64-qt6-serialport
+            mingw-w64-ucrt-x86_64-qt6-positioning
+            mingw-w64-ucrt-x86_64-qt6-multimedia
+            mingw-w64-ucrt-x86_64-qt6-tools
+            mingw-w64-ucrt-x86_64-qt6-translations
+            mingw-w64-ucrt-x86_64-libusb
+            mingw-w64-ucrt-x86_64-yaml-cpp
+            mingw-w64-ucrt-x86_64-librsvg
+            zip
+
+      # Same switches as windows-build.yml: stop windows.h macros clashing with qdmr names.
+      - name: Configure (tests on)
+        run: >-
+          cmake -S qdmr -B build -G Ninja
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_TESTS=ON
+          -DINSTALL_UDEV_RULES=OFF
+          -DINSTALL_APPSTREAM_DATA=OFF
+          -DCMAKE_C_FLAGS="-DWIN32_LEAN_AND_MEAN -DNOMINMAX -DNOGDI"
+          -DCMAKE_CXX_FLAGS="-DWIN32_LEAN_AND_MEAN -DNOMINMAX -DNOGDI"
+          -DCMAKE_INSTALL_PREFIX="$PWD/stage"
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: qdmr's test suite plus the preserving-write tests (Windows)
+        run: |
+          export PATH="$PWD/build/lib:$PATH"
+          export QT_QPA_PLATFORM=offscreen
+          cd build
+          # The AnyTone tests' own output, in the log (ctest shows nothing if the test dies early).
+          (cd test && ../anytone_preserve_test.exe -o ../aps.txt,txt) || true
+          grep -v '^PASS' aps.txt | tail -120 || true
+          ctest --output-on-failure 2>&1 | tee ../ctest.txt
+          grep -q "AnytonePreserve" ../ctest.txt
+
+      - name: Install into a staging folder
+        run: cmake --install build
+
+      - name: Bundle the DLLs it needs (Qt plugins + MSYS2 runtime)
+        run: |
+          set -e
+          cp -v stage/lib/*.dll stage/bin/ 2>/dev/null || true
+          find build -name 'libdmrconf*.dll' -exec cp -nv {} stage/bin/ \;
+          cd stage/bin
+          windeployqt6 --release --no-translations dmrconf.exe || true
+          [ -f qdmr.exe ] && windeployqt6 --release --no-translations qdmr.exe || true
+          for exe in *.exe *.dll; do
+            ldd "$exe" | awk '/\/ucrt64\//{print $3}'
+          done | sort -u | while read -r dll; do cp -n "$dll" . ; done
+          ls -la
+
+      - name: Set up Python for the smoke tests
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # dmrconf is a Windows GUI-subsystem program (TD-003): launch it the way the tool's Python
+      # engine will (start, wait, capture output, read the exit code).
+      - name: Smoke tests (launched like the tool will, with captured output)
+        shell: pwsh
+        run: |
+          @'
+          import pathlib, subprocess, sys
+          bindir = pathlib.Path("stage/bin").resolve()
+          exe = bindir / "dmrconf.exe"
+          def run(args, name):
+              p = subprocess.run([str(exe), *args], cwd=bindir, capture_output=True, text=True, timeout=300)
+              out = (p.stdout or "") + (p.stderr or "")
+              pathlib.Path(f"smoke_{name}.txt").write_text(f"args: {args}\nexit code: {p.returncode}\n---\n{out}")
+              print(f"dmrconf {' '.join(args)} -> exit {p.returncode}, {len(out)} chars of output")
+              print(out[:2000])
+              return p.returncode, out
+          ok = True
+          rc, out = run(["--version"], "version")
+          rc, out = run(["--help"], "help")
+          for word in ("plan-write", "--preserve", "--dry-run", "--plan"):
+              if word not in out:
+                  print(f"::error::'{word}' missing from dmrconf --help"); ok = False
+          rc, out = run(["--list-radios"], "list_radios")
+          if "d878uv" not in out:
+              print("::error::radio list not captured (TD-003)"); ok = False
+          ex = pathlib.Path("qdmr/examples/minimal.yaml").resolve()
+          for r in ("d878uv", "d878uv2", "d578uv"):
+              dst = pathlib.Path(f"encode-{r}.bin").resolve()
+              rc, out = run(["encode", f"--radio={r}", str(ex), str(dst)], f"encode_{r}")
+              if not dst.exists():
+                  print(f"::error::encode failed for {r}"); ok = False
+          # plan-write must refuse to run without its inputs (and say so on the captured output)
+          rc, out = run(["plan-write", str(ex)], "plan_write_args")
+          if rc == 0 or "plan-write needs" not in out:
+              print("::error::plan-write did not refuse missing arguments"); ok = False
+          sys.exit(0 if ok else 1)
+          '@ | Set-Content smoke.py
+          python smoke.py
+
+      - name: Zip
+        run: |
+          SHA=${GITHUB_SHA::7}
+          NAME="qdmr-$QDMR_BASE-gsq-preserve-$SHA-windows-x64"
+          echo "NAME=$NAME" >> "$GITHUB_ENV"
+          cp qdmr/LICENSE stage/bin/LICENSE-qdmr-GPL3.txt
+          printf 'qdmr %s with gsquared3d fixes (keep channel slots, preserving write)\nSource: %s/%s, branch %s, commit %s\nBuild: %s/%s/actions/runs/%s\n' \
+            "$QDMR_BASE" "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$GITHUB_SHA" \
+            "$GITHUB_SERVER_URL" "$GITHUB_REPOSITORY" "$GITHUB_RUN_ID" > stage/bin/BUILD-INFO.txt
+          cd stage && zip -r "../$NAME.zip" bin
+
+      - name: Upload
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.NAME || 'qdmr-gsq-preserve-windows-x64' }}
+          path: |
+            qdmr-*-windows-x64.zip
+            smoke*.txt
+            ctest.txt

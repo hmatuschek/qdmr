@@ -5,6 +5,9 @@
 #include "logger.hh"
 #include "configcopyvisitor.hh"
 
+#include "anytone_preserve.hh"
+#include "anytone_writeall.hh"
+#include "config.hh"
 #define RBSIZE 16
 #define WBSIZE 16
 
@@ -288,12 +291,152 @@ AnytoneRadio::download() {
   return true;
 }
 
+void
+AnytoneRadio::setPreservingWrite(bool enable, const QString &planFile, bool dryRun,
+                                 const QString &currentYAML, bool wholeAreas,
+                                 const QString &expectFile) {
+  _preserve = enable;
+  _expectFile = expectFile;
+  _wholeAreas = wholeAreas;
+  _planFile = planFile;
+  _dryRun = dryRun;
+  _currentYAML = currentYAML;
+}
+
+
+bool
+AnytoneRadio::readAddresses(const QList<QPair<unsigned, unsigned>> &ranges,
+                            AnytonePreservingWrite::Memory &mem, unsigned &failedAddr,
+                            const ErrorStack &err) {
+  if ((StatusIdle != _task) || (nullptr == _dev) || (! _dev->isOpen())) {
+    errMsg(err) << "Cannot read addresses: radio not ready.";
+    return false;
+  }
+  if (! _dev->read_start(0, 0, err)) {
+    errMsg(err) << "Cannot read addresses: cannot enter programming mode.";
+    return false;
+  }
+  unsigned total = 0, done = 0;
+  for (const auto &r : ranges)
+    total += (r.second - r.first) / RBSIZE;
+  for (const auto &r : ranges) {
+    for (unsigned addr = r.first; addr < r.second; addr += RBSIZE, done++) {
+      QByteArray block(RBSIZE, '\0');
+      if (! _dev->read(0, addr, reinterpret_cast<uint8_t *>(block.data()), RBSIZE, err)) {
+        failedAddr = addr;
+        errMsg(err) << "Radio did not answer the read of block 0x" << QString::number(addr, 16)
+                    << " (" << done << " of " << total << " blocks read).";
+        _dev->read_finish(err);
+        _dev->reboot();   // after a failed read, as download() does on error
+        _dev->close();
+        return false;
+      }
+      mem[addr] = block;
+      if (0 == (done % 64))
+        emit downloadProgress(float(done*100)/std::max(1u, total));
+    }
+  }
+  _dev->read_finish(err);
+  _dev->close();      // end the session exactly as qdmr's own read (download) does
+  emit downloadProgress(100);
+  return true;
+}
+
+
+bool
+AnytoneRadio::uploadPreserving() {
+  // D-113 (ham-radio-coordinator): write everything like the CPS. The old write of changed
+  // blocks only erased channels 2 to 256 on radio B (TD-008) and is gone.
+  const AnytoneWriteAll::Map *map = AnytoneWriteAll::forCodeplug(*_codeplug);
+  if (nullptr == map) {
+    errMsg(_errorStack) << "No write map for " << _name << " yet: a model needs a USB capture of "
+                           "the vendor CPS writing it first (INV-020). Nothing was written.";
+    return false;
+  }
+
+  AnytonePreservingWrite::Reader reader =
+      [this](unsigned addr, uint8_t *dst, unsigned size, const ErrorStack &err) -> bool {
+    return _dev->read(0, addr, dst, size, err);
+  };
+  if (! _dev->read_start(0, 0, _errorStack)) {
+    errMsg(_errorStack) << "Cannot enter programming mode; nothing was written.";
+    return false;
+  }
+
+  emit uploadProgress(0);
+  AnytoneWriteAll::Result res;
+  if (! AnytoneWriteAll::build(*_codeplug, *map, reader, _config, _codeplugFlags, res, _currentYAML,
+                               [this](int p) { emit uploadProgress(p/2); }, _errorStack)) {
+    errMsg(_errorStack) << "Cannot plan the write; nothing was written.";
+    return false;
+  }
+  _planStats = res.planStats;
+  logInfo() << "Write everything (" << map->model << "): " << res.pages.size() << " pages of "
+            << map->pageSize/1024 << " KB read (" << res.blocksRead << " blocks), " << res.blocksChanged
+            << " blocks changed (" << res.bytesChanged << " bytes), " << res.send.size()
+            << " blocks to send (" << res.blocksSentNotCps << " beyond the CPS's own), "
+            << res.pagesAdded << " pages added by the edit.";
+
+  QString what = _dryRun ? "dry run (nothing written)" : "written";
+  if (! _planFile.isEmpty()) {
+    AnytonePreservingWrite::Stats s = res.planStats;
+    s.blocksToWrite = res.send.size();
+    s.blocksChanged = res.blocksChanged;
+    s.bytesChanged = res.bytesChanged;
+    s.blocksPadding = res.send.size() - res.blocksChanged;
+    QString header = QString("radio: %1, %2; write everything: %3 pages, %4 blocks sent, %5 changed "
+                             "(only changed blocks are listed)")
+        .arg(_name, what).arg(res.pages.size()).arg(res.send.size()).arg(res.blocksChanged);
+    if (! AnytonePreservingWrite::writePlanFile(_planFile, res.plan, s, header, _errorStack)) {
+      errMsg(_errorStack) << "Cannot save the write plan; nothing was written.";
+      return false;
+    }
+  }
+  if (! _expectFile.isEmpty()) {
+    if ((! AnytonePreservingWrite::writeMemoryFile(_expectFile, res.expected, _errorStack))
+        || (! AnytoneWriteAll::writeRangesFile(_expectFile + ".ranges", res.pages, map->pageSize,
+                                               QString("pages of %1, %2").arg(_name, what), _errorStack))
+        || (! AnytonePreservingWrite::writeMemoryFile(_expectFile + ".before", res.image, _errorStack))) {
+      errMsg(_errorStack) << "Cannot save the expected radio content; nothing was written.";
+      return false;
+    }
+  }
+
+  if (_dryRun) {
+    logInfo() << "Dry run: nothing was written to the radio.";
+    emit uploadProgress(100);
+    return true;
+  }
+
+  // Send in ascending address order, as the CPS and qdmr do.
+  unsigned n = 0;
+  for (auto it = res.send.cbegin(); it != res.send.cend(); it++, n++) {
+    if (! _dev->write(0, it.key(), reinterpret_cast<uint8_t *>(const_cast<char *>(it->constData())),
+                      WBSIZE, _errorStack)) {
+      errMsg(_errorStack) << "Cannot write block 0x" << QString::number(it.key(), 16) << " (" << n
+                          << " of " << res.send.size() << " written). The radio may be incomplete: "
+                          "restore it from the CPS backup.";
+      return false;
+    }
+    if (0 == (n % 64))
+      emit uploadProgress(50 + float(n*50)/std::max<qsizetype>(1, res.send.size()));
+  }
+  emit uploadProgress(100);
+  logInfo() << "Sent " << res.send.size() << " blocks. Verify after the radio restarts: read the pages "
+               "again (read-addr with --expect) and compare.";
+  return true;
+}
+
+
 bool
 AnytoneRadio::upload() {
   if (nullptr == _codeplug) {
     errMsg(_errorStack) << "Cannot write codeplug: Object not created yet.";
     return false;
   }
+
+  if (_preserve)
+    return uploadPreserving();
 
   // Download bitmaps first
   size_t nbitmaps = _codeplug->numImages();

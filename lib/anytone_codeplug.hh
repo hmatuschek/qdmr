@@ -9,6 +9,7 @@
 #include <QGeoCoordinate>
 
 class RadioSettings;
+class Zone;
 
 
 /** Base class interface for all Anytone radio codeplugs.
@@ -3420,6 +3421,20 @@ public:
 protected:
   virtual bool index(Config *config, Context &ctx, const ErrorStack &err=ErrorStack()) const;
 
+public:
+  /** Returns the memory slot recorded for a channel when it was read from the radio
+   * (AnyTone channel extension), or -1 if it has none. */
+  static int channelSlot(const Channel *ch);
+  /** Records the memory slot a channel was read from (creates the AnyTone extension if needed). */
+  static void setChannelSlot(Channel *ch, int slot);
+  /** Returns the place in the radio's zone list recorded for a zone when it was read from the
+   * radio (AnyTone zone extension), or -1 if it has none. */
+  static int zoneSlot(const Zone *zone);
+  /** Records the place a zone was read from (creates the AnyTone extension if needed). */
+  static void setZoneSlot(Zone *zone, int slot);
+
+protected:
+
   /** Allocates the bitmaps. This is also performed during a clear. */
   virtual bool allocateBitmaps() = 0;
   /** Sets all bitmaps for the given config. */
@@ -3452,6 +3467,7 @@ protected:
 
   // Allow access to protected allocation methods.
   friend class AnytoneRadio;
+  friend class AnytonePreservingWrite;
 };
 
 #endif // ANYTONECODEPLUG_HH

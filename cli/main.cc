@@ -9,6 +9,8 @@
 #include "radioinfo.hh"
 #include "readcodeplug.hh"
 #include "writecodeplug.hh"
+#include "planwrite.hh"
+#include "readaddresses.hh"
 #include "writecallsigndb.hh"
 #include "encodecodeplug.hh"
 #include "encodecallsigndb.hh"
@@ -102,6 +104,49 @@ int main(int argc, char *argv[])
                        "main", "Initializes the code-plug in the radio. If not present (default) "
                                "the code-plug gets updated, maintaining all settings made earlier.")));
   parser.addOption(QCommandLineOption(
+                     "preserve",
+                     QCoreApplication::translate(
+                       "main", "AnyTone only (write): write everything like the vendor CPS. Every "
+                       "flash page the CPS writes is read whole and sent back with every block "
+                       "holding data; only the bits the edit changes differ. Needs a write map "
+                       "for the model (D878UVII only so far) and, without --dry-run, --expect.")));
+  parser.addOption(QCommandLineOption(
+                     "dry-run",
+                     QCoreApplication::translate(
+                       "main", "With --preserve: read the radio and plan the write, but write "
+                       "nothing.")));
+  parser.addOption({
+                     "expect",
+                     QCoreApplication::translate("main", "With --preserve or plan-write: save the "
+                     "radio's expected content after the write to this memory file (plus FILE.ranges, "
+                     "the pages written, and FILE.before, their content before). With read-addr: "
+                     "compare what is read with this file."),
+                     "FILENAME"
+                   });
+  parser.addOption(QCommandLineOption(
+                     "missing-blank",
+                     QCoreApplication::translate(
+                       "main", "plan-write only (offline tests): treat blocks the memory file lacks "
+                       "as blank (0xFF) instead of failing.")));
+  parser.addOption({
+                     "plan",
+                     QCoreApplication::translate("main", "With --preserve or plan-write: save the "
+                     "planned block writes (address, before, after) to this file."),
+                     "FILENAME"
+                   });
+  parser.addOption({
+                     "save-current",
+                     QCoreApplication::translate("main", "With --preserve or plan-write: save the "
+                     "radio's current set-up, as decoded before the write, to this YAML file."),
+                     "FILENAME"
+                   });
+  parser.addOption({
+                     "memory",
+                     QCoreApplication::translate("main", "plan-write: radio memory file (one line "
+                     "per 16-byte block: address data, in hex) used instead of a radio."),
+                     "FILENAME"
+                   });
+  parser.addOption(QCommandLineOption(
                      "update-device-clock",
                      QCoreApplication::translate(
                        "main", "If present, the device clock gets set to the system time on any "
@@ -124,7 +169,7 @@ int main(int argc, char *argv[])
                                                  "keys to be used with the --radio option.")));
   parser.addPositionalArgument(
         "command", QCoreApplication::translate(
-          "main", "Specifies the command to perform. Either detect, verify, read, write, "
+          "main", "Specifies the command to perform. Either detect, verify, read, read-addr, write, plan-write, "
           "write-db, encode, encode-db, decode or info. Consult the man-page of dmrconf for a "
           "detailed description of these commands."),
         QCoreApplication::translate("main", "[command]"));
@@ -196,6 +241,10 @@ int main(int argc, char *argv[])
     res = readCodeplug(parser, app);
   else if ("write" == command)
     res = writeCodeplug(parser, app);
+  else if ("plan-write" == command)
+    res = planWrite(parser, app);
+  else if ("read-addr" == command)
+    res = readAddresses(parser, app);
   else if ("write-db" == command)
     res = writeCallsignDB(parser, app);
   else if ("encode" == command)

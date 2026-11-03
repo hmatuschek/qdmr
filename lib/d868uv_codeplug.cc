@@ -1432,8 +1432,9 @@ D868UVCodeplug::setBitmaps(Context& ctx)
 
   // Mark valid channels (set bit)
   ChannelBitmapElement channel_bitmap(data(Offset::channelBitmap()));
-  unsigned int num_channels = std::min(Limit::numChannels(), ctx.count<Channel>());
-  channel_bitmap.clear(); channel_bitmap.enableFirst(num_channels);
+  channel_bitmap.clear();
+  for (unsigned int i=0; i<Limit::numChannels(); i++)
+    channel_bitmap.setEncoded(i, ctx.has<Channel>(i));
 
   // Mark valid contacts (clear bit)
   ContactBitmapElement contact_bitmap(data(Offset::contactBitmap()));
@@ -1445,10 +1446,12 @@ D868UVCodeplug::setBitmaps(Context& ctx)
   unsigned int num_dtmf_contacts = std::min(Limit::numDTMFContacts(), ctx.count<DTMFContact>());
   analog_contact_bitmap.clear(); analog_contact_bitmap.enableFirst(num_dtmf_contacts);
 
-  // Mark valid zones (set bits)
+  // Mark valid zones (set bits), per place in the zone list: zones keep the place they were
+  // read from, so the list may have gaps (see AnytoneCodeplug::index()).
   ZoneBitmapElement zone_bitmap(data(Offset::zoneBitmap()));
-  unsigned int num_zones = std::min(Limit::numZones(), ctx.count<Zone>());
-  zone_bitmap.clear(); zone_bitmap.enableFirst(num_zones);
+  zone_bitmap.clear();
+  for (unsigned int i=0; i<Limit::numZones(); i++)
+    zone_bitmap.setEncoded(i, ctx.has<Zone>(i));
 
   // Mark group lists
   GroupListBitmapElement group_bitmap(data(Offset::groupListBitmap()));
@@ -1630,7 +1633,9 @@ D868UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode channels
-  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+  for (unsigned int i=0; i<Limit::numChannels(); i++) {
+    if (! ctx.has<Channel>(i))
+      continue;
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     ChannelElement ch(data(Offset::channelBanks() + bank * Offset::betweenChannelBanks()
@@ -1655,7 +1660,7 @@ D868UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
     if (Channel *obj = ch.toChannelObj(ctx)) {
-      ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+      ctx.config()->channelList()->add(obj); ctx.add(obj, i); setChannelSlot(obj, i);
     }
   }
   return true;
@@ -1952,8 +1957,10 @@ bool
 D868UVCodeplug::encodeZones(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err);
 
-  // Encode zones
-  for (unsigned int i=0; i<ctx.count<Zone>(); i++) {
+  // Encode zones, each at its place in the zone list (which may have gaps).
+  for (unsigned int i=0; i<Limit::numZones(); i++) {
+    if (! ctx.has<Zone>(i))
+      continue;
     Zone *zone = ctx.get<Zone>(i);
     // Clear name and channel list
     uint8_t  *name     = (uint8_t *)data(Offset::zoneNames() + i*Offset::betweenZoneNames());
@@ -1997,7 +2004,8 @@ D868UVCodeplug::createZones(Context &ctx, const ErrorStack &err) {
       zone->deleteLater();
       return false;
     }
-    // add to config
+    // add to config, remembering the zone's place in the radio's zone list
+    setZoneSlot(zone, i);
     ctx.config()->zones()->add(zone); ctx.add(zone, i);
   }
   return true;

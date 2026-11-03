@@ -471,7 +471,9 @@ bool
 D168UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStack &err) {
   Q_UNUSED(flags); Q_UNUSED(err)
   // Encode channels
-  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+  for (unsigned int i=0; i<Limit::numChannels(); i++) {
+    if (! ctx.has<Channel>(i))
+      continue;
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
@@ -504,7 +506,7 @@ D168UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
     ChannelExtensionElement ext(data(addr + Offset::toChannelExtension()));
 
     if (Channel *obj = ch.toChannelObj(ctx)) {
-      ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+      ctx.config()->channelList()->add(obj); ctx.add(obj, i); setChannelSlot(obj, i);
       ext.updateChannelObj(obj, ctx);
     }
   }

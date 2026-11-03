@@ -11,6 +11,7 @@
 #define __ANYTONE_RADIO_HH__
 
 #include "radio.hh"
+#include "anytone_preserve.hh"
 #include "anytone_interface.hh"
 #include "anytone_codeplug.hh"
 #include "anytone_satelliteconfig.hh"
@@ -47,6 +48,25 @@ public:
   const Codeplug &codeplug() const;
   Codeplug &codeplug();
 
+  /** Switches the next codeplug upload to a preserving "write everything" (AnytoneWriteAll,
+   * D-113): only the bits the edit changes differ; every page the CPS writes is read whole and
+   * sent back with every block that holds data.
+   * @param planFile If not empty, the planned blocks are saved there before anything is written.
+   * @param dryRun If @c true, nothing is written to the radio (the radio is only read).
+   * @param currentYAML If not empty, the radio's current set-up is saved there as YAML. */
+  void setPreservingWrite(bool enable, const QString &planFile=QString(), bool dryRun=false,
+                          const QString &currentYAML=QString(), bool wholeAreas=true,
+                          const QString &expectFile=QString());
+
+  /** Read-only: reads the given address ranges ([start, end), 16-byte aligned) from the radio
+   * into @c mem, block by block. Stops at the first block the radio does not answer correctly
+   * and returns @c false with its address in @c failedAddr; @c mem then holds every block read
+   * before it. Writes nothing. Blocking; call it instead of a download, on a freshly detected
+   * radio. */
+  bool readAddresses(const QList<QPair<unsigned, unsigned>> &ranges,
+                     AnytonePreservingWrite::Memory &mem, unsigned &failedAddr,
+                     const ErrorStack &err=ErrorStack());
+
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
   bool startDownload(const TransferFlags &flags, const ErrorStack &err=ErrorStack());
@@ -70,6 +90,8 @@ private:
   virtual bool download();
   /** Uploads the encoded codeplug to the radio. This method block until the upload is complete. */
   virtual bool upload();
+  /** Preserving variant of @c upload(). */
+  virtual bool uploadPreserving();
   /** Uploads the encoded callsign database to the radio.
    * This method block until the upload is complete. */
   virtual bool uploadCallsigns();
@@ -85,6 +107,21 @@ protected:
   /** If @c true, the codeplug on the radio gets updated upon upload. If @c false, it gets
    * overridden. */
   Codeplug::Flags _codeplugFlags;
+  /** If @c true, the next upload is a preserving write. */
+  bool _preserve = false;
+  /** Where to save the preserving-write plan (may be empty). */
+  QString _planFile;
+  /** If @c true, the preserving write only plans and writes nothing. */
+  bool _dryRun = false;
+  /** Where to save the radio's current set-up as YAML (may be empty). */
+  QString _currentYAML;
+  /** If @c true, changed blocks are written with the rest of their memory area. */
+  bool _wholeAreas = true;
+  /** Where to save the radio's expected content after the write (and, with suffixes
+   * ".ranges" and ".before", the pages written and their content before). May be empty. */
+  QString _expectFile;
+  /** Counters of the last preserving-write plan. */
+  AnytonePreservingWrite::Stats _planStats;
   /** Owns the generic configuration. */
   Config *_config;
   /** A weak reference to the user-database. */

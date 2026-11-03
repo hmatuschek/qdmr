@@ -3410,7 +3410,9 @@ D578UVCodeplug::encodeChannels(const Flags &flags, Context &ctx, const ErrorStac
   Q_UNUSED(flags); Q_UNUSED(err)
 
   // Encode channels
-  for (unsigned int i=0; i<ctx.count<Channel>(); i++) {
+  for (unsigned int i=0; i<Limit::numChannels(); i++) {
+    if (! ctx.has<Channel>(i))
+      continue;
     // enable channel
     uint16_t bank = i/Limit::channelsPerBank(), idx = i%Limit::channelsPerBank();
     uint32_t addr = Offset::channelBanks() + bank*Offset::betweenChannelBanks()
@@ -3439,7 +3441,7 @@ D578UVCodeplug::createChannels(Context &ctx, const ErrorStack &err) {
     ChannelElement ch(data(Offset::channelBanks() + bank*Offset::betweenChannelBanks()
                            + idx*ChannelElement::size()));
     if (Channel *obj = ch.toChannelObj(ctx)) {
-      ctx.config()->channelList()->add(obj); ctx.add(obj, i);
+      ctx.config()->channelList()->add(obj); ctx.add(obj, i); setChannelSlot(obj, i);
     }
   }
   return true;

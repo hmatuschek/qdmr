@@ -76,6 +76,10 @@ class AnytoneChannelExtension: public ConfigExtension
 
   /** Holds the frequency correction in some unknown units. */
   Q_PROPERTY(int frequencyCorrection READ frequencyCorrection WRITE setFrequencyCorrection)
+  /** The channel's memory slot in the radio (0-based), as read from the radio; -1 = not yet placed.
+   * Encoding keeps a channel in this slot, so the radio's channel numbering and any per-slot data
+   * stay as they are. New channels go into the lowest free slots. */
+  Q_PROPERTY(int memorySlot READ memorySlot WRITE setMemorySlot)
   /** If @c true, the hands-free feature is enabled for this channel. */
   Q_PROPERTY(bool handsFree READ handsFree WRITE enableHandsFree)
   /** A reference to the FM APRS frequency. If not set, the default will be used. */
@@ -101,6 +105,11 @@ public:
   /** Sets the frequency correction. */
   void setFrequencyCorrection(int corr);
 
+  /** Returns the channel's memory slot in the radio, -1 if none. */
+  int memorySlot() const;
+  /** Sets the channel's memory slot in the radio. */
+  void setMemorySlot(int slot);
+
   /** Returns @c true if the hands-free feature is enabled. */
   bool handsFree() const;
   /** Enables/disables the hands-free feature for this channel. */
@@ -118,6 +127,8 @@ public:
 protected:
   /** The frequency correction. */
   int _frequencyCorrection;
+  /** The memory slot, -1 if none. */
+  int _memorySlot;
   /** If @c true, the hands-free feature is enabled for this channel. */
   bool _handsFree;
   /** A reference to the FM APRS frequency. */
@@ -250,6 +261,8 @@ class AnytoneZoneExtension : public ConfigExtension
 
   /** If @c true, the zone is hidden in the menu. */
   Q_PROPERTY(bool hidden READ hidden WRITE enableHidden)
+  /** The zone's place in the radio's zone list, -1 if none (a new zone). */
+  Q_PROPERTY(int memorySlot READ memorySlot WRITE setMemorySlot)
 
 public:
   /** Default constructor. */
@@ -262,9 +275,16 @@ public:
   /** Enables/disables hidden zone. */
   void enableHidden(bool enable);
 
+  /** Returns the zone's place in the radio's zone list, -1 if none. */
+  int memorySlot() const;
+  /** Sets the zone's place in the radio's zone list. */
+  void setMemorySlot(int slot);
+
 protected:
   /** If @c true, the zone is hidden in the menu. */
   bool _hidden;
+  /** The zone's place in the radio's zone list, -1 if none. */
+  int _memorySlot;
 };
 
 
