@@ -4661,17 +4661,35 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
 
   // Map zones, the same way as channels: a zone read from the radio keeps its place in the
   // radio's zone list (which may have gaps), new zones take the lowest free places.
+  // A zone with an A and a B list is split into two zones ("X A", "X B") by preprocess(); the
+  // B part carries no place of its own, so it goes right after its A part when that place is
+  // free (that is where it was read from), otherwise to the lowest free place.
   QSet<int> usedZoneSlots;
+  for (int i=0; i<config->zones()->count(); i++) {
+    int slot = zoneSlot(config->zones()->zone(i));
+    if (slot >= 0)
+      usedZoneSlots.insert(slot);
+  }
+  QSet<int> placedZoneSlots;
   QList<Zone *> unplacedZones;
+  int prevSlot = -1;
   for (int i=0; i<config->zones()->count(); i++) {
     Zone *zone = config->zones()->zone(i);
     int slot = zoneSlot(zone);
-    if ((slot >= 0) && (! usedZoneSlots.contains(slot))) {
-      ctx.add(zone, slot); usedZoneSlots.insert(slot);
+    if ((slot >= 0) && (! placedZoneSlots.contains(slot))) {
+      ctx.add(zone, slot); placedZoneSlots.insert(slot);
+    } else if ((slot < 0) && (prevSlot >= 0) && zone->name().endsWith(" B")
+               && (i > 0) && config->zones()->zone(i-1)->name().endsWith(" A")
+               && (! usedZoneSlots.contains(prevSlot+1)) && (! placedZoneSlots.contains(prevSlot+1))) {
+      slot = prevSlot+1;
+      ctx.add(zone, slot); placedZoneSlots.insert(slot); usedZoneSlots.insert(slot);
     } else {
       unplacedZones.append(zone);
+      slot = -1;
     }
+    prevSlot = slot;
   }
+  usedZoneSlots.unite(placedZoneSlots);
   for (int slot=0; ! unplacedZones.isEmpty(); slot++) {
     if (usedZoneSlots.contains(slot))
       continue;

@@ -279,7 +279,7 @@ void AnytonePreserveTest::testZonesKeepTheirPlaces() {
   QVERIFY(before.zones()->count() >= 2);
   QStringList places0 = zonePlaces(before);
   for (int z=0; z<before.zones()->count(); z++)
-    QCOMPARE(AnytoneCodeplug::zoneSlot(before.zones()->zone(z)), z); // from-scratch radio: no gaps
+    QVERIFY(AnytoneCodeplug::zoneSlot(before.zones()->zone(z)) >= 0); // every zone has a place
 
   // 1. Make a gap: remove the first zone. The others must stay where they are.
   QString gap = c0;
@@ -288,7 +288,12 @@ void AnytonePreserveTest::testZonesKeepTheirPlaces() {
   QRegularExpressionMatch m = firstZone.match(gap, zs+7);
   QVERIFY2(m.hasMatch() && (m.capturedStart(0) == zs+7), "first zone not found");
   QString removed = before.zones()->zone(0)->name();
+  QRegularExpression idRe("\n  - id: ([^\n]+)\n");
+  QString zid = idRe.match(m.captured(0)).captured(1).trimmed();
+  QVERIFY(! zid.isEmpty());
   gap.remove(m.capturedStart(0)+1, m.capturedLength(0)-1);
+  // Settings may point at the removed zone (e.g. the zone shown on start-up): drop those lines.
+  gap.remove(QRegularExpression(QString("\n[ ]+[A-Za-z]+: %1(?=\n)").arg(QRegularExpression::escape(zid))));
   APW::Plan plan; QString cur;
   QVERIFY2(planYAML(*cp, mem, gap, plan, cur, msg), qPrintable(msg));
   APW::Memory holed = apply(mem, plan);
@@ -309,6 +314,8 @@ void AnytonePreserveTest::testZonesKeepTheirPlaces() {
   QVERIFY2(readRadio(*cp, after, c2, msg), qPrintable(msg));
   Config now;
   QVERIFY2(load(c2, now, msg), qPrintable(msg));
+  // The first zone used place 0 (and place 1 for its B half, if it had one); the new zone
+  // takes place 0 and every other zone stays where it was.
   QCOMPARE(zonePlaces(now), QStringList({"NEW CHANNELS@0"}) + expect);
   QVERIFY2(byName(now, "W06 NEW"), "new channel not in the radio (slot not marked in use)");
   QCOMPARE(zoneFingerprint(now, {"W06 NEW"}).mid(1), zoneFingerprint(mid));
@@ -333,7 +340,9 @@ void AnytonePreserveTest::testAPRSOnlyChannelTakesNoSlot() {
   QString base = QString::fromUtf8(tf.readAll());
   // An FM APRS system whose revert channel is in no zone (so the radio holds it only in its
   // APRS settings).
-  int z = base.indexOf("\nzones:");
+  int cs = base.indexOf("\nchannels:");
+  QVERIFY(cs >= 0);
+  int z = base.indexOf(QRegularExpression("\n[a-zA-Z]"), cs+1);
   QVERIFY(z > 0);
   base.insert(z+1, "  - fm:\n      id: aprsch\n      name: APRS TX\n      rxFrequency: 144.39 MHz\n"
                    "      txFrequency: 144.39 MHz\n      bandwidth: Wide\n      power: Low\n");

@@ -9,6 +9,7 @@
 #include <QGeoCoordinate>
 
 class RadioSettings;
+class Zone;
 
 
 /** Base class interface for all Anytone radio codeplugs.
