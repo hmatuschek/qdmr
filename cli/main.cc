@@ -105,9 +105,9 @@ int main(int argc, char *argv[])
   parser.addOption(QCommandLineOption(
                      "preserve",
                      QCoreApplication::translate(
-                       "main", "AnyTone only (write): preserving write. Only the bits the edit "
-                       "changes are written; everything else stays as the radio holds it. "
-                       "Every written block is read back and compared.")));
+                       "main", "AnyTone only (write): plan a preserving write, where only the "
+                       "bits the edit changes differ from what the radio holds. Currently "
+                       "requires --dry-run: real writes are disabled (TD-008).")));
   parser.addOption(QCommandLineOption(
                      "dry-run",
                      QCoreApplication::translate(

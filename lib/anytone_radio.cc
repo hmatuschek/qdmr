@@ -335,6 +335,14 @@ AnytoneRadio::uploadPreserving() {
     return true;
   }
 
+  // TD-008 (ham-radio-coordinator): the AnyTone erases a whole 16 KB flash block when any part
+  // of it is written, so sending only the planned blocks erased channels 2 to 256 on radio B
+  // (2026-11-02). Real preserving writes stay blocked until whole erase blocks are sent and
+  // that fix has been tested offline and approved by Tom.
+  errMsg(_errorStack) << "Preserving write to the radio is disabled (TD-008: a partial write erases "
+                         "the rest of each 16 KB flash block). Nothing was written. Use --dry-run.";
+  return false;
+
   // Write only the planned blocks
   unsigned n = 0;
   for (auto it=plan.begin(); it!=plan.end(); it++, n++) {
