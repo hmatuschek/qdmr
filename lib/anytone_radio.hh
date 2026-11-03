@@ -56,6 +56,15 @@ public:
   void setPreservingWrite(bool enable, const QString &planFile=QString(), bool dryRun=false,
                           const QString &currentYAML=QString(), bool wholeAreas=true);
 
+  /** Read-only: reads the given address ranges ([start, end), 16-byte aligned) from the radio
+   * into @c mem, block by block. Stops at the first block the radio does not answer correctly
+   * and returns @c false with its address in @c failedAddr; @c mem then holds every block read
+   * before it. Writes nothing. Blocking; call it instead of a download, on a freshly detected
+   * radio. */
+  bool readAddresses(const QList<QPair<unsigned, unsigned>> &ranges,
+                     AnytonePreservingWrite::Memory &mem, unsigned &failedAddr,
+                     const ErrorStack &err=ErrorStack());
+
 public slots:
   /** Starts the download of the codeplug and derives the generic configuration from it. */
   bool startDownload(const TransferFlags &flags, const ErrorStack &err=ErrorStack());

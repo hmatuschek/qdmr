@@ -10,6 +10,7 @@
 #include "readcodeplug.hh"
 #include "writecodeplug.hh"
 #include "planwrite.hh"
+#include "readaddresses.hh"
 #include "writecallsigndb.hh"
 #include "encodecodeplug.hh"
 #include "encodecallsigndb.hh"
@@ -159,7 +160,7 @@ int main(int argc, char *argv[])
                                                  "keys to be used with the --radio option.")));
   parser.addPositionalArgument(
         "command", QCoreApplication::translate(
-          "main", "Specifies the command to perform. Either detect, verify, read, write, plan-write, "
+          "main", "Specifies the command to perform. Either detect, verify, read, read-addr, write, plan-write, "
           "write-db, encode, encode-db, decode or info. Consult the man-page of dmrconf for a "
           "detailed description of these commands."),
         QCoreApplication::translate("main", "[command]"));
@@ -233,6 +234,8 @@ int main(int argc, char *argv[])
     res = writeCodeplug(parser, app);
   else if ("plan-write" == command)
     res = planWrite(parser, app);
+  else if ("read-addr" == command)
+    res = readAddresses(parser, app);
   else if ("write-db" == command)
     res = writeCallsignDB(parser, app);
   else if ("encode" == command)

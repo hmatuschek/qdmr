@@ -302,6 +302,45 @@ AnytoneRadio::setPreservingWrite(bool enable, const QString &planFile, bool dryR
 
 
 bool
+AnytoneRadio::readAddresses(const QList<QPair<unsigned, unsigned>> &ranges,
+                            AnytonePreservingWrite::Memory &mem, unsigned &failedAddr,
+                            const ErrorStack &err) {
+  if ((StatusIdle != _task) || (nullptr == _dev) || (! _dev->isOpen())) {
+    errMsg(err) << "Cannot read addresses: radio not ready.";
+    return false;
+  }
+  if (! _dev->read_start(0, 0, err)) {
+    errMsg(err) << "Cannot read addresses: cannot enter programming mode.";
+    return false;
+  }
+  unsigned total = 0, done = 0;
+  for (const auto &r : ranges)
+    total += (r.second - r.first) / RBSIZE;
+  for (const auto &r : ranges) {
+    for (unsigned addr = r.first; addr < r.second; addr += RBSIZE, done++) {
+      QByteArray block(RBSIZE, '\0');
+      if (! _dev->read(0, addr, reinterpret_cast<uint8_t *>(block.data()), RBSIZE, err)) {
+        failedAddr = addr;
+        errMsg(err) << "Radio did not answer the read of block 0x" << QString::number(addr, 16)
+                    << " (" << done << " of " << total << " blocks read).";
+        _dev->read_finish(err);
+        _dev->reboot();   // after a failed read, as download() does on error
+        _dev->close();
+        return false;
+      }
+      mem[addr] = block;
+      if (0 == (done % 64))
+        emit downloadProgress(float(done*100)/std::max(1u, total));
+    }
+  }
+  _dev->read_finish(err);
+  _dev->close();      // end the session exactly as qdmr's own read (download) does
+  emit downloadProgress(100);
+  return true;
+}
+
+
+bool
 AnytoneRadio::uploadPreserving() {
   AnytonePreservingWrite::Reader reader =
       [this](unsigned addr, uint8_t *dst, unsigned size, const ErrorStack &err) -> bool {
