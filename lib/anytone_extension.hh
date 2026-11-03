@@ -261,6 +261,8 @@ class AnytoneZoneExtension : public ConfigExtension
 
   /** If @c true, the zone is hidden in the menu. */
   Q_PROPERTY(bool hidden READ hidden WRITE enableHidden)
+  /** The zone's place in the radio's zone list, -1 if none (a new zone). */
+  Q_PROPERTY(int memorySlot READ memorySlot WRITE setMemorySlot)
 
 public:
   /** Default constructor. */
@@ -273,9 +275,16 @@ public:
   /** Enables/disables hidden zone. */
   void enableHidden(bool enable);
 
+  /** Returns the zone's place in the radio's zone list, -1 if none. */
+  int memorySlot() const;
+  /** Sets the zone's place in the radio's zone list. */
+  void setMemorySlot(int slot);
+
 protected:
   /** If @c true, the zone is hidden in the menu. */
   bool _hidden;
+  /** The zone's place in the radio's zone list, -1 if none. */
+  int _memorySlot;
 };
 
 

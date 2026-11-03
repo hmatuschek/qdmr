@@ -4564,6 +4564,20 @@ AnytoneCodeplug::setChannelSlot(Channel *ch, int slot) {
   }
 }
 
+int
+AnytoneCodeplug::zoneSlot(const Zone *zone) {
+  if (auto *ext = zone->anytoneExtension())
+    return ext->memorySlot();
+  return -1;
+}
+
+void
+AnytoneCodeplug::setZoneSlot(Zone *zone, int slot) {
+  if (nullptr == zone->anytoneExtension())
+    zone->setAnytoneExtension(new AnytoneZoneExtension());
+  zone->anytoneExtension()->setMemorySlot(slot);
+}
+
 bool
 AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) const {
   Q_UNUSED(err)
@@ -4594,6 +4608,31 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   for (int i=0; i<config->rxGroupLists()->count(); i++)
     ctx.add(config->rxGroupLists()->list(i), i);
 
+  // Channels that are only the FM APRS system's revert channel: the radio keeps that channel's
+  // frequency, tone, power and width in its APRS settings, not in a channel slot. When decoding
+  // finds no channel with the APRS frequency it creates one ("APRS Channel"); such a channel has
+  // no slot and is in no zone, so it must not take one of the radio's free slots.
+  QSet<const Channel *> zoned;
+  for (int i=0; i<config->zones()->count(); i++) {
+    Zone *zone = config->zones()->zone(i);
+    for (int j=0; j<zone->A()->count(); j++)
+      zoned.insert(zone->A()->get(j)->as<Channel>());
+    for (int j=0; j<zone->B()->count(); j++)
+      zoned.insert(zone->B()->get(j)->as<Channel>());
+  }
+  QSet<const Channel *> aprsOnly;
+  for (int i=0; i<config->posSystems()->count(); i++) {
+    auto *sys = config->posSystems()->system(i);
+    if (! sys->is<FMAPRSSystem>())
+      continue;
+    auto *aprs = sys->as<FMAPRSSystem>();
+    if (! aprs->hasRevertChannel())
+      continue;
+    const Channel *rev = aprs->revertChannel();
+    if ((channelSlot(rev) < 0) && (! zoned.contains(rev)))
+      aprsOnly.insert(rev);
+  }
+
   // Map channels. A channel read from the radio keeps the memory slot it was read from, so
   // the radio's channel numbering (and anything stored per slot) is left as it is. Channels
   // without a slot (new ones) take the lowest free slots, in list order.
@@ -4601,6 +4640,8 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
   QList<Channel *> unplaced;
   for (int i=0, am=0; i<config->channelList()->count(); i++) {
     Channel *ch = config->channelList()->channel(i);
+    if (aprsOnly.contains(ch))
+      continue;
     if (ch->is<DMRChannel>() || ch->is<FMChannel>()) {
       int slot = channelSlot(ch);
       if ((slot >= 0) && (! usedSlots.contains(slot))) {
@@ -4618,9 +4659,24 @@ AnytoneCodeplug::index(Config *config, Context &ctx, const ErrorStack &err) cons
     ctx.add(unplaced.takeFirst(), slot); usedSlots.insert(slot);
   }
 
-  // Map zones
-  for (int i=0; i<config->zones()->count(); i++)
-    ctx.add(config->zones()->zone(i), i);
+  // Map zones, the same way as channels: a zone read from the radio keeps its place in the
+  // radio's zone list (which may have gaps), new zones take the lowest free places.
+  QSet<int> usedZoneSlots;
+  QList<Zone *> unplacedZones;
+  for (int i=0; i<config->zones()->count(); i++) {
+    Zone *zone = config->zones()->zone(i);
+    int slot = zoneSlot(zone);
+    if ((slot >= 0) && (! usedZoneSlots.contains(slot))) {
+      ctx.add(zone, slot); usedZoneSlots.insert(slot);
+    } else {
+      unplacedZones.append(zone);
+    }
+  }
+  for (int slot=0; ! unplacedZones.isEmpty(); slot++) {
+    if (usedZoneSlots.contains(slot))
+      continue;
+    ctx.add(unplacedZones.takeFirst(), slot); usedZoneSlots.insert(slot);
+  }
 
   // Map scan lists
   for (int i=0; i<config->scanlists()->count(); i++)

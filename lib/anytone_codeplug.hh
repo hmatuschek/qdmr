@@ -3422,6 +3422,11 @@ public:
   static int channelSlot(const Channel *ch);
   /** Records the memory slot a channel was read from (creates the AnyTone extension if needed). */
   static void setChannelSlot(Channel *ch, int slot);
+  /** Returns the place in the radio's zone list recorded for a zone when it was read from the
+   * radio (AnyTone zone extension), or -1 if it has none. */
+  static int zoneSlot(const Zone *zone);
+  /** Records the place a zone was read from (creates the AnyTone extension if needed). */
+  static void setZoneSlot(Zone *zone, int slot);
 
 protected:
 

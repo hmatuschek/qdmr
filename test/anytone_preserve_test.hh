@@ -19,6 +19,10 @@ private slots:
   void testAnalogEditLeavesDigitalAlone();
   void testAddAnalogChannelLeavesDigitalAlone_data();
   void testAddAnalogChannelLeavesDigitalAlone();
+  void testZonesKeepTheirPlaces_data();
+  void testZonesKeepTheirPlaces();
+  void testAPRSOnlyChannelTakesNoSlot_data();
+  void testAPRSOnlyChannelTakesNoSlot();
   void testMemoryFileRoundTrip();
 };
 

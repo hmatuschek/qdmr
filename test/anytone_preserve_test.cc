@@ -242,6 +242,156 @@ void AnytonePreserveTest::testAddAnalogChannelLeavesDigitalAlone() {
   QCOMPARE(now.channelList()->count(), before.channelList()->count()+1);
 }
 
+/** Zone names in the order of their places in the radio's zone list, with their places. */
+static QStringList zonePlaces(const Config &c) {
+  QStringList out;
+  for (int z=0; z<c.zones()->count(); z++)
+    out << QString("%1@%2").arg(c.zones()->zone(z)->name()).arg(AnytoneCodeplug::zoneSlot(c.zones()->zone(z)));
+  return out;
+}
+
+/** Appends an FM channel and a zone holding it to a set-up given as YAML text. */
+static bool addChannelAndZone(QString &yaml, const QString &chId, const QString &chName,
+                              const QString &zoneName) {
+  int z = yaml.indexOf("\nzones:");
+  if (z < 0) return false;
+  yaml.insert(z+1, QString("  - fm:\n      id: %1\n      name: %2\n      rxFrequency: 146.52 MHz\n"
+                           "      txFrequency: 146.52 MHz\n      bandwidth: Wide\n      power: Low\n")
+              .arg(chId, chName));
+  z = yaml.indexOf("\nzones:");
+  int end = yaml.indexOf(QRegularExpression("\n[a-zA-Z]"), z+1);
+  if (end < 0) end = yaml.size();
+  yaml.insert(end, QString("\n  - id: znew_%1\n    name: %2\n    A: [%1]\n    B: []").arg(chId, zoneName));
+  return true;
+}
+
+void AnytonePreserveTest::testZonesKeepTheirPlaces_data() { radios(); }
+void AnytonePreserveTest::testZonesKeepTheirPlaces() {
+  // W-06 case 3: a radio whose zone list has a gap. qdmr used to close the gap, so a new zone
+  // was written over the zone after it. Zones must keep their places; new ones fill the gap.
+  QFETCH(QString, radio);
+  std::unique_ptr<AnytoneCodeplug> cp(makeCodeplug(radio));
+  APW::Memory mem; QString msg, c0;
+  QVERIFY2(makeRadio(*cp, mem, msg), qPrintable(msg));
+  QVERIFY2(readRadio(*cp, mem, c0, msg), qPrintable(msg));
+  Config before;
+  QVERIFY2(load(c0, before, msg), qPrintable(msg));
+  QVERIFY(before.zones()->count() >= 2);
+  QStringList places0 = zonePlaces(before);
+  for (int z=0; z<before.zones()->count(); z++)
+    QCOMPARE(AnytoneCodeplug::zoneSlot(before.zones()->zone(z)), z); // from-scratch radio: no gaps
+
+  // 1. Make a gap: remove the first zone. The others must stay where they are.
+  QString gap = c0;
+  QRegularExpression firstZone("\n  - id: [^\n]+\n    name: [^\n]+\n(    [^\n]*\n)*?(?=  - id: |[a-zA-Z])");
+  int zs = gap.indexOf("\nzones:");
+  QRegularExpressionMatch m = firstZone.match(gap, zs+7);
+  QVERIFY2(m.hasMatch() && (m.capturedStart(0) == zs+7), "first zone not found");
+  QString removed = before.zones()->zone(0)->name();
+  gap.remove(m.capturedStart(0)+1, m.capturedLength(0)-1);
+  APW::Plan plan; QString cur;
+  QVERIFY2(planYAML(*cp, mem, gap, plan, cur, msg), qPrintable(msg));
+  APW::Memory holed = apply(mem, plan);
+  QString c1;
+  QVERIFY2(readRadio(*cp, holed, c1, msg), qPrintable(msg));
+  Config mid;
+  QVERIFY2(load(c1, mid, msg), qPrintable(msg));
+  QStringList expect = places0.mid(1);
+  QCOMPARE(zonePlaces(mid), expect);
+
+  // 2. Add a channel and a new zone holding it: the zone takes the free place 0, nothing moves.
+  QString added = c1;
+  QVERIFY(addChannelAndZone(added, "chw06", "W06 NEW", "NEW CHANNELS"));
+  APW::Plan plan2;
+  QVERIFY2(planYAML(*cp, holed, added, plan2, cur, msg), qPrintable(msg));
+  APW::Memory after = apply(holed, plan2);
+  QString c2;
+  QVERIFY2(readRadio(*cp, after, c2, msg), qPrintable(msg));
+  Config now;
+  QVERIFY2(load(c2, now, msg), qPrintable(msg));
+  QCOMPARE(zonePlaces(now), QStringList({"NEW CHANNELS@0"}) + expect);
+  QVERIFY2(byName(now, "W06 NEW"), "new channel not in the radio (slot not marked in use)");
+  QCOMPARE(zoneFingerprint(now, {"W06 NEW"}).mid(1), zoneFingerprint(mid));
+  QCOMPARE(digitalFingerprint(now), digitalFingerprint(before));
+  Q_UNUSED(removed);
+
+  // Idempotent.
+  APW::Plan again;
+  QVERIFY2(planYAML(*cp, after, added, again, cur, msg), qPrintable(msg));
+  QCOMPARE(again.size(), 0);
+}
+
+void AnytonePreserveTest::testAPRSOnlyChannelTakesNoSlot_data() { radios(); }
+void AnytonePreserveTest::testAPRSOnlyChannelTakesNoSlot() {
+  // W-06 case 3: when the radio's FM APRS frequency matches no channel, decoding creates an
+  // "APRS Channel" that has no slot and is in no zone. It used to take the radio's lowest free
+  // slot on every write, so a new channel pushed it into another free slot, written as a real
+  // channel, and the new channel's slot was never marked in use.
+  QFETCH(QString, radio);
+  std::unique_ptr<AnytoneCodeplug> cp(makeCodeplug(radio));
+  QFile tf(":/data/anytone_preserve_test.yaml"); tf.open(QIODevice::ReadOnly);
+  QString base = QString::fromUtf8(tf.readAll());
+  // An FM APRS system whose revert channel is in no zone (so the radio holds it only in its
+  // APRS settings).
+  int z = base.indexOf("\nzones:");
+  QVERIFY(z > 0);
+  base.insert(z+1, "  - fm:\n      id: aprsch\n      name: APRS TX\n      rxFrequency: 144.39 MHz\n"
+                   "      txFrequency: 144.39 MHz\n      bandwidth: Wide\n      power: Low\n");
+  int p = base.indexOf("\npositioning:");
+  QVERIFY(p > 0);
+  base.insert(p+14, "  - aprs:\n      id: fmaprs\n      name: APRS APAT81\n      period: 300\n"
+                    "      revert: aprsch\n      icon: Jogger\n      message: test\n"
+                    "      destination: APAT81-0\n      source: DM3MAT-7\n      path: [WIDE1-1, WIDE2-1]\n");
+  ErrorStack err; Config config;
+  QTemporaryDir tmp; QString fn = tmp.filePath("b.yaml");
+  { QFile f(fn); f.open(QIODevice::WriteOnly); f.write(base.toUtf8()); }
+  QVERIFY2(config.readYAML(fn, err), qPrintable(err.format()));
+  Config *in = cp->preprocess(&config, err);
+  QVERIFY2(in, qPrintable(err.format()));
+  Codeplug::Flags flags; flags.setUpdateCodeplug(false);
+  QVERIFY2(cp->encode(in, flags, err), qPrintable(err.format()));
+  delete in;
+  APW::Memory mem;
+  cp->image(0).sort();
+  for (int n=0; n<cp->image(0).numElements(); n++) {
+    unsigned addr = cp->image(0).element(n).address();
+    unsigned size = cp->image(0).element(n).data().size();
+    for (unsigned off=0; off<size; off+=APW::BlockSize)
+      mem[addr+off] = QByteArray(reinterpret_cast<const char *>(cp->data(addr)+off), APW::BlockSize);
+  }
+
+  QString msg, c0; APW::Plan plan0;
+  QVERIFY2(planYAML(*cp, mem, base, plan0, c0, msg), qPrintable(msg));
+  Config before;
+  QVERIFY2(load(c0, before, msg), qPrintable(msg));
+  int nBefore = before.channelList()->count();
+
+  // An unedited write changes nothing.
+  APW::Plan none; QString cur;
+  QVERIFY2(planYAML(*cp, mem, c0, none, cur, msg), qPrintable(msg));
+  QCOMPARE(none.size(), 0);
+
+  // Add a channel in a zone.
+  QString added = c0;
+  QVERIFY(addChannelAndZone(added, "chw06", "W06 NEW", "NEW CHANNELS"));
+  APW::Plan plan;
+  QVERIFY2(planYAML(*cp, mem, added, plan, cur, msg), qPrintable(msg));
+  APW::Memory after = apply(mem, plan);
+  QString c2;
+  QVERIFY2(readRadio(*cp, after, c2, msg), qPrintable(msg));
+  Config now;
+  QVERIFY2(load(c2, now, msg), qPrintable(msg));
+  QVERIFY2(byName(now, "W06 NEW"), "new channel not in the radio (slot not marked in use)");
+  QVERIFY(AnytoneCodeplug::channelSlot(byName(now, "W06 NEW")) >= 0);
+  // Exactly one channel more: no APRS channel written into a free slot.
+  QCOMPARE(now.channelList()->count(), nBefore+1);
+  for (int i=0; i<now.channelList()->count(); i++) {
+    Channel *ch = now.channelList()->channel(i);
+    if (ch->name() == "APRS TX")
+      QCOMPARE(AnytoneCodeplug::channelSlot(ch), -1);
+  }
+}
+
 void AnytonePreserveTest::testMemoryFileRoundTrip() {
   APW::Memory mem;
   mem[0x00000000] = QByteArray(16, char(0x01));

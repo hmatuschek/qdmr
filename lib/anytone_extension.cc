@@ -264,7 +264,7 @@ void AnytoneDMRChannelExtension::enableCRC(bool enable) {
  * Implementation of AnytoneZoneExtension
  * ********************************************************************************************* */
 AnytoneZoneExtension::AnytoneZoneExtension(QObject *parent)
-  : ConfigExtension(parent), _hidden(false)
+  : ConfigExtension(parent), _hidden(false), _memorySlot(-1)
 {
   // pass...
 }
@@ -288,6 +288,18 @@ AnytoneZoneExtension::enableHidden(bool enable) {
   if (_hidden == enable)
     return;
   _hidden = enable;
+  emit modified(this);
+}
+
+int
+AnytoneZoneExtension::memorySlot() const {
+  return _memorySlot;
+}
+void
+AnytoneZoneExtension::setMemorySlot(int slot) {
+  if (slot == _memorySlot)
+    return;
+  _memorySlot = slot;
   emit modified(this);
 }
 
