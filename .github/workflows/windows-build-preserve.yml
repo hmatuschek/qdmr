@@ -75,6 +75,8 @@ jobs:
           export PATH="$PWD/build/lib:$PATH"
           export QT_QPA_PLATFORM=offscreen
           cd build
+          # The AnyTone tests' own output, in the log (ctest shows nothing if the test dies early).
+          ./test/anytone_preserve_test.exe -o -,txt 2>&1 | tail -80 || true
           ctest --output-on-failure 2>&1 | tee ../ctest.txt
           grep -q "AnytonePreserve" ../ctest.txt
 
