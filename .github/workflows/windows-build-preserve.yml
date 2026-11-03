@@ -76,7 +76,8 @@ jobs:
           export QT_QPA_PLATFORM=offscreen
           cd build
           # The AnyTone tests' own output, in the log (ctest shows nothing if the test dies early).
-          ctest -V -R AnytonePreserve 2>&1 | grep -v '^PASS' | tail -120 || true
+          (cd test && ../anytone_preserve_test.exe -o ../aps.txt,txt) || true
+          grep -v '^PASS' aps.txt | tail -120 || true
           ctest --output-on-failure 2>&1 | tee ../ctest.txt
           grep -q "AnytonePreserve" ../ctest.txt
 
