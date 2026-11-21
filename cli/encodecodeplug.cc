@@ -48,8 +48,9 @@ bool encode(Config &config, Codeplug::Flags flags, QCommandLineParser &parser) {
   delete intermediate;
 
   codeplug.image(0).sort();
-  if (! codeplug.write(parser.positionalArguments().at(2), err)) {
-    logError() << "Cannot write output codeplug file '" << parser.positionalArguments().at(1)
+  const QString outputPath = parser.positionalArguments().at(2);
+  if (! codeplug.write(outputPath, err)) {
+    logError() << "Cannot write output codeplug file '" << outputPath
                << "': " << err.format();
     return false;
   }
